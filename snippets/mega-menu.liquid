@@ -1,0 +1,124 @@
+{% comment %}
+===========================================
+MEGA-MENU.LIQUID - Full Width Mega Menu
+===========================================
+{% endcomment %}
+
+{% comment %} Find the mega menu block for this menu {% endcomment %}
+{% assign mega_menu_block = null %}
+{% for block in section.blocks %}
+  {% if block.type == 'mega_menu' and block.settings.menu_item_title == link.title %}
+    {% assign mega_menu_block = block %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% if mega_menu_block and link.links.size > 0 %}
+<div class="mega-menu">
+  <div class="mega-menu-container">
+    
+    {% comment %} Optional: Remove debug info in production {% endcomment %}
+    {% if section.settings.show_debug_info %}
+    <div class="debug-info">
+      <strong>🔍 MEGA MENU DEBUG:</strong><br>
+      Menu: "{{ link.title }}" | Sub-items: {{ link.links.size }} | Block: ✅ Found<br>
+      Columns: {{ mega_menu_block.settings.columns | default: 3 }} | Promo: {% if mega_menu_block.settings.promo_image %}✅{% else %}❌{% endif %}
+    </div>
+    {% endif %}
+    
+    <div class="mega-menu-grid">
+      <!-- Left Side: Menu Content Grid -->
+      <div class="mega-menu-content-grid" style="grid-template-columns: repeat({{ mega_menu_block.settings.columns | default: 3 }}, 1fr);">
+        {% for child_link in link.links %}
+          <div class="mega-menu-column">
+            <h3>{{ child_link.title }}</h3>
+            
+            {% if child_link.links.size > 0 %}
+              <ul>
+                {% for grandchild_link in child_link.links %}
+                  <li>
+                    <a href="{{ grandchild_link.url }}">
+                      {{ grandchild_link.title }}
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <a href="{{ child_link.url }}" style="color: #666; font-size: 13px; font-style: italic;">
+                View {{ child_link.title }} →
+              </a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+      
+      <!-- Right Side: Promotional Content -->
+      <div class="mega-menu-promo">
+        {% if mega_menu_block.settings.promo_image %}
+          <img src="{{ mega_menu_block.settings.promo_image | image_url: width: 300 }}" 
+               alt="{{ mega_menu_block.settings.promo_title | default: 'Featured' }}">
+        {% endif %}
+        
+        <h4>{{ mega_menu_block.settings.promo_title | default: 'Featured Equipment' }}</h4>
+        <p>{{ mega_menu_block.settings.promo_text | default: 'Discover our latest commercial equipment and get the best deals.' }}</p>
+        
+        {% if mega_menu_block.settings.promo_url %}
+          <a href="{{ mega_menu_block.settings.promo_url }}">
+            {{ mega_menu_block.settings.promo_button_text | default: 'Shop Now' }}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% elsif link.links.size > 0 %}
+  {% comment %} Fallback for menus without mega menu blocks - Simple dropdown {% endcomment %}
+  <div class="mega-menu">
+    <div class="mega-menu-container">
+      <div class="simple-dropdown">
+        <ul>
+          {% for child_link in link.links %}
+            <li>
+              <a href="{{ child_link.url }}">
+                {{ child_link.title }}
+                {% if child_link.links.size > 0 %}
+                  <svg style="float: right; margin-top: 2px;" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                  </svg>
+                {% endif %}
+              </a>
+              
+              {% if child_link.links.size > 0 %}
+                <div class="sub-dropdown">
+                  <ul>
+                    {% for grandchild_link in child_link.links %}
+                      <li>
+                        <a href="{{ grandchild_link.url }}">
+                          {{ grandchild_link.title }}
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+{% else %}
+  {% comment %} No sub-menu items found {% endcomment %}
+  {% if section.settings.show_debug_info %}
+  <div class="mega-menu">
+    <div class="mega-menu-container">
+      <div class="debug-error">
+        <strong>❌ NO SUB-MENU ITEMS</strong><br>
+        The menu item "{{ link.title }}" has no sub-items configured in Shopify Admin > Navigation.
+      </div>
+    </div>
+  </div>
+  {% endif %}
+{% endif %}

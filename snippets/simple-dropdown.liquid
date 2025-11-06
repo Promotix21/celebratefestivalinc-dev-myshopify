@@ -1,0 +1,51 @@
+{% comment %}
+===========================================
+SIMPLE-DROPDOWN.LIQUID - Simple Dropdown Menu Snippet
+===========================================
+{% endcomment %}
+
+{% if link.links.size > 0 %}
+<div class="simple-dropdown">
+  <ul>
+    {% for child_link in link.links %}
+      <li>
+        <a href="{{ child_link.url }}">
+          {{ child_link.title }}
+          {% if child_link.links.size > 0 %}
+            <svg style="float: right; margin-top: 2px;" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+            </svg>
+          {% endif %}
+        </a>
+        
+        {% comment %} Sub-submenu if needed {% endcomment %}
+        {% if child_link.links.size > 0 %}
+          <div class="sub-dropdown" style="position: absolute; left: 100%; top: 0; background: var(--mega-menu-bg); box-shadow: var(--mega-menu-shadow); border-radius: 6px; min-width: 200px; opacity: 0; visibility: hidden; transform: translateX(-10px); transition: all 0.3s ease; z-index: 1000;">
+            <ul style="list-style: none; margin: 0; padding: 10px 0;">
+              {% for grandchild_link in child_link.links %}
+                <li>
+                  <a href="{{ grandchild_link.url }}" style="display: block; padding: 10px 20px; color: var(--header-text); text-decoration: none; font-size: 13px; transition: all 0.3s ease;">
+                    {{ grandchild_link.title }}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+          
+          <style>
+            .simple-dropdown li:hover .sub-dropdown {
+              opacity: 1;
+              visibility: visible;
+              transform: translateX(0);
+            }
+            .sub-dropdown li a:hover {
+              background: var(--menu-hover-bg);
+              color: var(--menu-hover-text);
+            }
+          </style>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
