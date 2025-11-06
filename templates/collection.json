@@ -1,0 +1,17 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-collection",
+      "settings": {
+        "products_per_page": 12,
+        "products_per_row_desktop": 3,
+        "enable_filtering": true,
+        "filter_type": "vertical",
+        "enable_sorting": true,
+        "show_vendor": true,
+        "show_breadcrumbs": true
+      }
+    }
+  },
+  "order": ["main"]
+}
