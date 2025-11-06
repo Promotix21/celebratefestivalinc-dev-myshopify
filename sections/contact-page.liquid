@@ -1,0 +1,1668 @@
+{% comment %}
+  Contact Us Page Template - contact.liquid
+  Place this file in: themes/your-theme-name/templates/page.contact.liquid
+{% endcomment %}
+
+{% comment %} Page Settings - Replace with actual values {% endcomment %}
+{% assign contact_phone = settings.contact_phone | default: "(408) 673-9999" %}
+{% assign contact_email = settings.contact_email | default: "sales@celebratefestivalinc.com" %}
+{% assign contact_address = settings.contact_address | default: "235 Whitney Pl, Fremont, CA 94539" %}
+{% assign business_hours = settings.business_hours | default: "Mon-Fri: 9AM-6PM PST" %}
+
+{% comment %} JSON-LD Schema Markup {% endcomment %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "{{ shop.name }}",
+  "image": "{{ shop.logo | img_url: 'master' }}",
+  "@id": "{{ shop.url }}",
+  "url": "{{ shop.url }}",
+  "telephone": "+14086739999",
+  "email": "{{ contact_email }}",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "235 Whitney Pl",
+    "addressLocality": "Fremont",
+    "addressRegion": "CA",
+    "postalCode": "94539",
+    "addressCountry": "US"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 37.5485,
+    "longitude": -121.9886
+  },
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "opens": "09:00",
+      "closes": "18:00"
+    }
+  ],
+  "priceRange": "$$",
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.8",
+    "reviewCount": "5000"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  "name": "Contact Us - {{ shop.name }}",
+  "description": "Contact {{ shop.name }} for restaurant equipment quotes, expert consultations, and customer support.",
+  "url": "{{ canonical_url }}"
+}
+</script>
+
+{% comment %} Google reCAPTCHA v3 - Replace YOUR_SITE_KEY with actual key {% endcomment %}
+<script src="https://www.google.com/recaptcha/api.js?render={{ settings.recaptcha_site_key }}"></script>
+
+<style>
+/* Contact Page Styles */
+:root {
+    --popup-primary-navy: #1a365d;
+    --popup-primary-coral: #ff6b6b;
+    --popup-secondary-coral: #e85a4f;
+    --popup-neutral-white: #ffffff;
+    --popup-neutral-light: #f7fafc;
+    --popup-neutral-gray: #e2e8f0;
+    --popup-neutral-dark: #2d3748;
+    --popup-text-light: #718096;
+    --popup-success-green: #38a169;
+    --popup-error-red: #dc3545;
+    --popup-warning-yellow: #ffc107;
+    --gradient-navy: linear-gradient(135deg, #1a365d 0%, #2d5a87 100%);
+    --gradient-coral: linear-gradient(135deg, #ff6b6b, #e85a4f);
+    --border-radius: 8px;
+    --border-radius-large: 16px;
+    --transition-smooth: all 0.3s ease;
+    --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.08);
+    --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.12);
+    --shadow-heavy: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.contact-page-wrapper {
+    width: 100%;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Hero Section */
+.hero-contact-section {
+    background: var(--gradient-navy);
+    color: var(--popup-neutral-white);
+    padding: 60px 0;
+}
+
+.hero-content {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--popup-warning-yellow);
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.95;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+    color: var(--popup-neutral-white);
+}
+
+.contact-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.contact-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: var(--border-radius-large);
+    padding: 30px 20px;
+    text-align: center;
+    transition: var(--transition-smooth);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.contact-card:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-5px);
+}
+
+.contact-card-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--gradient-coral);
+    color: var(--popup-neutral-white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin: 0 auto 20px;
+}
+
+.contact-card-icon svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
+
+.contact-card-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    opacity: 0.9;
+    color: var(--popup-neutral-white);
+}
+
+.contact-card-info {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--popup-neutral-white);
+}
+
+/* Main Content */
+.main-content {
+    padding: 60px 0;
+    background: var(--popup-neutral-light);
+}
+
+.content-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 50px;
+    align-items: start;
+}
+
+/* Alerts */
+.alert {
+    padding: 12px 20px;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.alert-success {
+    background: rgba(56, 161, 105, 0.1);
+    color: var(--popup-success-green);
+    border: 1px solid var(--popup-success-green);
+}
+
+.alert-error {
+    background: rgba(220, 53, 69, 0.1);
+    color: var(--popup-error-red);
+    border: 1px solid var(--popup-error-red);
+}
+
+/* Form Section */
+.form-section {
+    background: var(--popup-neutral-white);
+    border-radius: var(--border-radius-large);
+    box-shadow: var(--shadow-medium);
+    overflow: hidden;
+}
+
+/* Form Selector Dropdown */
+.form-selector-wrapper {
+    padding: 25px 30px;
+    background: var(--popup-neutral-gray);
+    border-bottom: 2px solid var(--popup-primary-coral);
+}
+
+.form-selector-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--popup-primary-navy);
+    margin-bottom: 10px;
+}
+
+.form-selector {
+    width: 100%;
+    padding: 14px 40px 14px 16px;
+    border: 2px solid var(--popup-neutral-white);
+    border-radius: var(--border-radius);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--popup-primary-navy);
+    background: var(--popup-neutral-white);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%231a365d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+}
+
+.form-selector:hover {
+    border-color: var(--popup-primary-coral);
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.15);
+}
+
+.form-selector:focus {
+    outline: none;
+    border-color: var(--popup-primary-coral);
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15);
+}
+
+.tab-content {
+    padding: 30px;
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.form-header {
+    margin-bottom: 25px;
+}
+
+.form-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--popup-primary-navy);
+    margin-bottom: 8px;
+}
+
+.form-description {
+    color: var(--popup-text-light);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Form Elements */
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--popup-neutral-dark);
+    margin-bottom: 6px;
+}
+
+.required {
+    color: var(--popup-error-red);
+    margin-left: 2px;
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+    padding: 12px 16px;
+    border: 2px solid var(--popup-neutral-gray);
+    border-radius: var(--border-radius);
+    font-size: 15px;
+    color: var(--popup-neutral-dark);
+    transition: var(--transition-smooth);
+    font-family: inherit;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+    outline: none;
+    border-color: var(--popup-primary-coral);
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+}
+
+.form-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.form-select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232d3748' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+    padding-right: 40px;
+}
+
+/* Submit Button */
+.submit-btn {
+    background: var(--gradient-coral);
+    color: var(--popup-neutral-white);
+    border: none;
+    padding: 14px 32px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    box-shadow: var(--shadow-light);
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Sidebar */
+.sidebar-section {
+    background: var(--popup-neutral-white);
+    border-radius: var(--border-radius-large);
+    padding: 30px;
+    box-shadow: var(--shadow-medium);
+    position: sticky;
+    top: 20px;
+}
+
+.sidebar-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--popup-primary-navy);
+    margin-bottom: 20px;
+}
+
+.business-hours-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.hours-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--popup-neutral-gray);
+}
+
+.hours-item:last-child {
+    border-bottom: none;
+}
+
+.hours-day {
+    font-weight: 600;
+    color: var(--popup-primary-navy);
+}
+
+.hours-time {
+    color: var(--popup-text-light);
+}
+
+/* Trust Indicators */
+.trust-section {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 2px solid var(--popup-neutral-gray);
+}
+
+.trust-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.trust-item {
+    text-align: center;
+    padding: 20px;
+    background: var(--popup-neutral-light);
+    border-radius: var(--border-radius);
+}
+
+.trust-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--popup-primary-coral);
+    margin-bottom: 5px;
+}
+
+.trust-label {
+    font-size: 13px;
+    color: var(--popup-text-light);
+}
+
+/* Service Features */
+.service-features {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    background: var(--popup-neutral-light);
+    border-radius: var(--border-radius);
+    border-left: 3px solid var(--popup-primary-coral);
+}
+
+.feature-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--gradient-coral);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--popup-neutral-white);
+    flex-shrink: 0;
+}
+
+.feature-content {
+    flex: 1;
+}
+
+.feature-title {
+    font-weight: 600;
+    color: var(--popup-primary-navy);
+    margin-bottom: 2px;
+    font-size: 14px;
+}
+
+.feature-description {
+    font-size: 13px;
+    color: var(--popup-text-light);
+}
+
+/* Why Choose Us Section */
+.why-choose-section {
+    padding: 60px 0;
+    background: var(--popup-neutral-white);
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--popup-primary-navy);
+    margin-bottom: 15px;
+}
+
+.section-subtitle {
+    font-size: 1.1rem;
+    color: var(--popup-text-light);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+}
+
+.feature-card {
+    text-align: center;
+    padding: 30px;
+    background: var(--popup-neutral-light);
+    border-radius: var(--border-radius-large);
+    transition: var(--transition-smooth);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-medium);
+}
+
+.feature-card-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--gradient-coral);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: var(--popup-neutral-white);
+    font-size: 36px;
+}
+
+.feature-card-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--popup-primary-navy);
+    margin-bottom: 12px;
+}
+
+.feature-card-description {
+    color: var(--popup-text-light);
+    line-height: 1.6;
+}
+
+/* Service Areas */
+.service-areas-section {
+    padding: 60px 0;
+    background: var(--gradient-navy);
+    color: var(--popup-neutral-white);
+}
+
+.service-areas-section .section-title {
+    color: var(--popup-warning-yellow);
+}
+
+.service-areas-section .section-subtitle {
+    color: var(--popup-neutral-white);
+    opacity: 0.9;
+}
+
+.service-areas-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.service-area-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    padding: 25px;
+    border-radius: var(--border-radius-large);
+    text-align: center;
+    transition: var(--transition-smooth);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.service-area-card:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-3px);
+}
+
+.service-area-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--popup-neutral-white);
+}
+
+/* FAQ Section */
+.faq-section {
+    padding: 60px 0;
+    background: var(--popup-neutral-light);
+}
+
+.faq-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.faq-item {
+    background: var(--popup-neutral-white);
+    border-radius: var(--border-radius-large);
+    margin-bottom: 15px;
+    overflow: hidden;
+    box-shadow: var(--shadow-light);
+    transition: var(--transition-smooth);
+    cursor: pointer;
+}
+
+.faq-item:hover {
+    box-shadow: var(--shadow-medium);
+}
+
+.faq-question {
+    padding: 20px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    color: var(--popup-primary-navy);
+    user-select: none;
+}
+
+.faq-toggle {
+    width: 30px;
+    height: 30px;
+    background: var(--popup-primary-coral);
+    color: var(--popup-neutral-white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    transition: var(--transition-smooth);
+}
+
+.faq-item.open .faq-toggle {
+    transform: rotate(45deg);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0 25px;
+    color: var(--popup-text-light);
+    line-height: 1.6;
+}
+
+.faq-item.open .faq-answer {
+    max-height: 500px;
+    padding: 0 25px 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .contact-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .service-areas-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .content-layout {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .sidebar-section {
+        position: static;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .contact-cards-grid,
+    .features-grid,
+    .service-areas-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .trust-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 1.75rem;
+    }
+    
+    .form-section,
+    .sidebar-section {
+        padding: 20px;
+    }
+    
+    .tab-content {
+        padding: 20px;
+    }
+    
+    .form-selector-wrapper {
+        padding: 20px;
+    }
+}
+</style>
+
+<div class="contact-page-wrapper">
+    {% comment %} Hero Section {% endcomment %}
+    <section class="hero-contact-section">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Get in Touch</h1>
+                <p class="hero-subtitle">We're here to help with expert advice, custom quotes, and support for all your restaurant equipment needs.</p>
+            </div>
+            
+            {% comment %} Quick Contact Cards {% endcomment %}
+            <div class="contact-cards-grid">
+                <div class="contact-card">
+                    <div class="contact-card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                        </svg>
+                    </div>
+                    <div class="contact-card-title">Call Us</div>
+                    <div class="contact-card-info">{{ contact_phone }}</div>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="contact-card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                            <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                    </div>
+                    <div class="contact-card-title">Email Us</div>
+                    <div class="contact-card-info">{{ contact_email }}</div>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="contact-card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                    </div>
+                    <div class="contact-card-title">Visit Us</div>
+                    <div class="contact-card-info">{{ contact_address }}</div>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="contact-card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                    </div>
+                    <div class="contact-card-title">Business Hours</div>
+                    <div class="contact-card-info">{{ business_hours }}</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% comment %} Main Content - Forms and Sidebar {% endcomment %}
+    <section class="main-content">
+        <div class="container">
+            <div class="content-layout">
+                {% comment %} Forms Section {% endcomment %}
+                <div>
+                    {% if form.posted_successfully? %}
+                        <div class="alert alert-success">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                            <span>Thank you! Your message has been sent successfully. We'll respond within 24 hours.</span>
+                        </div>
+                    {% elsif form.errors %}
+                        <div class="alert alert-error">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                            <span>{{ form.errors | default_errors }}</span>
+                        </div>
+                    {% endif %}
+
+                    <div class="form-section">
+                        {% comment %} Form Type Selector {% endcomment %}
+                        <div class="form-selector-wrapper">
+                            <label for="formSelector" class="form-selector-label">Select Form Type:</label>
+                            <select id="formSelector" class="form-selector" onchange="switchFormType(this.value)">
+                                <option value="general">General Inquiry</option>
+                                <option value="quote">Request a Quote</option>
+                                <option value="support">Technical Support</option>
+                                <option value="wholesale">Wholesale Partnership</option>
+                            </select>
+                        </div>
+
+                        {% comment %} General Inquiry Form {% endcomment %}
+                        <div id="general" class="tab-content active">
+                            <div class="form-header">
+                                <h2 class="form-title">General Inquiry</h2>
+                                <p class="form-description">Have a question? We're here to help with any inquiries about our products or services.</p>
+                            </div>
+                            
+                            {% form 'contact', class: 'contact-form' %}
+                                <input type="hidden" name="contact[inquiry_type]" value="General Inquiry">
+                                <input type="hidden" id="g-recaptcha-response-general" name="g-recaptcha-response">
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="general-name" class="form-label">Full Name <span class="required">*</span></label>
+                                        <input type="text" id="general-name" name="contact[name]" class="form-input" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="general-email" class="form-label">Email <span class="required">*</span></label>
+                                        <input type="email" id="general-email" name="contact[email]" class="form-input" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="general-phone" class="form-label">Phone Number</label>
+                                        <input type="tel" id="general-phone" name="contact[phone]" class="form-input">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="general-company" class="form-label">Restaurant/Business Name</label>
+                                        <input type="text" id="general-company" name="contact[company]" class="form-input">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="general-subject" class="form-label">Subject <span class="required">*</span></label>
+                                    <input type="text" id="general-subject" name="contact[subject]" class="form-input" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="general-message" class="form-label">Message <span class="required">*</span></label>
+                                    <textarea id="general-message" name="contact[body]" class="form-textarea" required></textarea>
+                                </div>
+                                
+                                <button type="submit" class="submit-btn" data-form="general">Send Message</button>
+                            {% endform %}
+                        </div>
+
+                        {% comment %} Quote Request Form {% endcomment %}
+                        <div id="quote" class="tab-content">
+                            <div class="form-header">
+                                <h2 class="form-title">Request a Quote</h2>
+                                <p class="form-description">Get competitive pricing on restaurant equipment. Our team will respond with a detailed quote within 24 hours.</p>
+                            </div>
+                            
+                            {% form 'contact', class: 'contact-form' %}
+                                <input type="hidden" name="contact[inquiry_type]" value="Quote Request">
+                                <input type="hidden" id="g-recaptcha-response-quote" name="g-recaptcha-response">
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="quote-name" class="form-label">Full Name <span class="required">*</span></label>
+                                        <input type="text" id="quote-name" name="contact[name]" class="form-input" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="quote-email" class="form-label">Email <span class="required">*</span></label>
+                                        <input type="email" id="quote-email" name="contact[email]" class="form-input" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="quote-phone" class="form-label">Phone Number <span class="required">*</span></label>
+                                        <input type="tel" id="quote-phone" name="contact[phone]" class="form-input" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="quote-company" class="form-label">Restaurant/Business Name <span class="required">*</span></label>
+                                        <input type="text" id="quote-company" name="contact[company]" class="form-input" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="quote-equipment" class="form-label">Equipment Category <span class="required">*</span></label>
+                                    <select id="quote-equipment" name="contact[equipment_category]" class="form-select" required>
+                                        <option value="">Select a category</option>
+                                        <option value="cooking">Cooking Equipment</option>
+                                        <option value="refrigeration">Refrigeration</option>
+                                        <option value="prep">Food Prep Equipment</option>
+                                        <option value="storage">Storage & Shelving</option>
+                                        <option value="smallwares">Smallwares & Utensils</option>
+                                        <option value="beverage">Beverage Equipment</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="quote-details" class="form-label">Equipment Details & Quantity <span class="required">*</span></label>
+                                    <textarea id="quote-details" name="contact[body]" class="form-textarea" placeholder="Please describe the equipment you need, quantities, specifications, and any special requirements..." required></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="quote-timeline" class="form-label">Project Timeline</label>
+                                    <select id="quote-timeline" name="contact[timeline]" class="form-select">
+                                        <option value="">Select timeline</option>
+                                        <option value="urgent">Urgent (Within 1 week)</option>
+                                        <option value="1-2weeks">1-2 weeks</option>
+                                        <option value="1month">Within 1 month</option>
+                                        <option value="2-3months">2-3 months</option>
+                                        <option value="flexible">Flexible</option>
+                                    </select>
+                                </div>
+                                
+                                <button type="submit" class="submit-btn" data-form="quote">Request Quote</button>
+                            {% endform %}
+                        </div>
+
+                        {% comment %} Technical Support Form {% endcomment %}
+                        <div id="support" class="tab-content">
+                            <div class="form-header">
+                                <h2 class="form-title">Technical Support</h2>
+                                <p class="form-description">Need help with equipment installation, troubleshooting, or maintenance? Our technical team is ready to assist.</p>
+                            </div>
+                            
+                            {% form 'contact', class: 'contact-form' %}
+                                <input type="hidden" name="contact[inquiry_type]" value="Technical Support">
+                                <input type="hidden" id="g-recaptcha-response-support" name="g-recaptcha-response">
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="support-name" class="form-label">Full Name <span class="required">*</span></label>
+                                        <input type="text" id="support-name" name="contact[name]" class="form-input" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="support-email" class="form-label">Email <span class="required">*</span></label>
+                                        <input type="email" id="support-email" name="contact[email]" class="form-input" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="support-phone" class="form-label">Phone Number <span class="required">*</span></label>
+                                        <input type="tel" id="support-phone" name="contact[phone]" class="form-input" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="support-order" class="form-label">Order Number</label>
+                                        <input type="text" id="support-order" name="contact[order_number]" class="form-input">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="support-type" class="form-label">Support Type <span class="required">*</span></label>
+                                    <select id="support-type" name="contact[support_type]" class="form-select" required>
+                                        <option value="">Select support type</option>
+                                        <option value="installation">Installation Help</option>
+                                        <option value="troubleshooting">Equipment Troubleshooting</option>
+                                        <option value="maintenance">Maintenance Inquiry</option>
+                                        <option value="parts">Replacement Parts</option>
+                                        <option value="warranty">Warranty Claim</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="support-equipment" class="form-label">Equipment Model/Name <span class="required">*</span></label>
+                                    <input type="text" id="support-equipment" name="contact[equipment]" class="form-input" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="support-issue" class="form-label">Issue Description <span class="required">*</span></label>
+                                    <textarea id="support-issue" name="contact[body]" class="form-textarea" placeholder="Please describe the issue you're experiencing in detail..." required></textarea>
+                                </div>
+                                
+                                <button type="submit" class="submit-btn" data-form="support">Submit Support Request</button>
+                            {% endform %}
+                        </div>
+
+                        {% comment %} Wholesale Partnership Form {% endcomment %}
+                        <div id="wholesale" class="tab-content">
+                            <div class="form-header">
+                                <h2 class="form-title">Wholesale Partnership</h2>
+                                <p class="form-description">Interested in becoming a wholesale partner? Let's discuss volume pricing and partnership opportunities.</p>
+                            </div>
+                            
+                            {% form 'contact', class: 'contact-form' %}
+                                <input type="hidden" name="contact[inquiry_type]" value="Wholesale Partnership">
+                                <input type="hidden" id="g-recaptcha-response-wholesale" name="g-recaptcha-response">
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="wholesale-name" class="form-label">Full Name <span class="required">*</span></label>
+                                        <input type="text" id="wholesale-name" name="contact[name]" class="form-input" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="wholesale-email" class="form-label">Business Email <span class="required">*</span></label>
+                                        <input type="email" id="wholesale-email" name="contact[email]" class="form-input" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="wholesale-phone" class="form-label">Phone Number <span class="required">*</span></label>
+                                        <input type="tel" id="wholesale-phone" name="contact[phone]" class="form-input" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="wholesale-company" class="form-label">Company Name <span class="required">*</span></label>
+                                        <input type="text" id="wholesale-company" name="contact[company]" class="form-input" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="wholesale-type" class="form-label">Business Type <span class="required">*</span></label>
+                                    <select id="wholesale-type" name="contact[business_type]" class="form-select" required>
+                                        <option value="">Select business type</option>
+                                        <option value="restaurant-chain">Restaurant Chain</option>
+                                        <option value="distributor">Equipment Distributor</option>
+                                        <option value="contractor">Restaurant Contractor</option>
+                                        <option value="consultant">Restaurant Consultant</option>
+                                        <option value="franchise">Franchise Owner</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="wholesale-volume" class="form-label">Expected Monthly Purchase Volume</label>
+                                        <select id="wholesale-volume" name="contact[purchase_volume]" class="form-select">
+                                            <option value="">Select volume range</option>
+                                            <option value="5k-10k">$5,000 - $10,000</option>
+                                            <option value="10k-25k">$10,000 - $25,000</option>
+                                            <option value="25k-50k">$25,000 - $50,000</option>
+                                            <option value="50k-100k">$50,000 - $100,000</option>
+                                            <option value="100k+">$100,000+</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="wholesale-locations" class="form-label">Number of Locations</label>
+                                        <input type="number" id="wholesale-locations" name="contact[locations]" class="form-input" min="1">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="wholesale-message" class="form-label">Additional Information <span class="required">*</span></label>
+                                    <textarea id="wholesale-message" name="contact[body]" class="form-textarea" placeholder="Tell us about your business, specific equipment needs, and how we can work together..." required></textarea>
+                                </div>
+                                
+                                <button type="submit" class="submit-btn" data-form="wholesale">Submit Partnership Request</button>
+                            {% endform %}
+                        </div>
+                    </div>
+                </div>
+
+                {% comment %} Sidebar {% endcomment %}
+                <aside>
+                    <div class="sidebar-section">
+                        <h3 class="sidebar-title">Business Hours</h3>
+                        <ul class="business-hours-list">
+                            <li class="hours-item">
+                                <span class="hours-day">Monday</span>
+                                <span class="hours-time">{{ settings.monday_hours | default: "9:00 AM - 6:00 PM" }}</span>
+                            </li>
+                            <li class="hours-item">
+                                <span class="hours-day">Tuesday</span>
+                                <span class="hours-time">{{ settings.tuesday_hours | default: "9:00 AM - 6:00 PM" }}</span>
+                            </li>
+                            <li class="hours-item">
+                                <span class="hours-day">Wednesday</span>
+                                <span class="hours-time">{{ settings.wednesday_hours | default: "9:00 AM - 6:00 PM" }}</span>
+                            </li>
+                            <li class="hours-item">
+                                <span class="hours-day">Thursday</span>
+                                <span class="hours-time">{{ settings.thursday_hours | default: "9:00 AM - 6:00 PM" }}</span>
+                            </li>
+                            <li class="hours-item">
+                                <span class="hours-day">Friday</span>
+                                <span class="hours-time">{{ settings.friday_hours | default: "9:00 AM - 6:00 PM" }}</span>
+                            </li>
+                            <li class="hours-item">
+                                <span class="hours-day">Saturday</span>
+                                <span class="hours-time">{{ settings.saturday_hours | default: "Closed" }}</span>
+                            </li>
+                            <li class="hours-item">
+                                <span class="hours-day">Sunday</span>
+                                <span class="hours-time">{{ settings.sunday_hours | default: "Closed" }}</span>
+                            </li>
+                        </ul>
+
+                        {% comment %} Trust Indicators {% endcomment %}
+                        <div class="trust-section">
+                            <div class="trust-grid">
+                                {% for block in section.blocks %}
+                                    {% if block.type == 'trust_indicator' %}
+                                        <div class="trust-item">
+                                            <div class="trust-number">{{ block.settings.number }}</div>
+                                            <div class="trust-label">{{ block.settings.label }}</div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% comment %} Default trust indicators if no blocks {% endcomment %}
+                                {% if section.blocks.size == 0 %}
+                                    <div class="trust-item">
+                                        <div class="trust-number">15+</div>
+                                        <div class="trust-label">Years Experience</div>
+                                    </div>
+                                    <div class="trust-item">
+                                        <div class="trust-number">5000+</div>
+                                        <div class="trust-label">Happy Customers</div>
+                                    </div>
+                                    <div class="trust-item">
+                                        <div class="trust-number">24/7</div>
+                                        <div class="trust-label">Support Available</div>
+                                    </div>
+                                    <div class="trust-item">
+                                        <div class="trust-number">4.8★</div>
+                                        <div class="trust-label">Customer Rating</div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% comment %} Service Features {% endcomment %}
+                        <div class="service-features">
+                            {% for block in section.blocks %}
+                                {% if block.type == 'service_feature' %}
+                                    <div class="feature-item">
+                                        <div class="feature-icon">✓</div>
+                                        <div class="feature-content">
+                                            <div class="feature-title">{{ block.settings.title }}</div>
+                                            <div class="feature-description">{{ block.settings.description }}</div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% comment %} Default features if no blocks {% endcomment %}
+                            {% if section.blocks.size == 0 %}
+                                <div class="feature-item">
+                                    <div class="feature-icon">✓</div>
+                                    <div class="feature-content">
+                                        <div class="feature-title">Free Shipping</div>
+                                        <div class="feature-description">On orders over $2,500</div>
+                                    </div>
+                                </div>
+                                <div class="feature-item">
+                                    <div class="feature-icon">✓</div>
+                                    <div class="feature-content">
+                                        <div class="feature-title">Expert Installation</div>
+                                        <div class="feature-description">Available nationwide</div>
+                                    </div>
+                                </div>
+                                <div class="feature-item">
+                                    <div class="feature-icon">✓</div>
+                                    <div class="feature-content">
+                                        <div class="feature-title">Warranty Support</div>
+                                        <div class="feature-description">Comprehensive coverage</div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    {% comment %} Why Choose Us Section {% endcomment %}
+    <section class="why-choose-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">{{ settings.why_choose_title | default: "Why Choose Us" }}</h2>
+                <p class="section-subtitle">Your trusted partner for quality restaurant equipment and exceptional service</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-card-icon">⚡</div>
+                    <h3 class="feature-card-title">Fast Response Time</h3>
+                    <p class="feature-card-description">Get quotes within 24 hours and experience industry-leading customer service with quick turnaround times.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-card-icon">💰</div>
+                    <h3 class="feature-card-title">Competitive Pricing</h3>
+                    <p class="feature-card-description">Best prices on top-quality equipment with flexible payment options and volume discounts for large orders.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-card-icon">🛠️</div>
+                    <h3 class="feature-card-title">Expert Support</h3>
+                    <p class="feature-card-description">Our knowledgeable team provides technical guidance, installation support, and ongoing maintenance assistance.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-card-icon">📦</div>
+                    <h3 class="feature-card-title">Wide Selection</h3>
+                    <p class="feature-card-description">Comprehensive inventory of restaurant equipment from leading brands, all in one convenient location.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-card-icon">✅</div>
+                    <h3 class="feature-card-title">Quality Guaranteed</h3>
+                    <p class="feature-card-description">All equipment is thoroughly inspected and comes with manufacturer warranties for your peace of mind.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-card-icon">🚚</div>
+                    <h3 class="feature-card-title">Nationwide Delivery</h3>
+                    <p class="feature-card-description">Fast, reliable shipping to any location with white-glove delivery and installation services available.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% comment %} Service Areas Section {% endcomment %}
+    <section class="service-areas-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">{{ settings.service_areas_title | default: "Service Areas" }}</h2>
+                <p class="section-subtitle">{{ settings.service_areas_description | default: "We serve restaurants nationwide with local support in key markets:" }}</p>
+            </div>
+            
+            <div class="service-areas-grid">
+                {% for block in section.blocks %}
+                    {% if block.type == 'service_location' %}
+                        <div class="service-area-card">
+                            <div class="service-area-name">{{ block.settings.area }}</div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                
+                {% comment %} Default service areas if no blocks {% endcomment %}
+                {% if section.blocks.size == 0 %}
+                    <div class="service-area-card">
+                        <div class="service-area-name">California (Bay Area & Los Angeles)</div>
+                    </div>
+                    <div class="service-area-card">
+                        <div class="service-area-name">Texas (Houston, Dallas, Austin)</div>
+                    </div>
+                    <div class="service-area-card">
+                        <div class="service-area-name">New York & New Jersey</div>
+                    </div>
+                    <div class="service-area-card">
+                        <div class="service-area-name">Florida (Miami, Orlando, Tampa)</div>
+                    </div>
+                    <div class="service-area-card">
+                        <div class="service-area-name">Illinois (Chicago Metro)</div>
+                    </div>
+                    <div class="service-area-card">
+                        <div class="service-area-name">And More Nationwide...</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    {% comment %} FAQ Section {% endcomment %}
+    <section class="faq-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">{{ settings.faq_title | default: "Frequently Asked Questions" }}</h2>
+                <p class="section-subtitle">{{ settings.faq_description | default: "Quick answers to common questions about our equipment and services" }}</p>
+            </div>
+            
+            <div class="faq-container">
+                {% for block in section.blocks %}
+                    {% if block.type == 'faq_item' %}
+                        <div class="faq-item" onclick="toggleFaq(this)">
+                            <div class="faq-question">
+                                <span>{{ block.settings.question }}</span>
+                                <div class="faq-toggle">+</div>
+                            </div>
+                            <div class="faq-answer">
+                                {{ block.settings.answer }}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                
+                {% comment %} Default FAQ items if no blocks {% endcomment %}
+                {% if section.blocks.size == 0 %}
+                    <div class="faq-item" onclick="toggleFaq(this)">
+                        <div class="faq-question">
+                            <span>What are your shipping options and costs?</span>
+                            <div class="faq-toggle">+</div>
+                        </div>
+                        <div class="faq-answer">
+                            We offer free standard shipping on orders over $2,500. For smaller orders, shipping costs are calculated at checkout based on weight and destination. Expedited shipping and white-glove delivery services are available for an additional fee.
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item" onclick="toggleFaq(this)">
+                        <div class="faq-question">
+                            <span>Do you offer installation services?</span>
+                            <div class="faq-toggle">+</div>
+                        </div>
+                        <div class="faq-answer">
+                            Yes, we provide professional installation services for most equipment through our network of certified technicians nationwide. Contact us for a quote on installation for your specific equipment and location.
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item" onclick="toggleFaq(this)">
+                        <div class="faq-question">
+                            <span>What warranty coverage do you provide?</span>
+                            <div class="faq-toggle">+</div>
+                        </div>
+                        <div class="faq-answer">
+                            All equipment comes with manufacturer warranties, typically ranging from 1-3 years depending on the product. We also offer extended warranty options for additional coverage. Check individual product pages for specific warranty details.
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item" onclick="toggleFaq(this)">
+                        <div class="faq-question">
+                            <span>Can you help design my kitchen layout?</span>
+                            <div class="faq-toggle">+</div>
+                        </div>
+                        <div class="faq-answer">
+                            Yes, our kitchen design consultants work with restaurants of all sizes. We provide CAD drawings, workflow analysis, and equipment recommendations to maximize efficiency and meet health code requirements.
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+// Form Type Switching with Select Dropdown
+function switchFormType(formType) {
+    var i, tabcontent;
+    
+    // Hide all form contents
+    tabcontent = document.getElementsByClassName("tab-content");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+        tabcontent[i].classList.remove("active");
+    }
+    
+    // Show selected form
+    var selectedForm = document.getElementById(formType);
+    if (selectedForm) {
+        selectedForm.style.display = "block";
+        selectedForm.classList.add("active");
+    }
+}
+
+// FAQ Toggle
+function toggleFaq(element) {
+    const isOpen = element.classList.contains('open');
+    
+    // Close all FAQs
+    document.querySelectorAll('.faq-item').forEach(item => {
+        item.classList.remove('open');
+    });
+    
+    // Open clicked FAQ if it wasn't already open
+    if (!isOpen) {
+        element.classList.add('open');
+    }
+}
+
+// Google reCAPTCHA v3 Integration
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('form[action*="contact"]');
+    
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const submitBtn = this.querySelector('.submit-btn');
+            const formType = submitBtn.getAttribute('data-form');
+            const siteKey = '{{ settings.recaptcha_site_key }}';
+            
+            if (siteKey && typeof grecaptcha !== 'undefined') {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = 'Sending...';
+                
+                grecaptcha.ready(function() {
+                    grecaptcha.execute(siteKey, {action: 'submit'}).then(function(token) {
+                        document.getElementById('g-recaptcha-response-' + formType).value = token;
+                        form.submit();
+                    });
+                });
+            } else {
+                form.submit();
+            }
+        });
+    });
+    
+    // Phone Number Formatting
+    document.querySelectorAll('input[type="tel"]').forEach(input => {
+        input.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 6) {
+                value = `(${value.slice(0,3)}) ${value.slice(3,6)}-${value.slice(6,10)}`;
+            } else if (value.length >= 3) {
+                value = `(${value.slice(0,3)}) ${value.slice(3)}`;
+            }
+            e.target.value = value;
+        });
+    });
+});
+</script>
+
+{% schema %}
+{
+  "name": "Contact Page",
+  "settings": [
+    {
+      "type": "text",
+      "id": "contact_phone",
+      "label": "Contact Phone",
+      "default": "(408) 673-9999"
+    },
+    {
+      "type": "text",
+      "id": "contact_email",
+      "label": "Contact Email",
+      "default": "sales@celebratefestivalinc.com"
+    },
+    {
+      "type": "text",
+      "id": "contact_address",
+      "label": "Contact Address",
+      "default": "235 Whitney Pl, Fremont, CA 94539"
+    },
+    {
+      "type": "text",
+      "id": "business_hours",
+      "label": "Business Hours (Short)",
+      "default": "Mon-Fri: 9AM-6PM PST"
+    },
+    {
+      "type": "text",
+      "id": "recaptcha_site_key",
+      "label": "Google reCAPTCHA Site Key",
+      "info": "Get your reCAPTCHA v3 keys from https://www.google.com/recaptcha/admin"
+    },
+    {
+      "type": "header",
+      "content": "Business Hours Details"
+    },
+    {
+      "type": "text",
+      "id": "monday_hours",
+      "label": "Monday Hours",
+      "default": "9:00 AM - 6:00 PM"
+    },
+    {
+      "type": "text",
+      "id": "tuesday_hours",
+      "label": "Tuesday Hours",
+      "default": "9:00 AM - 6:00 PM"
+    },
+    {
+      "type": "text",
+      "id": "wednesday_hours",
+      "label": "Wednesday Hours",
+      "default": "9:00 AM - 6:00 PM"
+    },
+    {
+      "type": "text",
+      "id": "thursday_hours",
+      "label": "Thursday Hours",
+      "default": "9:00 AM - 6:00 PM"
+    },
+    {
+      "type": "text",
+      "id": "friday_hours",
+      "label": "Friday Hours",
+      "default": "9:00 AM - 6:00 PM"
+    },
+    {
+      "type": "text",
+      "id": "saturday_hours",
+      "label": "Saturday Hours",
+      "default": "Closed"
+    },
+    {
+      "type": "text",
+      "id": "sunday_hours",
+      "label": "Sunday Hours",
+      "default": "Closed"
+    },
+    {
+      "type": "header",
+      "content": "Why Choose Us Section"
+    },
+    {
+      "type": "text",
+      "id": "why_choose_title",
+      "label": "Section Title",
+      "default": "Why Choose Us"
+    },
+    {
+      "type": "header",
+      "content": "Service Areas Section"
+    },
+    {
+      "type": "text",
+      "id": "service_areas_title",
+      "label": "Section Title",
+      "default": "Service Areas"
+    },
+    {
+      "type": "textarea",
+      "id": "service_areas_description",
+      "label": "Description",
+      "default": "We serve restaurants nationwide with local support in key markets:"
+    },
+    {
+      "type": "header",
+      "content": "FAQ Section"
+    },
+    {
+      "type": "text",
+      "id": "faq_title",
+      "label": "FAQ Title",
+      "default": "Frequently Asked Questions"
+    },
+    {
+      "type": "text",
+      "id": "faq_description",
+      "label": "FAQ Description",
+      "default": "Quick answers to common questions about our equipment and services"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq_item",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "Enter your question here"
+        },
+        {
+          "type": "textarea",
+          "id": "answer",
+          "label": "Answer",
+          "default": "Enter your answer here"
+        }
+      ]
+    },
+    {
+      "type": "trust_indicator",
+      "name": "Trust Indicator",
+      "settings": [
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Number/Stat",
+          "default": "15+"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Years Experience"
+        }
+      ]
+    },
+    {
+      "type": "service_feature",
+      "name": "Service Feature",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Feature Title",
+          "default": "Free Shipping"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Feature Description",
+          "default": "On orders over $2,500"
+        }
+      ]
+    },
+    {
+      "type": "service_location",
+      "name": "Service Location",
+      "settings": [
+        {
+          "type": "text",
+          "id": "area",
+          "label": "Service Area",
+          "default": "California (Bay Area & Los Angeles)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Contact Page",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

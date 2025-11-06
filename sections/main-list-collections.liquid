@@ -1,0 +1,329 @@
+{{ 'collection-list.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign sort_by = section.settings.sort
+  assign columns_desktop = section.settings.columns_desktop
+  assign columns_mobile = section.settings.columns_mobile
+  assign image_ratio = section.settings.image_ratio
+  assign show_description = section.settings.show_description
+  assign show_product_count = section.settings.show_product_count
+  assign header_bg_color = section.settings.header_bg_color
+  assign header_overlay_color = section.settings.header_overlay_color
+-%}
+
+<!-- Breadcrumb -->
+{%- if section.settings.show_breadcrumbs -%}
+<section class="breadcrumb">
+  <div class="container">
+    <nav class="breadcrumb-nav" role="navigation" aria-label="breadcrumbs">
+      <a href="{{ routes.root_url }}">
+        <i class="fas fa-home"></i> Home
+      </a>
+      <span> > </span>
+      <span>Collections</span>
+    </nav>
+  </div>
+</section>
+{%- endif -%}
+
+<!-- Page Header -->
+<div class="collection-list-header" 
+     style="background-color: {{ header_bg_color }}; 
+            {% if section.settings.header_bg_image %}
+              background-image: url('{{ section.settings.header_bg_image | image_url: width: 1920 }}');
+              background-size: cover;
+              background-position: center;
+            {% endif %}">
+  
+  {%- if section.settings.header_bg_image or header_overlay_color != 'rgba(0,0,0,0)' -%}
+  <div class="header-overlay" style="background-color: {{ header_overlay_color }};"></div>
+  {%- endif -%}
+  
+  <div class="container header-content-wrapper">
+    {%- if section.settings.title != blank -%}
+      <h1 class="collection-list-title">{{ section.settings.title }}</h1>
+    {%- endif -%}
+    
+    {%- if section.settings.description != blank -%}
+      <div class="collection-list-description">
+        {{ section.settings.description }}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+<!-- Collections Grid -->
+<div class="collection-list-content">
+  <div class="container">
+    {%- liquid
+      case sort_by
+        when 'products_high', 'products_low'
+          assign collections = collections | sort: 'all_products_count'
+        when 'date', 'date_reversed'
+          assign collections = collections | sort: 'published_at'
+        else
+          assign collections = collections | sort: 'title'
+      endcase
+
+      if sort_by == 'products_high' or sort_by == 'date_reversed' or sort_by == 'alphabetical_reversed'
+        assign collections = collections | reverse
+      endif
+    -%}
+
+    <div 
+      class="collections-grid" 
+      data-columns="{{ columns_desktop }}"
+      data-columns-mobile="{{ columns_mobile }}"
+    >
+      {%- for collection in collections -%}
+        {%- unless collection.handle == 'frontpage' -%}
+          <div class="collection-card">
+            <a href="{{ collection.url }}" class="collection-card-link">
+              
+              <!-- Collection Image -->
+              <div class="collection-image {% if image_ratio != 'adapt' %}collection-image-{{ image_ratio }}{% endif %}">
+                {%- if collection.featured_image -%}
+                  <img
+                    src="{{ collection.featured_image | image_url: width: 800 }}"
+                    srcset="
+                      {{ collection.featured_image | image_url: width: 400 }} 400w,
+                      {{ collection.featured_image | image_url: width: 600 }} 600w,
+                      {{ collection.featured_image | image_url: width: 800 }} 800w,
+                      {{ collection.featured_image | image_url: width: 1000 }} 1000w
+                    "
+                    alt="{{ collection.featured_image.alt | default: collection.title | escape }}"
+                    loading="lazy"
+                    width="{{ collection.featured_image.width }}"
+                    height="{{ collection.featured_image.height }}"
+                  >
+                {%- else -%}
+                  <div class="collection-placeholder">
+                    {{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                  </div>
+                {%- endif -%}
+                
+                <!-- Hover Overlay -->
+                <div class="collection-overlay" style="background-color: {{ section.settings.card_overlay_color }};">
+                  <span class="collection-cta">
+                    View Collection
+                    <i class="fas fa-arrow-right"></i>
+                  </span>
+                </div>
+
+                <!-- Product Count Badge -->
+                {%- if show_product_count -%}
+                  <div class="collection-count-badge">
+                    {{ collection.all_products_count }} 
+                    {%- if collection.all_products_count == 1 -%}
+                      Product
+                    {%- else -%}
+                      Products
+                    {%- endif -%}
+                  </div>
+                {%- endif -%}
+              </div>
+
+              <!-- Collection Info -->
+              <div class="collection-info">
+                <h2 class="collection-title">{{ collection.title }}</h2>
+                
+                {%- if show_description and collection.description != blank -%}
+                  <div class="collection-description">
+                    {{ collection.description | strip_html | truncatewords: 20 }}
+                  </div>
+                {%- endif -%}
+
+                <div class="collection-footer">
+                  <span class="collection-link-text">
+                    Shop Now <i class="fas fa-arrow-right"></i>
+                  </span>
+                </div>
+              </div>
+            </a>
+          </div>
+        {%- endunless -%}
+      {%- endfor -%}
+    </div>
+
+    {%- if collections.size == 0 -%}
+      <div class="collection-list-empty">
+        <div class="empty-icon">
+          <i class="fas fa-folder-open"></i>
+        </div>
+        <h3>No collections found</h3>
+        <p>Start creating collections to organize your products.</p>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Collection List",
+  "tag": "section",
+  "class": "section-collection-list",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Breadcrumbs"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumbs",
+      "default": true,
+      "label": "Show breadcrumbs"
+    },
+    {
+      "type": "header",
+      "content": "Page Header"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "default": "Collections",
+      "label": "Heading"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "info": "Optional description below the heading"
+    },
+    {
+      "type": "color",
+      "id": "header_bg_color",
+      "default": "#1e3a8a",
+      "label": "Header background color"
+    },
+    {
+      "type": "image_picker",
+      "id": "header_bg_image",
+      "label": "Header background image",
+      "info": "Displays over background color"
+    },
+    {
+      "type": "color",
+      "id": "header_overlay_color",
+      "default": "rgba(30, 58, 138, 0.85)",
+      "label": "Header overlay color",
+      "info": "Overlay color over background image"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 3,
+      "label": "Collections per row (desktop)"
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 column"
+        },
+        {
+          "value": "2",
+          "label": "2 columns"
+        }
+      ],
+      "default": "2",
+      "label": "Collections per row (mobile)"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "Adapt to image"
+        },
+        {
+          "value": "portrait",
+          "label": "Portrait"
+        },
+        {
+          "value": "square",
+          "label": "Square"
+        },
+        {
+          "value": "landscape",
+          "label": "Landscape"
+        }
+      ],
+      "default": "portrait",
+      "label": "Image ratio"
+    },
+    {
+      "type": "header",
+      "content": "Collection Card"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "default": true,
+      "label": "Show collection description"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_count",
+      "default": true,
+      "label": "Show product count"
+    },
+    {
+      "type": "color",
+      "id": "card_overlay_color",
+      "default": "rgba(30, 58, 138, 0.85)",
+      "label": "Card hover overlay color"
+    },
+    {
+      "type": "header",
+      "content": "Sorting"
+    },
+    {
+      "type": "select",
+      "id": "sort",
+      "options": [
+        {
+          "value": "alphabetical",
+          "label": "Alphabetically, A-Z"
+        },
+        {
+          "value": "alphabetical_reversed",
+          "label": "Alphabetically, Z-A"
+        },
+        {
+          "value": "date_reversed",
+          "label": "Date, new to old"
+        },
+        {
+          "value": "date",
+          "label": "Date, old to new"
+        },
+        {
+          "value": "products_high",
+          "label": "Product count, high to low"
+        },
+        {
+          "value": "products_low",
+          "label": "Product count, low to high"
+        }
+      ],
+      "default": "alphabetical",
+      "label": "Sort collections by"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection List"
+    }
+  ]
+}
+{% endschema %}

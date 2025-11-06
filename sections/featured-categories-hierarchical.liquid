@@ -1,0 +1,283 @@
+{{ 'featured-categories.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign heading = section.settings.heading
+  assign description = section.settings.description
+  assign show_subcategories = section.settings.show_subcategories
+-%}
+
+<section class="featured-categories-section">
+  <div class="container">
+    
+    {%- if heading != blank -%}
+      <div class="section-header">
+        <h2 class="section-title">{{ heading }}</h2>
+        {%- if description != blank -%}
+          <p class="section-description">{{ description }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="featured-categories-grid">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign main_collection = collections[block.settings.main_collection]
+          assign subcollection_1 = block.settings.subcollection_1
+          assign subcollection_2 = block.settings.subcollection_2
+          assign subcollection_3 = block.settings.subcollection_3
+          assign subcollection_4 = block.settings.subcollection_4
+          assign subcollection_5 = block.settings.subcollection_5
+          assign subcollection_6 = block.settings.subcollection_6
+          assign subcollection_7 = block.settings.subcollection_7
+          assign subcollection_8 = block.settings.subcollection_8
+        -%}
+
+        {%- if main_collection -%}
+          <div class="category-feature-card" {{ block.shopify_attributes }}>
+            
+            <!-- Main Category Image & Link -->
+            <a href="{{ main_collection.url }}" class="category-feature-link">
+              <div class="category-feature-image">
+                {%- if main_collection.featured_image -%}
+                  <img
+                    src="{{ main_collection.featured_image | image_url: width: 800 }}"
+                    alt="{{ main_collection.title | escape }}"
+                    loading="lazy"
+                  >
+                {%- elsif block.settings.fallback_image -%}
+                  <img
+                    src="{{ block.settings.fallback_image | image_url: width: 800 }}"
+                    alt="{{ main_collection.title | escape }}"
+                    loading="lazy"
+                  >
+                {%- else -%}
+                  {{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                {%- endif -%}
+                <div class="category-overlay"></div>
+              </div>
+            </a>
+
+            <!-- Category Content -->
+            <div class="category-feature-content">
+              <a href="{{ main_collection.url }}" class="category-title-link">
+                <h3 class="category-feature-title">{{ main_collection.title }}</h3>
+              </a>
+              
+              {%- if main_collection.description != blank -%}
+                <p class="category-feature-description">
+                  {{ main_collection.description | strip_html | truncatewords: 15 }}
+                </p>
+              {%- endif -%}
+
+              {%- if block.settings.category_count != blank -%}
+                <div class="category-count-info">
+                  <span class="category-shop-link">
+                    Shop {{ block.settings.category_count }} Categories <i class="fas fa-angle-right"></i>
+                  </span>
+                </div>
+              {%- endif -%}
+
+              <!-- Subcategories List -->
+              {%- if show_subcategories -%}
+                <ul class="subcategories-list">
+                  {%- if subcollection_1 != blank -%}
+                    {%- assign sub_1 = collections[subcollection_1] -%}
+                    {%- if sub_1 -%}
+                      <li>
+                        <a href="{{ sub_1.url }}" class="subcategory-link">{{ sub_1.title }}</a>
+                      </li>
+                    {%- endif -%}
+                  {%- endif -%}
+
+                  {%- if subcollection_2 != blank -%}
+                    {%- assign sub_2 = collections[subcollection_2] -%}
+                    {%- if sub_2 -%}
+                      <li>
+                        <a href="{{ sub_2.url }}" class="subcategory-link">{{ sub_2.title }}</a>
+                      </li>
+                    {%- endif -%}
+                  {%- endif -%}
+
+                  {%- if subcollection_3 != blank -%}
+                    {%- assign sub_3 = collections[subcollection_3] -%}
+                    {%- if sub_3 -%}
+                      <li>
+                        <a href="{{ sub_3.url }}" class="subcategory-link">{{ sub_3.title }}</a>
+                      </li>
+                    {%- endif -%}
+                  {%- endif -%}
+
+                  {%- if subcollection_4 != blank -%}
+                    {%- assign sub_4 = collections[subcollection_4] -%}
+                    {%- if sub_4 -%}
+                      <li>
+                        <a href="{{ sub_4.url }}" class="subcategory-link">{{ sub_4.title }}</a>
+                      </li>
+                    {%- endif -%}
+                  {%- endif -%}
+
+                  {%- if subcollection_5 != blank -%}
+                    {%- assign sub_5 = collections[subcollection_5] -%}
+                    {%- if sub_5 -%}
+                      <li>
+                        <a href="{{ sub_5.url }}" class="subcategory-link">{{ sub_5.title }}</a>
+                      </li>
+                    {%- endif -%}
+                  {%- endif -%}
+
+                  {%- if subcollection_6 != blank -%}
+                    {%- assign sub_6 = collections[subcollection_6] -%}
+                    {%- if sub_6 -%}
+                      <li>
+                        <a href="{{ sub_6.url }}" class="subcategory-link">{{ sub_6.title }}</a>
+                      </li>
+                    {%- endif -%}
+                  {%- endif -%}
+
+                  {%- if subcollection_7 != blank -%}
+                    {%- assign sub_7 = collections[subcollection_7] -%}
+                    {%- if sub_7 -%}
+                      <li>
+                        <a href="{{ sub_7.url }}" class="subcategory-link">{{ sub_7.title }}</a>
+                      </li>
+                    {%- endif -%}
+                  {%- endif -%}
+
+                  {%- if subcollection_8 != blank -%}
+                    {%- assign sub_8 = collections[subcollection_8] -%}
+                    {%- if sub_8 -%}
+                      <li>
+                        <a href="{{ sub_8.url }}" class="subcategory-link">{{ sub_8.title }}</a>
+                      </li>
+                    {%- endif -%}
+                  {%- endif -%}
+                </ul>
+              {%- endif -%}
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Featured Categories",
+  "tag": "section",
+  "class": "section-featured-categories",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "Our Top Categories",
+      "label": "Heading"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Browse our complete range of commercial kitchen equipment organized by category"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_subcategories",
+      "default": true,
+      "label": "Show subcategory links"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Main Category"
+        },
+        {
+          "type": "collection",
+          "id": "main_collection",
+          "label": "Main collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "fallback_image",
+          "label": "Fallback image",
+          "info": "Used if collection has no featured image"
+        },
+        {
+          "type": "text",
+          "id": "category_count",
+          "label": "Number of subcategories",
+          "default": "8",
+          "info": "Display text like 'Shop 8 Categories'"
+        },
+        {
+          "type": "header",
+          "content": "Subcategories (Up to 8)"
+        },
+        {
+          "type": "collection",
+          "id": "subcollection_1",
+          "label": "Subcategory 1"
+        },
+        {
+          "type": "collection",
+          "id": "subcollection_2",
+          "label": "Subcategory 2"
+        },
+        {
+          "type": "collection",
+          "id": "subcollection_3",
+          "label": "Subcategory 3"
+        },
+        {
+          "type": "collection",
+          "id": "subcollection_4",
+          "label": "Subcategory 4"
+        },
+        {
+          "type": "collection",
+          "id": "subcollection_5",
+          "label": "Subcategory 5"
+        },
+        {
+          "type": "collection",
+          "id": "subcollection_6",
+          "label": "Subcategory 6"
+        },
+        {
+          "type": "collection",
+          "id": "subcollection_7",
+          "label": "Subcategory 7"
+        },
+        {
+          "type": "collection",
+          "id": "subcollection_8",
+          "label": "Subcategory 8"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Categories",
+      "blocks": [
+        {
+          "type": "category"
+        },
+        {
+          "type": "category"
+        },
+        {
+          "type": "category"
+        },
+        {
+          "type": "category"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

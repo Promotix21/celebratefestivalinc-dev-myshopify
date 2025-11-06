@@ -1,0 +1,593 @@
+{% comment %}
+  Product Template for Restaurant Equipment Store
+  Based on Dawn Theme - Custom Modifications
+  Features: Sticky bottom bar, dynamic related sections, reviews
+{% endcomment %}
+
+{{ 'section-main-product.css' | asset_url | stylesheet_tag }}
+{{ 'component-accordion.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'component-slider.css' | asset_url | stylesheet_tag }}
+{{ 'component-rating.css' | asset_url | stylesheet_tag }}
+
+<link rel="stylesheet" href="{{ 'custom-product-page.css' | asset_url }}" media="print" onload="this.media='all'">
+<noscript>{{ 'custom-product-page.css' | asset_url | stylesheet_tag }}</noscript>
+
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign product_form_id = 'product-form-' | append: section.id
+-%}
+
+<section class="product-section">
+  <div class="page-width">
+    
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb" role="navigation" aria-label="breadcrumbs">
+      <a href="{{ routes.root_url }}" title="Home">
+        <i class="fas fa-home"></i> Home
+      </a>
+      <span class="breadcrumb-separator">></span>
+      
+      {% if collection %}
+        <a href="{{ collection.url }}" title="{{ collection.title }}">
+          {{ collection.title }}
+        </a>
+        <span class="breadcrumb-separator">></span>
+      {% endif %}
+      
+      <span>{{ product.title | truncate: 50 }}</span>
+    </nav>
+
+    <!-- Product Layout -->
+    <div class="product-layout">
+      
+      <!-- Product Gallery -->
+      <div class="product-gallery">
+        <div class="main-image">
+          <img 
+            id="mainImage"
+            src="{{ product.featured_image | img_url: '800x800' }}"
+            alt="{{ product.featured_image.alt | escape }}"
+            width="800"
+            height="800"
+          >
+          <div class="zoom-indicator">
+            <i class="fas fa-search-plus"></i>
+            Click to expand
+          </div>
+        </div>
+
+        {% if product.images.size > 1 %}
+        <div class="thumbnail-grid">
+          {% for image in product.images limit: 4 %}
+            <div class="thumbnail {% if forloop.first %}active{% endif %}" data-image-index="{{ forloop.index0 }}">
+              <img 
+                src="{{ image | img_url: '100x100' }}"
+                alt="{{ image.alt | escape }}"
+                width="100"
+                height="100"
+              >
+            </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Product Info -->
+      <div class="product-info">
+        
+        <!-- Badges -->
+        <div class="product-badges">
+          {% if product.tags contains 'free-shipping' %}
+            <span class="badge free-shipping-badge">Free Shipping</span>
+          {% endif %}
+          
+          {% if product.selected_or_first_available_variant.inventory_quantity < 10 and product.selected_or_first_available_variant.inventory_quantity > 0 %}
+            <span class="badge low-stock-badge">Low Stock</span>
+          {% endif %}
+        </div>
+
+        <!-- Product Title -->
+        <h1 class="product-title">{{ product.title }}</h1>
+
+        <!-- Brand -->
+        {% if product.vendor != blank %}
+        <div class="product-brand">
+          by <a href="{{ product.vendor | url_for_vendor }}">{{ product.vendor }}</a>
+        </div>
+        {% endif %}
+
+        <!-- Price -->
+        <div class="product-price">
+          <span class="current-price">{{ product.selected_or_first_available_variant.price | money }}</span>
+          
+          {% if product.selected_or_first_available_variant.compare_at_price > product.selected_or_first_available_variant.price %}
+            <span class="original-price">{{ product.selected_or_first_available_variant.compare_at_price | money }}</span>
+            <span class="savings">
+              Save {{ product.selected_or_first_available_variant.compare_at_price | minus: product.selected_or_first_available_variant.price | money }}
+            </span>
+          {% endif %}
+        </div>
+
+        <!-- Contact for Pricing (if product has 'contact-for-price' tag) -->
+        {% if product.tags contains 'contact-for-price' %}
+        <div class="contact-pricing">
+          <h3>Contact us for best pricing!</h3>
+          <div class="contact-info">
+            <div class="contact-number">(408) 673-9999</div>
+            <div class="contact-hours">Monday - Fridays 9am-5pm</div>
+          </div>
+          <div class="why-call">
+            <h4>Why do I need to call?</h4>
+            <p>Some manufacturers do not allow us to advertise pricing below their required minimum. However, they do allow us to offer you the best possible deal, we ask that you simply contact us to find out our great price!</p>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Product Form -->
+        {% form 'product', product, id: product_form_id, class: 'form', novalidate: 'novalidate', data-type: 'add-to-cart-form' %}
+          
+          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+
+          <!-- Quantity -->
+          <div class="quantity-section">
+            <label class="quantity-label" for="Quantity-{{ section.id }}">Quantity</label>
+            <div class="quantity-input">
+              <button class="qty-btn" type="button" name="minus" aria-label="Decrease quantity">
+                <span>-</span>
+              </button>
+              <input 
+                type="number" 
+                class="qty-input" 
+                name="quantity" 
+                id="Quantity-{{ section.id }}"
+                min="1" 
+                value="1"
+              >
+              <button class="qty-btn" type="button" name="plus" aria-label="Increase quantity">
+                <span>+</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <button 
+              type="submit" 
+              name="add"
+              class="add-to-cart-btn"
+              {% unless product.selected_or_first_available_variant.available %}disabled{% endunless %}
+            >
+              <i class="fas fa-shopping-cart"></i>
+              {% if product.selected_or_first_available_variant.available %}
+                Add to cart
+              {% else %}
+                Sold out
+              {% endif %}
+            </button>
+
+            <div class="secondary-actions">
+              <button type="button" class="secondary-btn wishlist-btn" data-product-id="{{ product.id }}">
+                <i class="fas fa-heart"></i>
+                Add to Wishlist
+              </button>
+              <button type="button" class="secondary-btn share-btn">
+                <i class="fas fa-share-alt"></i>
+                Share
+              </button>
+            </div>
+          </div>
+
+        {% endform %}
+
+        <!-- Key Features -->
+        {% if product.metafields.custom.key_features != blank and product.metafields.custom.key_features != '' %}
+        <div class="features-list">
+          <h3>Key Features</h3>
+          <div class="features-grid">
+            {% assign features = product.metafields.custom.key_features | split: '||' %}
+            {% for feature in features %}
+              {% if feature != blank and feature != '' %}
+              <div class="feature-item">
+                <i class="fas fa-check-circle"></i>
+                <span>{{ feature | strip }}</span>
+              </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Accessories Section - Dynamic based on tags -->
+        {% if product.tags contains 'show:accessories' or product.tags contains 'show:parts' or product.tags contains 'show:works-with' %}
+        <div class="accessories-section">
+          <div class="accessories-header">
+            <h3>
+              {% if product.tags contains 'show:parts' %}
+                Parts & Accessories
+              {% elsif product.tags contains 'show:works-with' %}
+                Works With
+              {% else %}
+                Add Accessories
+              {% endif %}
+            </h3>
+            <i class="fas fa-plus-circle"></i>
+          </div>
+          
+          {% comment %} Get related products from matching collection {% endcomment %}
+          {% assign related_collection_handle = product.metafields.custom.related_collection | default: 'accessories' %}
+          {% assign related_products = collections[related_collection_handle].products %}
+          
+          {% if related_products.size > 0 %}
+            {% for related_product in related_products limit: 3 %}
+              {% unless related_product.id == product.id %}
+              <div class="accessory-item">
+                <div class="accessory-image">
+                  {% if related_product.featured_image %}
+                    <img src="{{ related_product.featured_image | img_url: '80x80' }}" alt="{{ related_product.title }}">
+                  {% else %}
+                    <i class="fas fa-box" style="color: var(--text-light); font-size: 24px;"></i>
+                  {% endif %}
+                </div>
+                <div class="accessory-info">
+                  <div class="accessory-title">{{ related_product.title }}</div>
+                  <div class="accessory-price">{{ related_product.price | money }}</div>
+                </div>
+                <a href="{{ related_product.url }}" class="accessory-link" aria-label="View {{ related_product.title }}"></a>
+              </div>
+              {% endunless %}
+            {% endfor %}
+          {% endif %}
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+    <!-- Value Props -->
+    <div class="value-props">
+      <div class="value-prop">
+        <div class="value-prop-icon">
+          <i class="fas fa-tools"></i>
+        </div>
+        <h4>Free Installation</h4>
+        <p>On orders $5000+ with T&C applied</p>
+      </div>
+      <div class="value-prop">
+        <div class="value-prop-icon">
+          <i class="fas fa-headset"></i>
+        </div>
+        <h4>Expert Support</h4>
+        <p>Professional customer service</p>
+      </div>
+      <div class="value-prop">
+        <div class="value-prop-icon">
+          <i class="fas fa-dollar-sign"></i>
+        </div>
+        <h4>Price Match</h4>
+        <p>We beat any competitor's price</p>
+      </div>
+      <div class="value-prop">
+        <div class="value-prop-icon">
+          <i class="fas fa-shipping-fast"></i>
+        </div>
+        <h4>Free Shipping</h4>
+        <p>On select products nationwide</p>
+      </div>
+    </div>
+
+    <!-- Product Details Tabs -->
+    <div class="product-details">
+      <div class="tabs-nav">
+        <button class="tab-btn active" data-tab="specifications">Specifications</button>
+        <button class="tab-btn" data-tab="details">Details</button>
+        <button class="tab-btn" data-tab="warranty">Warranty</button>
+        <button class="tab-btn" data-tab="reviews">Reviews</button>
+      </div>
+
+      <!-- Specifications Tab -->
+      <div class="tab-content active" id="specifications">
+        <div class="specs-table">
+          {% if product.metafields.custom.specifications != blank and product.metafields.custom.specifications != '' %}
+            {{ product.metafields.custom.specifications }}
+          {% else %}
+            <table>
+              <thead>
+                <tr>
+                  <th>Attribute</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if product.vendor != blank %}
+                <tr>
+                  <td><strong>Brand</strong></td>
+                  <td>{{ product.vendor }}</td>
+                </tr>
+                {% endif %}
+                {% if product.metafields.custom.model != blank and product.metafields.custom.model != '' %}
+                <tr>
+                  <td><strong>Model</strong></td>
+                  <td>{{ product.metafields.custom.model }}</td>
+                </tr>
+                {% endif %}
+                {% if product.weight > 0 %}
+                <tr>
+                  <td><strong>Weight</strong></td>
+                  <td>{{ product.weight | weight_with_unit }}</td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Details Tab -->
+      <div class="tab-content" id="details">
+        <div class="product-description">
+          {% if product.description != blank and product.description != '' %}
+            {{ product.description }}
+          {% else %}
+            <p>Product details coming soon. Please contact us for more information.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Warranty Tab -->
+      <div class="tab-content" id="warranty">
+        <div class="warranty-content">
+          {% if product.metafields.custom.warranty != blank and product.metafields.custom.warranty != '' %}
+            {{ product.metafields.custom.warranty }}
+          {% else %}
+            <div style="background: var(--neutral-light); border-radius: var(--border-radius); padding: 30px;">
+              <h3 style="color: var(--primary-navy); margin-bottom: 20px;">Manufacturer Warranty</h3>
+              <p style="color: var(--text-light); line-height: 1.6;">
+                This product comes with manufacturer warranty coverage. For specific warranty details, terms, and registration information, please contact our customer service team.
+              </p>
+              <div style="margin-top: 20px; padding: 15px; background: white; border-radius: var(--border-radius); border-left: 4px solid var(--primary-coral);">
+                <strong style="color: var(--primary-navy);">Contact Us:</strong><br>
+                <span style="color: var(--text-light);">Phone: (408) 673-9999</span><br>
+                <span style="color: var(--text-light);">Email: sales@celebratefestivalinc.com</span>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Reviews Tab -->
+      <div class="tab-content" id="reviews">
+        <div id="shopify-product-reviews" data-id="{{ product.id }}">
+          {{ product.metafields.spr.reviews }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if recommendations.performed %}
+      {% if recommendations.products_count > 0 %}
+      <div class="related-products">
+        <h2 class="section-title">You may also like</h2>
+        <div class="products-grid">
+          {% for product in recommendations.products limit: 4 %}
+            <div class="product-card">
+              <a href="{{ product.url }}" class="product-card-link">
+                <div class="product-card-image">
+                  {% if product.featured_image %}
+                    <img 
+                      src="{{ product.featured_image | img_url: '300x300' }}"
+                      alt="{{ product.featured_image.alt | escape }}"
+                      loading="lazy"
+                      width="300"
+                      height="300"
+                    >
+                  {% endif %}
+                </div>
+                <div class="product-card-info">
+                  <h3 class="product-card-title">{{ product.title | truncate: 50 }}</h3>
+                  <div class="product-card-price">{{ product.price | money }}</div>
+                </div>
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    {% endif %}
+
+  </div>
+</section>
+
+<!-- Sticky Bottom Bar -->
+<div class="sticky-bottom-bar" id="stickyBottomBar">
+  <div class="sticky-bar-container">
+    <div class="sticky-bar-product">
+      <img 
+        src="{{ product.featured_image | img_url: '60x60' }}"
+        alt="{{ product.title }}"
+        class="sticky-product-image"
+      >
+      <div class="sticky-product-info">
+        <div class="sticky-product-title">{{ product.title | truncate: 40 }}</div>
+        <div class="sticky-product-price">{{ product.selected_or_first_available_variant.price | money }}</div>
+      </div>
+    </div>
+    
+    <div class="sticky-bar-actions">
+      <div class="sticky-quantity">
+        <button class="sticky-qty-btn" type="button" data-action="minus">-</button>
+        <input type="number" class="sticky-qty-input" value="1" min="1" readonly>
+        <button class="sticky-qty-btn" type="button" data-action="plus">+</button>
+      </div>
+      
+      <button class="sticky-add-to-cart" data-product-id="{{ product.selected_or_first_available_variant.id }}">
+        <i class="fas fa-shopping-cart"></i>
+        Add to Cart
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Product Recommendations (for Dawn theme compatibility) -->
+<div class="product-recommendations" data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit=4"></div>
+
+<script>
+// Product page functionality
+document.addEventListener('DOMContentLoaded', function() {
+  
+  // Thumbnail switching
+  const thumbnails = document.querySelectorAll('.thumbnail');
+  const mainImage = document.getElementById('mainImage');
+  
+  thumbnails.forEach((thumb, index) => {
+    thumb.addEventListener('click', function() {
+      thumbnails.forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      mainImage.src = this.querySelector('img').src.replace('100x100', '800x800');
+    });
+  });
+
+  // Quantity controls
+  const qtyBtns = document.querySelectorAll('.qty-btn');
+  qtyBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const input = this.parentElement.querySelector('.qty-input');
+      let value = parseInt(input.value);
+      
+      if (this.name === 'plus') {
+        input.value = value + 1;
+      } else if (this.name === 'minus' && value > 1) {
+        input.value = value - 1;
+      }
+    });
+  });
+
+  // Tab switching
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+  
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const tabId = this.getAttribute('data-tab');
+      
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabContents.forEach(c => c.classList.remove('active'));
+      
+      this.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    });
+  });
+
+  // Sticky bottom bar
+  const stickyBar = document.getElementById('stickyBottomBar');
+  let lastScroll = 0;
+  
+  window.addEventListener('scroll', function() {
+    const currentScroll = window.pageYOffset;
+    
+    if (currentScroll > 800) {
+      stickyBar.classList.add('visible');
+    } else {
+      stickyBar.classList.remove('visible');
+    }
+    
+    lastScroll = currentScroll;
+  });
+
+  // Sticky bar quantity controls
+  const stickyQtyBtns = document.querySelectorAll('.sticky-qty-btn');
+  const stickyQtyInput = document.querySelector('.sticky-qty-input');
+  
+  stickyQtyBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      let value = parseInt(stickyQtyInput.value);
+      
+      if (this.getAttribute('data-action') === 'plus') {
+        stickyQtyInput.value = value + 1;
+      } else if (this.getAttribute('data-action') === 'minus' && value > 1) {
+        stickyQtyInput.value = value - 1;
+      }
+    });
+  });
+
+  // Sticky bar add to cart
+  const stickyAddToCart = document.querySelector('.sticky-add-to-cart');
+  if (stickyAddToCart) {
+    stickyAddToCart.addEventListener('click', function() {
+      const variantId = this.getAttribute('data-product-id');
+      const quantity = parseInt(stickyQtyInput.value);
+      
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: variantId,
+          quantity: quantity
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Update cart count and show notification
+        this.innerHTML = '<i class="fas fa-check"></i> Added!';
+        setTimeout(() => {
+          this.innerHTML = '<i class="fas fa-shopping-cart"></i> Add to Cart';
+        }, 2000);
+        
+        // Trigger cart drawer if available
+        if (window.theme && window.theme.CartDrawer) {
+          window.theme.CartDrawer.open();
+        }
+      });
+    });
+  }
+
+  // Product recommendations
+  const productRecommendations = document.querySelector('.product-recommendations');
+  if (productRecommendations) {
+    fetch(productRecommendations.dataset.url)
+      .then(response => response.text())
+      .then(text => {
+        const html = new DOMParser().parseFromString(text, 'text/html');
+        const recommendations = html.querySelector('.product-recommendations');
+        if (recommendations && recommendations.innerHTML.trim().length) {
+          productRecommendations.innerHTML = recommendations.innerHTML;
+        }
+      });
+  }
+});
+</script>
+
+{% schema %}
+{
+  "name": "Product Information",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_sticky_bar",
+      "label": "Enable sticky bottom bar",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_image_zoom",
+      "label": "Enable image zoom",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_related_products",
+      "label": "Show related products",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

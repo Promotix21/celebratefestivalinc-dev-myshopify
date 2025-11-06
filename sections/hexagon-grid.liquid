@@ -1,0 +1,1186 @@
+<!-- sections/hexagon-grid.liquid -->
+<style>
+  .hexagon-section {
+    padding: {{ section.settings.section_padding_desktop }}px 20px;
+    background-color: {{ section.settings.background_color }};
+    font-family: Arial, sans-serif;
+  }
+
+  .hexagon-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 0 20px;
+  }
+
+  .hexagon-title {
+    color: {{ section.settings.title_color }};
+    font-size: {{ section.settings.title_size_desktop }}px;
+    font-weight: bold;
+    margin-bottom: {{ section.settings.title_margin_desktop }}px;
+  }
+
+  .hexagon-grid {
+    display: inline-block;
+    position: relative;
+    margin: 0 auto;
+    --hex-size-desktop: {{ section.settings.hex_size_desktop }}px;
+    --hex-height-desktop: {{ section.settings.hex_height_desktop }}px;
+    --vertical-spacing-desktop: {{ section.settings.vertical_spacing_desktop }}px;
+    --horizontal-spacing-desktop: {{ section.settings.horizontal_spacing_desktop }}px;
+    --offset-desktop: {{ section.settings.honeycomb_offset_desktop }}px;
+  }
+
+  .hex-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: calc(-1 * var(--vertical-spacing-desktop));
+  }
+
+  .hex-row:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Honeycomb offset for even rows */
+  .hex-row:nth-child(even) {
+    transform: translateX(var(--offset-desktop));
+  }
+
+  .hexagon-link {
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .hexagon-item {
+    margin: 0 calc(-1 * var(--horizontal-spacing-desktop));
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+
+  .hexagon-item:hover {
+    transform: scale({{ section.settings.hover_scale }});
+    z-index: 999;
+  }
+
+  .hexagon-svg {
+    width: var(--hex-size-desktop);
+    height: var(--hex-height-desktop);
+  }
+
+  .hex-shape {
+    fill: {{ section.settings.hex_background }};
+    
+    stroke-width: {{ section.settings.hex_border_width }};
+  }
+
+  .hex-logo {
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  /* Stats Section Styling */
+  .stats-section {
+    margin-top: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 80px;
+    flex-wrap: wrap;
+  }
+
+  .stat-item {
+    text-align: center;
+  }
+
+  .stat-number {
+    font-size: 48px;
+    font-weight: bold;
+    color: {{ section.settings.stats_number_color }};
+    line-height: 1;
+    margin-bottom: 5px;
+  }
+
+  .stat-label {
+    font-size: 14px;
+    color: {{ section.settings.stats_label_color }};
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .view-brands-btn {
+    margin-top: 40px;
+    display: inline-block;
+    background-color: {{ section.settings.button_background_color }};
+    color: {{ section.settings.button_text_color }};
+    padding: 15px 30px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+  }
+
+  .view-brands-btn:hover {
+    background-color: {{ section.settings.button_hover_color }};
+    transform: translateY(-2px);
+  }
+
+  /* Tablet Responsive */
+  @media screen and (max-width: 1024px) and (min-width: 768px) {
+    .hexagon-section {
+      padding: {{ section.settings.section_padding_tablet }}px 15px;
+    }
+    
+    .hexagon-title {
+      font-size: {{ section.settings.title_size_tablet }}px;
+      margin-bottom: {{ section.settings.title_margin_tablet }}px;
+    }
+    
+    .hexagon-grid {
+      --hex-size-desktop: {{ section.settings.hex_size_tablet }}px;
+      --hex-height-desktop: {{ section.settings.hex_height_tablet }}px;
+      --vertical-spacing-desktop: {{ section.settings.vertical_spacing_tablet }}px;
+      --horizontal-spacing-desktop: {{ section.settings.horizontal_spacing_tablet }}px;
+      --offset-desktop: {{ section.settings.honeycomb_offset_tablet }}px;
+    }
+
+    .stats-section {
+      gap: 60px;
+      margin-top: 50px;
+    }
+
+    .stat-number {
+      font-size: 40px;
+    }
+
+    .stat-label {
+      font-size: 13px;
+    }
+  }
+
+  /* Mobile Responsive */
+  @media screen and (max-width: 767px) {
+    .hexagon-section {
+      padding: {{ section.settings.section_padding_mobile }}px 10px;
+    }
+    
+    .hexagon-title {
+      font-size: {{ section.settings.title_size_mobile }}px;
+      margin-bottom: {{ section.settings.title_margin_mobile }}px;
+    }
+    
+    .hexagon-grid {
+      --hex-size-desktop: {{ section.settings.hex_size_mobile }}px;
+      --hex-height-desktop: {{ section.settings.hex_height_mobile }}px;
+      --vertical-spacing-desktop: {{ section.settings.vertical_spacing_mobile }}px;
+      --horizontal-spacing-desktop: {{ section.settings.horizontal_spacing_mobile }}px;
+      --offset-desktop: {{ section.settings.honeycomb_offset_mobile }}px;
+    }
+
+    .stats-section {
+      gap: 40px;
+      margin-top: 40px;
+    }
+
+    .stat-number {
+      font-size: 32px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+    }
+
+    .view-brands-btn {
+      padding: 12px 25px;
+      font-size: 15px;
+    }
+  }
+</style>
+
+<section class="hexagon-section">
+  <div class="hexagon-container">
+    {% if section.settings.title != blank %}
+      <h2 class="hexagon-title">{{ section.settings.title }}</h2>
+    {% endif %}
+    
+   <div class="hexagon-grid">
+  <!-- Row 1: 8 hexagons -->
+  <div class="hex-row">
+    {% for i in (1..8) %}
+      {% assign logo_key = 'logo_row1_' | append: i %}
+      {% assign link_key = 'link_row1_' | append: i %}
+      {% assign logo = section.settings[logo_key] %}
+      {% assign link_url = section.settings[link_key] %}
+      
+      {% if link_url != blank %}
+        <a href="{{ link_url }}" class="hexagon-link">
+      {% endif %}
+      <div class="hexagon-item">
+        <svg class="hexagon-svg" viewBox="0 0 80 70">
+          <defs>
+            <linearGradient id="hexBorderGradient-row1-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
+              <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
+            </linearGradient>
+          </defs>
+          <polygon class="hex-shape" 
+            points="40,2 70,18 70,52 40,68 10,52 10,18"
+            fill="{{ section.settings.hex_background }}"
+            stroke="url(#hexBorderGradient-row1-{{ i }})"
+            stroke-width="{{ section.settings.hex_border_width }}" />
+          <foreignObject x="15" y="25" width="50" height="40">
+            {% if logo != blank %}
+              <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ i }}" loading="lazy">
+            {% else %}
+              <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
+            {% endif %}
+          </foreignObject>
+        </svg>
+      </div>
+      {% if link_url != blank %}
+        </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <!-- Row 2: 9 hexagons -->
+  <div class="hex-row">
+    {% for i in (1..9) %}
+      {% assign logo_key = 'logo_row2_' | append: i %}
+      {% assign link_key = 'link_row2_' | append: i %}
+      {% assign logo = section.settings[logo_key] %}
+      {% assign link_url = section.settings[link_key] %}
+      
+      {% if link_url != blank %}
+        <a href="{{ link_url }}" class="hexagon-link">
+      {% endif %}
+      <div class="hexagon-item">
+        <svg class="hexagon-svg" viewBox="0 0 80 70">
+          <defs>
+            <linearGradient id="hexBorderGradient-row2-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
+              <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
+            </linearGradient>
+          </defs>
+          <polygon class="hex-shape" 
+            points="40,2 70,18 70,52 40,68 10,52 10,18"
+            fill="{{ section.settings.hex_background }}"
+            stroke="url(#hexBorderGradient-row2-{{ i }})"
+            stroke-width="{{ section.settings.hex_border_width }}" />
+          <foreignObject x="17" y="25" width="46" height="36">
+            {% if logo != blank %}
+              <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ i }}" loading="lazy">
+            {% else %}
+              <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
+            {% endif %}
+          </foreignObject>
+        </svg>
+      </div>
+      {% if link_url != blank %}
+        </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <!-- Row 3: 8 hexagons -->
+  <div class="hex-row">
+    {% for i in (1..8) %}
+      {% assign logo_key = 'logo_row3_' | append: i %}
+      {% assign link_key = 'link_row3_' | append: i %}
+      {% assign logo = section.settings[logo_key] %}
+      {% assign link_url = section.settings[link_key] %}
+      
+      {% if link_url != blank %}
+        <a href="{{ link_url }}" class="hexagon-link">
+      {% endif %}
+      <div class="hexagon-item">
+        <svg class="hexagon-svg" viewBox="0 0 80 70">
+          <defs>
+            <linearGradient id="hexBorderGradient-row3-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
+              <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
+            </linearGradient>
+          </defs>
+          <polygon class="hex-shape" 
+            points="40,2 70,18 70,52 40,68 10,52 10,18"
+            fill="{{ section.settings.hex_background }}"
+            stroke="url(#hexBorderGradient-row3-{{ i }})"
+            stroke-width="{{ section.settings.hex_border_width }}" />
+          <foreignObject x="17" y="25" width="46" height="36">
+            {% if logo != blank %}
+              <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ i }}" loading="lazy">
+            {% else %}
+              <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
+            {% endif %}
+          </foreignObject>
+        </svg>
+      </div>
+      {% if link_url != blank %}
+        </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <!-- Row 4: 9 hexagons -->
+  <div class="hex-row">
+    {% for i in (1..9) %}
+      {% assign logo_key = 'logo_row4_' | append: i %}
+      {% assign link_key = 'link_row4_' | append: i %}
+      {% assign logo = section.settings[logo_key] %}
+      {% assign link_url = section.settings[link_key] %}
+      
+      {% if link_url != blank %}
+        <a href="{{ link_url }}" class="hexagon-link">
+      {% endif %}
+      <div class="hexagon-item">
+        <svg class="hexagon-svg" viewBox="0 0 80 70">
+          <defs>
+            <linearGradient id="hexBorderGradient-row4-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
+              <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
+            </linearGradient>
+          </defs>
+          <polygon class="hex-shape" 
+            points="40,2 70,18 70,52 40,68 10,52 10,18"
+            fill="{{ section.settings.hex_background }}"
+            stroke="url(#hexBorderGradient-row4-{{ i }})"
+            stroke-width="{{ section.settings.hex_border_width }}" />
+          <foreignObject x="17" y="25" width="46" height="36">
+            {% if logo != blank %}
+              <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ i }}" loading="lazy">
+            {% else %}
+              <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
+            {% endif %}
+          </foreignObject>
+        </svg>
+      </div>
+      {% if link_url != blank %}
+        </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+    <!-- Stats Section -->
+    <div class="stats-section">
+      <div class="stat-item">
+        <div class="stat-number">{{ section.settings.stat1_number }}</div>
+        <div class="stat-label">{{ section.settings.stat1_label }}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">{{ section.settings.stat2_number }}</div>
+        <div class="stat-label">{{ section.settings.stat2_label }}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">{{ section.settings.stat3_number }}</div>
+        <div class="stat-label">{{ section.settings.stat3_label }}</div>
+      </div>
+    </div>
+
+    <!-- View All Brands Button -->
+    {% if section.settings.button_text != blank %}
+      <a href="{{ section.settings.button_url }}" class="view-brands-btn">{{ section.settings.button_text }}</a>
+    {% endif %}
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Hexagon Brand Grid",
+  "tag": "section",
+  "class": "section-hexagon-grid",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Settings"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "100+ Trusted Brands for Your Kitchen & Restaurant"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title Color",
+      "default": "#2c5aa0"
+    },
+    {
+      "type": "header",
+      "content": "Stats Section"
+    },
+    {
+      "type": "text",
+      "id": "stat1_number",
+      "label": "Stat 1 Number",
+      "default": "100+"
+    },
+    {
+      "type": "text",
+      "id": "stat1_label",
+      "label": "Stat 1 Label",
+      "default": "TRUSTED BRANDS"
+    },
+    {
+      "type": "text",
+      "id": "stat2_number",
+      "label": "Stat 2 Number",
+      "default": "10,000+"
+    },
+    {
+      "type": "text",
+      "id": "stat2_label",
+      "label": "Stat 2 Label",
+      "default": "PRODUCTS"
+    },
+    {
+      "type": "text",
+      "id": "stat3_number",
+      "label": "Stat 3 Number",
+      "default": "25+"
+    },
+    {
+      "type": "text",
+      "id": "stat3_label",
+      "label": "Stat 3 Label",
+      "default": "YEARS EXPERIENCE"
+    },
+    {
+      "type": "color",
+      "id": "stats_number_color",
+      "label": "Stats Number Color",
+      "default": "#f85454"
+    },
+    {
+      "type": "color",
+      "id": "stats_label_color",
+      "label": "Stats Label Color",
+      "default": "#999999"
+    },
+    {
+      "type": "header",
+      "content": "Button Settings"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "View All Brands"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Button URL"
+    },
+    {
+      "type": "color",
+      "id": "button_background_color",
+      "label": "Button Background Color",
+      "default": "#f85454"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_color",
+      "label": "Button Hover Color",
+      "default": "#e74545"
+    },
+    {
+      "type": "header",
+      "content": "Desktop Settings"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_desktop",
+      "label": "Section Padding (Desktop)",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "title_size_desktop",
+      "label": "Title Size (Desktop)",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "default": 24,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "title_margin_desktop",
+      "label": "Title Bottom Margin (Desktop)",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "default": 30,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "hex_size_desktop",
+      "label": "Hexagon Width (Desktop)",
+      "min": 120,
+      "max": 250,
+      "step": 5,
+      "default": 180,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "hex_height_desktop",
+      "label": "Hexagon Height (Desktop)",
+      "min": 120,
+      "max": 250,
+      "step": 5,
+      "default": 160,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "vertical_spacing_desktop",
+      "label": "Vertical Spacing (Desktop)",
+      "min": 40,
+      "max": 120,
+      "step": 2,
+      "default": 80,
+      "unit": "px",
+      "info": "Distance between rows"
+    },
+    {
+      "type": "range",
+      "id": "horizontal_spacing_desktop",
+      "label": "Horizontal Spacing (Desktop)",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "default": 20,
+      "unit": "px",
+      "info": "Distance between hexagons in same row"
+    },
+    {
+      "type": "range",
+      "id": "honeycomb_offset_desktop",
+      "label": "Honeycomb Offset (Desktop)",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 90,
+      "unit": "px",
+      "info": "How much even rows are shifted"
+    },
+    {
+      "type": "header",
+      "content": "Tablet Settings"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_tablet",
+      "label": "Section Padding (Tablet)",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "default": 35,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "title_size_tablet",
+      "label": "Title Size (Tablet)",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "default": 22,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "title_margin_tablet",
+      "label": "Title Bottom Margin (Tablet)",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "default": 25,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "hex_size_tablet",
+      "label": "Hexagon Width (Tablet)",
+      "min": 60,
+      "max": 150,
+      "step": 5,
+      "default": 100,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "hex_height_tablet",
+      "label": "Hexagon Height (Tablet)",
+      "min": 60,
+      "max": 150,
+      "step": 5,
+      "default": 115,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "vertical_spacing_tablet",
+      "label": "Vertical Spacing (Tablet)",
+      "min": 15,
+      "max": 70,
+      "step": 1,
+      "default": 50,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "horizontal_spacing_tablet",
+      "label": "Horizontal Spacing (Tablet)",
+      "min": 3,
+      "max": 25,
+      "step": 1,
+      "default": 12,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "honeycomb_offset_tablet",
+      "label": "Honeycomb Offset (Tablet)",
+      "min": -50,
+      "max": 50,
+      "step": 1,
+      "default": 35,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Mobile Settings"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_mobile",
+      "label": "Section Padding (Mobile)",
+      "min": 10,
+      "max": 80,
+      "step": 5,
+      "default": 30,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "title_size_mobile",
+      "label": "Title Size (Mobile)",
+      "min": 14,
+      "max": 32,
+      "step": 2,
+      "default": 18,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "title_margin_mobile",
+      "label": "Title Bottom Margin (Mobile)",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "hex_size_mobile",
+      "label": "Hexagon Width (Mobile)",
+      "min": 50,
+      "max": 120,
+      "step": 5,
+      "default": 80,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "hex_height_mobile",
+      "label": "Hexagon Height (Mobile)",
+      "min": 50,
+      "max": 120,
+      "step": 5,
+      "default": 95,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "vertical_spacing_mobile",
+      "label": "Vertical Spacing (Mobile)",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "horizontal_spacing_mobile",
+      "label": "Horizontal Spacing (Mobile)",
+      "min": 2,
+      "max": 20,
+      "step": 1,
+      "default": 8,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "honeycomb_offset_mobile",
+      "label": "Honeycomb Offset (Mobile)",
+      "min": -40,
+      "max": 40,
+      "step": 1,
+      "default": 30,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Hexagon Styling"
+    },
+    {
+      "type": "color",
+      "id": "hex_background",
+      "label": "Hexagon Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "hex_border_color",
+      "label": "Hexagon Border Color",
+      "default": "#dc143c"
+    },
+    {
+      "type": "range",
+      "id": "hex_border_width",
+      "label": "Border Width",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 1,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "hover_scale",
+      "label": "Hover Scale Effect",
+      "min": 1.0,
+      "max": 1.2,
+      "step": 0.1,
+      "default": 1
+    },
+    {
+  "type": "color",
+  "id": "hex_border_gradient_start",
+  "label": "Hexagon Border Gradient Start",
+  "default": "#ff0000"
+},
+{
+  "type": "color",
+  "id": "hex_border_gradient_end",
+  "label": "Hexagon Border Gradient End",
+  "default": "#0000ff"
+},
+    {
+      "type": "header",
+      "content": "Row 1 Logos (8 hexagons)"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row1_1",
+      "label": "Row 1 - Logo 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row1_2",
+      "label": "Row 1 - Logo 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row1_3",
+      "label": "Row 1 - Logo 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row1_4",
+      "label": "Row 1 - Logo 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row1_5",
+      "label": "Row 1 - Logo 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row1_6",
+      "label": "Row 1 - Logo 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row1_7",
+      "label": "Row 1 - Logo 7"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row1_8",
+      "label": "Row 1 - Logo 8"
+    },
+    {
+      "type": "header",
+      "content": "Row 1 Links (8 hexagons)"
+    },
+    {
+      "type": "url",
+      "id": "link_row1_1",
+      "label": "Row 1 - Link 1"
+    },
+    {
+      "type": "url",
+      "id": "link_row1_2",
+      "label": "Row 1 - Link 2"
+    },
+    {
+      "type": "url",
+      "id": "link_row1_3",
+      "label": "Row 1 - Link 3"
+    },
+    {
+      "type": "url",
+      "id": "link_row1_4",
+      "label": "Row 1 - Link 4"
+    },
+    {
+      "type": "url",
+      "id": "link_row1_5",
+      "label": "Row 1 - Link 5"
+    },
+    {
+      "type": "url",
+      "id": "link_row1_6",
+      "label": "Row 1 - Link 6"
+    },
+    {
+      "type": "url",
+      "id": "link_row1_7",
+      "label": "Row 1 - Link 7"
+    },
+    {
+      "type": "url",
+      "id": "link_row1_8",
+      "label": "Row 1 - Link 8"
+    },
+    {
+      "type": "header",
+      "content": "Row 2 Logos (9 hexagons)"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row2_1",
+      "label": "Row 2 - Logo 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row2_2",
+      "label": "Row 2 - Logo 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row2_3",
+      "label": "Row 2 - Logo 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row2_4",
+      "label": "Row 2 - Logo 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row2_5",
+      "label": "Row 2 - Logo 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row2_6",
+      "label": "Row 2 - Logo 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row2_7",
+      "label": "Row 2 - Logo 7"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row2_8",
+      "label": "Row 2 - Logo 8"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row2_9",
+      "label": "Row 2 - Logo 9"
+    },
+    {
+      "type": "header",
+      "content": "Row 2 Links (9 hexagons)"
+    },
+    {
+      "type": "url",
+      "id": "link_row2_1",
+      "label": "Row 2 - Link 1"
+    },
+    {
+      "type": "url",
+      "id": "link_row2_2",
+      "label": "Row 2 - Link 2"
+    },
+    {
+      "type": "url",
+      "id": "link_row2_3",
+      "label": "Row 2 - Link 3"
+    },
+    {
+      "type": "url",
+      "id": "link_row2_4",
+      "label": "Row 2 - Link 4"
+    },
+    {
+      "type": "url",
+      "id": "link_row2_5",
+      "label": "Row 2 - Link 5"
+    },
+    {
+      "type": "url",
+      "id": "link_row2_6",
+      "label": "Row 2 - Link 6"
+    },
+    {
+      "type": "url",
+      "id": "link_row2_7",
+      "label": "Row 2 - Link 7"
+    },
+    {
+      "type": "url",
+      "id": "link_row2_8",
+      "label": "Row 2 - Link 8"
+    },
+    {
+      "type": "url",
+      "id": "link_row2_9",
+      "label": "Row 2 - Link 9"
+    },
+    {
+      "type": "header",
+      "content": "Row 3 Logos (8 hexagons)"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row3_1",
+      "label": "Row 3 - Logo 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row3_2",
+      "label": "Row 3 - Logo 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row3_3",
+      "label": "Row 3 - Logo 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row3_4",
+      "label": "Row 3 - Logo 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row3_5",
+      "label": "Row 3 - Logo 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row3_6",
+      "label": "Row 3 - Logo 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row3_7",
+      "label": "Row 3 - Logo 7"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row3_8",
+      "label": "Row 3 - Logo 8"
+    },
+    {
+      "type": "header",
+      "content": "Row 3 Links (8 hexagons)"
+    },
+    {
+      "type": "url",
+      "id": "link_row3_1",
+      "label": "Row 3 - Link 1"
+    },
+    {
+      "type": "url",
+      "id": "link_row3_2",
+      "label": "Row 3 - Link 2"
+    },
+    {
+      "type": "url",
+      "id": "link_row3_3",
+      "label": "Row 3 - Link 3"
+    },
+    {
+      "type": "url",
+      "id": "link_row3_4",
+      "label": "Row 3 - Link 4"
+    },
+    {
+      "type": "url",
+      "id": "link_row3_5",
+      "label": "Row 3 - Link 5"
+    },
+    {
+      "type": "url",
+      "id": "link_row3_6",
+      "label": "Row 3 - Link 6"
+    },
+    {
+      "type": "url",
+      "id": "link_row3_7",
+      "label": "Row 3 - Link 7"
+    },
+    {
+      "type": "url",
+      "id": "link_row3_8",
+      "label": "Row 3 - Link 8"
+    },
+    {
+      "type": "header",
+      "content": "Row 4 Logos (9 hexagons)"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row4_1",
+      "label": "Row 4 - Logo 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row4_2",
+      "label": "Row 4 - Logo 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row4_3",
+      "label": "Row 4 - Logo 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row4_4",
+      "label": "Row 4 - Logo 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row4_5",
+      "label": "Row 4 - Logo 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row4_6",
+      "label": "Row 4 - Logo 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row4_7",
+      "label": "Row 4 - Logo 7"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row4_8",
+      "label": "Row 4 - Logo 8"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_row4_9",
+      "label": "Row 4 - Logo 9"
+    },
+    {
+      "type": "header",
+      "content": "Row 4 Links (9 hexagons)"
+    },
+    {
+      "type": "url",
+      "id": "link_row4_1",
+      "label": "Row 4 - Link 1"
+    },
+    {
+      "type": "url",
+      "id": "link_row4_2",
+      "label": "Row 4 - Link 2"
+    },
+    {
+      "type": "url",
+      "id": "link_row4_3",
+      "label": "Row 4 - Link 3"
+    },
+    {
+      "type": "url",
+      "id": "link_row4_4",
+      "label": "Row 4 - Link 4"
+    },
+    {
+      "type": "url",
+      "id": "link_row4_5",
+      "label": "Row 4 - Link 5"
+    },
+    {
+      "type": "url",
+      "id": "link_row4_6",
+      "label": "Row 4 - Link 6"
+    },
+    {
+      "type": "url",
+      "id": "link_row4_7",
+      "label": "Row 4 - Link 7"
+    },
+    {
+      "type": "url",
+      "id": "link_row4_8",
+      "label": "Row 4 - Link 8"
+    },
+    {
+      "type": "url",
+      "id": "link_row4_9",
+      "label": "Row 4 - Link 9"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hexagon Brand Grid",
+      "category": "Brand Display"
+    }
+  ]
+}
+{% endschema %}

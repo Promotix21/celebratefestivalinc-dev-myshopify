@@ -1,0 +1,781 @@
+<div class="hero-section-wrapper" 
+     style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; background-color: {{ section.settings.section_bg_color }};">
+  
+  <!-- Main Container -->
+  <div class="hero-container" 
+       style="max-width: {{ section.settings.container_width }}px; margin: 0 auto; padding: 0 20px;">
+    
+    <!-- Inner Container with Two Columns -->
+    <div class="hero-content" 
+         style="display: flex; 
+                flex-direction: row; 
+                gap: {{ section.settings.column_gap }}px; 
+                align-items: flex-start;
+                min-height: 500px;">
+      
+      <!-- Left Column: Text Content -->
+      <div class="hero-text-column" 
+           style="flex: {{ section.settings.left_column_width }}; 
+                  {% if section.settings.text_alignment == 'center' %}text-align: center;{% elsif section.settings.text_alignment == 'right' %}text-align: right;{% else %}text-align: left;{% endif %}
+                  padding-right: 20px;">
+        
+        <!-- Trusted Badge -->
+        {% if section.settings.show_trust_badge and section.settings.trust_badge_text != blank %}
+          <div class="trust-badge" 
+               style="display: inline-block; background: {{ section.settings.trust_badge_bg }}; color: {{ section.settings.trust_badge_color }}; padding: 8px 16px; border-radius: 25px; font-size: {{ section.settings.trust_badge_font_size }}px; font-weight: 600; margin-bottom: 20px;">
+            {{ section.settings.trust_badge_text }}
+          </div>
+        {% endif %}
+
+        <!-- Main Heading -->
+        {% if section.settings.heading != blank %}
+          <h1 class="hero-heading" 
+              style="font-size: {{ section.settings.heading_font_size }}px; font-weight: {{ section.settings.heading_font_weight }}; color: {{ section.settings.heading_color }}; line-height: 1.2; margin: 0 0 20px 0;">
+            {{ section.settings.heading }}
+          </h1>
+        {% endif %}
+
+        <!-- Description Text -->
+        {% if section.settings.description != blank %}
+          <div class="hero-description" 
+               style="font-size: {{ section.settings.description_font_size }}px; color: {{ section.settings.description_color }}; line-height: 1.6; margin-bottom: 30px;">
+            {{ section.settings.description }}
+          </div>
+        {% endif %}
+
+        <!-- Feature Icons Grid -->
+        {% if section.settings.show_features %}
+          <div class="features-grid" 
+               style="display: grid; grid-template-columns: repeat({{ section.settings.features_per_row }}, 1fr); gap: {{ section.settings.features_gap }}px; margin-bottom: 30px;">
+            
+            {% for block in section.blocks %}
+              {% if block.type == 'feature' %}
+                <div class="feature-item" 
+                     style="display: flex; align-items: center; gap: 12px;">
+                  
+                  <!-- Feature Icon -->
+                  <div class="feature-icon" 
+                       style="width: {{ section.settings.feature_icon_size }}px; height: {{ section.settings.feature_icon_size }}px; background: {{ block.settings.icon_bg_color }}; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    {% if block.settings.feature_icon %}
+                      <img src="{{ block.settings.feature_icon | image_url: width: 24 }}" 
+                           alt="{{ block.settings.feature_text }}"
+                           style="width: 20px; height: 20px; object-fit: contain;">
+                    {% else %}
+                      <span style="font-size: 16px; color: {{ block.settings.icon_color }};">{{ block.settings.icon_fallback | default: '✓' }}</span>
+                    {% endif %}
+                  </div>
+
+                  <!-- Feature Text -->
+                  <span class="feature-text" 
+                        style="font-size: {{ section.settings.feature_font_size }}px; color: {{ section.settings.feature_text_color }}; font-weight: 500;">
+                    {{ block.settings.feature_text }}
+                  </span>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <!-- Call to Action Button -->
+        {% if section.settings.show_cta and section.settings.cta_text != blank %}
+          <div class="hero-cta">
+            <a href="{{ section.settings.cta_url }}" 
+               class="cta-button"
+               style="display: inline-block; background: {{ section.settings.cta_bg_color }}; color: {{ section.settings.cta_text_color }}; padding: {{ section.settings.cta_padding_vertical }}px {{ section.settings.cta_padding_horizontal }}px; text-decoration: none; border-radius: {{ section.settings.cta_border_radius }}px; font-size: {{ section.settings.cta_font_size }}px; font-weight: {{ section.settings.cta_font_weight }}; transition: all 0.3s ease;">
+              {{ section.settings.cta_text }}
+            </a>
+          </div>
+        {% endif %}
+
+      </div>
+
+      <!-- Right Column: Image Content -->
+      <div class="hero-image-column" 
+           style="flex: {{ section.settings.right_column_width }}; 
+                  position: relative;
+                  padding-left: 20px;">
+        
+        {% if section.settings.hero_image %}
+          <div class="hero-image-container" 
+               style="position: relative; border-radius: {{ section.settings.image_border_radius }}px; overflow: hidden; {% if section.settings.image_shadow %}box-shadow: 0 10px 30px rgba(0,0,0,0.1);{% endif %}">
+            
+            <img src="{{ section.settings.hero_image | image_url: width: section.settings.image_width }}" 
+                 alt="{{ section.settings.image_alt_text | default: section.settings.heading }}"
+                 style="width: 100%; height: {{ section.settings.image_height }}px; object-fit: {{ section.settings.image_fit }}; display: block;">
+
+            <!-- Years Badge Overlay -->
+            {% if section.settings.show_years_badge and section.settings.years_text != blank %}
+              <div class="years-badge" 
+                   style="position: absolute; top: {{ section.settings.badge_top }}px; right: {{ section.settings.badge_right }}px; background: {{ section.settings.badge_bg_color }}; color: {{ section.settings.badge_text_color }}; padding: 15px 20px; border-radius: {{ section.settings.badge_border_radius }}px; text-align: center; font-weight: 700; {% if section.settings.badge_shadow %}box-shadow: 0 4px 12px rgba(0,0,0,0.15);{% endif %}">
+                <div style="font-size: {{ section.settings.badge_number_size }}px; line-height: 1; margin-bottom: 5px;">{{ section.settings.years_number }}</div>
+                <div style="font-size: {{ section.settings.badge_text_size }}px; text-transform: uppercase; letter-spacing: 0.5px;">{{ section.settings.years_text }}</div>
+              </div>
+            {% endif %}
+
+          </div>
+        {% else %}
+          <!-- Placeholder when no image -->
+          <div style="background: #f5f5f5; border: 2px dashed #ddd; border-radius: {{ section.settings.image_border_radius }}px; height: {{ section.settings.image_height }}px; display: flex; align-items: center; justify-content: center; color: #999;">
+            <div style="text-align: center;">
+              <div style="font-size: 48px; margin-bottom: 10px;">📷</div>
+              <div>Add Hero Image</div>
+            </div>
+          </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .hero-section-wrapper .cta-button:hover {
+    background: {{ section.settings.cta_hover_bg | default: '#e55a5a' }} !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .hero-section-wrapper .feature-item:hover .feature-icon {
+    transform: scale(1.1);
+    transition: transform 0.3s ease;
+  }
+
+  /* Ensure proper two-column layout on desktop */
+  @media (min-width: 769px) {
+    .hero-section-wrapper .hero-content {
+      display: flex !important;
+      flex-direction: row !important;
+    }
+    
+    .hero-section-wrapper .hero-text-column {
+      flex: {{ section.settings.left_column_width }} !important;
+    }
+    
+    .hero-section-wrapper .hero-image-column {
+      flex: {{ section.settings.right_column_width }} !important;
+    }
+  }
+
+  /* Responsive Design - Only stack on mobile */
+  @media (max-width: 768px) {
+    .hero-section-wrapper .hero-content {
+      flex-direction: {% if section.settings.mobile_stack_order == 'image_first' %}column-reverse{% else %}column{% endif %} !important;
+      gap: 30px !important;
+    }
+    
+    .hero-section-wrapper .hero-text-column,
+    .hero-section-wrapper .hero-image-column {
+      flex: none !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+    
+    .hero-section-wrapper .features-grid {
+      grid-template-columns: 1fr !important;
+      gap: 15px !important;
+    }
+    
+    .hero-section-wrapper .hero-heading {
+      font-size: {{ section.settings.heading_font_size | minus: 10 }}px !important;
+    }
+    
+    .hero-section-wrapper .years-badge {
+      top: 10px !important;
+      right: 10px !important;
+      padding: 10px 15px !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-section-wrapper .hero-heading {
+      font-size: {{ section.settings.heading_font_size | minus: 16 }}px !important;
+    }
+    
+    .hero-section-wrapper .hero-description {
+      font-size: {{ section.settings.description_font_size | minus: 2 }}px !important;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Hero Section",
+  "class": "hero-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout Settings"
+    },
+    {
+      "type": "range",
+      "id": "container_width",
+      "label": "Container max width",
+      "min": 1000,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Section padding top",
+      "min": 0,
+      "max": 150,
+      "step": 10,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Section padding bottom",
+      "min": 0,
+      "max": 150,
+      "step": 10,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "color",
+      "id": "section_bg_color",
+      "label": "Section background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "label": "Gap between columns",
+      "min": 20,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "left_column_width",
+      "label": "Left column width",
+      "min": 1,
+      "max": 3,
+      "step": 0.1,
+      "default": 1.2
+    },
+    {
+      "type": "range",
+      "id": "right_column_width",
+      "label": "Right column width",
+      "min": 1,
+      "max": 3,
+      "step": 0.1,
+      "default": 1
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment",
+      "label": "Vertical alignment",
+      "options": [
+        { "value": "flex-start", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Bottom" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "mobile_stack_order",
+      "label": "Mobile stacking order",
+      "options": [
+        { "value": "text_first", "label": "Text first, then image" },
+        { "value": "image_first", "label": "Image first, then text" }
+      ],
+      "default": "text_first"
+    },
+    {
+      "type": "header",
+      "content": "Trust Badge"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badge",
+      "label": "Show trust badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "trust_badge_text",
+      "label": "Trust badge text",
+      "default": "Trusted Since 1999"
+    },
+    {
+      "type": "color",
+      "id": "trust_badge_bg",
+      "label": "Trust badge background",
+      "default": "#FF6B6B"
+    },
+    {
+      "type": "color",
+      "id": "trust_badge_color",
+      "label": "Trust badge text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "trust_badge_font_size",
+      "label": "Trust badge font size",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "Main heading",
+      "default": "<p>Your Complete<br>Restaurant Equipment<br>Partner</p>"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "label": "Heading font size",
+      "min": 24,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "select",
+      "id": "heading_font_weight",
+      "label": "Heading font weight",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" },
+        { "value": "800", "label": "Extra Bold" }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#333333"
+    },
+    {
+      "type": "header",
+      "content": "Description"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description text",
+      "default": "<p>For over 25 years, Celebrate Festival Inc has been the trusted choice for restaurant owners nationwide. From cozy cafes to high-volume commercial kitchens, we provide premium equipment solutions that help culinary businesses thrive.</p><p>Based in Fremont, California, we maintain a comprehensive warehouse stocked with equipment from 100+ trusted manufacturers. Our team of industry professionals understands the unique challenges of running a successful food business.</p>"
+    },
+    {
+      "type": "range",
+      "id": "description_font_size",
+      "label": "Description font size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "Description color",
+      "default": "#666666"
+    },
+    {
+      "type": "header",
+      "content": "Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_features",
+      "label": "Show feature icons",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "features_per_row",
+      "label": "Features per row",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "features_gap",
+      "label": "Gap between features",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "feature_icon_size",
+      "label": "Feature icon size",
+      "min": 24,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "feature_font_size",
+      "label": "Feature text size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "feature_text_color",
+      "label": "Feature text color",
+      "default": "#2c2c2c"
+    },
+    {
+      "type": "header",
+      "content": "Call to Action"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show CTA button",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "Button text",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button URL"
+    },
+    {
+      "type": "color",
+      "id": "cta_bg_color",
+      "label": "Button background",
+      "default": "#FF6B6B"
+    },
+    {
+      "type": "color",
+      "id": "cta_text_color",
+      "label": "Button text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "cta_hover_bg",
+      "label": "Button hover background",
+      "default": "#e55a5a"
+    },
+    {
+      "type": "range",
+      "id": "cta_font_size",
+      "label": "Button font size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "cta_font_weight",
+      "label": "Button font weight",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "range",
+      "id": "cta_padding_vertical",
+      "label": "Button vertical padding",
+      "min": 8,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "cta_padding_horizontal",
+      "label": "Button horizontal padding",
+      "min": 16,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "cta_border_radius",
+      "label": "Button border radius",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Hero Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero image"
+    },
+    {
+      "type": "text",
+      "id": "image_alt_text",
+      "label": "Image alt text",
+      "info": "Describe the image for accessibility"
+    },
+    {
+      "type": "range",
+      "id": "image_width",
+      "label": "Image width",
+      "min": 400,
+      "max": 1200,
+      "step": 50,
+      "unit": "px",
+      "default": 800
+    },
+    {
+      "type": "range",
+      "id": "image_height",
+      "label": "Image height",
+      "min": 300,
+      "max": 800,
+      "step": 25,
+      "unit": "px",
+      "default": 500
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "Image fit",
+      "options": [
+        { "value": "cover", "label": "Cover (fill area)" },
+        { "value": "contain", "label": "Contain (fit within area)" },
+        { "value": "fill", "label": "Fill (stretch to fit)" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "range",
+      "id": "image_border_radius",
+      "label": "Image border radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "checkbox",
+      "id": "image_shadow",
+      "label": "Add image shadow",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Years Badge"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_years_badge",
+      "label": "Show years badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "years_number",
+      "label": "Years number",
+      "default": "25+"
+    },
+    {
+      "type": "text",
+      "id": "years_text",
+      "label": "Years text",
+      "default": "YEARS"
+    },
+    {
+      "type": "color",
+      "id": "badge_bg_color",
+      "label": "Badge background",
+      "default": "#FF6B6B"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Badge text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "badge_number_size",
+      "label": "Badge number size",
+      "min": 16,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "badge_text_size",
+      "label": "Badge text size",
+      "min": 8,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "badge_border_radius",
+      "label": "Badge border radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "badge_top",
+      "label": "Badge position from top",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "badge_right",
+      "label": "Badge position from right",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "checkbox",
+      "id": "badge_shadow",
+      "label": "Add badge shadow",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature Item",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "feature_icon",
+          "label": "Feature icon image"
+        },
+        {
+          "type": "text",
+          "id": "icon_fallback",
+          "label": "Icon fallback (emoji or text)",
+          "default": "✓",
+          "info": "Used if no icon image is uploaded"
+        },
+        {
+          "type": "text",
+          "id": "feature_text",
+          "label": "Feature text",
+          "default": "Feature Name"
+        },
+        {
+          "type": "color",
+          "id": "icon_bg_color",
+          "label": "Icon background color",
+          "default": "#FF6B6B"
+        },
+        {
+          "type": "color",
+          "id": "icon_color",
+          "label": "Icon color (for fallback)",
+          "default": "#ffffff"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Section",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "feature_text": "Price Match Guarantee",
+            "icon_fallback": "💰"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "feature_text": "Fast Nationwide Shipping",
+            "icon_fallback": "🚚"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "feature_text": "Expert Support Team",
+            "icon_fallback": "🛠️"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "feature_text": "Large Inventory Stock",
+            "icon_fallback": "📦"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
