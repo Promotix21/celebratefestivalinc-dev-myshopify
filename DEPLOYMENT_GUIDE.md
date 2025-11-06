@@ -2,7 +2,7 @@
 
 ## 📁 Files to Copy to Shopify
 
-You need to copy **2 files** from GitHub to your Shopify theme editor:
+You need to copy **3 files** from GitHub to your Shopify theme editor:
 
 ---
 
@@ -43,21 +43,22 @@ assets/product-webstaurant-improved.css
 
 ---
 
-## Step 3: Create a New Product Template
+## Step 3: Copy the Template JSON File
 
-### In Shopify Theme Customizer:
+### File Location on GitHub:
+```
+templates/product.webstaurant-improved.json
+```
 
-1. Go to **Online Store** → **Themes**
-2. Click **Customize** (on your active theme)
-3. In the top dropdown, change from "Home page" to **"Products"** → **"Default product"**
-4. Click the dropdown again and select **"Create template"**
-5. Name it: `WebstaurantStore Style` (or any name you prefer)
-6. In the template editor:
-   - Remove all existing sections
-   - Click **"Add section"**
-   - Scroll down to find **"Product - WebstaurantStore Style"** (this is your new section)
-   - Add it
-7. Click **Save**
+### Where to Copy in Shopify:
+1. Still in the code editor, find **"Templates"** folder in left sidebar
+2. Click **"Add a new template"**
+3. Choose **"product"** as the template type
+4. Name it: `webstaurant-improved`
+5. Replace the default JSON with the contents of `templates/product.webstaurant-improved.json` from GitHub
+6. Click **Save**
+
+**Result:** The template "product.webstaurant-improved" will now automatically appear in the product template dropdown!
 
 ---
 
@@ -241,6 +242,7 @@ At the top of the page, you'll see a red banner:
 |------|---------|------|
 | `sections/product-webstaurant-improved.liquid` | Product template structure | ~1000 lines |
 | `assets/product-webstaurant-improved.css` | Styling (WebstaurantStore aesthetic) | ~600 lines |
+| `templates/product.webstaurant-improved.json` | Template definition (makes it appear in dropdown) | 1 line |
 
 ---
 
@@ -256,10 +258,9 @@ At the top of the page, you'll see a red banner:
 
 - [ ] Copied `product-webstaurant-improved.liquid` to Sections folder
 - [ ] Copied `product-webstaurant-improved.css` to Assets folder
-- [ ] Created new product template in customizer
-- [ ] Added "Product - WebstaurantStore Style" section to template
+- [ ] Copied `product.webstaurant-improved.json` to Templates folder
+- [ ] Verified template appears in product template dropdown
 - [ ] Enabled "Show Demo Data" for testing
-- [ ] Saved template
 - [ ] Assigned template to test product
 - [ ] Previewed product page
 - [ ] Saw demo data displaying correctly
