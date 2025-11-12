@@ -202,6 +202,14 @@
         <div class="description-section">
           <h2>{{ section.settings.description_heading | default: "Product Description" }}</h2>
 
+          {%- comment %} DEBUG: Product Description {% endcomment -%}
+          <div style="background: yellow; padding: 10px; margin: 10px 0; font-size: 11px; border: 2px solid red;">
+            <strong>DEBUG DESCRIPTION:</strong><br>
+            product.description blank? {{ product.description | blank }}<br>
+            product.description length: {{ product.description | size }}<br>
+            First 200 chars: "{{ product.description | truncate: 200 }}"<br>
+          </div>
+
           {%- if product.description != blank -%}
             {{ product.description }}
           {%- elsif show_demo -%}
@@ -231,6 +239,14 @@
             </div>
           {%- endif -%}
 
+          {%- comment %} DEBUG: Key Features {% endcomment -%}
+          <div style="background: yellow; padding: 10px; margin: 10px 0; font-size: 11px; border: 2px solid red;">
+            <strong>DEBUG KEY FEATURES:</strong><br>
+            feature_sections blank? {{ feature_sections | blank }}<br>
+            feature_sections value: "{{ feature_sections }}"<br>
+            feature_sections type: {{ feature_sections.type }}<br>
+          </div>
+
           {%- if feature_sections != blank -%}
             <h3>Key Features</h3>
             <div style="background: var(--neutral-light); border: 2px solid var(--primary-coral); border-radius: 12px; padding: 25px; margin: 20px 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
@@ -251,8 +267,15 @@
             </div>
           {%- endif -%}
 
-          {%- comment %} Dimensions & Utilities Section {% endcomment -%}
+          {%- comment %} DEBUG: Dimensions & Utilities {% endcomment -%}
           {%- assign dimensions_utilities = product.metafields.custom.dimensions_utilities -%}
+          <div style="background: yellow; padding: 10px; margin: 10px 0; font-size: 11px; border: 2px solid red;">
+            <strong>DEBUG DIMENSIONS & UTILITIES:</strong><br>
+            dimensions_utilities blank? {{ dimensions_utilities | blank }}<br>
+            dimensions_utilities value: "{{ dimensions_utilities }}"<br>
+            dimensions_utilities type: {{ dimensions_utilities.type }}<br>
+          </div>
+
           {%- if dimensions_utilities != blank -%}
             <h3>Dimensions & Utilities</h3>
             <div style="background: var(--neutral-light); border: 2px solid var(--accent-teal); border-radius: 12px; padding: 25px; margin: 20px 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
@@ -478,6 +501,14 @@
         <div class="instant-access-box">
           <div class="instant-access-title">🚀 {{ section.settings.shipping_info_title | default: "Shipping Information" }}</div>
 
+          {%- comment %} DEBUG: Show what we have {% endcomment -%}
+          <div style="background: yellow; padding: 10px; margin: 10px 0; font-size: 11px; border: 2px solid red;">
+            <strong>DEBUG SHIPPING:</strong><br>
+            shipment_text blank? {{ shipment_text | blank }}<br>
+            shipment_text value: "{{ shipment_text }}"<br>
+            shipment_text type: {{ shipment_text.type }}<br>
+          </div>
+
           {%- comment %} Display shipment_text metafield if available (multi-line text) {% endcomment -%}
           {%- if shipment_text != blank -%}
             <p style="font-size: 14px; font-weight: 600; color: var(--success-green); margin-bottom: 10px; white-space: pre-line;">
@@ -577,6 +608,14 @@
           {%- endif -%}
 
           {%- comment %} Display Spec Sheet Rich Text as Table {% endcomment -%}
+          {%- comment %} DEBUG: Spec Sheet {% endcomment -%}
+          <div style="background: yellow; padding: 10px; margin: 10px 0; font-size: 11px; border: 2px solid red;">
+            <strong>DEBUG SPEC SHEET:</strong><br>
+            spec_sheet blank? {{ spec_sheet | blank }}<br>
+            spec_sheet type: {{ spec_sheet.type }}<br>
+            spec_sheet value (truncated): "{{ spec_sheet | truncate: 100 }}"<br>
+          </div>
+
           {%- if spec_sheet != blank -%}
             <div style="margin-bottom: 15px; padding: 10px 0;">
               {{ spec_sheet }}
@@ -624,6 +663,15 @@
           {%- endif -%}
 
           {%- comment %} Display Warranty Rich Text {% endcomment -%}
+          {%- comment %} DEBUG: Warranty {% endcomment -%}
+          <div style="background: yellow; padding: 10px; margin: 10px 0; font-size: 11px; border: 2px solid red;">
+            <strong>DEBUG WARRANTY:</strong><br>
+            warranty_text blank? {{ warranty_text | blank }}<br>
+            warranty_text type: {{ warranty_text.type }}<br>
+            warranty_text has children? {{ warranty_text.children.size }}<br>
+            warranty_text raw: "{{ warranty_text }}"<br>
+          </div>
+
           {%- if warranty_text != blank -%}
           <div class="spec-item">
             <div class="spec-label">Warranty:</div>
