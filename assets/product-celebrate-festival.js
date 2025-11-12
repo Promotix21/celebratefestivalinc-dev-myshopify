@@ -19,6 +19,7 @@
     initThumbnailSwitcher();
     initQuantityInput();
     initProductForm();
+    initCarouselNavigation();
   }
 
   /**
@@ -241,7 +242,86 @@
     });
   }
 
-  // Initialize carousel navigation if needed
-  // initCarouselNavigation();
+  /**
+   * Carousel Navigation with Auto-Slide
+   * Adds manual navigation and auto-slide functionality to product carousels
+   */
+  function initCarouselNavigation() {
+    const carouselWrappers = document.querySelectorAll('.carousel-wrapper');
+
+    carouselWrappers.forEach((wrapper) => {
+      const carousel = wrapper.querySelector('.products-carousel');
+      const leftBtn = wrapper.querySelector('.carousel-nav-left');
+      const rightBtn = wrapper.querySelector('.carousel-nav-right');
+
+      if (!carousel || !leftBtn || !rightBtn) return;
+
+      const scrollAmount = 450; // Scroll by ~2 cards (215px * 2 + gaps)
+      let autoSlideInterval;
+
+      // Manual Navigation - Left Button
+      leftBtn.addEventListener('click', () => {
+        carousel.scrollBy({
+          left: -scrollAmount,
+          behavior: 'smooth'
+        });
+        // Reset auto-slide when manually navigating
+        resetAutoSlide();
+      });
+
+      // Manual Navigation - Right Button
+      rightBtn.addEventListener('click', () => {
+        carousel.scrollBy({
+          left: scrollAmount,
+          behavior: 'smooth'
+        });
+        // Reset auto-slide when manually navigating
+        resetAutoSlide();
+      });
+
+      // Auto-slide Function
+      function startAutoSlide() {
+        autoSlideInterval = setInterval(() => {
+          // Check if we've reached the end
+          if (carousel.scrollLeft + carousel.clientWidth >= carousel.scrollWidth - 10) {
+            // Reset to beginning
+            carousel.scrollTo({
+              left: 0,
+              behavior: 'smooth'
+            });
+          } else {
+            // Scroll right
+            carousel.scrollBy({
+              left: scrollAmount,
+              behavior: 'smooth'
+            });
+          }
+        }, 3000); // Auto-slide every 3 seconds
+      }
+
+      // Stop and restart auto-slide
+      function resetAutoSlide() {
+        if (autoSlideInterval) {
+          clearInterval(autoSlideInterval);
+        }
+        startAutoSlide();
+      }
+
+      // Pause auto-slide on hover
+      carousel.addEventListener('mouseenter', () => {
+        if (autoSlideInterval) {
+          clearInterval(autoSlideInterval);
+        }
+      });
+
+      // Resume auto-slide on mouse leave
+      carousel.addEventListener('mouseleave', () => {
+        startAutoSlide();
+      });
+
+      // Start auto-slide initially
+      startAutoSlide();
+    });
+  }
 
 })();

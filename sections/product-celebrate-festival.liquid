@@ -147,7 +147,11 @@
         {%- if related_collection.products.size > 0 or show_demo -%}
         <div class="other-products-section">
           <h3>{{ related_title }}</h3>
-          <div class="products-carousel">
+          <div class="carousel-wrapper">
+            <button class="carousel-nav carousel-nav-left" aria-label="Previous products">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="products-carousel">
             {%- if related_collection.products.size > 0 -%}
               {%- for related_product in related_collection.products limit: 8 -%}
                 {%- unless related_product.id == product.id -%}
@@ -185,6 +189,10 @@
               </div>
               {%- endfor -%}
             {%- endif -%}
+            </div>
+            <button class="carousel-nav carousel-nav-right" aria-label="Next products">
+              <i class="fas fa-chevron-right"></i>
+            </button>
           </div>
         </div>
         {%- endif -%}
@@ -322,7 +330,11 @@
         {%- if section.settings.enable_bottom_related and related_collection.products.size > 0 or show_demo -%}
         <div class="related-section">
           <h2>{{ section.settings.bottom_related_title | default: "You May Also Need" }}</h2>
-          <div class="products-carousel">
+          <div class="carousel-wrapper">
+            <button class="carousel-nav carousel-nav-left" aria-label="Previous products">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="products-carousel">
             {%- if related_collection.products.size > 0 -%}
               {%- for related_product in related_collection.products limit: 8 -%}
                 {%- unless related_product.id == product.id -%}
@@ -354,6 +366,10 @@
               </div>
               {%- endfor -%}
             {%- endif -%}
+            </div>
+            <button class="carousel-nav carousel-nav-right" aria-label="Next products">
+              <i class="fas fa-chevron-right"></i>
+            </button>
           </div>
         </div>
         {%- endif -%}
