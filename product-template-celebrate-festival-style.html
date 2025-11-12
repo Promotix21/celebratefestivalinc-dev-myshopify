@@ -230,7 +230,8 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            min-width: 280px;
+            min-width: 215px;
+            max-width: 215px;
             flex-shrink: 0;
             border: 1px solid var(--neutral-gray);
             background-color: #fff;
@@ -296,7 +297,7 @@
             font-weight: 500;
             line-height: 1.4;
             display: -webkit-box;
-            -webkit-line-clamp: 2;
+            -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -1218,6 +1219,18 @@
             .compare-table th,
             .compare-table td {
                 padding: 8px;
+            }
+
+            .product-card-small {
+                min-width: 160px;
+                max-width: 160px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product-card-small {
+                min-width: 280px;
+                max-width: 280px;
             }
         }
     </style>

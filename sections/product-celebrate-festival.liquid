@@ -1,0 +1,1041 @@
+{% comment %}
+  Celebrate Festival Inc - Product Template
+  Version: 1.0
+
+  This template supports:
+  - Demo mode for previewing design
+  - Multiple metafield types (text, images, PDFs, arrays, booleans)
+  - Smart related products
+  - Member/non-member pricing
+{% endcomment %}
+
+{%- liquid
+  assign show_demo = section.settings.show_demo_data
+  assign enable_member_pricing = section.settings.enable_member_pricing
+  assign member_discount = section.settings.member_discount_percent
+
+  # Calculate member price if enabled
+  if enable_member_pricing
+    assign discount_multiplier = 100 | minus: member_discount | divided_by: 100.0
+    assign member_price = product.price | times: discount_multiplier
+    assign savings_amount = product.price | minus: member_price
+  endif
+
+  # Get metafields
+  assign specs_table = product.metafields.custom.specs_table_pic_pdf
+  assign material = product.metafields.custom.material
+  assign free_shipping = product.metafields.custom.free_shipping
+  assign feature_sections = product.metafields.custom.feature_sections
+  assign works_with_products = product.metafields.custom.works_with_products
+  assign warranty_doc = product.metafields.custom.warranty_document
+  assign spec_doc = product.metafields.custom.spec_doc
+  assign manual_doc = product.metafields.custom.instructions_manual
+  assign warranty_text = product.metafields.custom.warranty
+
+  # Related products logic
+  assign related_title = section.settings.related_title_default
+  assign related_collection_handle = section.settings.related_collection_default
+
+  # Check for conditional related products based on product type
+  if product.type == section.settings.conditional_product_type_1 and section.settings.conditional_product_type_1 != blank
+    assign related_title = section.settings.conditional_title_1
+    assign related_collection_handle = section.settings.conditional_collection_1
+  elsif product.type == section.settings.conditional_product_type_2 and section.settings.conditional_product_type_2 != blank
+    assign related_title = section.settings.conditional_title_2
+    assign related_collection_handle = section.settings.conditional_collection_2
+  endif
+
+  # Get related collection
+  if related_collection_handle != blank
+    assign related_collection = collections[related_collection_handle]
+  else
+    # Fallback to same collection or vendor
+    if product.collections.size > 0
+      assign related_collection = product.collections.first
+    endif
+  endif
+-%}
+
+{{ 'product-celebrate-festival.css' | asset_url | stylesheet_tag }}
+
+<div class="celebrate-festival-product-template">
+  <div class="container">
+
+    {%- if section.settings.show_breadcrumb -%}
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <nav class="breadcrumb-nav">
+        <a href="/"><i class="fas fa-home"></i> Home</a>
+        <span class="breadcrumb-separator">&gt;</span>
+        {%- if product.collections.size > 0 -%}
+          {%- assign main_collection = product.collections.first -%}
+          <a href="{{ main_collection.url }}">{{ main_collection.title }}</a>
+          <span class="breadcrumb-separator">&gt;</span>
+        {%- endif -%}
+        <span>{{ product.title }}</span>
+      </nav>
+    </div>
+    {%- endif -%}
+
+    <!-- Main Two Column Layout -->
+    <div class="product-layout">
+
+      <!-- LEFT COLUMN - MAIN CONTENT -->
+      <div class="main-content">
+
+        <!-- Product Title & Meta -->
+        <div>
+          <h1 class="product-title">{{ product.title }}</h1>
+
+          <div class="product-meta">
+            {%- if product.vendor != blank -%}
+              Vendor: <a href="/collections/vendors?q={{ product.vendor | url_encode }}">{{ product.vendor }}</a>
+            {%- endif -%}
+            {%- if product.vendor != blank and product.sku != blank %} | {% endif -%}
+            {%- if product.sku != blank -%}
+              SKU: {{ product.sku }}
+            {%- endif -%}
+          </div>
+        </div>
+
+        <!-- Product Images with Vertical Thumbnails -->
+        <div class="product-images-wrapper">
+          <div class="product-images-section">
+
+            <!-- Vertical Thumbnail Column -->
+            {%- if product.images.size > 1 or show_demo -%}
+            <div class="thumbnail-column">
+              {%- if product.images.size > 1 -%}
+                {%- for image in product.images limit: 6 -%}
+                  <div class="thumbnail {% if forloop.first %}active{% endif %}" data-image-index="{{ forloop.index0 }}">
+                    <img src="{{ image | image_url: width: 70 }}" alt="{{ image.alt | escape }}">
+                  </div>
+                {%- endfor -%}
+              {%- elsif show_demo -%}
+                {%- for i in (1..6) -%}
+                  <div class="thumbnail {% if forloop.first %}active{% endif %}" data-image-index="{{ forloop.index0 }}">
+                    <img src="https://via.placeholder.com/70x70/f7fafc/718096?text={{ i }}" alt="Demo Image {{ i }}">
+                  </div>
+                {%- endfor -%}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+
+            <!-- Main Product Image -->
+            <div class="main-image-container">
+              {%- if product.featured_image -%}
+                <img id="main-product-image" src="{{ product.featured_image | image_url: width: 800 }}" alt="{{ product.featured_image.alt | escape }}">
+              {%- elsif show_demo -%}
+                <img id="main-product-image" src="https://via.placeholder.com/600x600/f7fafc/1a2332?text=Main+Product+Image" alt="Demo Product">
+              {%- else -%}
+                {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+              {%- endif -%}
+              <div class="zoom-indicator">
+                <i class="fas fa-search-plus"></i>
+                Hover to zoom
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Other Products from this Line -->
+        {%- if related_collection.products.size > 0 or show_demo -%}
+        <div class="other-products-section">
+          <h3>{{ related_title }}</h3>
+          <div class="products-carousel">
+            {%- if related_collection.products.size > 0 -%}
+              {%- for related_product in related_collection.products limit: 8 -%}
+                {%- unless related_product.id == product.id -%}
+                <a href="{{ related_product.url }}" class="product-card-small">
+                  {%- if related_product.tags contains 'hot-deal' -%}
+                    <span class="product-badge">Hot Deal</span>
+                  {%- elsif related_product.tags contains 'new' -%}
+                    <span class="product-badge new">New</span>
+                  {%- endif -%}
+                  <div class="product-card-small-image">
+                    {%- if related_product.featured_image -%}
+                      <img src="{{ related_product.featured_image | image_url: width: 80 }}" alt="{{ related_product.title | escape }}">
+                    {%- else -%}
+                      {{ 'product-1' | placeholder_svg_tag }}
+                    {%- endif -%}
+                  </div>
+                  <div class="product-card-small-info">
+                    <div class="product-card-title-small">{{ related_product.title }}</div>
+                    <div class="product-card-price-small">{{ related_product.price | money }}</div>
+                  </div>
+                </a>
+                {%- endunless -%}
+              {%- endfor -%}
+            {%- elsif show_demo -%}
+              {%- for i in (1..6) -%}
+              <div class="product-card-small">
+                {% if i <= 3 %}<span class="product-badge">Hot Deal</span>{% endif %}
+                <div class="product-card-small-image">
+                  <img src="https://via.placeholder.com/80x80/f7fafc/718096?text={{ i }}" alt="Demo Product">
+                </div>
+                <div class="product-card-small-info">
+                  <div class="product-card-title-small">Demo Related Product {{ i }} with Long Name</div>
+                  <div class="product-card-price-small">$2,{{ i }}99.00</div>
+                </div>
+              </div>
+              {%- endfor -%}
+            {%- endif -%}
+          </div>
+        </div>
+        {%- endif -%}
+
+        <!-- Product Description -->
+        {%- if product.description != blank or show_demo -%}
+        <div class="description-section">
+          <h2>{{ section.settings.description_heading | default: "Product Description" }}</h2>
+
+          {%- if product.description != blank -%}
+            {{ product.description }}
+          {%- elsif show_demo -%}
+            <p>This is a demo description. Your actual product description will appear here when you add it to your product.</p>
+
+            <div class="feature-icons-grid">
+              <div class="feature-icon-item">
+                <div class="feature-icon-img">📦</div>
+                <h4>Feature One</h4>
+                <p>Description here</p>
+              </div>
+              <div class="feature-icon-item">
+                <div class="feature-icon-img">🌡️</div>
+                <h4>Feature Two</h4>
+                <p>Description here</p>
+              </div>
+              <div class="feature-icon-item">
+                <div class="feature-icon-img">⚡</div>
+                <h4>Feature Three</h4>
+                <p>Description here</p>
+              </div>
+              <div class="feature-icon-item">
+                <div class="feature-icon-img">🔧</div>
+                <h4>Feature Four</h4>
+                <p>Description here</p>
+              </div>
+            </div>
+          {%- endif -%}
+
+          {%- if feature_sections != blank -%}
+            <h3>Key Features</h3>
+            <ul>
+              {%- assign features = feature_sections | split: '/' -%}
+              {%- for feature in features -%}
+                <li>{{ feature }}</li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </div>
+        {%- endif -%}
+
+        <!-- Q&A Section -->
+        {%- if section.settings.enable_qa or show_demo -%}
+        <div class="qa-section">
+          <h2>{{ section.settings.qa_heading | default: "Questions & Answers" }}</h2>
+
+          {%- if section.settings.qa_items != blank -%}
+            {%- assign qa_items = section.settings.qa_items | split: '||' -%}
+            {%- for item in qa_items -%}
+              {%- assign qa_parts = item | split: '|' -%}
+              <div class="qa-item">
+                <div class="qa-question">Q: {{ qa_parts[0] }}</div>
+                <div class="qa-answer">A: {{ qa_parts[1] }}</div>
+                {%- if qa_parts[2] != blank -%}
+                  <div class="qa-meta">{{ qa_parts[2] }}</div>
+                {%- endif -%}
+              </div>
+            {%- endfor -%}
+          {%- elsif show_demo -%}
+            <div class="qa-item">
+              <div class="qa-question">Q: What is the warranty on this product?</div>
+              <div class="qa-answer">A: This product comes with a comprehensive warranty. Check the specifications section for details.</div>
+              <div class="qa-meta">Asked by: Customer | Answered by: Celebrate Festival Team</div>
+            </div>
+          {%- endif -%}
+
+          {%- if section.settings.qa_button_text != blank -%}
+            <button class="ask-question-btn" onclick="window.location.href='{{ section.settings.qa_button_link }}'">
+              {{ section.settings.qa_button_text }}
+            </button>
+          {%- endif -%}
+        </div>
+        {%- endif -%}
+
+        <!-- Compare Section -->
+        {%- if section.settings.enable_compare or show_demo -%}
+        <div class="compare-section">
+          <h2>{{ section.settings.compare_heading | default: "Compare to Other Products" }}</h2>
+          <p style="text-align: center; color: var(--text-light); margin-bottom: 20px;">
+            Configure comparison products in theme settings
+          </p>
+        </div>
+        {%- endif -%}
+
+        <!-- Customer Reviews -->
+        {%- if section.settings.enable_reviews -%}
+        <div class="reviews-section" id="shopify-product-reviews">
+          <h2>{{ section.settings.reviews_heading | default: "Customer Reviews" }}</h2>
+          <div id="shopify-product-reviews" data-id="{{ product.id }}"></div>
+        </div>
+        {%- endif -%}
+
+        <!-- Related Products (Bottom) -->
+        {%- if section.settings.enable_bottom_related and related_collection.products.size > 0 or show_demo -%}
+        <div class="related-section">
+          <h2>{{ section.settings.bottom_related_title | default: "You May Also Need" }}</h2>
+          <div class="products-carousel">
+            {%- if related_collection.products.size > 0 -%}
+              {%- for related_product in related_collection.products limit: 8 -%}
+                {%- unless related_product.id == product.id -%}
+                <a href="{{ related_product.url }}" class="product-card-small">
+                  <div class="product-card-small-image">
+                    {%- if related_product.featured_image -%}
+                      <img src="{{ related_product.featured_image | image_url: width: 80 }}" alt="{{ related_product.title | escape }}">
+                    {%- else -%}
+                      {{ 'product-1' | placeholder_svg_tag }}
+                    {%- endif -%}
+                  </div>
+                  <div class="product-card-small-info">
+                    <div class="product-card-title-small">{{ related_product.title }}</div>
+                    <div class="product-card-price-small">{{ related_product.price | money }}</div>
+                  </div>
+                </a>
+                {%- endunless -%}
+              {%- endfor -%}
+            {%- elsif show_demo -%}
+              {%- for i in (1..6) -%}
+              <div class="product-card-small">
+                <div class="product-card-small-image">
+                  <img src="https://via.placeholder.com/80x80/f7fafc/718096?text=Item{{ i }}" alt="Demo">
+                </div>
+                <div class="product-card-small-info">
+                  <div class="product-card-title-small">Accessory Product {{ i }}</div>
+                  <div class="product-card-price-small">${{ i }}9.99</div>
+                </div>
+              </div>
+              {%- endfor -%}
+            {%- endif -%}
+          </div>
+        </div>
+        {%- endif -%}
+      </div>
+
+      <!-- RIGHT SIDEBAR -->
+      <div class="sidebar">
+
+        <!-- Price Box with Member/Non-Member Pricing -->
+        <div class="price-box">
+          <div class="price-type-label">{{ section.settings.price_label | default: "Price:" }}</div>
+          <div class="price-main">
+            {{ product.price | money }}
+            <span class="price-unit">/{{ section.settings.price_unit | default: "Each" }}</span>
+          </div>
+
+          {%- if enable_member_pricing -%}
+          <div class="price-member-section">
+            <div class="price-type-label">{{ section.settings.member_price_label | default: "Plus Member Price:" }}</div>
+            <div class="member-price">
+              {{ member_price | money }}
+              <span>/{{ section.settings.price_unit | default: "Each" }}</span>
+            </div>
+            <span class="savings-badge">Save {{ savings_amount | money }} ({{ member_discount }}%)</span>
+          </div>
+          {%- endif -%}
+        </div>
+
+        <!-- Shipping Alert -->
+        {%- if section.settings.shipping_alert_text != blank -%}
+        <div class="alert-box alert-warning">
+          ⚠️ {{ section.settings.shipping_alert_text }}
+        </div>
+        {%- endif -%}
+
+        {%- if free_shipping -%}
+        <div class="alert-box" style="background-color: #d4edda; border-color: #6bcf7f; color: #155724;">
+          ✓ This item qualifies for FREE SHIPPING
+        </div>
+        {%- endif -%}
+
+        <!-- Plus Member Info -->
+        {%- if enable_member_pricing and section.settings.member_info_text != blank -%}
+        <div class="alert-box alert-dark">
+          🌟 {{ section.settings.member_info_text }}
+        </div>
+        {%- endif -%}
+
+        <!-- Quantity and Add to Cart -->
+        <div class="quantity-section">
+          <form action="/cart/add" method="post" enctype="multipart/form-data" id="product-form">
+            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+
+            <label class="quantity-label">Quantity:</label>
+            <div class="quantity-input-group">
+              <input type="number" name="quantity" value="1" min="1" id="quantity-input">
+              <span>{{ section.settings.price_unit | default: "Each" }}</span>
+            </div>
+
+            <div class="action-buttons">
+              <button type="submit" class="btn btn-add-cart" {% unless product.available %}disabled{% endunless %}>
+                <i class="fas fa-shopping-cart"></i>
+                {%- if product.available -%}
+                  {{ section.settings.add_to_cart_text | default: "Add to Cart" }}
+                {%- else -%}
+                  Sold Out
+                {%- endif -%}
+              </button>
+              <button type="button" class="btn btn-add-list" onclick="window.location.href='/pages/wishlist'">
+                <i class="fas fa-heart"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Instant Access Shipping -->
+        {%- if section.settings.show_shipping_info -%}
+        <div class="instant-access-box">
+          <div class="instant-access-title">🚀 {{ section.settings.shipping_info_title | default: "Shipping Information" }}</div>
+          {%- if section.settings.shipping_info_list != blank -%}
+            <ul class="instant-access-list">
+              {%- assign shipping_items = section.settings.shipping_info_list | split: '|' -%}
+              {%- for item in shipping_items -%}
+                <li>{{ item }}</li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+          {%- if section.settings.shipping_link_text != blank -%}
+            <a href="{{ section.settings.shipping_link_url }}" class="instant-access-link">
+              {{ section.settings.shipping_link_text }} →
+            </a>
+          {%- endif -%}
+        </div>
+        {%- endif -%}
+
+        <!-- Brand Promotional Banner -->
+        {%- if section.settings.show_brand_banner -%}
+        <div class="sidebar-banner">
+          <div class="promo-banner-1">
+            <div class="brand-name">{{ section.settings.brand_banner_name | default: product.vendor | upcase }}</div>
+            <div class="tagline">{{ section.settings.brand_banner_tagline }}</div>
+            <div class="description">{{ section.settings.brand_banner_description }}</div>
+            {%- if section.settings.brand_banner_features != blank -%}
+            <div class="features-check">
+              {%- assign features = section.settings.brand_banner_features | split: '|' -%}
+              {%- for feature in features -%}
+                ✓ {{ feature }}<br>
+              {%- endfor -%}
+            </div>
+            {%- endif -%}
+          </div>
+        </div>
+        {%- endif -%}
+
+        <!-- Parts & Service Banner -->
+        {%- if section.settings.show_service_banner -%}
+        <div class="sidebar-banner">
+          <div class="promo-banner-2">
+            <div class="icon">{{ section.settings.service_banner_icon | default: "🏆" }}</div>
+            <div class="title">{{ section.settings.service_banner_title }}</div>
+            <div class="description">{{ section.settings.service_banner_description }}</div>
+            {%- if section.settings.service_banner_list != blank -%}
+            <hr>
+            <div class="services-list">
+              {{ section.settings.service_banner_list | newline_to_br }}
+            </div>
+            {%- endif -%}
+            {%- if section.settings.service_banner_button_text != blank -%}
+            <button class="cta-btn" onclick="window.location.href='{{ section.settings.service_banner_button_url }}'">
+              {{ section.settings.service_banner_button_text }}
+            </button>
+            {%- endif -%}
+          </div>
+        </div>
+        {%- endif -%}
+
+        <!-- SPECIFICATIONS IN SIDEBAR -->
+        <div class="sidebar-specs">
+          <h4>📋 Specifications</h4>
+
+          {%- comment %} Handle specs_table_pic_pdf metafield - can be image or PDF {% endcomment -%}
+          {%- if specs_table -%}
+            {%- if specs_table.value != blank -%}
+              {%- assign file_extension = specs_table.value | split: '.' | last | downcase -%}
+
+              {%- if file_extension == 'pdf' -%}
+                {%- comment %} It's a PDF - show download link {% endcomment -%}
+                <div class="spec-item" style="display: block; text-align: center; padding: 20px;">
+                  <a href="{{ specs_table.value }}" target="_blank" class="spec-download-btn" style="display: inline-block; background: var(--primary-coral); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                    <i class="fas fa-file-pdf"></i> Download Specifications PDF
+                  </a>
+                </div>
+              {%- else -%}
+                {%- comment %} It's an image - display it {% endcomment -%}
+                <div class="spec-item" style="display: block;">
+                  <img src="{{ specs_table.value }}" alt="Product Specifications" style="width: 100%; height: auto; border-radius: 8px;">
+                </div>
+              {%- endif -%}
+            {%- endif -%}
+          {%- else -%}
+            {%- comment %} Fallback to manual specifications {% endcomment -%}
+
+            {%- if material != blank -%}
+            <div class="spec-item">
+              <div class="spec-label">Material:</div>
+              <div class="spec-value">{{ material }}</div>
+            </div>
+            {%- endif -%}
+
+            {%- if product.weight -%}
+            <div class="spec-item">
+              <div class="spec-label">Weight:</div>
+              <div class="spec-value">{{ product.weight | weight_with_unit }}</div>
+            </div>
+            {%- endif -%}
+
+            {%- if product.vendor -%}
+            <div class="spec-item">
+              <div class="spec-label">Brand:</div>
+              <div class="spec-value">{{ product.vendor }}</div>
+            </div>
+            {%- endif -%}
+
+            {%- if product.type -%}
+            <div class="spec-item">
+              <div class="spec-label">Type:</div>
+              <div class="spec-value">{{ product.type }}</div>
+            </div>
+            {%- endif -%}
+
+            {%- if warranty_text != blank -%}
+            <div class="spec-item">
+              <div class="spec-label">Warranty:</div>
+              <div class="spec-value">{{ warranty_text }}</div>
+            </div>
+            {%- endif -%}
+
+            {%- if show_demo and material == blank -%}
+              <div class="spec-item">
+                <div class="spec-label">Type:</div>
+                <div class="spec-value">Demo Product</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-label">Capacity:</div>
+                <div class="spec-value">Demo Value</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-label">Dimensions:</div>
+                <div class="spec-value">24" x 30" x 36"</div>
+              </div>
+            {%- endif -%}
+          {%- endif -%}
+        </div>
+
+        <!-- Resources Box -->
+        {%- if warranty_doc != blank or spec_doc != blank or manual_doc != blank or section.settings.show_resources or show_demo -%}
+        <div class="sidebar-info-box">
+          <h4>📄 Resources & Documents</h4>
+          <ul>
+            {%- if spec_doc != blank -%}
+              <li><a href="{{ spec_doc }}" target="_blank">Spec Sheet (PDF)</a></li>
+            {%- endif -%}
+            {%- if manual_doc != blank -%}
+              <li><a href="{{ manual_doc }}" target="_blank">Installation Manual</a></li>
+            {%- endif -%}
+            {%- if warranty_doc != blank -%}
+              <li><a href="{{ warranty_doc }}" target="_blank">Warranty Information</a></li>
+            {%- endif -%}
+            {%- if section.settings.resource_links != blank -%}
+              {%- assign resources = section.settings.resource_links | split: '|' -%}
+              {%- for resource in resources -%}
+                {%- assign resource_parts = resource | split: '::' -%}
+                <li><a href="{{ resource_parts[1] }}" target="_blank">{{ resource_parts[0] }}</a></li>
+              {%- endfor -%}
+            {%- endif -%}
+            {%- if show_demo and spec_doc == blank -%}
+              <li><a href="#">Demo Spec Sheet</a></li>
+              <li><a href="#">Demo Manual</a></li>
+              <li><a href="#">Demo Warranty Info</a></li>
+            {%- endif -%}
+          </ul>
+        </div>
+        {%- endif -%}
+
+        <!-- Additional Resources Banner -->
+        {%- if section.settings.show_additional_resources -%}
+        <div class="sidebar-banner">
+          <div class="promo-banner-3">
+            <div class="title">{{ section.settings.additional_resources_title | default: "📚 Additional Resources" }}</div>
+            <div class="description">{{ section.settings.additional_resources_description }}</div>
+            {%- if section.settings.video_resources != blank -%}
+            <div class="resource-box">
+              <h5>📹 Video Resources:</h5>
+              <ul>
+                {%- assign videos = section.settings.video_resources | split: '|' -%}
+                {%- for video in videos -%}
+                  <li>{{ video }}</li>
+                {%- endfor -%}
+              </ul>
+            </div>
+            {%- endif -%}
+            {%- if section.settings.guide_resources != blank -%}
+            <div class="resource-box">
+              <h5>📖 Buying Guides:</h5>
+              <ul>
+                {%- assign guides = section.settings.guide_resources | split: '|' -%}
+                {%- for guide in guides -%}
+                  <li>{{ guide }}</li>
+                {%- endfor -%}
+              </ul>
+            </div>
+            {%- endif -%}
+          </div>
+        </div>
+        {%- endif -%}
+
+        <!-- Help Box -->
+        {%- if section.settings.show_help_box -%}
+        <div class="sidebar-info-box">
+          <h4>💡 Need Help?</h4>
+          <ul>
+            {%- if section.settings.help_phone != blank -%}
+              <li>📞 Call: <a href="tel:{{ section.settings.help_phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' }}">{{ section.settings.help_phone }}</a></li>
+            {%- endif -%}
+            {%- if section.settings.help_email != blank -%}
+              <li>📧 <a href="mailto:{{ section.settings.help_email }}">Email Support</a></li>
+            {%- endif -%}
+            {%- if section.settings.help_chat_enabled -%}
+              <li>💬 Live Chat Available</li>
+            {%- endif -%}
+            {%- if section.settings.help_additional_links != blank -%}
+              {%- assign help_links = section.settings.help_additional_links | split: '|' -%}
+              {%- for link in help_links -%}
+                <li>{{ link }}</li>
+              {%- endfor -%}
+            {%- endif -%}
+          </ul>
+        </div>
+        {%- endif -%}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ 'product-celebrate-festival.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Product - Celebrate Festival",
+  "settings": [
+    {
+      "type": "header",
+      "content": "🎨 Demo Mode"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_demo_data",
+      "label": "Show Demo Data",
+      "default": false,
+      "info": "Enable to preview design with sample data. Disable for live products."
+    },
+    {
+      "type": "header",
+      "content": "🛒 General Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumb",
+      "label": "Show Breadcrumb",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "description_heading",
+      "label": "Description Section Heading",
+      "default": "Product Description"
+    },
+    {
+      "type": "header",
+      "content": "💰 Pricing Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_member_pricing",
+      "label": "Enable Member Pricing",
+      "default": true,
+      "info": "Show member vs non-member pricing"
+    },
+    {
+      "type": "range",
+      "id": "member_discount_percent",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "%",
+      "label": "Member Discount Percentage",
+      "default": 2
+    },
+    {
+      "type": "text",
+      "id": "price_label",
+      "label": "Price Label",
+      "default": "Non-Member Price:"
+    },
+    {
+      "type": "text",
+      "id": "member_price_label",
+      "label": "Member Price Label",
+      "default": "Plus Member Price:"
+    },
+    {
+      "type": "text",
+      "id": "price_unit",
+      "label": "Price Unit",
+      "default": "Each"
+    },
+    {
+      "type": "text",
+      "id": "member_info_text",
+      "label": "Member Info Text",
+      "default": "Plus Members save on this item. Learn more",
+      "info": "Text shown in member info box"
+    },
+    {
+      "type": "header",
+      "content": "🚚 Shipping Settings"
+    },
+    {
+      "type": "text",
+      "id": "shipping_alert_text",
+      "label": "Shipping Alert Text",
+      "default": "This item ships via freight. Additional time and fees may apply.",
+      "info": "Leave blank to hide"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_shipping_info",
+      "label": "Show Shipping Info Box",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "shipping_info_title",
+      "label": "Shipping Info Title",
+      "default": "Instant Access Shipping"
+    },
+    {
+      "type": "textarea",
+      "id": "shipping_info_list",
+      "label": "Shipping Info List",
+      "default": "Ships in 1-2 business days|Ships via freight carrier|Free lift gate service included",
+      "info": "Separate items with | (pipe character)"
+    },
+    {
+      "type": "text",
+      "id": "shipping_link_text",
+      "label": "Shipping Link Text",
+      "default": "See all shipping options"
+    },
+    {
+      "type": "url",
+      "id": "shipping_link_url",
+      "label": "Shipping Link URL",
+      "default": "/pages/shipping"
+    },
+    {
+      "type": "header",
+      "content": "🛍️ Add to Cart"
+    },
+    {
+      "type": "text",
+      "id": "add_to_cart_text",
+      "label": "Add to Cart Button Text",
+      "default": "Add to Cart"
+    },
+    {
+      "type": "header",
+      "content": "🔗 Related Products"
+    },
+    {
+      "type": "text",
+      "id": "related_title_default",
+      "label": "Default Related Products Title",
+      "default": "Other Products from this Line"
+    },
+    {
+      "type": "collection",
+      "id": "related_collection_default",
+      "label": "Default Related Products Collection",
+      "info": "Fallback to same collection if empty"
+    },
+    {
+      "type": "text",
+      "id": "conditional_product_type_1",
+      "label": "Conditional Product Type 1",
+      "info": "If product type matches, use settings below"
+    },
+    {
+      "type": "text",
+      "id": "conditional_title_1",
+      "label": "Conditional Title 1",
+      "info": "Title to show for conditional type 1"
+    },
+    {
+      "type": "collection",
+      "id": "conditional_collection_1",
+      "label": "Conditional Collection 1"
+    },
+    {
+      "type": "text",
+      "id": "conditional_product_type_2",
+      "label": "Conditional Product Type 2"
+    },
+    {
+      "type": "text",
+      "id": "conditional_title_2",
+      "label": "Conditional Title 2"
+    },
+    {
+      "type": "collection",
+      "id": "conditional_collection_2",
+      "label": "Conditional Collection 2"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_bottom_related",
+      "label": "Show Bottom Related Products",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "bottom_related_title",
+      "label": "Bottom Related Products Title",
+      "default": "You May Also Need"
+    },
+    {
+      "type": "header",
+      "content": "❓ Q&A Section"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_qa",
+      "label": "Enable Q&A Section",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "qa_heading",
+      "label": "Q&A Heading",
+      "default": "Questions & Answers"
+    },
+    {
+      "type": "textarea",
+      "id": "qa_items",
+      "label": "Q&A Items",
+      "info": "Format: Question|Answer|Meta||Question|Answer|Meta (use || to separate items)"
+    },
+    {
+      "type": "text",
+      "id": "qa_button_text",
+      "label": "Ask Question Button Text",
+      "default": "Ask a Question"
+    },
+    {
+      "type": "url",
+      "id": "qa_button_link",
+      "label": "Ask Question Button Link",
+      "default": "/pages/contact"
+    },
+    {
+      "type": "header",
+      "content": "⚖️ Compare Section"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_compare",
+      "label": "Enable Compare Section",
+      "default": false,
+      "info": "Note: Comparison table requires custom development"
+    },
+    {
+      "type": "text",
+      "id": "compare_heading",
+      "label": "Compare Heading",
+      "default": "Compare to Other Products"
+    },
+    {
+      "type": "header",
+      "content": "⭐ Reviews"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_reviews",
+      "label": "Enable Reviews Section",
+      "default": true,
+      "info": "Requires Shopify Product Reviews app"
+    },
+    {
+      "type": "text",
+      "id": "reviews_heading",
+      "label": "Reviews Heading",
+      "default": "Customer Reviews"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Brand Banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_brand_banner",
+      "label": "Show Brand Banner",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "brand_banner_name",
+      "label": "Brand Banner Name",
+      "info": "Leave blank to use product vendor"
+    },
+    {
+      "type": "text",
+      "id": "brand_banner_tagline",
+      "label": "Brand Banner Tagline"
+    },
+    {
+      "type": "textarea",
+      "id": "brand_banner_description",
+      "label": "Brand Banner Description"
+    },
+    {
+      "type": "textarea",
+      "id": "brand_banner_features",
+      "label": "Brand Banner Features",
+      "info": "Separate features with | (pipe character)"
+    },
+    {
+      "type": "header",
+      "content": "🏆 Service Banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_service_banner",
+      "label": "Show Service Banner",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "service_banner_icon",
+      "label": "Service Banner Icon (Emoji)",
+      "default": "🏆"
+    },
+    {
+      "type": "text",
+      "id": "service_banner_title",
+      "label": "Service Banner Title",
+      "default": "Proud Parts & Service Partner"
+    },
+    {
+      "type": "textarea",
+      "id": "service_banner_description",
+      "label": "Service Banner Description"
+    },
+    {
+      "type": "textarea",
+      "id": "service_banner_list",
+      "label": "Service Banner List",
+      "info": "Services available - use line breaks"
+    },
+    {
+      "type": "text",
+      "id": "service_banner_button_text",
+      "label": "Service Banner Button Text",
+      "default": "Find Parts & Manuals"
+    },
+    {
+      "type": "url",
+      "id": "service_banner_button_url",
+      "label": "Service Banner Button URL"
+    },
+    {
+      "type": "header",
+      "content": "📄 Resources"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_resources",
+      "label": "Show Resources Box",
+      "default": true,
+      "info": "Shows metafield PDFs automatically"
+    },
+    {
+      "type": "textarea",
+      "id": "resource_links",
+      "label": "Additional Resource Links",
+      "info": "Format: Link Text::URL|Link Text::URL"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_additional_resources",
+      "label": "Show Additional Resources Banner",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "additional_resources_title",
+      "label": "Additional Resources Title",
+      "default": "📚 Additional Resources"
+    },
+    {
+      "type": "textarea",
+      "id": "additional_resources_description",
+      "label": "Additional Resources Description"
+    },
+    {
+      "type": "textarea",
+      "id": "video_resources",
+      "label": "Video Resources List",
+      "info": "Separate with | (pipe character)"
+    },
+    {
+      "type": "textarea",
+      "id": "guide_resources",
+      "label": "Guide Resources List",
+      "info": "Separate with | (pipe character)"
+    },
+    {
+      "type": "header",
+      "content": "💡 Help Box"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_help_box",
+      "label": "Show Help Box",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "help_phone",
+      "label": "Help Phone Number",
+      "default": "(408) 673-9999"
+    },
+    {
+      "type": "text",
+      "id": "help_email",
+      "label": "Help Email"
+    },
+    {
+      "type": "checkbox",
+      "id": "help_chat_enabled",
+      "label": "Show Live Chat Option",
+      "default": true
+    },
+    {
+      "type": "textarea",
+      "id": "help_additional_links",
+      "label": "Additional Help Links",
+      "info": "Separate with | (pipe character)"
+    }
+  ]
+}
+{% endschema %}
