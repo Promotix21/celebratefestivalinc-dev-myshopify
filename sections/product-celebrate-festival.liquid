@@ -538,22 +538,11 @@
         </div>
         {%- endif -%}
 
-        <!-- Brand Promotional Banner -->
-        {%- if section.settings.show_brand_banner -%}
-        <div class="sidebar-banner">
-          <div class="promo-banner-1">
-            <div class="brand-name">{{ section.settings.brand_banner_name | default: product.vendor | upcase }}</div>
-            <div class="tagline">{{ section.settings.brand_banner_tagline }}</div>
-            <div class="description">{{ section.settings.brand_banner_description }}</div>
-            {%- if section.settings.brand_banner_features != blank -%}
-            <div class="features-check">
-              {%- assign features = section.settings.brand_banner_features | split: '|' -%}
-              {%- for feature in features -%}
-                ✓ {{ feature }}<br>
-              {%- endfor -%}
-            </div>
-            {%- endif -%}
-          </div>
+        <!-- Brand Box (Prominent) -->
+        {%- if product.vendor -%}
+        <div style="background: linear-gradient(135deg, var(--accent-gold) 0%, #f4d03f 100%); border: 3px solid var(--primary-navy); border-radius: 12px; padding: 20px; margin: 20px 0; box-shadow: 0 6px 12px rgba(0,0,0,0.15); text-align: center;">
+          <div style="font-size: 12px; font-weight: 600; color: var(--primary-navy); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px;">Brand</div>
+          <div style="font-size: 22px; font-weight: 800; color: var(--primary-navy); text-transform: uppercase; letter-spacing: 1px;">{{ product.vendor }}</div>
         </div>
         {%- endif -%}
 
@@ -617,7 +606,8 @@
           </div>
 
           {%- if spec_sheet != blank -%}
-            <div style="margin-bottom: 15px; padding: 10px 0;">
+            <div style="background: var(--neutral-light); border: 2px solid var(--primary-navy); border-radius: 12px; padding: 20px; margin: 20px 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+              <h4 style="margin: 0 0 15px 0; color: var(--primary-navy); font-size: 16px; font-weight: 700;">Specification Table</h4>
               {{ spec_sheet }}
             </div>
           {%- endif -%}
@@ -648,13 +638,6 @@
           </div>
           {%- endif -%}
 
-          {%- if product.vendor -%}
-          <div style="background: linear-gradient(135deg, var(--accent-gold) 0%, #f4d03f 100%); border: 3px solid var(--primary-navy); border-radius: 12px; padding: 20px; margin: 20px 0; box-shadow: 0 6px 12px rgba(0,0,0,0.15); text-align: center;">
-            <div style="font-size: 12px; font-weight: 600; color: var(--primary-navy); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px;">Brand</div>
-            <div style="font-size: 22px; font-weight: 800; color: var(--primary-navy); text-transform: uppercase; letter-spacing: 1px;">{{ product.vendor }}</div>
-          </div>
-          {%- endif -%}
-
           {%- if product.type -%}
           <div class="spec-item">
             <div class="spec-label">Type:</div>
@@ -668,7 +651,6 @@
             <strong>DEBUG WARRANTY:</strong><br>
             warranty_text blank? {{ warranty_text | blank }}<br>
             warranty_text type: {{ warranty_text.type }}<br>
-            warranty_text has children? {{ warranty_text.children.size }}<br>
             warranty_text raw: "{{ warranty_text }}"<br>
           </div>
 
@@ -676,20 +658,7 @@
           <div class="spec-item">
             <div class="spec-label">Warranty:</div>
             <div class="spec-value">
-              {%- comment %} Extract text from rich text JSON structure {% endcomment -%}
-              {%- if warranty_text.children.size > 0 -%}
-                {%- for paragraph in warranty_text.children -%}
-                  {%- if paragraph.children.size > 0 -%}
-                    {%- for text_node in paragraph.children -%}
-                      {%- if text_node.value -%}
-                        {{ text_node.value }}
-                      {%- endif -%}
-                    {%- endfor -%}
-                  {%- endif -%}
-                {%- endfor -%}
-              {%- else -%}
-                {{ warranty_text }}
-              {%- endif -%}
+              {{ warranty_text }}
             </div>
           </div>
           {%- endif -%}
