@@ -225,15 +225,15 @@
 
           {%- if feature_sections != blank -%}
             <h3>Key Features</h3>
-            <div style="background: var(--neutral-light); border: 1px solid var(--neutral-gray); border-radius: 8px; padding: 20px; margin: 20px 0;">
+            <div style="background: var(--neutral-light); border: 2px solid var(--primary-coral); border-radius: 12px; padding: 25px; margin: 20px 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
               <table style="width: 100%; border-collapse: collapse;">
-                {%- assign features = feature_sections | newline_to_br | split: '<br />' -%}
+                {%- assign features = feature_sections | split: '|' -%}
                 {%- for feature in features -%}
                   {%- assign trimmed_feature = feature | strip -%}
                   {%- if trimmed_feature != blank -%}
                     <tr style="border-bottom: 1px solid var(--neutral-gray);">
-                      <td style="padding: 12px 8px; color: var(--primary-navy); font-weight: 500;">
-                        <i class="fas fa-check-circle" style="color: var(--primary-coral); margin-right: 8px;"></i>
+                      <td style="padding: 12px 8px; color: var(--primary-navy); font-weight: 600; font-size: 14px;">
+                        <i class="fas fa-check-circle" style="color: var(--primary-coral); margin-right: 10px; font-size: 16px;"></i>
                         {{ trimmed_feature }}
                       </td>
                     </tr>
@@ -383,15 +383,21 @@
         </div>
 
         <!-- Shipping Alert -->
-        {%- if section.settings.shipping_alert_text != blank -%}
+        {%- comment %} Only show schema alert if no shipment_text metafield {% endcomment -%}
+        {%- if section.settings.shipping_alert_text != blank and shipment_text == blank -%}
         <div class="alert-box alert-warning">
           ⚠️ {{ section.settings.shipping_alert_text }}
         </div>
         {%- endif -%}
 
+        {%- comment %} Free shipping status {% endcomment -%}
         {%- if free_shipping -%}
         <div class="alert-box" style="background-color: #d4edda; border-color: #6bcf7f; color: #155724;">
           ✓ This item qualifies for FREE SHIPPING
+        </div>
+        {%- elsif free_shipping == false -%}
+        <div class="alert-box alert-warning">
+          📦 This item is not eligible for free shipping
         </div>
         {%- endif -%}
 
@@ -444,15 +450,16 @@
                 {{ shipment_text_sub }}
               </p>
             {%- endif -%}
-          {%- endif -%}
-
-          {%- if section.settings.shipping_info_list != blank -%}
-            <ul class="instant-access-list">
-              {%- assign shipping_items = section.settings.shipping_info_list | split: '|' -%}
-              {%- for item in shipping_items -%}
-                <li>{{ item }}</li>
-              {%- endfor -%}
-            </ul>
+          {%- else -%}
+            {%- comment %} Show schema defaults if no shipment_text metafield {% endcomment -%}
+            {%- if section.settings.shipping_info_list != blank -%}
+              <ul class="instant-access-list">
+                {%- assign shipping_items = section.settings.shipping_info_list | split: '|' -%}
+                {%- for item in shipping_items -%}
+                  <li>{{ item }}</li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
           {%- endif -%}
           {%- if section.settings.shipping_link_text != blank -%}
             <a href="{{ section.settings.shipping_link_url }}" class="instant-access-link">
@@ -582,7 +589,13 @@
           {%- if warranty_text != blank -%}
           <div class="spec-item">
             <div class="spec-label">Warranty:</div>
-            <div class="spec-value">{{ warranty_text }}</div>
+            <div class="spec-value">
+              {%- if warranty_text.value -%}
+                {{ warranty_text.value }}
+              {%- else -%}
+                {{ warranty_text }}
+              {%- endif -%}
+            </div>
           </div>
           {%- endif -%}
 
