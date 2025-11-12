@@ -608,7 +608,7 @@
           {%- if spec_sheet != blank -%}
             <div style="background: var(--neutral-light); border: 2px solid var(--primary-navy); border-radius: 12px; padding: 20px; margin: 20px 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
               <h4 style="margin: 0 0 15px 0; color: var(--primary-navy); font-size: 16px; font-weight: 700;">Specification Table</h4>
-              {{ spec_sheet }}
+              {{ spec_sheet.value }}
             </div>
           {%- endif -%}
 
@@ -658,7 +658,7 @@
           <div class="spec-item">
             <div class="spec-label">Warranty:</div>
             <div class="spec-value">
-              {{ warranty_text }}
+              {{ warranty_text.value }}
             </div>
           </div>
           {%- endif -%}
