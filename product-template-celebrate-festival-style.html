@@ -1,0 +1,1958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Template - Celebrate Festival Inc Style</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Celebrate Festival Inc Color Palette */
+            --primary-navy: #1a2332;
+            --primary-coral: #ff6b6b;
+            --secondary-teal: #4ecdc4;
+            --accent-gold: #ffd93d;
+            --accent-orange: #ff9a3d;
+            --success-green: #6bcf7f;
+            --neutral-dark: #2d3748;
+            --neutral-gray: #cbd5e0;
+            --neutral-light: #f7fafc;
+            --text-light: #718096;
+            --gradient-coral: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+            --gradient-ocean: linear-gradient(135deg, #4ecdc4 0%, #44a3a3 100%);
+            --border-radius: 8px;
+            --border-radius-large: 12px;
+            --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 4px 8px rgba(0, 0, 0, 0.12);
+            --shadow-heavy: 0 10px 25px rgba(0, 0, 0, 0.15);
+            --transition-smooth: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--neutral-dark);
+            line-height: 1.6;
+            background-color: #ffffff;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: var(--neutral-light);
+            padding: 15px 0;
+            margin-bottom: 20px;
+        }
+
+        .breadcrumb-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .breadcrumb-nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+
+        .breadcrumb-nav a:hover {
+            color: var(--primary-coral);
+        }
+
+        .breadcrumb-separator {
+            color: var(--text-light);
+        }
+
+        /* Main Layout - Two Column */
+        .product-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+            align-items: start;
+        }
+
+        /* LEFT COLUMN - Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        /* Product Title */
+        .product-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--primary-navy);
+            line-height: 1.3;
+        }
+
+        .product-meta {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        .product-meta a {
+            color: var(--primary-coral);
+            text-decoration: none;
+        }
+
+        .product-meta a:hover {
+            text-decoration: underline;
+        }
+
+        /* Image Section with Vertical Thumbnails */
+        .product-images-wrapper {
+            margin-bottom: 20px;
+        }
+
+        .product-images-section {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Vertical Thumbnails */
+        .thumbnail-column {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .thumbnail {
+            width: 70px;
+            height: 70px;
+            border: 2px solid var(--neutral-gray);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            overflow: hidden;
+            border-radius: var(--border-radius);
+        }
+
+        .thumbnail:hover,
+        .thumbnail.active {
+            border-color: var(--primary-coral);
+            transform: scale(1.05);
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Main Product Image */
+        .main-image-container {
+            flex: 1;
+            border: 2px solid var(--neutral-gray);
+            background-color: var(--neutral-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 500px;
+            border-radius: var(--border-radius-large);
+            overflow: hidden;
+            position: relative;
+            cursor: zoom-in;
+        }
+
+        .main-image-container img {
+            max-width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .main-image-container:hover img {
+            transform: scale(1.2);
+        }
+
+        .zoom-indicator {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(26, 35, 50, 0.85);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Other Products from this Line */
+        .other-products-section {
+            padding: 25px;
+            background-color: var(--neutral-light);
+            border: 1px solid var(--neutral-gray);
+            border-radius: var(--border-radius);
+        }
+
+        .other-products-section h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: var(--primary-navy);
+        }
+
+        .products-carousel {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-behavior: smooth;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .products-carousel::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .product-card-small {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 280px;
+            flex-shrink: 0;
+            border: 1px solid var(--neutral-gray);
+            background-color: #fff;
+            padding: 12px;
+            position: relative;
+            border-radius: var(--border-radius);
+            transition: var(--transition-smooth);
+        }
+
+        .product-card-small:hover {
+            box-shadow: var(--shadow-medium);
+            transform: translateY(-2px);
+            border-color: var(--primary-coral);
+        }
+
+        .product-card-small-image {
+            width: 70px;
+            height: 70px;
+            flex-shrink: 0;
+            background-color: var(--neutral-light);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .product-card-small-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .product-card-small-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 0;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--gradient-coral);
+            color: white;
+            padding: 4px 10px;
+            font-size: 10px;
+            font-weight: 600;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .product-badge.new {
+            background: var(--gradient-ocean);
+        }
+
+        .product-card-title-small {
+            font-size: 13px;
+            color: var(--neutral-dark);
+            font-weight: 500;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-card-price-small {
+            color: var(--primary-coral);
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        /* Product Description Section */
+        .description-section {
+            padding: 30px;
+            background-color: #fff;
+            border: 1px solid var(--neutral-gray);
+            border-radius: var(--border-radius);
+        }
+
+        .description-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--primary-navy);
+            font-weight: 700;
+        }
+
+        .description-section h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            margin: 25px 0 15px;
+            color: var(--primary-navy);
+            font-weight: 600;
+        }
+
+        .description-section p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+            color: var(--text-light);
+        }
+
+        .description-section ul {
+            margin-left: 20px;
+            line-height: 2;
+            margin-bottom: 15px;
+            color: var(--text-light);
+        }
+
+        .description-section ul li {
+            margin-bottom: 8px;
+        }
+
+        .feature-icons-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .feature-icon-item {
+            text-align: center;
+            padding: 20px;
+            background-color: var(--neutral-light);
+            border: 1px solid var(--neutral-gray);
+            border-radius: var(--border-radius);
+            transition: var(--transition-smooth);
+        }
+
+        .feature-icon-item:hover {
+            box-shadow: var(--shadow-medium);
+            transform: translateY(-3px);
+            border-color: var(--primary-coral);
+        }
+
+        .feature-icon-img {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .feature-icon-item h4 {
+            font-size: 15px;
+            margin-bottom: 8px;
+            color: var(--primary-navy);
+            font-weight: 600;
+        }
+
+        .feature-icon-item p {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .product-detail-images {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .product-detail-images img {
+            width: 100%;
+            border: 1px solid var(--neutral-gray);
+            border-radius: var(--border-radius);
+        }
+
+        /* Q&A Section */
+        .qa-section {
+            padding: 30px;
+            background-color: var(--neutral-light);
+            border: 1px solid var(--neutral-gray);
+            border-radius: var(--border-radius);
+        }
+
+        .qa-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: var(--primary-navy);
+            font-weight: 700;
+        }
+
+        .qa-item {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--neutral-gray);
+        }
+
+        .qa-item:last-child {
+            border-bottom: none;
+            margin-bottom: 15px;
+        }
+
+        .qa-question {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-navy);
+            font-size: 15px;
+        }
+
+        .qa-answer {
+            color: var(--text-light);
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .qa-meta {
+            font-size: 12px;
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        .ask-question-btn {
+            background: var(--gradient-coral);
+            color: #fff;
+            padding: 12px 28px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+
+        .ask-question-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Compare Section */
+        .compare-section {
+            padding: 30px;
+            background-color: #fff;
+            border: 1px solid var(--neutral-gray);
+            border-radius: var(--border-radius);
+        }
+
+        .compare-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: var(--primary-navy);
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid var(--neutral-gray);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .compare-table th,
+        .compare-table td {
+            padding: 15px;
+            border: 1px solid var(--neutral-gray);
+            text-align: center;
+            vertical-align: top;
+            font-size: 13px;
+        }
+
+        .compare-table th {
+            background-color: var(--primary-navy);
+            font-weight: 600;
+            color: white;
+        }
+
+        .compare-table th:first-child {
+            background-color: var(--primary-coral);
+        }
+
+        .compare-table tr:hover {
+            background-color: var(--neutral-light);
+        }
+
+        .compare-table img {
+            width: 100px;
+            margin-bottom: 10px;
+        }
+
+        .compare-product-name {
+            font-size: 12px;
+            margin-bottom: 10px;
+            min-height: 36px;
+            font-weight: 500;
+        }
+
+        .compare-product-price {
+            color: var(--primary-coral);
+            font-weight: 700;
+            font-size: 15px;
+            margin: 10px 0;
+        }
+
+        .compare-add-btn {
+            background: var(--gradient-coral);
+            color: #fff;
+            padding: 8px 16px;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+
+        .compare-add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-light);
+        }
+
+        /* Customer Reviews Section */
+        .reviews-section {
+            padding: 30px;
+            background-color: #fff;
+            border: 1px solid var(--neutral-gray);
+            border-radius: var(--border-radius);
+        }
+
+        .reviews-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: var(--primary-navy);
+            font-weight: 700;
+        }
+
+        .reviews-summary {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid var(--neutral-gray);
+        }
+
+        .rating-overview {
+            flex: 1;
+        }
+
+        .overall-rating {
+            font-size: 56px;
+            font-weight: 800;
+            color: var(--primary-navy);
+            margin-bottom: 10px;
+        }
+
+        .stars {
+            color: var(--accent-gold);
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .total-reviews {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .rating-breakdown {
+            flex: 2;
+        }
+
+        .rating-bar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .rating-label {
+            min-width: 70px;
+            font-size: 13px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .rating-bar {
+            flex: 1;
+            height: 10px;
+            background-color: var(--neutral-light);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--neutral-gray);
+        }
+
+        .rating-bar-fill {
+            height: 100%;
+            background: var(--gradient-coral);
+        }
+
+        .rating-count {
+            min-width: 45px;
+            font-size: 13px;
+            color: var(--text-light);
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .write-review-btn {
+            background: var(--primary-navy);
+            color: #fff;
+            padding: 12px 28px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: var(--transition-smooth);
+            margin-top: 15px;
+        }
+
+        .write-review-btn:hover {
+            background: var(--primary-coral);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .review-item {
+            padding: 20px 0;
+            border-bottom: 1px solid var(--neutral-gray);
+        }
+
+        .review-item:last-child {
+            border-bottom: none;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .review-author {
+            font-weight: 600;
+            color: var(--primary-navy);
+        }
+
+        .review-date {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .review-stars {
+            color: var(--accent-gold);
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .review-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-navy);
+        }
+
+        .review-text {
+            color: var(--text-light);
+            line-height: 1.8;
+            margin-bottom: 12px;
+        }
+
+        .review-verified {
+            font-size: 12px;
+            color: var(--success-green);
+            font-weight: 600;
+        }
+
+        .review-helpful {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 10px;
+        }
+
+        .review-helpful button {
+            background: none;
+            border: 1px solid var(--neutral-gray);
+            color: var(--primary-coral);
+            cursor: pointer;
+            padding: 4px 12px;
+            border-radius: var(--border-radius);
+            margin-left: 5px;
+            transition: var(--transition-smooth);
+        }
+
+        .review-helpful button:hover {
+            background: var(--neutral-light);
+            border-color: var(--primary-coral);
+        }
+
+        /* Related Products */
+        .related-section {
+            padding: 25px;
+            background-color: var(--neutral-light);
+            border: 1px solid var(--neutral-gray);
+            border-radius: var(--border-radius);
+        }
+
+        .related-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--primary-navy);
+            font-weight: 700;
+        }
+
+        /* RIGHT SIDEBAR */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Price Box */
+        .price-box {
+            background-color: var(--neutral-light);
+            border: 2px solid var(--neutral-gray);
+            border-radius: var(--border-radius);
+            padding: 25px;
+        }
+
+        .price-type-label {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .price-main {
+            font-size: 36px;
+            color: var(--primary-coral);
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .price-unit {
+            font-size: 16px;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        .price-member-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid var(--neutral-gray);
+        }
+
+        .member-price {
+            font-size: 26px;
+            color: var(--success-green);
+            font-weight: 700;
+        }
+
+        .member-price span {
+            font-size: 16px;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        .savings-badge {
+            background: var(--success-green);
+            color: white;
+            padding: 6px 14px;
+            font-size: 12px;
+            display: inline-block;
+            margin-top: 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /* Alert Boxes */
+        .alert-box {
+            padding: 15px;
+            font-size: 13px;
+            border-radius: var(--border-radius);
+            line-height: 1.6;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            border: 2px solid var(--accent-gold);
+            color: #856404;
+        }
+
+        .alert-dark {
+            background-color: var(--primary-navy);
+            color: white;
+            border: 2px solid var(--primary-navy);
+        }
+
+        .alert-dark a {
+            color: var(--accent-gold);
+            text-decoration: underline;
+            font-weight: 600;
+        }
+
+        /* Quantity and Buttons */
+        .quantity-section {
+            background-color: var(--neutral-light);
+            border: 2px solid var(--neutral-gray);
+            border-radius: var(--border-radius);
+            padding: 20px;
+        }
+
+        .quantity-label {
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: block;
+            font-weight: 600;
+            color: var(--primary-navy);
+        }
+
+        .quantity-input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .quantity-input-group input {
+            width: 70px;
+            padding: 10px;
+            border: 2px solid var(--neutral-gray);
+            font-size: 16px;
+            text-align: center;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+        }
+
+        .quantity-input-group span {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 14px 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: var(--border-radius);
+            transition: var(--transition-smooth);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-add-cart {
+            background: var(--gradient-coral);
+            color: #fff;
+            flex: 2;
+        }
+
+        .btn-add-cart:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-add-list {
+            background: white;
+            color: var(--neutral-dark);
+            border: 2px solid var(--neutral-gray);
+            flex: 1;
+        }
+
+        .btn-add-list:hover {
+            border-color: var(--primary-coral);
+            color: var(--primary-coral);
+        }
+
+        /* Instant Access Box */
+        .instant-access-box {
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.1) 0%, rgba(68, 163, 163, 0.1) 100%);
+            border: 2px solid var(--secondary-teal);
+            padding: 20px;
+            border-radius: var(--border-radius);
+        }
+
+        .instant-access-title {
+            font-weight: 700;
+            margin-bottom: 12px;
+            font-size: 15px;
+            color: var(--primary-navy);
+        }
+
+        .instant-access-list {
+            font-size: 13px;
+            line-height: 2;
+            color: var(--neutral-dark);
+        }
+
+        .instant-access-list li {
+            margin-left: 20px;
+            margin-bottom: 5px;
+        }
+
+        .instant-access-link {
+            font-size: 13px;
+            color: var(--primary-coral);
+            text-decoration: none;
+            display: block;
+            margin-top: 12px;
+            font-weight: 600;
+        }
+
+        .instant-access-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Sidebar Promotional Banners */
+        .sidebar-banner {
+            border: 2px solid var(--neutral-gray);
+            overflow: hidden;
+            border-radius: var(--border-radius);
+        }
+
+        .promo-banner-1 {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, #2a3f5f 100%);
+            padding: 25px;
+            color: white;
+            text-align: center;
+        }
+
+        .promo-banner-1 .brand-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .promo-banner-1 .tagline {
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .promo-banner-1 .description {
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .promo-banner-1 .features-check {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 12px;
+            border-radius: var(--border-radius);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .promo-banner-2 {
+            background: var(--gradient-ocean);
+            padding: 25px;
+            color: white;
+            text-align: center;
+        }
+
+        .promo-banner-2 .icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .promo-banner-2 .title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .promo-banner-2 .description {
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .promo-banner-2 hr {
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin: 15px 0;
+        }
+
+        .promo-banner-2 .services-list {
+            font-size: 13px;
+            line-height: 2;
+            text-align: left;
+        }
+
+        .promo-banner-2 .cta-btn {
+            background-color: white;
+            color: var(--secondary-teal);
+            border: none;
+            padding: 12px 24px;
+            margin-top: 15px;
+            border-radius: var(--border-radius);
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .promo-banner-2 .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .promo-banner-3 {
+            background-color: var(--neutral-light);
+            padding: 25px;
+            border: 2px solid var(--neutral-gray);
+        }
+
+        .promo-banner-3 .title {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary-navy);
+            text-align: center;
+        }
+
+        .promo-banner-3 .description {
+            font-size: 13px;
+            line-height: 1.8;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .promo-banner-3 .resource-box {
+            background-color: white;
+            padding: 15px;
+            border: 1px solid var(--neutral-gray);
+            border-radius: var(--border-radius);
+            margin-bottom: 12px;
+        }
+
+        .promo-banner-3 .resource-box h5 {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-navy);
+            font-size: 14px;
+        }
+
+        .promo-banner-3 .resource-box ul {
+            font-size: 12px;
+            line-height: 2;
+            color: var(--text-light);
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .promo-banner-3 .resource-box ul li:before {
+            content: "• ";
+            color: var(--primary-coral);
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        /* Sidebar Info Box */
+        .sidebar-info-box {
+            background-color: var(--neutral-light);
+            border: 2px solid var(--neutral-gray);
+            border-radius: var(--border-radius);
+            padding: 20px;
+        }
+
+        .sidebar-info-box h4 {
+            font-size: 15px;
+            margin-bottom: 15px;
+            color: var(--primary-navy);
+            font-weight: 700;
+        }
+
+        .sidebar-info-box ul {
+            font-size: 13px;
+            line-height: 2;
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar-info-box li {
+            margin-bottom: 8px;
+            color: var(--text-light);
+        }
+
+        .sidebar-info-box a {
+            color: var(--primary-coral);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .sidebar-info-box a:hover {
+            text-decoration: underline;
+        }
+
+        /* Specifications in Sidebar */
+        .sidebar-specs {
+            background-color: white;
+            border: 2px solid var(--neutral-gray);
+            border-radius: var(--border-radius);
+            padding: 20px;
+        }
+
+        .sidebar-specs h4 {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: var(--primary-navy);
+            font-weight: 700;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary-coral);
+        }
+
+        .spec-item {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--neutral-light);
+            font-size: 13px;
+        }
+
+        .spec-item:last-child {
+            border-bottom: none;
+        }
+
+        .spec-label {
+            font-weight: 600;
+            color: var(--primary-navy);
+            min-width: 120px;
+            flex-shrink: 0;
+        }
+
+        .spec-value {
+            color: var(--text-light);
+            flex: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .product-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: relative;
+                top: 0;
+            }
+
+            .feature-icons-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .product-title {
+                font-size: 1.5rem;
+            }
+
+            .feature-icons-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .product-detail-images {
+                grid-template-columns: 1fr;
+            }
+
+            .reviews-summary {
+                flex-direction: column;
+            }
+
+            .compare-table {
+                font-size: 11px;
+            }
+
+            .compare-table th,
+            .compare-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <nav class="breadcrumb-nav">
+                <a href="#"><i class="fas fa-home"></i> Home</a>
+                <span class="breadcrumb-separator">&gt;</span>
+                <a href="#">Refrigeration</a>
+                <span class="breadcrumb-separator">&gt;</span>
+                <a href="#">Commercial Refrigerators and Freezers</a>
+                <span class="breadcrumb-separator">&gt;</span>
+                <a href="#">Undercounter Refrigerators</a>
+                <span class="breadcrumb-separator">&gt;</span>
+                <span>Beverage-Air UCF27AHC-23 and UCR27AHC-23</span>
+            </nav>
+        </div>
+
+        <!-- Main Two Column Layout -->
+        <div class="product-layout">
+            <!-- LEFT COLUMN - MAIN CONTENT -->
+            <div class="main-content">
+                <!-- Product Title & Meta -->
+                <div>
+                    <h1 class="product-title">Beverage-Air UCF27AHC-23 and UCR27AHC-23 Double Stacked 27" Undercounter Freezer and Refrigerator and 3" Casters</h1>
+                    
+                    <div class="product-meta">
+                        Item #: 123UCF27AHCUCR27AHC23C | 
+                        MFG #: UCF27AHC-23+UCR27AHC-23+CASTERS | 
+                        <a href="#">Write a Review</a>
+                    </div>
+                </div>
+
+                <!-- Product Images with Vertical Thumbnails -->
+                <div class="product-images-wrapper">
+                    <div class="product-images-section">
+                        <!-- Vertical Thumbnail Column -->
+                        <div class="thumbnail-column">
+                            <div class="thumbnail active">
+                                <img src="https://via.placeholder.com/70x70/f7fafc/718096?text=1" alt="Image 1">
+                            </div>
+                            <div class="thumbnail">
+                                <img src="https://via.placeholder.com/70x70/f7fafc/718096?text=2" alt="Image 2">
+                            </div>
+                            <div class="thumbnail">
+                                <img src="https://via.placeholder.com/70x70/f7fafc/718096?text=3" alt="Image 3">
+                            </div>
+                            <div class="thumbnail">
+                                <img src="https://via.placeholder.com/70x70/f7fafc/718096?text=4" alt="Image 4">
+                            </div>
+                            <div class="thumbnail">
+                                <img src="https://via.placeholder.com/70x70/f7fafc/718096?text=5" alt="Image 5">
+                            </div>
+                            <div class="thumbnail">
+                                <img src="https://via.placeholder.com/70x70/f7fafc/718096?text=6" alt="Image 6">
+                            </div>
+                        </div>
+
+                        <!-- Main Product Image -->
+                        <div class="main-image-container">
+                            <img src="https://via.placeholder.com/600x600/f7fafc/1a2332?text=Main+Product+Image" alt="Main Product">
+                            <div class="zoom-indicator">
+                                <i class="fas fa-search-plus"></i>
+                                Hover to zoom
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other Products from this Line -->
+                <div class="other-products-section">
+                    <h3>Other Products from this Line</h3>
+                    <div class="products-carousel">
+                        <div class="product-card-small">
+                            <span class="product-badge">Hot Deal</span>
+                            <div class="product-card-small-image">
+                                <img src="https://via.placeholder.com/80x80/f7fafc/718096?text=1" alt="Product">
+                            </div>
+                            <div class="product-card-small-info">
+                                <div class="product-card-title-small">Beverage-Air UCR27AHC 27" Undercounter Refrigerator</div>
+                                <div class="product-card-price-small">$2,749.00</div>
+                            </div>
+                        </div>
+                        <div class="product-card-small">
+                            <span class="product-badge">Hot Deal</span>
+                            <div class="product-card-small-image">
+                                <img src="https://via.placeholder.com/80x80/f7fafc/718096?text=2" alt="Product">
+                            </div>
+                            <div class="product-card-small-info">
+                                <div class="product-card-title-small">Beverage-Air UCF27AHC 27" Undercounter Freezer</div>
+                                <div class="product-card-price-small">$2,899.00</div>
+                            </div>
+                        </div>
+                        <div class="product-card-small">
+                            <span class="product-badge">Hot Deal</span>
+                            <div class="product-card-small-image">
+                                <img src="https://via.placeholder.com/80x80/f7fafc/718096?text=3" alt="Product">
+                            </div>
+                            <div class="product-card-small-info">
+                                <div class="product-card-title-small">Beverage-Air UCR20HC 20" Undercounter Refrigerator</div>
+                                <div class="product-card-price-small">$2,249.00</div>
+                            </div>
+                        </div>
+                        <div class="product-card-small">
+                            <span class="product-badge new">New</span>
+                            <div class="product-card-small-image">
+                                <img src="https://via.placeholder.com/80x80/f7fafc/718096?text=4" alt="Product">
+                            </div>
+                            <div class="product-card-small-info">
+                                <div class="product-card-title-small">Beverage-Air UCF20HC 20" Undercounter Freezer</div>
+                                <div class="product-card-price-small">$2,399.00</div>
+                            </div>
+                        </div>
+                        <div class="product-card-small">
+                            <div class="product-card-small-image">
+                                <img src="https://via.placeholder.com/80x80/f7fafc/718096?text=5" alt="Product">
+                            </div>
+                            <div class="product-card-small-info">
+                                <div class="product-card-title-small">Beverage-Air UCR34HC 34" Undercounter Refrigerator</div>
+                                <div class="product-card-price-small">$3,149.00</div>
+                            </div>
+                        </div>
+                        <div class="product-card-small">
+                            <div class="product-card-small-image">
+                                <img src="https://via.placeholder.com/80x80/f7fafc/718096?text=6" alt="Product">
+                            </div>
+                            <div class="product-card-small-info">
+                                <div class="product-card-title-small">Beverage-Air UCF34HC 34" Undercounter Freezer</div>
+                                <div class="product-card-price-small">$3,299.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Description -->
+                <div class="description-section">
+                    <h2>Thinking you need more storage? Think bigger with this Beverage-Air double stacked undercounter freezer and refrigerator!</h2>
+                    
+                    <p>Looking for a fast and easy way to add more storage to your busy food storage space? Look no further than this Beverage-Air UCF27AHC-23 and UCR27AHC-23 double stacked 27" undercounter freezer and refrigerator! This innovative model stacks a reliable undercounter freezer on top of an undercounter refrigerator to double your storage capacity without doubling your floor space. Both units utilize an HC refrigerant, which is better for the environment while still maintaining excellent cooling performance for reliable results. You also get 3 rugged casters that can easily be installed for easy mobility around your space!</p>
+
+                    <div class="feature-icons-grid">
+                        <div class="feature-icon-item">
+                            <div class="feature-icon-img">📦</div>
+                            <h4>Double Storage</h4>
+                            <p>Two units in one footprint</p>
+                        </div>
+                        <div class="feature-icon-item">
+                            <div class="feature-icon-img">🌡️</div>
+                            <h4>HC Refrigerant</h4>
+                            <p>Eco-friendly cooling</p>
+                        </div>
+                        <div class="feature-icon-item">
+                            <div class="feature-icon-img">⚡</div>
+                            <h4>Energy Efficient</h4>
+                            <p>Low operating costs</p>
+                        </div>
+                        <div class="feature-icon-item">
+                            <div class="feature-icon-img">🔧</div>
+                            <h4>Easy Mobility</h4>
+                            <p>Includes 3" casters</p>
+                        </div>
+                    </div>
+
+                    <h3>Engineered Performance</h3>
+                    <p>Built with food service in mind, these Beverage-Air units are carefully designed to optimize your storage capabilities. The space-saving design provides all the benefits of two separate units while utilizing half the floor space. Each unit features sturdy stainless steel construction that will hold up against the demands of a busy commercial kitchen, and the included set of casters makes it simple to relocate these units as needed.</p>
+
+                    <div class="product-detail-images">
+                        <img src="https://via.placeholder.com/400x400/f7fafc/1a2332?text=Interior+Storage+View" alt="Interior View">
+                        <img src="https://via.placeholder.com/400x400/f7fafc/1a2332?text=Casters+Detail" alt="Casters Detail">
+                    </div>
+
+                    <h3>Specialized Refrigerant</h3>
+                    <p>The Beverage-Air units in this bundle feature an HC refrigerant (R-290). This hydrocarbon refrigerant is better for the environment than traditional HCFC refrigerants yet still offers reliable cooling performance with excellent energy efficiency. The units maintain precise temperature control for optimal food safety.</p>
+
+                    <h3>Key Features Include:</h3>
+                    <ul>
+                        <li>Self-closing doors with stay-open feature at 120 degrees</li>
+                        <li>Magnetic door gaskets for positive seal and energy efficiency</li>
+                        <li>Front-breathing design allows for built-in installation</li>
+                        <li>Digital temperature display and electronic controls</li>
+                        <li>Energy-efficient LED lighting in both units</li>
+                        <li>Adjustable epoxy-coated wire shelves for flexible storage</li>
+                        <li>Stainless steel exterior for durability and easy cleaning</li>
+                        <li>Aluminum interior resists corrosion</li>
+                    </ul>
+
+                    <div class="product-detail-images">
+                        <img src="https://via.placeholder.com/400x400/f7fafc/1a2332?text=Digital+Controls" alt="Digital Controls">
+                        <img src="https://via.placeholder.com/400x400/f7fafc/1a2332?text=Door+Mechanism" alt="Door Mechanism">
+                    </div>
+
+                    <h3>Accurate Organization</h3>
+                    <p>These undercounter units are expertly designed with features that help you organize your food items with ease. The adjustable shelving in both units allows you to customize the interior layout to match your needs, while the interior is spacious enough to easily fit full-size sheet pans, bulk ingredients, and more. The freezer maintains temperatures from -10°F to 0°F, while the refrigerator keeps contents between 36°F and 38°F.</p>
+
+                    <h3>Actual Mobility</h3>
+                    <p>The included 3" heavy-duty casters make it easy to move these units around as needed. With these casters installed, you'll be able to quickly reposition your units during cleaning or reorganization. This feature is also great for units used in catering settings or food trucks, where equipment may need to be moved from location to location on a regular basis.</p>
+                </div>
+
+                <!-- Q&A Section -->
+                <div class="qa-section">
+                    <h2>Questions & Answers</h2>
+                    
+                    <div class="qa-item">
+                        <div class="qa-question">Q: Can these units be used in a food truck or mobile food operation?</div>
+                        <div class="qa-answer">A: Yes! These units are excellent for food trucks and mobile operations. The included casters make them easy to secure and move, and their front-breathing design means they can be placed in tight spaces. Just make sure you have adequate ventilation and a stable 115V power source. The self-closing doors are particularly helpful in mobile environments where the vehicle may be in motion.</div>
+                        <div class="qa-meta">Asked by: FoodTruckOwner | Answered by: Celebrate Festival Team - 2 months ago</div>
+                    </div>
+
+                    <div class="qa-item">
+                        <div class="qa-question">Q: What is the warranty coverage on these units?</div>
+                        <div class="qa-answer">A: These Beverage-Air units come with a comprehensive 3-year parts and labor warranty on the entire unit and an extended 5-year warranty on the compressor. This gives you peace of mind knowing your investment is protected. Beverage-Air also has an extensive service network across North America for convenient repairs if needed.</div>
+                        <div class="qa-meta">Asked by: RestaurantManager | Answered by: Celebrate Festival Team - 3 months ago</div>
+                    </div>
+
+                    <div class="qa-item">
+                        <div class="qa-question">Q: How much clearance do I need on each side of the units for proper ventilation?</div>
+                        <div class="qa-answer">A: Because these units feature front-breathing compressors, you only need clearance at the front for service access. The units can be placed directly against walls on the sides and back, making them ideal for tight spaces and built-in installations. We recommend at least 6" of clearance at the front for optimal performance and serviceability.</div>
+                        <div class="qa-meta">Asked by: ChefMike | Answered by: Celebrate Festival Team - 4 months ago</div>
+                    </div>
+
+                    <div class="qa-item">
+                        <div class="qa-question">Q: Can I stack these units myself or do I need professional installation?</div>
+                        <div class="qa-answer">A: While it's possible to stack them yourself, we strongly recommend professional installation for safety reasons. These are heavy commercial units (approximately 200 lbs each), and proper stacking ensures stability and safe operation. The units come with stacking brackets and detailed instructions. Many customers opt for our installation service to ensure everything is set up correctly.</div>
+                        <div class="qa-meta">Asked by: NewRestaurantOwner | Answered by: Celebrate Festival Team - 5 months ago</div>
+                    </div>
+
+                    <button class="ask-question-btn">Ask a Question</button>
+                </div>
+
+                <!-- Compare Products Section -->
+                <div class="compare-section">
+                    <h2>Compare to Other Products</h2>
+                    
+                    <table class="compare-table">
+                        <thead>
+                            <tr>
+                                <th>Features</th>
+                                <th>This Item</th>
+                                <th>True Model</th>
+                                <th>Delfield Model</th>
+                                <th>Turbo Air Model</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Product</strong></td>
+                                <td>
+                                    <img src="https://via.placeholder.com/100x100/f7fafc/1a2332?text=BA" alt="Beverage-Air">
+                                    <div class="compare-product-name">Beverage-Air UCF27AHC + UCR27AHC</div>
+                                </td>
+                                <td>
+                                    <img src="https://via.placeholder.com/100x100/f7fafc/1a2332?text=True" alt="True">
+                                    <div class="compare-product-name">True TUC-27F-HC + TUC-27-HC</div>
+                                </td>
+                                <td>
+                                    <img src="https://via.placeholder.com/100x100/f7fafc/1a2332?text=DF" alt="Delfield">
+                                    <div class="compare-product-name">Delfield 4427N + 4427NP</div>
+                                </td>
+                                <td>
+                                    <img src="https://via.placeholder.com/100x100/f7fafc/1a2332?text=TA" alt="Turbo Air">
+                                    <div class="compare-product-name">Turbo Air TUF-28SD + TUR-28SD</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Capacity</strong></td>
+                                <td>14.6 cu. ft.</td>
+                                <td>13.0 cu. ft.</td>
+                                <td>14.0 cu. ft.</td>
+                                <td>15.2 cu. ft.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Width</strong></td>
+                                <td>27"</td>
+                                <td>27"</td>
+                                <td>27"</td>
+                                <td>28"</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Refrigerant</strong></td>
+                                <td>R-290 (HC)</td>
+                                <td>R-290 (HC)</td>
+                                <td>R-134a</td>
+                                <td>R-290 (HC)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Casters</strong></td>
+                                <td>Included (3")</td>
+                                <td>Optional</td>
+                                <td>Optional</td>
+                                <td>Included (4")</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Controls</strong></td>
+                                <td>Digital</td>
+                                <td>Digital</td>
+                                <td>Mechanical</td>
+                                <td>Digital</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Warranty</strong></td>
+                                <td>3 Yr / 5 Yr</td>
+                                <td>3 Yr / 5 Yr</td>
+                                <td>2 Yr / 5 Yr</td>
+                                <td>3 Yr / 5 Yr</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Price</strong></td>
+                                <td>
+                                    <div class="compare-product-price">$5,593.37</div>
+                                    <button class="compare-add-btn">Add to Cart</button>
+                                </td>
+                                <td>
+                                    <div class="compare-product-price">$5,899.00</div>
+                                    <button class="compare-add-btn">Add to Cart</button>
+                                </td>
+                                <td>
+                                    <div class="compare-product-price">$4,999.00</div>
+                                    <button class="compare-add-btn">Add to Cart</button>
+                                </td>
+                                <td>
+                                    <div class="compare-product-price">$5,799.00</div>
+                                    <button class="compare-add-btn">Add to Cart</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Customer Reviews -->
+                <div class="reviews-section">
+                    <h2>Customer Reviews</h2>
+                    
+                    <div class="reviews-summary">
+                        <div class="rating-overview">
+                            <div class="overall-rating">4.7</div>
+                            <div class="stars">★★★★★</div>
+                            <div class="total-reviews">Based on 127 reviews</div>
+                            <button class="write-review-btn">Write a Review</button>
+                        </div>
+                        
+                        <div class="rating-breakdown">
+                            <div class="rating-bar-item">
+                                <span class="rating-label">5 Stars</span>
+                                <div class="rating-bar">
+                                    <div class="rating-bar-fill" style="width: 78%;"></div>
+                                </div>
+                                <span class="rating-count">99</span>
+                            </div>
+                            <div class="rating-bar-item">
+                                <span class="rating-label">4 Stars</span>
+                                <div class="rating-bar">
+                                    <div class="rating-bar-fill" style="width: 15%;"></div>
+                                </div>
+                                <span class="rating-count">19</span>
+                            </div>
+                            <div class="rating-bar-item">
+                                <span class="rating-label">3 Stars</span>
+                                <div class="rating-bar">
+                                    <div class="rating-bar-fill" style="width: 4%;"></div>
+                                </div>
+                                <span class="rating-count">5</span>
+                            </div>
+                            <div class="rating-bar-item">
+                                <span class="rating-label">2 Stars</span>
+                                <div class="rating-bar">
+                                    <div class="rating-bar-fill" style="width: 2%;"></div>
+                                </div>
+                                <span class="rating-count">3</span>
+                            </div>
+                            <div class="rating-bar-item">
+                                <span class="rating-label">1 Star</span>
+                                <div class="rating-bar">
+                                    <div class="rating-bar-fill" style="width: 1%;"></div>
+                                </div>
+                                <span class="rating-count">1</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="review-item">
+                        <div class="review-header">
+                            <div class="review-author">Sarah M. - Restaurant Owner</div>
+                            <div class="review-date">October 15, 2024</div>
+                        </div>
+                        <div class="review-stars">★★★★★</div>
+                        <div class="review-title">Perfect solution for our small kitchen!</div>
+                        <div class="review-text">We have a very limited footprint in our commercial kitchen, and this double-stacked unit has been a game-changer. The build quality is excellent - all stainless steel construction feels very solid. The digital controls are intuitive and easy to read. Both units maintain consistent temperatures, which is crucial for food safety. The casters make it easy to move for cleaning. Installation was straightforward with two people. Highly recommend for anyone looking to maximize vertical space!</div>
+                        <div class="review-verified">✓ Verified Purchase</div>
+                        <div class="review-helpful">Was this helpful? <button>Yes (24)</button> <button>No (1)</button></div>
+                    </div>
+
+                    <div class="review-item">
+                        <div class="review-header">
+                            <div class="review-author">Mike T. - Food Truck Operator</div>
+                            <div class="review-date">September 28, 2024</div>
+                        </div>
+                        <div class="review-stars">★★★★★</div>
+                        <div class="review-title">Excellent for mobile operations</div>
+                        <div class="review-text">Been using this in my food truck for 3 months now and it's been flawless. The front-breathing design is perfect because I can tuck it right against the wall. Temperature stays rock solid even when we're driving between locations. The self-closing doors are clutch when you're working fast during lunch rush. Energy consumption is surprisingly low too - important when running on generators. Only minor issue is the freezer requires manual defrost, but that's expected and not a big deal. Worth every penny!</div>
+                        <div class="review-verified">✓ Verified Purchase</div>
+                        <div class="review-helpful">Was this helpful? <button>Yes (18)</button> <button>No (0)</button></div>
+                    </div>
+
+                    <div class="review-item">
+                        <div class="review-header">
+                            <div class="review-author">Jennifer K. - Catering Business</div>
+                            <div class="review-date">September 12, 2024</div>
+                        </div>
+                        <div class="review-stars">★★★★★</div>
+                        <div class="review-title">Great capacity and build quality</div>
+                        <div class="review-text">We do high-volume catering and needed reliable refrigeration that wouldn't take up too much space. This unit delivers on both fronts. The shelves are adjustable and can hold full sheet pans with ease. LED lighting in both sections is bright and doesn't generate heat. The magnetic door seals work perfectly. Temperature recovery after opening is quick. Customer service from Celebrate Festival was excellent - they helped us choose the right model for our needs. Five stars!</div>
+                        <div class="review-verified">✓ Verified Purchase</div>
+                        <div class="review-helpful">Was this helpful? <button>Yes (15)</button> <button>No (0)</button></div>
+                    </div>
+                </div>
+
+                <!-- Related Products -->
+                <div class="related-section">
+                    <h2>You May Also Need to Complete Your Order</h2>
+                    <div class="products-carousel">
+                        <div class="product-card-small">
+                            <div class="product-card-small-image">
+                                <img src="https://via.placeholder.com/80x80/f7fafc/718096?text=Shelf" alt="Additional Shelf">
+                            </div>
+                            <div class="product-card-small-info">
+                                <div class="product-card-title-small">Additional Wire Shelf for UCR/UCF Series</div>
+                                <div class="product-card-price-small">$79.99</div>
+                            </div>
+                        </div>
+                        <div class="product-card-small">
+                            <div class="product-card-small-image">
+                                <img src="https://via.placeholder.com/80x80/f7fafc/718096?text=Lock" alt="Door Lock">
+                            </div>
+                            <div class="product-card-small-info">
+                                <div class="product-card-title-small">Keyed Door Lock Kit</div>
+                                <div class="product-card-price-small">$34.99</div>
+                            </div>
+                        </div>
+                        <div class="product-card-small">
+                            <div class="product-card-small-image">
+                                <img src="https://via.placeholder.com/80x80/f7fafc/718096?text=Pan" alt="Sheet Pan">
+                            </div>
+                            <div class="product-card-small-info">
+                                <div class="product-card-title-small">Full Size Sheet Pan</div>
+                                <div class="product-card-price-small">$12.99</div>
+                            </div>
+                        </div>
+                        <div class="product-card-small">
+                            <div class="product-card-small-image">
+                                <img src="https://via.placeholder.com/80x80/f7fafc/718096?text=Cover" alt="Food Covers">
+                            </div>
+                            <div class="product-card-small-info">
+                                <div class="product-card-title-small">Food Storage Covers</div>
+                                <div class="product-card-price-small">$24.99</div>
+                            </div>
+                        </div>
+                        <div class="product-card-small">
+                            <div class="product-card-small-image">
+                                <img src="https://via.placeholder.com/80x80/f7fafc/718096?text=Cleaner" alt="Cleaner">
+                            </div>
+                            <div class="product-card-small-info">
+                                <div class="product-card-title-small">Stainless Steel Cleaner</div>
+                                <div class="product-card-price-small">$8.99</div>
+                            </div>
+                        </div>
+                        <div class="product-card-small">
+                            <div class="product-card-small-image">
+                                <img src="https://via.placeholder.com/80x80/f7fafc/718096?text=Thermo" alt="Thermometer">
+                            </div>
+                            <div class="product-card-small-info">
+                                <div class="product-card-title-small">Digital Thermometer</div>
+                                <div class="product-card-price-small">$19.99</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT SIDEBAR -->
+            <div class="sidebar">
+                <!-- Price Box with Member/Non-Member Pricing -->
+                <div class="price-box">
+                    <div class="price-type-label">Non-Member Price:</div>
+                    <div class="price-main">$5,593.37<span class="price-unit">/Each</span></div>
+                    
+                    <div class="price-member-section">
+                        <div class="price-type-label">Plus Member Price:</div>
+                        <div class="member-price">$5,481.50 <span>/Each</span></div>
+                        <span class="savings-badge">Save $111.87 (2%)</span>
+                    </div>
+                </div>
+
+                <!-- Shipping Alert -->
+                <div class="alert-box alert-warning">
+                    ⚠️ This item ships via freight. Additional time and fees may apply.
+                </div>
+
+                <!-- Plus Member Info -->
+                <div class="alert-box alert-dark">
+                    🌟 Plus Members save 2% on this item. <a href="#">Learn more</a>
+                </div>
+
+                <!-- Quantity and Add to Cart -->
+                <div class="quantity-section">
+                    <label class="quantity-label">Quantity:</label>
+                    <div class="quantity-input-group">
+                        <input type="number" value="1" min="1">
+                        <span>Each</span>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-add-cart"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                        <button class="btn btn-add-list"><i class="fas fa-heart"></i> Wishlist</button>
+                    </div>
+                </div>
+
+                <!-- Instant Access Shipping -->
+                <div class="instant-access-box">
+                    <div class="instant-access-title">🚀 Instant Access Shipping</div>
+                    <ul class="instant-access-list">
+                        <li>Ships from CA in 1-2 business days</li>
+                        <li>Ships via freight carrier</li>
+                        <li>Eligible for expedited shipping</li>
+                        <li>Original packaging to reduce damage</li>
+                        <li>Free lift gate service included</li>
+                    </ul>
+                    <a href="#" class="instant-access-link">See all shipping options →</a>
+                </div>
+
+                <!-- Beverage-Air Undercounters Promotional Banner -->
+                <div class="sidebar-banner">
+                    <div class="promo-banner-1">
+                        <div class="brand-name">BEVERAGE-AIR</div>
+                        <div class="tagline">UNDERCOUNTERS</div>
+                        <div class="description">
+                            Premium quality commercial refrigeration solutions designed for professional kitchens. 
+                            Trusted by restaurants worldwide.
+                        </div>
+                        <div class="features-check">
+                            ✓ Energy Efficient<br>
+                            ✓ NSF Certified<br>
+                            ✓ Extended Warranty
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Proud Parts & Service Partner -->
+                <div class="sidebar-banner">
+                    <div class="promo-banner-2">
+                        <div class="icon">🏆</div>
+                        <div class="title">Proud Parts & Service Partner</div>
+                        <div class="description">
+                            We stock genuine Beverage-Air replacement parts and provide expert technical support.
+                        </div>
+                        <hr>
+                        <div class="services-list">
+                            <strong>Services Available:</strong><br>
+                            • Genuine OEM Parts<br>
+                            • Technical Support<br>
+                            • Installation Assistance<br>
+                            • Warranty Service
+                        </div>
+                        <button class="cta-btn">Find Parts & Manuals</button>
+                    </div>
+                </div>
+
+                <!-- SPECIFICATIONS IN SIDEBAR -->
+                <div class="sidebar-specs">
+                    <h4>📋 Specifications</h4>
+                    
+                    <div class="spec-item">
+                        <div class="spec-label">Type:</div>
+                        <div class="spec-value">Double Stacked</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Capacity:</div>
+                        <div class="spec-value">14.6 cu. ft.</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Width:</div>
+                        <div class="spec-value">27"</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Depth:</div>
+                        <div class="spec-value">30"</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Height:</div>
+                        <div class="spec-value">73"</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Doors:</div>
+                        <div class="spec-value">2 Solid</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Refrigerant:</div>
+                        <div class="spec-value">R-290 (HC)</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Voltage:</div>
+                        <div class="spec-value">115V</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Amps:</div>
+                        <div class="spec-value">7.6 Amps</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Compressor:</div>
+                        <div class="spec-value">1/2 HP Total</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Temp (Fridge):</div>
+                        <div class="spec-value">36°F to 38°F</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Temp (Freezer):</div>
+                        <div class="spec-value">-10°F to 0°F</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Controls:</div>
+                        <div class="spec-value">Digital Display</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Lighting:</div>
+                        <div class="spec-value">LED</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Casters:</div>
+                        <div class="spec-value">3" Included</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Exterior:</div>
+                        <div class="spec-value">Stainless Steel</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Interior:</div>
+                        <div class="spec-value">Aluminum</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Shelves:</div>
+                        <div class="spec-value">8 Total (4 each)</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Warranty:</div>
+                        <div class="spec-value">3 Yr / 5 Yr Comp</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Weight:</div>
+                        <div class="spec-value">385 lbs.</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Certifications:</div>
+                        <div class="spec-value">cETLus, ETL-Sanitation</div>
+                    </div>
+                </div>
+
+                <!-- Resources Box -->
+                <div class="sidebar-info-box">
+                    <h4>📄 Resources & Documents</h4>
+                    <ul>
+                        <li><a href="#">Spec Sheet (PDF)</a></li>
+                        <li><a href="#">Installation Manual</a></li>
+                        <li><a href="#">Warranty Information</a></li>
+                        <li><a href="#">Energy Guide</a></li>
+                        <li><a href="#">CAD Drawings</a></li>
+                        <li><a href="#">Parts Diagram</a></li>
+                    </ul>
+                </div>
+
+                <!-- Additional Resources & Information -->
+                <div class="sidebar-banner">
+                    <div class="promo-banner-3">
+                        <div class="title">📚 Additional Resources</div>
+                        <div class="description">
+                            Everything you need to make an informed decision about your refrigeration purchase.
+                        </div>
+                        <div class="resource-box">
+                            <h5>📹 Video Resources:</h5>
+                            <ul>
+                                <li>Product Overview Video</li>
+                                <li>Installation Guide Video</li>
+                                <li>Maintenance Tips Video</li>
+                                <li>Troubleshooting Guide</li>
+                            </ul>
+                        </div>
+                        <div class="resource-box">
+                            <h5>📖 Buying Guides:</h5>
+                            <ul>
+                                <li>Undercounter Refrigeration Guide</li>
+                                <li>Commercial Kitchen Planning</li>
+                                <li>Energy Efficiency Tips</li>
+                                <li>Sizing Calculator</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Help Box -->
+                <div class="sidebar-info-box">
+                    <h4>💡 Need Help?</h4>
+                    <ul>
+                        <li>📞 Call: <a href="tel:4086739999">(408) 673-9999</a></li>
+                        <li>💬 Live Chat Available</li>
+                        <li>📧 <a href="/cdn-cgi/l/email-protection#7f0c0a0f0f100d0b3f1c1a131a1d0d1e0b1a191a0c0b16091e13511c1012">Email Support</a></li>
+                        <li>🎥 Product Videos</li>
+                        <li>❓ FAQ Section</li>
+                        <li>🛠️ Installation Service</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        // Thumbnail Image Switcher
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        const mainImage = document.querySelector('.main-image-container img');
+        
+        thumbnails.forEach(thumbnail => {
+            thumbnail.addEventListener('click', function() {
+                thumbnails.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Quantity Input
+        const quantityInput = document.querySelector('.quantity-input-group input');
+        quantityInput.addEventListener('change', function() {
+            if (this.value < 1) this.value = 1;
+        });
+
+        // Buttons
+        document.querySelector('.btn-add-cart').addEventListener('click', () => alert('Added to cart!'));
+        document.querySelector('.btn-add-list').addEventListener('click', () => alert('Added to wishlist!'));
+        document.querySelector('.ask-question-btn').addEventListener('click', () => alert('Questio
