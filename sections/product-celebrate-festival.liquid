@@ -31,6 +31,11 @@
   assign spec_doc = product.metafields.custom.spec_doc
   assign manual_doc = product.metafields.custom.instructions_manual
   assign warranty_text = product.metafields.custom.warranty
+  assign spec_sheet = product.metafields.custom.spec_sheet
+  assign certifications = product.metafields.custom.certifications
+  assign shipment_text = product.metafields.custom.shipment_text
+  assign shipment_text_sub = product.metafields.custom.shipment_text_sub
+  assign shipment_tooltip_text = product.metafields.custom.shipment_tooltip_text
 
   # Related products logic
   assign related_title = section.settings.related_title_default
@@ -220,12 +225,19 @@
 
           {%- if feature_sections != blank -%}
             <h3>Key Features</h3>
-            <ul>
-              {%- assign features = feature_sections | split: '/' -%}
-              {%- for feature in features -%}
-                <li>{{ feature }}</li>
-              {%- endfor -%}
-            </ul>
+            <div style="background: var(--neutral-light); border: 1px solid var(--neutral-gray); border-radius: 8px; padding: 20px; margin: 20px 0;">
+              <table style="width: 100%; border-collapse: collapse;">
+                {%- assign features = feature_sections | split: '|' -%}
+                {%- for feature in features -%}
+                  <tr style="border-bottom: 1px solid var(--neutral-gray);">
+                    <td style="padding: 12px 8px; color: var(--primary-navy); font-weight: 500;">
+                      <i class="fas fa-check-circle" style="color: var(--primary-coral); margin-right: 8px;"></i>
+                      {{ feature | strip }}
+                    </td>
+                  </tr>
+                {%- endfor -%}
+              </table>
+            </div>
           {%- endif -%}
         </div>
         {%- endif -%}
@@ -393,9 +405,22 @@
         </div>
 
         <!-- Instant Access Shipping -->
-        {%- if section.settings.show_shipping_info -%}
+        {%- if section.settings.show_shipping_info or shipment_text != blank -%}
         <div class="instant-access-box">
           <div class="instant-access-title">🚀 {{ section.settings.shipping_info_title | default: "Shipping Information" }}</div>
+
+          {%- comment %} Display shipment_text metafield if available {% endcomment -%}
+          {%- if shipment_text != blank -%}
+            <p style="font-size: 14px; font-weight: 600; color: var(--success-green); margin-bottom: 10px;">
+              ✓ {{ shipment_text }}
+            </p>
+            {%- if shipment_text_sub != blank -%}
+              <p style="font-size: 13px; color: var(--neutral-dark); margin-bottom: 10px;">
+                {{ shipment_text_sub }}
+              </p>
+            {%- endif -%}
+          {%- endif -%}
+
           {%- if section.settings.shipping_info_list != blank -%}
             <ul class="instant-access-list">
               {%- assign shipping_items = section.settings.shipping_info_list | split: '|' -%}
@@ -457,81 +482,98 @@
         <div class="sidebar-specs">
           <h4>📋 Specifications</h4>
 
-          {%- comment %} Handle specs_table_pic_pdf metafield - can be image or PDF {% endcomment -%}
+          {%- comment %} Display Specs Table Image (if it's an image, not PDF) {% endcomment -%}
           {%- if specs_table != blank -%}
-            {%- comment %} Check if it's a PDF by looking at the URL {% endcomment -%}
-            {%- assign specs_url = specs_table | default: '' -%}
-            {%- assign is_pdf = false -%}
-
-            {%- if specs_url contains '.pdf' or specs_url contains 'application/pdf' -%}
-              {%- assign is_pdf = true -%}
-            {%- endif -%}
-
-            {%- if is_pdf -%}
-              {%- comment %} It's a PDF - show download button {% endcomment -%}
-              <div class="spec-item" style="display: block; text-align: center; padding: 20px;">
-                <a href="{{ specs_table }}" target="_blank" class="spec-download-btn">
-                  <i class="fas fa-file-pdf"></i> Download Specifications PDF
-                </a>
-              </div>
-            {%- else -%}
-              {%- comment %} It's an image - display it {% endcomment -%}
-              <div class="spec-item" style="display: block; padding: 10px 0;">
-                <img src="{{ specs_table }}" alt="Product Specifications" style="width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--neutral-gray);">
+            {%- assign specs_file_url = specs_table | file_url -%}
+            {%- if specs_file_url contains '.png' or specs_file_url contains '.jpg' or specs_file_url contains '.jpeg' or specs_file_url contains '.webp' -%}
+              <div class="spec-item" style="display: block; padding: 10px 0; margin-bottom: 15px;">
+                <img src="{{ specs_file_url }}" alt="Product Specifications" style="width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--neutral-gray);">
               </div>
             {%- endif -%}
-          {%- else -%}
-            {%- comment %} Fallback to manual specifications {% endcomment -%}
+          {%- endif -%}
 
-            {%- if material != blank -%}
-            <div class="spec-item">
-              <div class="spec-label">Material:</div>
-              <div class="spec-value">{{ material }}</div>
+          {%- comment %} Display Spec Doc PDF Download Button {% endcomment -%}
+          {%- if spec_doc != blank -%}
+            {%- assign spec_doc_url = spec_doc | file_url -%}
+            <div class="spec-item" style="display: block; text-align: center; padding: 15px 0; margin-bottom: 15px;">
+              <a href="{{ spec_doc_url }}" target="_blank" class="spec-download-btn">
+                <i class="fas fa-file-pdf"></i> Download Spec Sheet PDF
+              </a>
             </div>
-            {%- endif -%}
+          {%- endif -%}
 
-            {%- if product.weight -%}
-            <div class="spec-item">
-              <div class="spec-label">Weight:</div>
-              <div class="spec-value">{{ product.weight | weight_with_unit }}</div>
+          {%- comment %} Display Spec Sheet Text as Table {% endcomment -%}
+          {%- if spec_sheet != blank -%}
+            {%- assign spec_lines = spec_sheet | split: ' ' -%}
+            <div style="margin-bottom: 15px; padding: 10px 0;">
+              {%- for line in spec_lines -%}
+                {%- assign parts = line | split: ':' -%}
+                {%- if parts.size == 2 -%}
+                  <div class="spec-item">
+                    <div class="spec-label">{{ parts[0] | strip }}:</div>
+                    <div class="spec-value">{{ parts[1] | strip }}</div>
+                  </div>
+                {%- endif -%}
+              {%- endfor -%}
             </div>
-            {%- endif -%}
+          {%- endif -%}
 
-            {%- if product.vendor -%}
-            <div class="spec-item">
-              <div class="spec-label">Brand:</div>
-              <div class="spec-value">{{ product.vendor }}</div>
-            </div>
-            {%- endif -%}
+          {%- comment %} Display other specification metafields {% endcomment -%}
+          {%- if material != blank -%}
+          <div class="spec-item">
+            <div class="spec-label">Material:</div>
+            <div class="spec-value">{{ material }}</div>
+          </div>
+          {%- endif -%}
 
-            {%- if product.type -%}
+          {%- if product.weight -%}
+          <div class="spec-item">
+            <div class="spec-label">Weight:</div>
+            <div class="spec-value">{{ product.weight | weight_with_unit }}</div>
+          </div>
+          {%- endif -%}
+
+          {%- if product.vendor -%}
+          <div class="spec-item">
+            <div class="spec-label">Brand:</div>
+            <div class="spec-value">{{ product.vendor }}</div>
+          </div>
+          {%- endif -%}
+
+          {%- if product.type -%}
+          <div class="spec-item">
+            <div class="spec-label">Type:</div>
+            <div class="spec-value">{{ product.type }}</div>
+          </div>
+          {%- endif -%}
+
+          {%- if warranty_text != blank -%}
+          <div class="spec-item">
+            <div class="spec-label">Warranty:</div>
+            <div class="spec-value">{{ warranty_text }}</div>
+          </div>
+          {%- endif -%}
+
+          {%- if certifications != blank -%}
+          <div class="spec-item">
+            <div class="spec-label">Certifications:</div>
+            <div class="spec-value">{{ certifications }}</div>
+          </div>
+          {%- endif -%}
+
+          {%- if show_demo and material == blank and spec_sheet == blank -%}
             <div class="spec-item">
               <div class="spec-label">Type:</div>
-              <div class="spec-value">{{ product.type }}</div>
+              <div class="spec-value">Demo Product</div>
             </div>
-            {%- endif -%}
-
-            {%- if warranty_text != blank -%}
             <div class="spec-item">
-              <div class="spec-label">Warranty:</div>
-              <div class="spec-value">{{ warranty_text }}</div>
+              <div class="spec-label">Capacity:</div>
+              <div class="spec-value">Demo Value</div>
             </div>
-            {%- endif -%}
-
-            {%- if show_demo and material == blank -%}
-              <div class="spec-item">
-                <div class="spec-label">Type:</div>
-                <div class="spec-value">Demo Product</div>
-              </div>
-              <div class="spec-item">
-                <div class="spec-label">Capacity:</div>
-                <div class="spec-value">Demo Value</div>
-              </div>
-              <div class="spec-item">
-                <div class="spec-label">Dimensions:</div>
-                <div class="spec-value">24" x 30" x 36"</div>
-              </div>
-            {%- endif -%}
+            <div class="spec-item">
+              <div class="spec-label">Dimensions:</div>
+              <div class="spec-value">24" x 30" x 36"</div>
+            </div>
           {%- endif -%}
         </div>
 
@@ -541,13 +583,16 @@
           <h4>📄 Resources & Documents</h4>
           <ul>
             {%- if spec_doc != blank -%}
-              <li><a href="{{ spec_doc }}" target="_blank">Spec Sheet (PDF)</a></li>
+              {%- assign spec_doc_url = spec_doc | file_url -%}
+              <li><a href="{{ spec_doc_url }}" target="_blank">Spec Sheet (PDF)</a></li>
             {%- endif -%}
             {%- if manual_doc != blank -%}
-              <li><a href="{{ manual_doc }}" target="_blank">Installation Manual</a></li>
+              {%- assign manual_doc_url = manual_doc | file_url -%}
+              <li><a href="{{ manual_doc_url }}" target="_blank">Installation Manual</a></li>
             {%- endif -%}
             {%- if warranty_doc != blank -%}
-              <li><a href="{{ warranty_doc }}" target="_blank">Warranty Information</a></li>
+              {%- assign warranty_doc_url = warranty_doc | file_url -%}
+              <li><a href="{{ warranty_doc_url }}" target="_blank">Warranty Information</a></li>
             {%- endif -%}
             {%- if section.settings.resource_links != blank -%}
               {%- assign resources = section.settings.resource_links | split: '|' -%}
