@@ -507,6 +507,10 @@
             shipment_text blank? {{ shipment_text | blank }}<br>
             shipment_text value: "{{ shipment_text }}"<br>
             shipment_text type: {{ shipment_text.type }}<br>
+            <br><strong>ALL CUSTOM METAFIELDS:</strong><br>
+            {%- for field in product.metafields.custom -%}
+              {{ field.first }}: "{{ field.last }}" (type: {{ field.last.type }})<br>
+            {%- endfor -%}
           </div>
 
           {%- comment %} Display shipment_text metafield if available (multi-line text) {% endcomment -%}
