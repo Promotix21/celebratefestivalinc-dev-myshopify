@@ -90,6 +90,7 @@
             display: flex;
             flex-direction: column;
             gap: 30px;
+            min-width: 0; /* Allow content to shrink below content size */
         }
 
         /* Product Title */
@@ -203,6 +204,8 @@
             background-color: var(--neutral-light);
             border: 1px solid var(--neutral-gray);
             border-radius: var(--border-radius);
+            overflow: hidden; /* Prevent carousel from expanding parent */
+            max-width: 100%; /* Ensure it doesn't exceed viewport */
         }
 
         .other-products-section h3 {
@@ -731,6 +734,8 @@
             background-color: var(--neutral-light);
             border: 1px solid var(--neutral-gray);
             border-radius: var(--border-radius);
+            overflow: hidden; /* Prevent carousel from expanding parent */
+            max-width: 100%; /* Ensure it doesn't exceed viewport */
         }
 
         .related-section h2 {

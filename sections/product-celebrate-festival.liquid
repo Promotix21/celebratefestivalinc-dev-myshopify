@@ -458,23 +458,27 @@
           <h4>📋 Specifications</h4>
 
           {%- comment %} Handle specs_table_pic_pdf metafield - can be image or PDF {% endcomment -%}
-          {%- if specs_table -%}
-            {%- if specs_table.value != blank -%}
-              {%- assign file_extension = specs_table.value | split: '.' | last | downcase -%}
+          {%- if specs_table != blank -%}
+            {%- comment %} Check if it's a PDF by looking at the URL {% endcomment -%}
+            {%- assign specs_url = specs_table | default: '' -%}
+            {%- assign is_pdf = false -%}
 
-              {%- if file_extension == 'pdf' -%}
-                {%- comment %} It's a PDF - show download link {% endcomment -%}
-                <div class="spec-item" style="display: block; text-align: center; padding: 20px;">
-                  <a href="{{ specs_table.value }}" target="_blank" class="spec-download-btn" style="display: inline-block; background: var(--primary-coral); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
-                    <i class="fas fa-file-pdf"></i> Download Specifications PDF
-                  </a>
-                </div>
-              {%- else -%}
-                {%- comment %} It's an image - display it {% endcomment -%}
-                <div class="spec-item" style="display: block;">
-                  <img src="{{ specs_table.value }}" alt="Product Specifications" style="width: 100%; height: auto; border-radius: 8px;">
-                </div>
-              {%- endif -%}
+            {%- if specs_url contains '.pdf' or specs_url contains 'application/pdf' -%}
+              {%- assign is_pdf = true -%}
+            {%- endif -%}
+
+            {%- if is_pdf -%}
+              {%- comment %} It's a PDF - show download button {% endcomment -%}
+              <div class="spec-item" style="display: block; text-align: center; padding: 20px;">
+                <a href="{{ specs_table }}" target="_blank" class="spec-download-btn">
+                  <i class="fas fa-file-pdf"></i> Download Specifications PDF
+                </a>
+              </div>
+            {%- else -%}
+              {%- comment %} It's an image - display it {% endcomment -%}
+              <div class="spec-item" style="display: block; padding: 10px 0;">
+                <img src="{{ specs_table }}" alt="Product Specifications" style="width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--neutral-gray);">
+              </div>
             {%- endif -%}
           {%- else -%}
             {%- comment %} Fallback to manual specifications {% endcomment -%}
@@ -738,10 +742,11 @@
       "default": "See all shipping options"
     },
     {
-      "type": "url",
+      "type": "text",
       "id": "shipping_link_url",
       "label": "Shipping Link URL",
-      "default": "/pages/shipping"
+      "default": "/pages/shipping",
+      "info": "Enter page URL (e.g., /pages/shipping)"
     },
     {
       "type": "header",
@@ -842,10 +847,11 @@
       "default": "Ask a Question"
     },
     {
-      "type": "url",
+      "type": "text",
       "id": "qa_button_link",
       "label": "Ask Question Button Link",
-      "default": "/pages/contact"
+      "default": "/pages/contact",
+      "info": "Enter page URL (e.g., /pages/contact)"
     },
     {
       "type": "header",
@@ -953,9 +959,11 @@
       "default": "Find Parts & Manuals"
     },
     {
-      "type": "url",
+      "type": "text",
       "id": "service_banner_button_url",
-      "label": "Service Banner Button URL"
+      "label": "Service Banner Button URL",
+      "default": "/pages/parts-and-service",
+      "info": "Enter page URL (e.g., /pages/parts-and-service)"
     },
     {
       "type": "header",
