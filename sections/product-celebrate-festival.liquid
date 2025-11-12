@@ -251,6 +251,28 @@
             </div>
           {%- endif -%}
 
+          {%- comment %} Dimensions & Utilities Section {% endcomment -%}
+          {%- assign dimensions_utilities = product.metafields.custom.dimensions_utilities -%}
+          {%- if dimensions_utilities != blank -%}
+            <h3>Dimensions & Utilities</h3>
+            <div style="background: var(--neutral-light); border: 2px solid var(--accent-teal); border-radius: 12px; padding: 25px; margin: 20px 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+              <table style="width: 100%; border-collapse: collapse;">
+                {%- assign dimension_items = dimensions_utilities | split: '|' -%}
+                {%- for item in dimension_items -%}
+                  {%- assign trimmed_item = item | strip -%}
+                  {%- if trimmed_item != blank -%}
+                    <tr style="border-bottom: 1px solid var(--neutral-gray);">
+                      <td style="padding: 12px 8px; color: var(--primary-navy); font-weight: 600; font-size: 14px;">
+                        <i class="fas fa-ruler-combined" style="color: var(--accent-teal); margin-right: 10px; font-size: 16px;"></i>
+                        {{ trimmed_item }}
+                      </td>
+                    </tr>
+                  {%- endif -%}
+                {%- endfor -%}
+              </table>
+            </div>
+          {%- endif -%}
+
           {%- comment %} Display Compatible/Works With Products {% endcomment -%}
           {%- if works_with_products.value.size > 0 -%}
             <h3>Works With / Compatible Products</h3>
@@ -476,11 +498,11 @@
                 {%- endfor -%}
               </ul>
             {%- endif -%}
-          {%- endif -%}
-          {%- if section.settings.shipping_link_text != blank -%}
-            <a href="{{ section.settings.shipping_link_url }}" class="instant-access-link">
-              {{ section.settings.shipping_link_text }} →
-            </a>
+            {%- if section.settings.shipping_link_text != blank -%}
+              <a href="{{ section.settings.shipping_link_url }}" class="instant-access-link">
+                {{ section.settings.shipping_link_text }} →
+              </a>
+            {%- endif -%}
           {%- endif -%}
         </div>
         {%- endif -%}
@@ -588,9 +610,9 @@
           {%- endif -%}
 
           {%- if product.vendor -%}
-          <div class="spec-item">
-            <div class="spec-label">Brand:</div>
-            <div class="spec-value">{{ product.vendor }}</div>
+          <div style="background: linear-gradient(135deg, var(--accent-gold) 0%, #f4d03f 100%); border: 3px solid var(--primary-navy); border-radius: 12px; padding: 20px; margin: 20px 0; box-shadow: 0 6px 12px rgba(0,0,0,0.15); text-align: center;">
+            <div style="font-size: 12px; font-weight: 600; color: var(--primary-navy); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px;">Brand</div>
+            <div style="font-size: 22px; font-weight: 800; color: var(--primary-navy); text-transform: uppercase; letter-spacing: 1px;">{{ product.vendor }}</div>
           </div>
           {%- endif -%}
 
@@ -606,8 +628,17 @@
           <div class="spec-item">
             <div class="spec-label">Warranty:</div>
             <div class="spec-value">
-              {%- if warranty_text.value -%}
-                {{ warranty_text.value }}
+              {%- comment %} Extract text from rich text JSON structure {% endcomment -%}
+              {%- if warranty_text.children.size > 0 -%}
+                {%- for paragraph in warranty_text.children -%}
+                  {%- if paragraph.children.size > 0 -%}
+                    {%- for text_node in paragraph.children -%}
+                      {%- if text_node.value -%}
+                        {{ text_node.value }}
+                      {%- endif -%}
+                    {%- endfor -%}
+                  {%- endif -%}
+                {%- endfor -%}
               {%- else -%}
                 {{ warranty_text }}
               {%- endif -%}
