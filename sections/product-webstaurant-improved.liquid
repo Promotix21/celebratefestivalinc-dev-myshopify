@@ -1,0 +1,738 @@
+{% comment %}
+==================================================
+PRODUCT PAGE - WEBSTAURANTSTORE STYLE (IMPROVED)
+==================================================
+Features:
+- Demo data toggle for development
+- WebstaurantStore-inspired layout
+- Reordered sidebar (price → CTA priority)
+- Accordion feature sections
+- Graceful fallbacks for missing data
+==================================================
+{% endcomment %}
+
+{{ 'product-webstaurant-improved.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign product_form_id = 'product-form-' | append: section.id
+
+  # Check if demo mode is enabled
+  assign demo_mode = section.settings.show_demo_data
+-%}
+
+<div class="product-webstaurant-container{% if demo_mode %} demo-mode{% endif %}">
+
+  {%- comment -%} DEMO MODE INDICATOR {%- endcomment -%}
+  {% if demo_mode %}
+    <div class="demo-mode-banner" style="background: #ff6b6b; color: white; padding: 10px; text-align: center; font-weight: bold;">
+      ⚠️ DEMO MODE ACTIVE - Showing Example Data | Turn off "Show Demo Data" in theme settings for production
+    </div>
+  {% endif %}
+
+  {%- comment -%} ===== MAIN PRODUCT SECTION ===== {%- endcomment -%}
+  <div class="product-main-wrapper">
+
+    {%- comment -%} LEFT COLUMN: Images + Info {%- endcomment -%}
+    <div class="product-content-left">
+
+      {%- comment -%} Product Title & Meta {%- endcomment -%}
+      <div class="product-header">
+        <h1 class="product-title">{{ product.title }}</h1>
+
+        <div class="product-meta-row">
+          {%- comment -%} Star Rating {%- endcomment -%}
+          <div class="product-rating">
+            {% if demo_mode %}
+              <div class="stars-demo">
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star empty">★</span>
+              </div>
+              <a href="#reviews-section" class="reviews-link">Read 24 reviews</a>
+            {% else %}
+              {%- if product.metafields.reviews.rating -%}
+                {% assign rating = product.metafields.reviews.rating | times: 1.0 %}
+                <div class="product-stars">
+                  {% for i in (1..5) %}
+                    {% if i <= rating %}
+                      <span class="star filled">★</span>
+                    {% else %}
+                      <span class="star empty">★</span>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+                <a href="#reviews-section" class="reviews-link">
+                  Read {{ product.metafields.reviews.count | default: 0 }} reviews
+                </a>
+              {%- endif -%}
+            {% endif %}
+          </div>
+
+          {%- comment -%} SKU/Item Number {%- endcomment -%}
+          <span class="product-sku">
+            Item #: {{ current_variant.sku | default: product.id }}
+          </span>
+        </div>
+      </div>
+
+      {%- comment -%} Image Gallery {%- endcomment -%}
+      <div class="product-gallery-section">
+        <div class="gallery-container">
+          <div class="product-main-image">
+            {% if product.featured_image %}
+              <img src="{{ product.featured_image | img_url: '800x800' }}"
+                   alt="{{ product.featured_image.alt | escape }}"
+                   id="main-product-image"
+                   width="800"
+                   height="800"
+                   loading="eager">
+            {% else %}
+              <div class="placeholder-image">No image available</div>
+            {% endif %}
+
+            {% if section.settings.enable_zoom %}
+              <button class="zoom-button" aria-label="Click to expand image">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.35-4.35"></path>
+                  <line x1="11" y1="8" x2="11" y2="14"></line>
+                  <line x1="8" y1="11" x2="14" y2="11"></line>
+                </svg>
+              </button>
+            {% endif %}
+          </div>
+
+          {%- comment -%} Thumbnail Gallery {%- endcomment -%}
+          {% if product.images.size > 1 %}
+            <div class="product-thumbnail-gallery">
+              {% for image in product.images limit: 8 %}
+                <div class="thumbnail-item {% if forloop.first %}active{% endif %}"
+                     data-image-url="{{ image | img_url: '800x800' }}">
+                  <img src="{{ image | img_url: '100x100' }}"
+                       alt="{{ image.alt | escape }}"
+                       width="100"
+                       height="100"
+                       loading="lazy">
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {%- comment -%} Action Buttons (Share, Ask Question, etc.) {%- endcomment -%}
+      <div class="product-actions-bottom">
+        <button class="btn-share" onclick="shareProduct()">
+          <svg width="16" height="16"><use href="#icon-share"></use></svg>
+          Share
+        </button>
+        <button class="btn-ask-question" onclick="openContactForm()">
+          <svg width="16" height="16"><use href="#icon-message"></use></svg>
+          Ask a Question
+        </button>
+      </div>
+
+    </div>
+
+    {%- comment -%} ===== RIGHT SIDEBAR: Purchase Panel ===== {%- endcomment -%}
+    <div class="product-sidebar-right">
+
+      {%- comment -%} 1. FREE SHIPPING BADGE {%- endcomment -%}
+      {% if demo_mode or product.metafields.custom.free_shipping == true or product.tags contains 'free-shipping' %}
+        <div class="free-shipping-badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="1" y="3" width="15" height="13"></rect>
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+          </svg>
+          Free Shipping
+        </div>
+      {% endif %}
+
+      {%- comment -%} 2. PRICING (Most Prominent) {%- endcomment -%}
+      <div class="product-pricing-box">
+        {%- comment -%} Regular Price {%- endcomment -%}
+        <div class="price-regular-box">
+          <span class="price-label">Regularly</span>
+          <span class="price-amount">${{ current_variant.price | money_without_currency }}</span>
+          <span class="price-unit">/Each</span>
+        </div>
+
+        {%- comment -%} Member Price {%- endcomment -%}
+        {% if section.settings.enable_member_pricing %}
+          <div class="price-member-box">
+            <span class="member-badge">plus</span>
+            <span class="price-label">Member Price</span>
+
+            {% if demo_mode %}
+              {%- comment -%} Demo: Show blurred price for non-logged-in users {%- endcomment -%}
+              <div class="price-blurred-container">
+                <span class="blurred-text">$•,•••.••</span>
+                <span class="price-unit blurred-unit">/Each</span>
+                <div class="login-overlay">
+                  <a href="{{ routes.account_login_url }}" class="login-overlay-link">
+                    Login to see<br>member price
+                  </a>
+                </div>
+              </div>
+            {% else %}
+              {% if customer %}
+                {% assign member_price = product.metafields.custom.member_price | default: current_variant.price %}
+                <span class="price-amount member-price">${{ member_price | money_without_currency }}</span>
+                <span class="price-unit">/Each</span>
+              {% else %}
+                <div class="price-blurred-container">
+                  <span class="blurred-text">$•,•••.••</span>
+                  <span class="price-unit blurred-unit">/Each</span>
+                  <div class="login-overlay">
+                    <a href="{{ routes.account_login_url }}" class="login-overlay-link">
+                      Login to see<br>member price
+                    </a>
+                  </div>
+                </div>
+              {% endif %}
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+
+      {%- comment -%} 3. PROTECTION PLAN {%- endcomment -%}
+      {% if section.settings.show_protection_plan %}
+        <div class="protection-plan-section">
+          <h3 class="section-label">What We Offer</h3>
+          <div class="protection-offer">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            <div class="offer-text">
+              <strong>Protect Your Product</strong>
+              {% if demo_mode %}
+                <p>Coverage starting at $78.99</p>
+              {% else %}
+                {% assign protection_price = product.metafields.custom.protection_plan_price | default: current_variant.price | times: 0.03 %}
+                <p>Coverage starting at ${{ protection_price | money_without_currency }}</p>
+              {% endif %}
+            </div>
+            <button class="btn-add-protection" onclick="openProtectionModal()">Add Protection</button>
+          </div>
+        </div>
+      {% endif %}
+
+      {%- comment -%} 4. QUANTITY & ADD TO CART {%- endcomment -%}
+      {% form 'product', product, id: product_form_id, class: 'product-form' %}
+        <input type="hidden" name="id" value="{{ current_variant.id }}">
+
+        <div class="quantity-cart-section">
+          <div class="quantity-selector">
+            <button class="qty-btn minus" type="button" onclick="decreaseQuantity()">−</button>
+            <input type="number" name="quantity" value="1" min="1" class="qty-input" id="quantity-input">
+            <button class="qty-btn plus" type="button" onclick="increaseQuantity()">+</button>
+          </div>
+
+          <button type="submit"
+                  name="add"
+                  class="btn-add-to-cart"
+                  {% unless current_variant.available %}disabled{% endunless %}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+            </svg>
+            {% if current_variant.available %}
+              Add to Cart
+            {% else %}
+              Sold Out
+            {% endif %}
+          </button>
+        </div>
+      {% endform %}
+
+      {%- comment -%} 5. REWARDS INFO {%- endcomment -%}
+      {% if section.settings.show_rewards %}
+        <div class="rewards-info">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+          <div class="rewards-text">
+            {% if demo_mode %}
+              <span>Earn up to <strong>$78.57</strong> back (7,857 points)</span>
+            {% else %}
+              {% assign rewards_amount = current_variant.price | times: 0.03 %}
+              {% assign rewards_points = current_variant.price | times: 3 | round %}
+              <span>Earn up to <strong>${{ rewards_amount | money_without_currency }}</strong> back</span>
+              <span class="points-text">({{ rewards_points }} points)</span>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+
+      {%- comment -%} 6. ADD TO WISHLIST {%- endcomment -%}
+      <button class="btn-wishlist" onclick="addToWishlist({{ product.id }})">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+        Add to Wish List
+      </button>
+
+      {%- comment -%} 7. SHIPPING INFO {%- endcomment -%}
+      {% if product.metafields.custom.shipment_text != blank or demo_mode %}
+        <div class="shipping-info">
+          <svg width="16" height="16"><use href="#icon-truck"></use></svg>
+          {% if demo_mode %}
+            <span>Ships in 3-5 business days</span>
+          {% else %}
+            <span>{{ product.metafields.custom.shipment_text }}</span>
+          {% endif %}
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  {%- comment -%} ===== BELOW MAIN SECTION ===== {%- endcomment -%}
+
+  {%- comment -%} KEY FEATURES (if available) {%- endcomment -%}
+  {% if demo_mode or product.metafields.custom.key_features != blank %}
+    <div class="key-features-section">
+      <h2 class="section-title">Key Features</h2>
+      <ul class="features-list">
+        {% if demo_mode %}
+          <li>49 cubic feet interior capacity with 6 adjustable shelves</li>
+          <li>Stainless steel exterior with aluminum interior</li>
+          <li>Self-closing solid doors with recessed handles</li>
+          <li>Temperature range of -10°F to 0°F</li>
+          <li>Bottom-mounted 1/2 HP compressor</li>
+          <li>4-inch heavy-duty casters for mobility</li>
+          <li>Digital temperature display and controls</li>
+          <li>Energy-efficient R290 refrigerant</li>
+        {% else %}
+          {% assign features = product.metafields.custom.key_features | split: '|' %}
+          {% for feature in features %}
+            {% if feature != blank %}
+              <li>{{ feature | strip }}</li>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {%- comment -%} FEATURE ACCORDION SECTIONS {%- endcomment -%}
+  {% if section.settings.show_feature_accordion %}
+    <div class="feature-accordion-section">
+      <h2 class="section-title">Product Features</h2>
+
+      {% if demo_mode %}
+        {%- comment -%} DEMO DATA: Feature Accordion {%- endcomment -%}
+        <div class="accordion">
+          <div class="accordion-item">
+            <button class="accordion-header" type="button">
+              <span>Convenient Capacity</span>
+              <svg class="accordion-icon" width="20" height="20" viewBox="0 0 24 24">
+                <path d="M19 9l-7 7-7-7" stroke="currentColor" fill="none" stroke-width="2"/>
+              </svg>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                <img src="https://via.placeholder.com/400x300" alt="Feature" loading="lazy">
+                <p>With 49 cu. ft. of interior space and 6 adjustable shelves, this freezer provides ample storage for all your frozen goods. The adjustable shelving allows you to customize the interior layout to accommodate items of various sizes.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-header" type="button">
+              <span>Strong and Sturdy Construction</span>
+              <svg class="accordion-icon" width="20" height="20" viewBox="0 0 24 24">
+                <path d="M19 9l-7 7-7-7" stroke="currentColor" fill="none" stroke-width="2"/>
+              </svg>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                <img src="https://via.placeholder.com/400x300" alt="Feature" loading="lazy">
+                <p>Built with a durable stainless steel exterior and aluminum interior, this unit is designed to withstand the demands of busy commercial kitchens while maintaining a professional appearance.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-header" type="button">
+              <span>Digital Temperature Control</span>
+              <svg class="accordion-icon" width="20" height="20" viewBox="0 0 24 24">
+                <path d="M19 9l-7 7-7-7" stroke="currentColor" fill="none" stroke-width="2"/>
+              </svg>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                <img src="https://via.placeholder.com/400x300" alt="Feature" loading="lazy">
+                <p>Easy-to-read digital display and precise electronic controls allow you to maintain optimal temperature settings. Monitor and adjust temperatures without opening the doors.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        {%- comment -%} REAL DATA: Feature Accordion {%- endcomment -%}
+        {% if product.metafields.custom.feature_sections != blank %}
+          {% assign feature_sections = product.metafields.custom.feature_sections | parse_json %}
+          <div class="accordion">
+            {% for feature in feature_sections %}
+              <div class="accordion-item">
+                <button class="accordion-header" type="button">
+                  <span>{{ feature.title }}</span>
+                  <svg class="accordion-icon" width="20" height="20" viewBox="0 0 24 24">
+                    <path d="M19 9l-7 7-7-7" stroke="currentColor" fill="none" stroke-width="2"/>
+                  </svg>
+                </button>
+                <div class="accordion-content">
+                  <div class="accordion-body">
+                    {% if feature.image %}
+                      <img src="{{ feature.image | img_url: '400x300' }}" alt="{{ feature.title }}" loading="lazy">
+                    {% endif %}
+                    <p>{{ feature.description }}</p>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {%- comment -%} SPECIFICATION TABLE {%- endcomment -%}
+  {% if section.settings.show_specifications %}
+    <div class="specifications-section">
+      <h2 class="section-title">Specifications</h2>
+
+      {% if demo_mode %}
+        {%- comment -%} DEMO DATA: Specs Table {%- endcomment -%}
+        <table class="specs-table">
+          <thead>
+            <tr>
+              <th>Attribute</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="2"><strong>Overall Dimensions</strong></td></tr>
+            <tr><td>Width</td><td>54 inches</td></tr>
+            <tr><td>Depth</td><td>31 1/2 inches</td></tr>
+            <tr><td>Height</td><td>82 3/4 inches</td></tr>
+            <tr><td colspan="2"><strong>Electrical</strong></td></tr>
+            <tr><td>Voltage</td><td>115 Volts</td></tr>
+            <tr><td>Phase</td><td>1 Phase</td></tr>
+            <tr><td>Plug Type</td><td>NEMA 5-15P</td></tr>
+            <tr><td colspan="2"><strong>Construction</strong></td></tr>
+            <tr><td>Exterior</td><td>Stainless steel</td></tr>
+            <tr><td>Interior</td><td>Aluminum</td></tr>
+          </tbody>
+        </table>
+      {% else %}
+        {%- comment -%} REAL DATA: Specs {%- endcomment -%}
+        {% if product.metafields.custom.specification != blank %}
+          <div class="specs-content">
+            {{ product.metafields.custom.specification }}
+          </div>
+        {% else %}
+          {%- comment -%} Basic fallback {%- endcomment -%}
+          <table class="specs-table">
+            <tbody>
+              {% if product.vendor %}<tr><td>Brand</td><td>{{ product.vendor }}</td></tr>{% endif %}
+              {% if current_variant.sku %}<tr><td>SKU</td><td>{{ current_variant.sku }}</td></tr>{% endif %}
+              {% if product.weight > 0 %}<tr><td>Weight</td><td>{{ product.weight | weight_with_unit }}</td></tr>{% endif %}
+            </tbody>
+          </table>
+        {% endif %}
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {%- comment -%} WORKS WITH SECTION {%- endcomment -%}
+  {% if section.settings.show_works_with %}
+    {% if demo_mode or product.tags contains 'show:works-with' or product.metafields.custom.works_with_products != blank %}
+      <div class="works-with-section">
+        <h2 class="section-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 11l3 3 8-8"></path>
+            <path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10"></path>
+          </svg>
+          Works With
+        </h2>
+
+        <div class="works-with-carousel">
+          {% if demo_mode %}
+            {%- comment -%} DEMO DATA: Works With Products {%- endcomment -%}
+            {% for i in (1..4) %}
+              <div class="cross-sell-card">
+                <div class="card-image">
+                  <img src="https://via.placeholder.com/200x200" alt="Accessory {{ i }}" loading="lazy">
+                </div>
+                <h3 class="card-title">Related Accessory {{ i }}</h3>
+                <div class="card-price">$45.99</div>
+                <button class="btn-quick-add" onclick="quickAdd({{ i }})">Quick Add</button>
+              </div>
+            {% endfor %}
+          {% else %}
+            {%- comment -%} REAL DATA: Works With {%- endcomment -%}
+            {% if product.metafields.custom.works_with_products != blank %}
+              {% for related_product in product.metafields.custom.works_with_products %}
+                {% if related_product.available %}
+                  <div class="cross-sell-card">
+                    <a href="{{ related_product.url }}">
+                      <div class="card-image">
+                        {% if related_product.featured_image %}
+                          <img src="{{ related_product.featured_image | img_url: '200x200' }}"
+                               alt="{{ related_product.title }}"
+                               loading="lazy">
+                        {% endif %}
+                      </div>
+                      <h3 class="card-title">{{ related_product.title | truncate: 50 }}</h3>
+                      <div class="card-price">{{ related_product.price | money }}</div>
+                    </a>
+                    <button class="btn-quick-add" data-product-id="{{ related_product.selected_or_first_available_variant.id }}">
+                      Quick Add
+                    </button>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  {% endif %}
+
+  {%- comment -%} PRODUCT DESCRIPTION {%- endcomment -%}
+  {% if product.description != blank %}
+    <div class="product-description-section">
+      <h2 class="section-title">Product Description</h2>
+      <div class="description-content">
+        {{ product.description }}
+      </div>
+    </div>
+  {% endif %}
+
+  {%- comment -%} WARRANTY TAB {%- endcomment -%}
+  {% if demo_mode or product.metafields.custom.warranty != blank or product.metafields.custom.warranty_document != blank %}
+    <div class="warranty-section">
+      <h2 class="section-title">Warranty Information</h2>
+
+      {% if demo_mode %}
+        <div class="warranty-content">
+          <h3>Manufacturer Warranty</h3>
+          <p><strong>Parts and Labor:</strong> 1 year from date of purchase</p>
+          <p><strong>Compressor:</strong> 3 years parts only</p>
+          <p>For warranty service, contact us at (408) 673-9999</p>
+        </div>
+      {% else %}
+        <div class="warranty-content">
+          {{ product.metafields.custom.warranty }}
+        </div>
+        {% if product.metafields.custom.warranty_document != blank %}
+          <a href="{{ product.metafields.custom.warranty_document }}"
+             class="btn-download"
+             download>
+            Download Warranty Document
+          </a>
+        {% endif %}
+      {% endif %}
+    </div>
+  {% endif %}
+
+</div>
+
+{%- comment -%} SVG ICONS {%- endcomment -%}
+<svg style="display: none;">
+  <symbol id="icon-share" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <circle cx="18" cy="5" r="3"></circle>
+    <circle cx="6" cy="12" r="3"></circle>
+    <circle cx="18" cy="19" r="3"></circle>
+    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+  </symbol>
+  <symbol id="icon-message" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+  </symbol>
+  <symbol id="icon-truck" viewBox="0 0 24 24" fill="currentColor">
+    <rect x="1" y="3" width="15" height="13"></rect>
+    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+    <circle cx="5.5" cy="18.5" r="2.5"></circle>
+    <circle cx="18.5" cy="18.5" r="2.5"></circle>
+  </symbol>
+</svg>
+
+{%- comment -%} JAVASCRIPT {%- endcomment -%}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+  // ===== QUANTITY CONTROLS =====
+  window.increaseQuantity = function() {
+    const input = document.getElementById('quantity-input');
+    input.value = parseInt(input.value) + 1;
+  };
+
+  window.decreaseQuantity = function() {
+    const input = document.getElementById('quantity-input');
+    if (parseInt(input.value) > 1) {
+      input.value = parseInt(input.value) - 1;
+    }
+  };
+
+  // ===== IMAGE GALLERY =====
+  const thumbnails = document.querySelectorAll('.thumbnail-item');
+  const mainImage = document.getElementById('main-product-image');
+
+  thumbnails.forEach(thumb => {
+    thumb.addEventListener('click', function() {
+      thumbnails.forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      mainImage.src = this.dataset.imageUrl;
+    });
+  });
+
+  // ===== ACCORDION =====
+  const accordionHeaders = document.querySelectorAll('.accordion-header');
+
+  accordionHeaders.forEach(header => {
+    header.addEventListener('click', function() {
+      const item = this.parentElement;
+      const content = this.nextElementSibling;
+      const icon = this.querySelector('.accordion-icon');
+
+      // Close all other accordions
+      document.querySelectorAll('.accordion-item').forEach(otherItem => {
+        if (otherItem !== item) {
+          otherItem.classList.remove('active');
+          otherItem.querySelector('.accordion-content').style.maxHeight = '0';
+        }
+      });
+
+      // Toggle current accordion
+      item.classList.toggle('active');
+      if (item.classList.contains('active')) {
+        content.style.maxHeight = content.scrollHeight + 'px';
+      } else {
+        content.style.maxHeight = '0';
+      }
+    });
+  });
+
+  // ===== SHARE PRODUCT =====
+  window.shareProduct = function() {
+    if (navigator.share) {
+      navigator.share({
+        title: document.querySelector('.product-title').textContent,
+        url: window.location.href
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!');
+    }
+  };
+
+  // ===== WISHLIST =====
+  window.addToWishlist = function(productId) {
+    console.log('Add to wishlist:', productId);
+    // Implement wishlist functionality
+  };
+
+  // ===== CONTACT FORM =====
+  window.openContactForm = function() {
+    window.location.href = '/pages/contact-us';
+  };
+
+  // ===== PROTECTION MODAL =====
+  window.openProtectionModal = function() {
+    alert('Protection plan details coming soon!');
+  };
+
+  // ===== QUICK ADD =====
+  window.quickAdd = function(id) {
+    console.log('Quick add product:', id);
+  };
+
+});
+</script>
+
+{% schema %}
+{
+  "name": "Product - Style",
+  "class": "product-webstaurant-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "🧪 DEVELOPMENT MODE"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_demo_data",
+      "label": "Show Demo Data",
+      "info": "Enable to preview all sections with example content. Disable for production.",
+      "default": false
+    },
+    {
+      "type": "paragraph",
+      "content": "⚠️ IMPORTANT: Turn OFF demo mode before going live! This shows fake data for preview purposes only."
+    },
+    {
+      "type": "header",
+      "content": "General Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_member_pricing",
+      "label": "Enable Member Pricing",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_zoom",
+      "label": "Enable Image Zoom",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Purchase Panel Options"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_protection_plan",
+      "label": "Show Protection Plan",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rewards",
+      "label": "Show Rewards Info",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Content Sections"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_feature_accordion",
+      "label": "Show Feature Accordion",
+      "info": "Displays collapsible feature sections with images",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_specifications",
+      "label": "Show Specifications Table",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_works_with",
+      "label": "Show 'Works With' Section",
+      "info": "Shows related/compatible products",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

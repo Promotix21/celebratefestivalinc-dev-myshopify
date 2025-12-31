@@ -1,0 +1,432 @@
+{%- comment -%}
+  Renders a product card for grid view
+  
+  Accepts:
+  - product: {Object} Product object
+  - show_vendor: {Boolean} Show brand/vendor
+  - show_rating: {Boolean} Show product rating
+  - image_ratio: {String} Image aspect ratio
+  - show_quick_add: {Boolean} Show quick add button
+  - show_sale_badge: {Boolean} Show sale badge
+  - show_shipping_badge: {Boolean} Show free shipping badge
+  - free_shipping_tag: {String} Tag for free shipping
+  
+  Usage:
+  {% render 'product-card', product: product, show_vendor: true %}
+{%- endcomment -%}
+
+{%- liquid
+  assign show_vendor = show_vendor | default: true
+  assign show_rating = show_rating | default: false
+  assign image_ratio = image_ratio | default: 'adapt'
+  assign show_quick_add = show_quick_add | default: false
+  assign show_sale_badge = show_sale_badge | default: true
+  assign show_shipping_badge = show_shipping_badge | default: true
+  assign free_shipping_tag = free_shipping_tag | default: 'free-shipping'
+  
+  assign on_sale = false
+  if product.compare_at_price > product.price
+    assign on_sale = true
+  endif
+  
+  assign has_free_shipping = false
+  if product.tags contains free_shipping_tag
+    assign has_free_shipping = true
+  endif
+  
+  assign low_stock = false
+  assign total_inventory = 0
+  for variant in product.variants
+    assign total_inventory = total_inventory | plus: variant.inventory_quantity
+  endfor
+  if total_inventory > 0 and total_inventory <= 10
+    assign low_stock = true
+  endif
+  
+  assign call_for_price = false
+  if product.metafields.custom.call_for_price == true or product.tags contains 'call-for-price'
+    assign call_for_price = true
+  endif
+-%}
+
+<div class="product-card" data-product-id="{{ product.id }}">
+  <a href="{{ product.url }}" class="product-link">
+    
+    <!-- Product Image -->
+    <div class="product-image" style="{% if image_ratio == 'square' %}padding-bottom: 100%;{% elsif image_ratio == 'portrait' %}padding-bottom: 125%;{% endif %}">
+      {%- if product.featured_media -%}
+        <img
+          src="{{ product.featured_media | image_url: width: 600 }}"
+          srcset="{{ product.featured_media | image_url: width: 300 }} 300w,
+                  {{ product.featured_media | image_url: width: 600 }} 600w,
+                  {{ product.featured_media | image_url: width: 900 }} 900w"
+          alt="{{ product.featured_media.alt | escape }}"
+          loading="lazy"
+          width="{{ product.featured_media.width }}"
+          height="{{ product.featured_media.height }}"
+        >
+        
+        {%- if product.media[1] != nil -%}
+          <img
+            src="{{ product.media[1] | image_url: width: 600 }}"
+            alt="{{ product.media[1].alt | escape }}"
+            loading="lazy"
+            class="product-image-hover"
+          >
+        {%- endif -%}
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+      
+      <!-- Product Badges -->
+      <div class="product-badges">
+        {%- if has_free_shipping and show_shipping_badge -%}
+          <span class="badge free-shipping-badge">
+            <i class="fas fa-shipping-fast"></i> Free Shipping
+          </span>
+        {%- endif -%}
+        
+        {%- if low_stock -%}
+          <span class="badge low-stock-badge">
+            <i class="fas fa-exclamation-circle"></i> Low Stock
+          </span>
+        {%- endif -%}
+        
+        {%- if on_sale and show_sale_badge -%}
+          {%- assign savings = product.compare_at_price | minus: product.price -%}
+          {%- assign savings_percent = savings | times: 100.0 | divided_by: product.compare_at_price | round -%}
+          <span class="badge sale-badge">
+            Save {{ savings_percent }}%
+          </span>
+        {%- endif -%}
+        
+        {%- if product.tags contains 'new' -%}
+          <span class="badge new-badge">New</span>
+        {%- endif -%}
+        
+        {%- if product.tags contains 'energy-star' -%}
+          <span class="badge energy-badge">
+            <i class="fas fa-leaf"></i> Energy Star
+          </span>
+        {%- endif -%}
+      </div>
+    </div>
+  </a>
+
+  <!-- Product Info -->
+  <div class="product-info">
+    <div class="product-content">
+      
+      {%- if show_vendor and product.vendor != blank -%}
+        <div class="product-brand">{{ product.vendor }}</div>
+      {%- endif -%}
+
+      <a href="{{ product.url }}" class="product-title-link">
+        <h3 class="product-title">{{ product.title }}</h3>
+      </a>
+
+      {%- if show_rating -%}
+        <div class="product-rating">
+          <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+        </div>
+      {%- endif -%}
+
+      <!-- Product Features/Tags -->
+      {%- if product.metafields.custom.key_features != blank -%}
+        <div class="product-features">
+          {%- assign features = product.metafields.custom.key_features | split: ',' -%}
+          {%- for feature in features limit: 3 -%}
+            <span class="feature-tag">{{ feature | strip }}</span>
+          {%- endfor -%}
+        </div>
+      {%- else -%}
+        {%- comment -%} Fallback to product tags if no metafield {%- endcomment -%}
+        {%- assign feature_tags = product.tags | where_exp: "tag", "tag contains 'feature_'" -%}
+        {%- if feature_tags.size > 0 -%}
+          <div class="product-features">
+            {%- for tag in feature_tags limit: 3 -%}
+              {%- assign feature_name = tag | remove: 'feature_' | replace: '-', ' ' | capitalize -%}
+              <span class="feature-tag">{{ feature_name }}</span>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      {%- endif -%}
+
+      <!-- Pricing -->
+      {%- if call_for_price -%}
+        <div class="contact-price">
+          <i class="fas fa-phone"></i>
+          Call for Best Price
+        </div>
+      {%- else -%}
+        {%- comment -%} Check for member/wholesale pricing {%- endcomment -%}
+        {%- assign member_price = product.metafields.custom.member_price.value -%}
+        {%- assign is_member = false -%}
+        {%- if customer and customer.tags.size > 0 -%}
+          {%- for tag in customer.tags -%}
+            {%- assign tag_lower = tag | downcase -%}
+            {%- if tag_lower contains 'wholesale' or tag_lower contains 'member' or tag_lower contains 'plus' -%}
+              {%- assign is_member = true -%}
+              {%- break -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+
+        <div class="product-pricing">
+          {%- if member_price != blank -%}
+            {%- comment -%} Has member price metafield - show both prices {%- endcomment -%}
+            <div class="member-pricing">
+              <span class="member-price-label">Plus Member Price:</span>
+              <span class="member-price">{{ member_price | times: 100 | money }}</span>
+            </div>
+            <div class="regular-pricing">
+              <span class="regular-price-label">Regularly:</span>
+              <span class="regular-price">{{ product.price | money }}</span>
+            </div>
+          {%- elsif is_member and on_sale -%}
+            {%- comment -%} Member viewing sale price {%- endcomment -%}
+            <div class="member-pricing">
+              <span class="member-price-label">Your Price:</span>
+              <span class="member-price">{{ product.price | money }}</span>
+            </div>
+            <div class="regular-pricing">
+              <span class="regular-price-label">Regularly:</span>
+              <span class="regular-price">{{ product.compare_at_price | money }}</span>
+            </div>
+            {%- assign savings = product.compare_at_price | minus: product.price -%}
+            <span class="savings">You Save {{ savings | money }}</span>
+          {%- else -%}
+            {%- comment -%} Standard pricing {%- endcomment -%}
+            <div class="price-group">
+              <span class="current-price">
+                {{ product.price | money }}
+              </span>
+              {%- if on_sale -%}
+                <span class="original-price">
+                  {{ product.compare_at_price | money }}
+                </span>
+              {%- endif -%}
+            </div>
+            {%- if on_sale -%}
+              {%- assign savings = product.compare_at_price | minus: product.price -%}
+              <span class="savings">Save {{ savings | money }}</span>
+            {%- endif -%}
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <!-- Product Actions -->
+    <div class="product-actions">
+      {%- if call_for_price -%}
+        <a href="{{ product.url }}" class="btn btn-primary">
+          <i class="fas fa-eye"></i>
+          View Details
+        </a>
+      {%- elsif product.available -%}
+        {%- if show_quick_add and product.variants.size == 1 -%}
+          <button 
+            type="button" 
+            class="btn btn-primary quick-add-btn"
+            data-product-id="{{ product.id }}"
+            data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+          >
+            <i class="fas fa-shopping-cart"></i>
+            Add to Cart
+          </button>
+        {%- else -%}
+          <a href="{{ product.url }}" class="btn btn-primary">
+            {%- if product.variants.size > 1 -%}
+              <i class="fas fa-eye"></i>
+              Select Options
+            {%- else -%}
+              <i class="fas fa-shopping-cart"></i>
+              Add to Cart
+            {%- endif -%}
+          </a>
+        {%- endif -%}
+      {%- else -%}
+        <button class="btn btn-primary btn-sold-out" disabled>
+          <i class="fas fa-times-circle"></i>
+          Sold Out
+        </button>
+      {%- endif -%}
+
+      <button 
+        class="btn btn-secondary wishlist-btn" 
+        data-product-id="{{ product.id }}"
+        aria-label="Add to wishlist"
+      >
+        <i class="fas fa-heart"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .product-card {
+    position: relative;
+  }
+
+  .product-image {
+    position: relative;
+    overflow: hidden;
+    background: #f5f5f5;
+  }
+
+  .product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 20px;
+    transition: var(--transition-smooth);
+  }
+
+  .product-image-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .product-card:hover .product-image-hover {
+    opacity: 1;
+  }
+
+  .product-card:hover .product-image img:not(.product-image-hover) {
+    transform: scale(1.05);
+  }
+
+  .wishlist-btn.active {
+    color: var(--primary-coral);
+    border-color: var(--primary-coral);
+  }
+
+  .wishlist-btn.active i {
+    color: var(--primary-coral);
+  }
+
+  .btn-sold-out {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+
+  .energy-badge {
+    background: #22c55e;
+  }
+
+  .new-badge {
+    background: var(--primary-navy);
+  }
+
+  /* Member Pricing Styles */
+  .member-pricing {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+
+  .member-price-label {
+    font-size: 11px;
+    color: #1e8e3e;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .member-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e8e3e;
+  }
+
+  .regular-pricing {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+
+  .regular-price-label {
+    font-size: 11px;
+    color: #888;
+  }
+
+  .regular-price {
+    font-size: 13px;
+    color: #888;
+    text-decoration: line-through;
+  }
+</style>
+
+<script>
+  // Quick add functionality
+  document.querySelectorAll('.quick-add-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const variantId = this.dataset.variantId;
+      
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: variantId,
+          quantity: 1
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Update cart count
+        fetch('/cart.js')
+          .then(res => res.json())
+          .then(cart => {
+            document.querySelector('.cart-count').textContent = cart.item_count;
+          });
+        
+        // Show success message
+        this.innerHTML = '<i class="fas fa-check"></i> Added!';
+        this.style.background = 'var(--success-green)';
+        
+        setTimeout(() => {
+          this.innerHTML = '<i class="fas fa-shopping-cart"></i> Add to Cart';
+          this.style.background = '';
+        }, 2000);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        this.innerHTML = '<i class="fas fa-times"></i> Error';
+      });
+    });
+  });
+
+  // Wishlist functionality
+  document.querySelectorAll('.wishlist-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      this.classList.toggle('active');
+      
+      const productId = this.dataset.productId;
+      let wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+      
+      if (this.classList.contains('active')) {
+        if (!wishlist.includes(productId)) {
+          wishlist.push(productId);
+        }
+      } else {
+        wishlist = wishlist.filter(id => id !== productId);
+      }
+      
+      localStorage.setItem('wishlist', JSON.stringify(wishlist));
+    });
+    
+    // Check if already in wishlist
+    const productId = btn.dataset.productId;
+    const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+    if (wishlist.includes(productId)) {
+      btn.classList.add('active');
+    }
+  });
+</script>

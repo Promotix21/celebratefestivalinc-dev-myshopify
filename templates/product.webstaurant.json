@@ -1,0 +1,38 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "product-webstaurant-style",
+      "settings": {
+        "enable_member_pricing": true,
+        "show_vendor": true,
+        "enable_zoom": true,
+        "enable_3d_view": true,
+        "show_works_with": true,
+        "show_you_might_like": true,
+        "recommendations_count": 6,
+        "show_reviews": true
+      }
+    },
+    "product-recommendations": {
+      "type": "product-recommendations",
+      "settings": {
+        "products_to_show": 4,
+        "show_vendor": false,
+        "show_badges": true
+      }
+    }
+  },
+  "order": [
+    "main",
+    "product-recommendations"
+  ]
+}

@@ -1,0 +1,178 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "Header group",
+  "type": "header",
+  "sections": {
+    "enhanced-header": {
+      "type": "enhanced-header",
+      "settings": {},
+      "blocks": {
+        "shop_by_brands": {
+          "type": "logo_grid",
+          "settings": {
+            "menu_item_title": "Shop by Brands",
+            "logos_per_row": 8,
+            "show_view_all": true,
+            "view_all_url": "/collections/vendors",
+            "view_all_text": "View All Brands"
+          }
+        },
+        "brand_atosa": {
+          "type": "logo_grid_item",
+          "settings": {
+            "parent_menu_title": "Shop by Brands",
+            "brand_name": "ATOSA",
+            "brand_url": "/collections/vendors?q=atosa"
+          }
+        },
+        "brand_gsw": {
+          "type": "logo_grid_item",
+          "settings": {
+            "parent_menu_title": "Shop by Brands",
+            "brand_name": "GSW",
+            "brand_url": "/collections/vendors?q=gsw"
+          }
+        },
+        "brand_thunder_group": {
+          "type": "logo_grid_item",
+          "settings": {
+            "parent_menu_title": "Shop by Brands",
+            "brand_name": "THUNDER GROUP",
+            "brand_url": "/collections/vendors?q=thunder+group"
+          }
+        },
+        "brand_rational": {
+          "type": "logo_grid_item",
+          "settings": {
+            "parent_menu_title": "Shop by Brands",
+            "brand_name": "RATIONAL",
+            "brand_url": "/collections/vendors?q=rational"
+          }
+        },
+        "brand_robot_coupe": {
+          "type": "logo_grid_item",
+          "settings": {
+            "parent_menu_title": "Shop by Brands",
+            "brand_name": "ROBOT COUPE",
+            "brand_url": "/collections/vendors?q=robot+coupe"
+          }
+        },
+        "brand_cac": {
+          "type": "logo_grid_item",
+          "settings": {
+            "parent_menu_title": "Shop by Brands",
+            "brand_name": "CAC",
+            "brand_url": "/collections/vendors?q=cac"
+          }
+        },
+        "brand_turbo_air": {
+          "type": "logo_grid_item",
+          "settings": {
+            "parent_menu_title": "Shop by Brands",
+            "brand_name": "TURBO AIR",
+            "brand_url": "/collections/vendors?q=turbo+air"
+          }
+        },
+        "brand_waring": {
+          "type": "logo_grid_item",
+          "settings": {
+            "parent_menu_title": "Shop by Brands",
+            "brand_name": "WARING",
+            "brand_url": "/collections/vendors?q=waring"
+          }
+        },
+        "brand_eurodib": {
+          "type": "logo_grid_item",
+          "settings": {
+            "parent_menu_title": "Shop by Brands",
+            "brand_name": "EURODIB",
+            "brand_url": "/collections/vendors?q=eurodib"
+          }
+        },
+        "brand_winco": {
+          "type": "logo_grid_item",
+          "settings": {
+            "parent_menu_title": "Shop by Brands",
+            "brand_name": "WINCO",
+            "brand_url": "/collections/vendors?q=winco"
+          }
+        },
+        "brand_sammic": {
+          "type": "logo_grid_item",
+          "settings": {
+            "parent_menu_title": "Shop by Brands",
+            "brand_name": "SAMMIC",
+            "brand_url": "/collections/vendors?q=sammic"
+          }
+        },
+        "brand_globe": {
+          "type": "logo_grid_item",
+          "settings": {
+            "parent_menu_title": "Shop by Brands",
+            "brand_name": "GLOBE",
+            "brand_url": "/collections/vendors?q=globe"
+          }
+        },
+        "brand_shaan": {
+          "type": "logo_grid_item",
+          "settings": {
+            "parent_menu_title": "Shop by Brands",
+            "brand_name": "SHAAN",
+            "brand_url": "/collections/vendors?q=shaan"
+          }
+        },
+        "brand_somerset": {
+          "type": "logo_grid_item",
+          "settings": {
+            "parent_menu_title": "Shop by Brands",
+            "brand_name": "SOMERSET",
+            "brand_url": "/collections/vendors?q=somerset"
+          }
+        },
+        "brand_global_solutions": {
+          "type": "logo_grid_item",
+          "settings": {
+            "parent_menu_title": "Shop by Brands",
+            "brand_name": "GLOBAL SOLUTIONS",
+            "brand_url": "/collections/vendors?q=global+solutions"
+          }
+        },
+        "brand_rotoquip": {
+          "type": "logo_grid_item",
+          "settings": {
+            "parent_menu_title": "Shop by Brands",
+            "brand_name": "ROTOQUIP",
+            "brand_url": "/collections/vendors?q=rotoquip"
+          }
+        },
+        "brand_kwitex": {
+          "type": "logo_grid_item",
+          "settings": {
+            "parent_menu_title": "Shop by Brands",
+            "brand_name": "KWITEX",
+            "brand_url": "/collections/vendors?q=kwitex"
+          }
+        },
+        "brand_yanco": {
+          "type": "logo_grid_item",
+          "settings": {
+            "parent_menu_title": "Shop by Brands",
+            "brand_name": "YANCO",
+            "brand_url": "/collections/vendors?q=yanco"
+          }
+        }
+      }
+    }
+  },
+  "order": [
+    "enhanced-header"
+  ]
+}

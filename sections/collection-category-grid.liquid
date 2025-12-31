@@ -1,0 +1,490 @@
+{% comment %}
+  Collection Category Grid - AUTO-POPULATE from Collection Tags
+
+  This section automatically displays child collections based on parent tags.
+  No manual configuration needed - just tag collections properly:
+  - level-1, level-2, level-3, level-4 for hierarchy level
+  - parent-{handle} for parent-child relationships
+
+  Example: A collection tagged "parent-restaurant-equipment" will appear
+  as a child of the "restaurant-equipment" collection.
+{% endcomment %}
+
+{%- style -%}
+  .collection-category-grid {
+    padding: {{ section.settings.section_padding_top_mobile }}px 0 {{ section.settings.section_padding_bottom_mobile }}px;
+    background-color: {{ section.settings.section_background_color }};
+  }
+
+  @media (min-width: 750px) {
+    .collection-category-grid {
+      padding: {{ section.settings.section_padding_top_desktop }}px 0 {{ section.settings.section_padding_bottom_desktop }}px;
+    }
+  }
+
+  .collection-category-grid__container {
+    max-width: {{ section.settings.container_max_width }}px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .collection-category-grid__header {
+    text-align: {{ section.settings.title_alignment }};
+    margin-bottom: 32px;
+  }
+
+  .collection-category-grid__title {
+    font-size: 24px;
+    font-weight: 600;
+    color: {{ section.settings.title_color }};
+    margin: 0 0 8px;
+  }
+
+  @media (min-width: 750px) {
+    .collection-category-grid__title {
+      font-size: 32px;
+    }
+  }
+
+  .collection-category-grid__subtitle {
+    font-size: 16px;
+    color: {{ section.settings.subtitle_color }};
+    margin: 0;
+  }
+
+  .collection-category-grid__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: {{ section.settings.grid_gap_mobile }}px;
+  }
+
+  @media (min-width: 750px) {
+    .collection-category-grid__grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: {{ section.settings.grid_gap_desktop }}px;
+    }
+  }
+
+  @media (min-width: 990px) {
+    .collection-category-grid__grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .collection-category-grid__card {
+    position: relative;
+    border-radius: {{ section.settings.card_border_radius }}px;
+    overflow: hidden;
+    background-color: #f5f5f5;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .collection-category-grid__card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .collection-category-grid__card-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    height: 100%;
+  }
+
+  .collection-category-grid__card-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: {{ section.settings.card_height_mobile }}px;
+    overflow: hidden;
+  }
+
+  @media (min-width: 750px) {
+    .collection-category-grid__card-image-wrapper {
+      height: {{ section.settings.card_height_desktop }}px;
+    }
+  }
+
+  .collection-category-grid__card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .collection-category-grid__card:hover .collection-category-grid__card-image {
+    transform: scale(1.05);
+  }
+
+  .collection-category-grid__card-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f5 100%);
+  }
+
+  .collection-category-grid__card-placeholder svg {
+    width: 60px;
+    height: 60px;
+    color: #ccc;
+  }
+
+  .collection-category-grid__card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px 16px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
+  }
+
+  .collection-category-grid__card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0 0 4px;
+    line-height: 1.3;
+  }
+
+  @media (min-width: 750px) {
+    .collection-category-grid__card-title {
+      font-size: 16px;
+    }
+  }
+
+  .collection-category-grid__card-count {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+  }
+
+  .collection-category-grid__empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+  }
+
+  .collection-category-grid__empty-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    color: #ccc;
+  }
+
+  .collection-category-grid__empty-text {
+    font-size: 16px;
+    margin: 0;
+  }
+{%- endstyle -%}
+
+{% comment %}
+  AUTO-POPULATION LOGIC
+  Find all collections that have metafield custom.parent_handle = current-collection-handle
+{% endcomment %}
+
+{% assign current_handle = collection.handle %}
+{% assign child_count = 0 %}
+
+{% comment %}
+  Loop through ALL collections to find children by metafield
+  Using .value accessor for metafield content
+{% endcomment %}
+{% for coll in collections %}
+  {% assign parent_metafield = coll.metafields.custom.parent_handle.value %}
+  {% if parent_metafield == current_handle %}
+    {% assign child_count = child_count | plus: 1 %}
+  {% endif %}
+{% endfor %}
+
+<section class="collection-category-grid" data-section-id="{{ section.id }}">
+  <div class="collection-category-grid__container">
+
+    {% if section.settings.show_title and section.settings.section_title != blank %}
+      <div class="collection-category-grid__header">
+        <h2 class="collection-category-grid__title">{{ section.settings.section_title }}</h2>
+        {% if section.settings.show_subtitle and section.settings.section_subtitle != blank %}
+          <p class="collection-category-grid__subtitle">{{ section.settings.section_subtitle }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% if child_count > 0 %}
+      <div class="collection-category-grid__grid">
+        {% for coll in collections %}
+          {% assign parent_metafield = coll.metafields.custom.parent_handle.value %}
+          {% assign is_child = false %}
+
+          {% if parent_metafield == current_handle %}
+            {% assign is_child = true %}
+          {% endif %}
+
+          {% if is_child %}
+            {% comment %} Strip "New Theme - " prefix from title {% endcomment %}
+            {% assign display_title = coll.title | remove: 'New Theme - ' | remove: 'New Theme- ' | remove: 'New Theme -' %}
+
+            <div class="collection-category-grid__card">
+              <a href="{{ coll.url }}" class="collection-category-grid__card-link">
+                <div class="collection-category-grid__card-image-wrapper">
+                  {% if coll.image %}
+                    <img
+                      src="{{ coll.image | image_url: width: 600 }}"
+                      srcset="{{ coll.image | image_url: width: 300 }} 300w,
+                              {{ coll.image | image_url: width: 450 }} 450w,
+                              {{ coll.image | image_url: width: 600 }} 600w"
+                      sizes="(max-width: 749px) 50vw, (max-width: 989px) 33vw, 25vw"
+                      alt="{{ display_title | escape }}"
+                      class="collection-category-grid__card-image"
+                      loading="lazy"
+                      width="600"
+                      height="400"
+                    >
+                  {% elsif coll.products.first and coll.products.first.featured_image %}
+                    <img
+                      src="{{ coll.products.first.featured_image | image_url: width: 600 }}"
+                      srcset="{{ coll.products.first.featured_image | image_url: width: 300 }} 300w,
+                              {{ coll.products.first.featured_image | image_url: width: 450 }} 450w,
+                              {{ coll.products.first.featured_image | image_url: width: 600 }} 600w"
+                      sizes="(max-width: 749px) 50vw, (max-width: 989px) 33vw, 25vw"
+                      alt="{{ display_title | escape }}"
+                      class="collection-category-grid__card-image"
+                      loading="lazy"
+                      width="600"
+                      height="400"
+                    >
+                  {% else %}
+                    <div class="collection-category-grid__card-placeholder">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21 15 16 10 5 21"/>
+                      </svg>
+                    </div>
+                  {% endif %}
+                </div>
+                <div class="collection-category-grid__card-overlay">
+                  <h3 class="collection-category-grid__card-title">{{ display_title }}</h3>
+                  {% if section.settings.show_product_count %}
+                    <p class="collection-category-grid__card-count">
+                      {{ coll.products_count }} {{ coll.products_count | pluralize: 'product', 'products' }}
+                    </p>
+                  {% endif %}
+                </div>
+              </a>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% else %}
+      {% comment %} No child collections found - show empty state (only in editor) {% endcomment %}
+      {% if request.design_mode %}
+        <div class="collection-category-grid__empty">
+          <svg class="collection-category-grid__empty-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+          </svg>
+          <p class="collection-category-grid__empty-text">
+            No child collections found.<br>
+            <small>Tag collections with "parent-{{ current_handle }}" to display them here automatically.</small>
+          </p>
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Category Grid (Auto)",
+  "tag": "section",
+  "class": "section-collection-category-grid",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "Show section title",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section title",
+      "default": "Browse Categories"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_subtitle",
+      "label": "Show subtitle",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "section_subtitle",
+      "label": "Section subtitle"
+    },
+    {
+      "type": "select",
+      "id": "title_alignment",
+      "label": "Title alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Card Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_count",
+      "label": "Show product count",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "card_height_desktop",
+      "label": "Card height (desktop)",
+      "min": 200,
+      "max": 500,
+      "step": 20,
+      "default": 300,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "card_height_mobile",
+      "label": "Card height (mobile)",
+      "min": 150,
+      "max": 350,
+      "step": 10,
+      "default": 220,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "label": "Card border radius",
+      "min": 0,
+      "max": 24,
+      "step": 2,
+      "default": 12,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Grid Layout"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap_desktop",
+      "label": "Grid gap (desktop)",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "default": 30,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap_mobile",
+      "label": "Grid gap (mobile)",
+      "min": 10,
+      "max": 30,
+      "step": 5,
+      "default": 15,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "container_max_width",
+      "label": "Container max width",
+      "min": 1000,
+      "max": 1600,
+      "step": 50,
+      "default": 1400,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top_desktop",
+      "label": "Padding top (desktop)",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "default": 60,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom_desktop",
+      "label": "Padding bottom (desktop)",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "default": 60,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top_mobile",
+      "label": "Padding top (mobile)",
+      "min": 0,
+      "max": 80,
+      "step": 10,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom_mobile",
+      "label": "Padding bottom (mobile)",
+      "min": 0,
+      "max": 80,
+      "step": 10,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "section_background_color",
+      "label": "Section background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#1e3a5f"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Subtitle color",
+      "default": "#666666"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Category Grid (Auto)",
+      "settings": {
+        "show_title": true,
+        "section_title": "Browse Categories"
+      }
+    }
+  ]
+}
+{% endschema %}

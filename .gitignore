@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Python scripts with API tokens (contain secrets)
+*.py
+
+# Session notes with secrets
+SESSION-NOTES.md
+
+# Large/unnecessary files
+*.xlsx
+*.png
+*.jpg
+*.json
+!config/*.json
+!templates/**/*.json
+!sections/*.json
+!locales/*.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary files
+*.log
+*.tmp
+*.temp
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Excel temp files
+~$*.xlsx
+~$*.xls
+
+# Shopify CLI
+.shopify/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/

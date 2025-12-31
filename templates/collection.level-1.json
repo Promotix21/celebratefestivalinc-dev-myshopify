@@ -1,0 +1,31 @@
+{
+  "sections": {
+    "breadcrumb": {
+      "type": "collection-breadcrumb",
+      "settings": {
+        "background_color": "#f8f9fa",
+        "text_color": "#666666",
+        "link_color": "#333333",
+        "link_hover_color": "#ff6b6b",
+        "padding_top": 16,
+        "padding_bottom": 16
+      }
+    },
+    "level1_hub": {
+      "type": "collection-level1-hub",
+      "settings": {
+        "show_thumbnails": true
+      }
+    },
+    "rich_text": {
+      "type": "rich-text",
+      "disabled": true,
+      "settings": {}
+    }
+  },
+  "order": [
+    "breadcrumb",
+    "level1_hub",
+    "rich_text"
+  ]
+}

@@ -1,0 +1,2008 @@
+{% comment %}
+  Celebrate Festival Inc - Product Template
+  Version: 2.0 - Updated with WSH Plugin Integration & Enhancements
+
+  This template supports:
+  - Demo mode for previewing design
+  - Multiple metafield types (text, images, PDFs, arrays, booleans)
+  - Smart related products
+  - Member/non-member pricing with WSH Wholesale Plugin integration
+  - Bulletproof fallback pricing (works with or without plugin)
+  - SKU display
+  - Vendor logo mapping
+  - Login prompt with blur effect for non-members
+{% endcomment %}
+
+{%- liquid
+  assign show_demo = section.settings.show_demo_data
+  assign enable_member_pricing = section.settings.enable_member_pricing
+  assign member_discount = section.settings.member_discount_percent
+
+  # Check if customer is logged in
+  assign is_logged_in = false
+  assign is_member = false
+  if customer
+    assign is_logged_in = true
+    # Check for member tag (adjust tag name as needed)
+    if customer.tags contains 'plus-member' or customer.tags contains 'wholesale' or customer.tags contains 'member'
+      assign is_member = true
+    endif
+  endif
+
+  # Calculate member price with multiple fallback methods
+  assign member_price = nil
+  assign price_source = 'manual'
+  
+  # Method 1: Try WSH Wholesale Plugin metafield (common metafield paths)
+  if product.metafields.wsh.wholesale_price
+    assign member_price = product.metafields.wsh.wholesale_price
+    assign price_source = 'wsh-plugin'
+  elsif product.metafields.wholesale.price
+    assign member_price = product.metafields.wholesale.price
+    assign price_source = 'wholesale-plugin'
+  elsif product.metafields.custom.wholesale_price
+    assign member_price = product.metafields.custom.wholesale_price
+    assign price_source = 'custom-plugin'
+  # Method 2: Try compare_at_price (if it's lower than regular price)
+  elsif product.compare_at_price and product.compare_at_price < product.price
+    assign member_price = product.compare_at_price
+    assign price_source = 'compare-price'
+  # Method 3: Fallback to manual calculation
+  else
+    assign discount_multiplier = 100 | minus: member_discount | divided_by: 100.0
+    assign member_price = product.price | times: discount_multiplier
+    assign price_source = 'manual-calculation'
+  endif
+
+  assign savings_amount = product.price | minus: member_price
+
+  # Vendor Logo Mapping
+  assign vendor_logo = ''
+  assign vendor_name = product.vendor | downcase | strip
+  
+  case vendor_name
+    when 'american range'
+      assign vendor_logo = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/american-range-logo.png'
+    when 'atosa'
+      assign vendor_logo = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/atosa-logo.png'
+    when 'winco'
+      assign vendor_logo = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/winco-logo.png'
+    when 'southbend'
+      assign vendor_logo = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/southbend-logo.png'
+    when 'true'
+      assign vendor_logo = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/true-logo.png'
+    when 'turbo air'
+      assign vendor_logo = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/turbo-air-logo.png'
+    when 'omcan'
+      assign vendor_logo = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/omcan-logo.png'
+    when 'global solutions'
+      assign vendor_logo = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/global-solutions-logo.png'
+    when 'waring'
+      assign vendor_logo = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/waring-logo.png'
+    when 'robot coupe'
+      assign vendor_logo = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/robot-coupe-logo.png'
+    when 'amana'
+      assign vendor_logo = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/amana-logo.png'
+    when 'dukers'
+      assign vendor_logo = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/dukers-logo.png'
+    when 'gsw'
+      assign vendor_logo = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/gsw-logo.png'
+    when 'globe'
+      assign vendor_logo = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/globe-logo.png'
+    when 'imperial'
+      assign vendor_logo = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/imperial-logo.png'
+    when 'eurodib'
+      assign vendor_logo = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/eurodib-logo.png'
+    when 'yanco'
+      assign vendor_logo = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/yanco-logo.png'
+    when 'thundergroup'
+      assign vendor_logo = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/thundergroup-logo.png'
+    when 'cac'
+      assign vendor_logo = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/cac-logo.png'
+    else
+      assign vendor_logo = ''
+  endcase
+
+  # Get metafields
+  assign specs_table = product.metafields.custom.specs_table_pic_pdf
+  assign material = product.metafields.custom.material
+  assign free_shipping = product.metafields.custom.free_shipping
+  assign feature_sections = product.metafields.custom.feature_sections
+  assign works_with_products = product.metafields.custom.works_with_products
+  assign warranty_doc = product.metafields.custom.warranty_document
+  assign spec_doc = product.metafields.custom.specification
+  assign manual_doc = product.metafields.custom.instructions_manual
+  assign warranty_text = product.metafields.custom.warranty
+  assign spec_sheet = product.metafields.custom.specification_sheet
+  assign certifications = product.metafields.custom.certifications
+  assign shipment_text = product.metafields.custom.shipment_text1
+  assign shipment_text_sub = product.metafields.custom.shipment_text_sub
+  assign shipment_tooltip_text = product.metafields.custom.shipment_tooltip_text
+
+  # Related products logic
+  assign related_title = section.settings.related_title_default
+  assign related_collection_handle = section.settings.related_collection_default
+
+  # Check for conditional related products based on product type
+  if product.type == section.settings.conditional_product_type_1 and section.settings.conditional_product_type_1 != blank
+    assign related_title = section.settings.conditional_title_1
+    assign related_collection_handle = section.settings.conditional_collection_1
+  elsif product.type == section.settings.conditional_product_type_2 and section.settings.conditional_product_type_2 != blank
+    assign related_title = section.settings.conditional_title_2
+    assign related_collection_handle = section.settings.conditional_collection_2
+  endif
+
+  # Get related collection
+  if related_collection_handle != blank
+    assign related_collection = collections[related_collection_handle]
+  else
+    # Fallback to same collection or vendor
+    if product.collections.size > 0
+      assign related_collection = product.collections.first
+    endif
+  endif
+-%}
+
+{{ 'product-celebrate-festival.css' | asset_url | stylesheet_tag }}
+
+<style>
+/* ENHANCED SKU DISPLAY - FIX #1 */
+.product-meta {
+  font-size: 15px;
+  color: #718096;
+  margin-bottom: 20px;
+  padding: 15px 0;
+  border-bottom: 2px solid #E2E8F0;
+}
+
+.product-meta strong {
+  display: inline-block;
+  color: #1A2332;
+  font-weight: 700;
+  font-size: 18px;
+  background: #FFD93D;
+  padding: 6px 15px;
+  border-radius: 6px;
+  margin-left: 8px;
+  letter-spacing: 0.5px;
+  border: 2px solid #1A2332;
+}
+
+/* ENHANCED THUMBNAIL STYLING - FIX #2 */
+.thumbnail {
+  cursor: pointer !important;
+  transition: all 0.3s ease;
+  border: 3px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.thumbnail:hover {
+  opacity: 0.7 !important;
+  transform: scale(1.05);
+  border-color: #20C997;
+}
+
+.thumbnail.active {
+  border-color: #1A2332;
+  opacity: 1 !important;
+  box-shadow: 0 0 10px rgba(26, 35, 50, 0.3);
+}
+
+.thumbnail img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Blur Effect for Member Pricing */
+.member-price-blur-container {
+  position: relative;
+  margin-top: 15px;
+}
+
+.member-price-blur-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  z-index: 10;
+  padding: 20px;
+  text-align: center;
+}
+
+.member-price-blur-overlay .login-prompt-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary-navy, #1A2332);
+  margin-bottom: 12px;
+}
+
+.member-price-blur-overlay .login-btn {
+  background: var(--primary-coral, #FF6B6B);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-block;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+}
+
+.member-price-blur-overlay .login-btn:hover {
+  background: var(--accent-teal, #4ECDC4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
+}
+
+.member-price-blur-overlay .info-text {
+  font-size: 12px;
+  color: #666;
+  margin-top: 8px;
+}
+
+/* Enhanced image display - handles small images better */
+.main-image-container {
+  position: relative;
+  background: #f8f8f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  border-radius: 8px;
+}
+
+.main-image-container img {
+  max-width: 100%;
+  max-height: 600px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Vendor logo styling */
+.vendor-brand-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.vendor-brand-box .vendor-logo {
+  max-width: 100px;
+  max-height: 40px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.vendor-brand-box .vendor-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary-navy, #1A2332);
+}
+</style>
+
+<div class="celebrate-festival-product-template">
+  <div class="container">
+
+    {%- if section.settings.show_breadcrumb -%}
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <nav class="breadcrumb-nav">
+        <a href="/"><i class="fas fa-home"></i> Home</a>
+        <span class="breadcrumb-separator">&gt;</span>
+        {%- if product.collections.size > 0 -%}
+          {%- assign main_collection = product.collections.first -%}
+          <a href="{{ main_collection.url }}">{{ main_collection.title }}</a>
+          <span class="breadcrumb-separator">&gt;</span>
+        {%- endif -%}
+        <span>{{ product.title }}</span>
+      </nav>
+    </div>
+    {%- endif -%}
+
+    <!-- Main Two Column Layout -->
+    <div class="product-layout">
+
+      <!-- LEFT COLUMN - MAIN CONTENT -->
+      <div class="main-content">
+
+        <!-- Product Title & Meta -->
+        <div>
+          <h1 class="product-title">{{ product.title }}</h1>
+
+          <div class="product-meta">
+            {%- if product.vendor != blank -%}
+              Vendor: <a href="/collections/vendors?q={{ product.vendor | url_encode }}">{{ product.vendor }}</a>
+            {%- endif -%}
+            {%- if product.vendor != blank and product.selected_or_first_available_variant.sku != blank %} | {% endif -%}
+            {%- if product.selected_or_first_available_variant.sku != blank -%}
+              SKU: <strong>{{ product.selected_or_first_available_variant.sku }}</strong>
+            {%- elsif show_demo -%}
+              SKU: <strong>DEMO-SKU-123</strong>
+            {%- endif -%}
+          </div>
+        </div>
+
+        <!-- Product Images with Vertical Thumbnails -->
+        <div class="product-images-wrapper">
+          <div class="product-images-section">
+
+            <!-- Vertical Thumbnail Column -->
+            {%- if product.images.size > 1 or show_demo -%}
+            <div class="thumbnail-column">
+              {%- if product.images.size > 1 -%}
+                {%- for image in product.images limit: 6 -%}
+                  <div class="thumbnail {% if forloop.first %}active{% endif %}" data-image-index="{{ forloop.index0 }}">
+                    <img src="{{ image | image_url: width: 70 }}" alt="{{ image.alt | escape }}">
+                  </div>
+                {%- endfor -%}
+              {%- elsif show_demo -%}
+                {%- for i in (1..6) -%}
+                  <div class="thumbnail {% if forloop.first %}active{% endif %}" data-image-index="{{ forloop.index0 }}">
+                    <img src="https://via.placeholder.com/70x70/f7fafc/718096?text={{ i }}" alt="Demo Image {{ i }}">
+                  </div>
+                {%- endfor -%}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+
+            <!-- Main Product Image - ENHANCED FOR SMALL IMAGES -->
+            <div class="main-image-container">
+              {%- if product.featured_image -%}
+                <img id="main-product-image" 
+                     src="{{ product.featured_image | image_url: width: 800 }}" 
+                     srcset="{{ product.featured_image | image_url: width: 400 }} 400w,
+                             {{ product.featured_image | image_url: width: 600 }} 600w,
+                             {{ product.featured_image | image_url: width: 800 }} 800w,
+                             {{ product.featured_image | image_url: width: 1000 }} 1000w"
+                     sizes="(max-width: 768px) 100vw, 600px"
+                     alt="{{ product.featured_image.alt | escape }}">
+              {%- elsif show_demo -%}
+                <img id="main-product-image" src="https://via.placeholder.com/600x600/f7fafc/1a2332?text=Main+Product+Image" alt="Demo Product">
+              {%- else -%}
+                {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+              {%- endif -%}
+              <div class="zoom-indicator">
+                <i class="fas fa-search-plus"></i>
+                Hover to zoom
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Other Products from this Line -->
+        {%- if works_with_products.value or related_collection.products.size > 0 or show_demo -%}
+        <div class="other-products-section">
+          <h3>{{ related_title }}</h3>
+          <div class="carousel-wrapper">
+            <button class="carousel-nav carousel-nav-left" aria-label="Previous products">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="products-carousel">
+            {%- comment %} First priority: Use works_with_products metafield if it exists {% endcomment -%}
+            {%- if works_with_products.value -%}
+              {%- for related_product in works_with_products.value -%}
+                <a href="{{ related_product.url }}" class="product-card-small">
+                  {%- if related_product.tags contains 'hot-deal' -%}
+                    <span class="product-badge">Hot Deal</span>
+                  {%- elsif related_product.tags contains 'new' -%}
+                    <span class="product-badge new">New</span>
+                  {%- endif -%}
+                  <div class="product-card-small-image">
+                    {%- if related_product.featured_image -%}
+                      <img src="{{ related_product.featured_image | image_url: width: 80 }}" alt="{{ related_product.title | escape }}">
+                    {%- else -%}
+                      {{ 'product-1' | placeholder_svg_tag }}
+                    {%- endif -%}
+                  </div>
+                  <div class="product-card-small-info">
+                    <div class="product-card-title-small">{{ related_product.title }}</div>
+                    <div class="product-card-small-price">{{ related_product.price | money }}</div>
+                  </div>
+                </a>
+              {%- endfor -%}
+            {%- comment %} Fallback: Use collection if no metafield {% endcomment -%}
+            {%- elsif related_collection.products.size > 0 -%}
+              {%- for related_product in related_collection.products limit: 8 -%}
+                {%- unless related_product.id == product.id -%}
+                <a href="{{ related_product.url }}" class="product-card-small">
+                  {%- if related_product.tags contains 'hot-deal' -%}
+                    <span class="product-badge">Hot Deal</span>
+                  {%- elsif related_product.tags contains 'new' -%}
+                    <span class="product-badge new">New</span>
+                  {%- endif -%}
+                  <div class="product-card-small-image">
+                    {%- if related_product.featured_image -%}
+                      <img src="{{ related_product.featured_image | image_url: width: 80 }}" alt="{{ related_product.title | escape }}">
+                    {%- else -%}
+                      {{ 'product-1' | placeholder_svg_tag }}
+                    {%- endif -%}
+                  </div>
+                  <div class="product-card-small-info">
+                    <div class="product-card-title-small">{{ related_product.title }}</div>
+                    <div class="product-card-small-price">{{ related_product.price | money }}</div>
+                  </div>
+                </a>
+                {%- endunless -%}
+              {%- endfor -%}
+            {%- elsif show_demo -%}
+              {%- for i in (1..6) -%}
+              <div class="product-card-small">
+                {% if i <= 3 %}<span class="product-badge">Hot Deal</span>{% endif %}
+                <div class="product-card-small-image">
+                  <img src="https://via.placeholder.com/80x80/f7fafc/718096?text={{ i }}" alt="Demo Product">
+                </div>
+                <div class="product-card-small-info">
+                  <div class="product-card-title-small">Demo Related Product {{ i }} with Long Name</div>
+                  <div class="product-card-small-price">$2,{{ i }}99.00</div>
+                </div>
+              </div>
+              {%- endfor -%}
+            {%- endif -%}
+            </div>
+            <button class="carousel-nav carousel-nav-right" aria-label="Next products">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+        {%- endif -%}
+
+        <!-- Product Description -->
+        {%- if product.description != blank or show_demo -%}
+        <div class="description-section">
+          <h2>{{ section.settings.description_heading | default: "Product Description" }}</h2>
+
+          {%- if product.description != blank -%}
+            {{ product.description }}
+          {%- elsif show_demo -%}
+            <p>This is a demo description. Your actual product description will appear here when you add it to your product.</p>
+
+            <div class="feature-icons-grid">
+              <div class="feature-icon-item">
+                <div class="feature-icon-img">📦</div>
+                <h4>Feature One</h4>
+                <p>Description here</p>
+              </div>
+              <div class="feature-icon-item">
+                <div class="feature-icon-img">🌡️</div>
+                <h4>Feature Two</h4>
+                <p>Description here</p>
+              </div>
+              <div class="feature-icon-item">
+                <div class="feature-icon-img">⚡</div>
+                <h4>Feature Three</h4>
+                <p>Description here</p>
+              </div>
+              <div class="feature-icon-item">
+                <div class="feature-icon-img">🔧</div>
+                <h4>Feature Four</h4>
+                <p>Description here</p>
+              </div>
+            </div>
+          {%- endif -%}
+
+          {%- if feature_sections != blank -%}
+            <h3>Key Features</h3>
+            <div style="background: var(--neutral-light); border: 2px solid var(--primary-coral); border-radius: 12px; padding: 25px; margin: 20px 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+              <table style="width: 100%; border-collapse: collapse;">
+                {%- assign features = feature_sections | split: '|' -%}
+                {%- for feature in features -%}
+                  {%- assign trimmed_feature = feature | strip -%}
+                  {%- if trimmed_feature != blank -%}
+                    <tr style="border-bottom: 1px solid var(--neutral-gray);">
+                      <td style="padding: 12px 8px; color: var(--primary-navy); font-weight: 600; font-size: 14px;">
+                        <i class="fas fa-check-circle" style="color: var(--primary-coral); margin-right: 10px; font-size: 16px;"></i>
+                        {{ trimmed_feature }}
+                      </td>
+                    </tr>
+                  {%- endif -%}
+                {%- endfor -%}
+              </table>
+            </div>
+          {%- endif -%}
+
+          {%- comment %} Dimensions & Utilities Section {% endcomment -%}
+          {%- assign dimensions_utilities = product.metafields.custom.dimensions_utilities -%}
+          {%- if dimensions_utilities != blank -%}
+            <h3>Dimensions & Utilities</h3>
+            <div style="background: var(--neutral-light); border: 2px solid var(--accent-teal); border-radius: 12px; padding: 25px; margin: 20px 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+              <table style="width: 100%; border-collapse: collapse;">
+                {%- assign dimension_items = dimensions_utilities | split: '|' -%}
+                {%- for item in dimension_items -%}
+                  {%- assign trimmed_item = item | strip -%}
+                  {%- if trimmed_item != blank -%}
+                    <tr style="border-bottom: 1px solid var(--neutral-gray);">
+                      <td style="padding: 12px 8px; color: var(--primary-navy); font-weight: 600; font-size: 14px;">
+                        <i class="fas fa-ruler-combined" style="color: var(--accent-teal); margin-right: 10px; font-size: 16px;"></i>
+                        {{ trimmed_item }}
+                      </td>
+                    </tr>
+                  {%- endif -%}
+                {%- endfor -%}
+              </table>
+            </div>
+          {%- endif -%}
+
+          {%- comment %} Display Compatible/Works With Products {% endcomment -%}
+          {%- if works_with_products.value.size > 0 -%}
+            <h3>Works With / Compatible Products</h3>
+            <div class="products-carousel" style="margin: 20px 0;">
+              {%- for compatible_product in works_with_products.value limit: 8 -%}
+                <a href="{{ compatible_product.url }}" class="product-card-small">
+                  <div class="product-card-small-image">
+                    {%- if compatible_product.featured_image -%}
+                      <img src="{{ compatible_product.featured_image | image_url: width: 80 }}" alt="{{ compatible_product.title | escape }}">
+                    {%- else -%}
+                      {{ 'product-1' | placeholder_svg_tag }}
+                    {%- endif -%}
+                  </div>
+                  <div class="product-card-small-info">
+                    <div class="product-card-title-small">{{ compatible_product.title }}</div>
+                    <div class="product-card-small-price">{{ compatible_product.price | money }}</div>
+                  </div>
+                </a>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        </div>
+        {%- endif -%}
+
+        <!-- Product Certificates -->
+        {%- assign product_certificates = product.metafields.custom.product_certificates -%}
+        {%- if product_certificates.value.size > 0 -%}
+        <div class="certificates-section">
+          <h2>Certifications & Standards</h2>
+          <div class="certificates-grid">
+            {%- for cert_name in product_certificates.value -%}
+              {%- comment %} Map certificate names to images and descriptions {% endcomment -%}
+              {%- assign cert_image = '' -%}
+              {%- assign cert_description = '' -%}
+              
+              {%- if cert_name == 'Made in America' -%}
+                {%- assign cert_image = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/MIA.png?v=1763021316' -%}
+                {%- assign cert_description = 'This item was made in the United States of America.' -%}
+              {%- elsif cert_name == 'NSF Listed' -%}
+                {%- assign cert_image = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/nsf.png?v=1763021314' -%}
+                {%- assign cert_description = 'This item has been certified by NSF International to meet applicable product standards on public safety, health, and / or the environment.' -%}
+              {%- elsif cert_name == 'ETL, US & Canada' -%}
+                {%- assign cert_image = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/elt.png?v=1763021315' -%}
+                {%- assign cert_description = 'This product has been certified by ETL, a division of the Intertek Group, to meet applicable electrical product safety standards required for use in the United States and Canada.' -%}
+              {%- endif -%}
+              
+              {%- if cert_image != '' -%}
+              <div class="certificate-card">
+                <div class="certificate-icon">
+                  <img src="{{ cert_image }}" alt="{{ cert_name }}">
+                </div>
+                <div class="certificate-content">
+                  <h3 class="certificate-title">{{ cert_name }}</h3>
+                  <p class="certificate-description">{{ cert_description }}</p>
+                </div>
+              </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </div>
+        {%- endif -%}
+
+        <!-- Q&A Section -->
+        {%- if section.settings.enable_qa or show_demo -%}
+        <div class="qa-section">
+          <h2>{{ section.settings.qa_heading | default: "Questions & Answers" }}</h2>
+
+          {%- if section.settings.qa_items != blank -%}
+            {%- assign qa_items = section.settings.qa_items | split: '||' -%}
+            {%- for item in qa_items -%}
+              {%- assign qa_parts = item | split: '|' -%}
+              <div class="qa-item">
+                <div class="qa-question">Q: {{ qa_parts[0] }}</div>
+                <div class="qa-answer">A: {{ qa_parts[1] }}</div>
+                {%- if qa_parts[2] != blank -%}
+                  <div class="qa-meta">{{ qa_parts[2] }}</div>
+                {%- endif -%}
+              </div>
+            {%- endfor -%}
+          {%- elsif show_demo -%}
+            <div class="qa-item">
+              <div class="qa-question">Q: What is the warranty on this product?</div>
+              <div class="qa-answer">A: This product comes with a comprehensive warranty. Check the specifications section for details.</div>
+              <div class="qa-meta">Asked by: Customer | Answered by: Celebrate Festival Team</div>
+            </div>
+          {%- endif -%}
+
+          {%- if section.settings.qa_button_text != blank -%}
+            <button class="ask-question-btn" onclick="window.location.href='{{ section.settings.qa_button_link }}'">
+              {{ section.settings.qa_button_text }}
+            </button>
+          {%- endif -%}
+        </div>
+        {%- endif -%}
+
+        <!-- Compare Section -->
+        {%- if section.settings.enable_compare or show_demo -%}
+        <div class="compare-section">
+          <h2>{{ section.settings.compare_heading | default: "Compare to Other Products" }}</h2>
+          <p style="text-align: center; color: var(--text-light); margin-bottom: 20px;">
+            Configure comparison products in theme settings
+          </p>
+        </div>
+        {%- endif -%}
+
+        <!-- Customer Reviews -->
+        {%- if section.settings.enable_reviews -%}
+        <div class="reviews-section" id="shopify-product-reviews">
+          <h2>{{ section.settings.reviews_heading | default: "Customer Reviews" }}</h2>
+          
+          {%- comment %} Check if customer is logged in {% endcomment -%}
+          {%- if customer -%}
+            {%- comment %} Logged in - Show review form {% endcomment -%}
+            <div class="review-form-wrapper">
+              <button class="write-review-btn" onclick="toggleReviewForm()">
+                <i class="fas fa-star"></i> Write a Review
+              </button>
+              
+              <div id="review-form-container" style="display: none; margin-top: 20px; padding: 25px; background: var(--neutral-light); border-radius: 12px; border: 2px solid var(--primary-navy);">
+                <h3 style="margin: 0 0 20px 0; color: var(--primary-navy);">Share Your Experience</h3>
+                <form id="new-review-form" class="review-form">
+                  <div class="form-group">
+                    <label for="review-rating">Rating <span style="color: var(--primary-coral);">*</span></label>
+                    <div class="star-rating-input">
+                      <input type="radio" name="rating" value="5" id="star5"><label for="star5">★</label>
+                      <input type="radio" name="rating" value="4" id="star4"><label for="star4">★</label>
+                      <input type="radio" name="rating" value="3" id="star3"><label for="star3">★</label>
+                      <input type="radio" name="rating" value="2" id="star2"><label for="star2">★</label>
+                      <input type="radio" name="rating" value="1" id="star1"><label for="star1">★</label>
+                    </div>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="review-title">Review Title <span style="color: var(--primary-coral);">*</span></label>
+                    <input type="text" id="review-title" name="review[title]" placeholder="Give your review a title" required>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="review-body">Your Review <span style="color: var(--primary-coral);">*</span></label>
+                    <textarea id="review-body" name="review[body]" rows="5" placeholder="Share your thoughts about this product..." required></textarea>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="review-name">Name <span style="color: var(--primary-coral);">*</span></label>
+                    <input type="text" id="review-name" name="review[author]" value="{{ customer.name }}" required>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="review-email">Email <span style="color: var(--primary-coral);">*</span></label>
+                    <input type="email" id="review-email" name="review[email]" value="{{ customer.email }}" required>
+                  </div>
+                  
+                  <div class="form-actions">
+                    <button type="submit" class="submit-review-btn">
+                      <i class="fas fa-paper-plane"></i> Submit Review
+                    </button>
+                    <button type="button" class="cancel-review-btn" onclick="toggleReviewForm()">
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          {%- else -%}
+            {%- comment %} Not logged in - Show login prompt {% endcomment -%}
+            <div class="review-login-prompt">
+              <div class="login-prompt-box">
+                <i class="fas fa-user-lock" style="font-size: 48px; color: var(--primary-coral); margin-bottom: 15px;"></i>
+                <h3 style="margin: 0 0 10px 0; color: var(--primary-navy);">Want to Share Your Experience?</h3>
+                <p style="color: var(--text-light); margin-bottom: 20px;">Log in or create an account to write a review</p>
+                <div class="login-prompt-actions">
+                  <a href="/account/login" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> Log In
+                  </a>
+                  <a href="/account/register" class="register-btn">
+                    <i class="fas fa-user-plus"></i> Create Account
+                  </a>
+                </div>
+              </div>
+            </div>
+          {%- endif -%}
+          
+          {%- comment %} Shopify Product Reviews App Integration {% endcomment -%}
+          <div id="shopify-product-reviews" data-id="{{ product.id }}"></div>
+        </div>
+        
+        <script>
+        function toggleReviewForm() {
+          const formContainer = document.getElementById('review-form-container');
+          if (formContainer.style.display === 'none') {
+            formContainer.style.display = 'block';
+            formContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else {
+            formContainer.style.display = 'none';
+          }
+        }
+        
+        // Handle review form submission
+        document.addEventListener('DOMContentLoaded', function() {
+          const reviewForm = document.getElementById('new-review-form');
+          if (reviewForm) {
+            reviewForm.addEventListener('submit', function(e) {
+              e.preventDefault();
+              
+              // Get form data
+              const formData = new FormData(reviewForm);
+              const rating = document.querySelector('input[name="rating"]:checked');
+              
+              if (!rating) {
+                alert('Please select a star rating');
+                return;
+              }
+              
+              // Here you would typically submit to Shopify Product Reviews app
+              // This is a placeholder - actual implementation depends on your review app
+              console.log('Review submitted:', {
+                rating: rating.value,
+                title: formData.get('review[title]'),
+                body: formData.get('review[body]'),
+                author: formData.get('review[author]'),
+                email: formData.get('review[email]')
+              });
+              
+              // Show success message
+              alert('Thank you for your review! It will be published after moderation.');
+              reviewForm.reset();
+              toggleReviewForm();
+            });
+          }
+        });
+        </script>
+        {%- endif -%}
+
+        <!-- Related Products (Bottom) -->
+        {%- if section.settings.enable_bottom_related and related_collection.products.size > 0 or show_demo -%}
+        <div class="related-section">
+          <h2>{{ section.settings.bottom_related_title | default: "You May Also Need" }}</h2>
+          <div class="carousel-wrapper">
+            <button class="carousel-nav carousel-nav-left" aria-label="Previous products">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="products-carousel">
+            {%- if related_collection.products.size > 0 -%}
+              {%- for related_product in related_collection.products limit: 8 -%}
+                {%- unless related_product.id == product.id -%}
+                <a href="{{ related_product.url }}" class="product-card-small">
+                  <div class="product-card-small-image">
+                    {%- if related_product.featured_image -%}
+                      <img src="{{ related_product.featured_image | image_url: width: 80 }}" alt="{{ related_product.title | escape }}">
+                    {%- else -%}
+                      {{ 'product-1' | placeholder_svg_tag }}
+                    {%- endif -%}
+                  </div>
+                  <div class="product-card-small-info">
+                    <div class="product-card-title-small">{{ related_product.title }}</div>
+                    <div class="product-card-small-price">{{ related_product.price | money }}</div>
+                  </div>
+                </a>
+                {%- endunless -%}
+              {%- endfor -%}
+            {%- elsif show_demo -%}
+              {%- for i in (1..6) -%}
+              <div class="product-card-small">
+                <div class="product-card-small-image">
+                  <img src="https://via.placeholder.com/80x80/f7fafc/718096?text=Item{{ i }}" alt="Demo">
+                </div>
+                <div class="product-card-small-info">
+                  <div class="product-card-title-small">Accessory Product {{ i }}</div>
+                  <div class="product-card-small-price">${{ i }}9.99</div>
+                </div>
+              </div>
+              {%- endfor -%}
+            {%- endif -%}
+            </div>
+            <button class="carousel-nav carousel-nav-right" aria-label="Next products">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+        {%- endif -%}
+      </div>
+
+      <!-- RIGHT SIDEBAR -->
+      <div class="sidebar">
+
+        <!-- Price Box with Member/Non-Member Pricing - BULLETPROOF VERSION -->
+        <div class="price-box">
+          <div class="price-type-label">{{ section.settings.price_label | default: "Non-Member Price:" }}</div>
+          <div class="price-main">
+            {{ product.price | money }}
+            <span class="price-unit">/{{ section.settings.price_unit | default: "Each" }}</span>
+          </div>
+
+          {%- if enable_member_pricing -%}
+            {%- if is_logged_in and is_member -%}
+              {%- comment %} User is logged in AND is a member - Show member price {% endcomment -%}
+              <div class="price-member-section">
+                <div class="price-type-label" style="color: var(--secondary-teal);">{{ section.settings.member_price_label | default: "Plus Member Price:" }}</div>
+                <div class="member-price">
+                  {{ member_price | money }}
+                  <span>/{{ section.settings.price_unit | default: "Each" }}</span>
+                </div>
+                <span class="savings-badge">Save {{ savings_amount | money }} ({{ member_discount }}%)</span>
+                {%- comment %} Debug info (remove in production) {% endcomment -%}
+                <small style="display: block; font-size: 10px; color: #999; margin-top: 5px;">Price source: {{ price_source }}</small>
+              </div>
+            {%- else -%}
+              {%- comment %} User is NOT logged in OR not a member - Show blur overlay {% endcomment -%}
+              <div class="member-price-blur-container">
+                {%- comment %} Background member price (blurred) {% endcomment -%}
+                <div class="price-member-section" style="filter: blur(5px); user-select: none; pointer-events: none;">
+                  <div class="price-type-label" style="color: var(--secondary-teal);">Plus Member Price:</div>
+                  <div class="member-price">
+                    $X,XXX.XX
+                    <span>/Each</span>
+                  </div>
+                  <span class="savings-badge">Save $XX.XX</span>
+                </div>
+                
+                {%- comment %} Blur overlay with login prompt {% endcomment -%}
+                <div class="member-price-blur-overlay">
+                  <div class="login-prompt-text">
+                    {%- if is_logged_in -%}
+                      🌟 Become a Plus Member to see savings
+                    {%- else -%}
+                      🔒 Login to see member pricing
+                    {%- endif -%}
+                  </div>
+                  <a href="/account/login" class="login-btn">
+                    {%- if is_logged_in -%}
+                      Learn About Membership
+                    {%- else -%}
+                      Login to Your Account
+                    {%- endif -%}
+                  </a>
+                  <div class="info-text">
+                    {%- if is_logged_in -%}
+                      Save up to {{ member_discount }}% on this item
+                    {%- else -%}
+                      Plus Members save {{ member_discount }}% on this item
+                    {%- endif -%}
+                  </div>
+                </div>
+              </div>
+            {%- endif -%}
+          {%- endif -%}
+        </div>
+
+        <!-- FIX #3: WSH PLUGIN NOTICE FOR CUSTOM THEME VIEW -->
+        {%- if enable_member_pricing -%}
+        <div class="alert-box" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; margin-top: 15px;">
+          <div style="display: flex; align-items: start; gap: 12px;">
+            <div style="font-size: 24px; flex-shrink: 0;">ℹ️</div>
+            <div style="flex: 1;">
+              <div style="font-weight: 700; font-size: 14px; margin-bottom: 6px;">About Member Pricing</div>
+              <div style="font-size: 13px; line-height: 1.5; opacity: 0.95;">
+                Member pricing requires the WSH Wholesale plugin to be active on the live theme. 
+                If you're viewing this with <code style="background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 3px; font-size: 12px;">?view=custom</code> in the URL, 
+                member prices may not display correctly. To see accurate member pricing, visit the regular product page without URL parameters.
+              </div>
+            </div>
+          </div>
+        </div>
+        {%- endif -%}
+
+        <!-- Shipping Alert -->
+        {%- comment %} Only show schema alert if no shipment_text metafield {% endcomment -%}
+        {%- if section.settings.shipping_alert_text != blank and shipment_text == blank -%}
+        <div class="alert-box alert-warning">
+          ⚠️ {{ section.settings.shipping_alert_text }}
+        </div>
+        {%- endif -%}
+
+        {%- comment %} Free shipping status {% endcomment -%}
+        {%- if free_shipping -%}
+        <div class="alert-box" style="background-color: #d4edda; border-color: #6bcf7f; color: #155724;">
+          ✓ This item qualifies for FREE SHIPPING
+        </div>
+        {%- elsif free_shipping == false -%}
+        <div class="alert-box alert-warning">
+          📦 This item is not eligible for free shipping
+        </div>
+        {%- endif -%}
+
+        <!-- Plus Member Info -->
+        {%- if enable_member_pricing and section.settings.member_info_text != blank -%}
+        <div class="alert-box alert-dark">
+          🌟 {{ section.settings.member_info_text }}
+        </div>
+        {%- endif -%}
+
+        <!-- Quantity and Add to Cart -->
+        <div class="quantity-section">
+          <form action="/cart/add" method="post" enctype="multipart/form-data" id="product-form">
+            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+
+            <label class="quantity-label">Quantity:</label>
+            <div class="quantity-input-group">
+              <input type="number" name="quantity" value="1" min="1" id="quantity-input">
+              <span>{{ section.settings.price_unit | default: "Each" }}</span>
+            </div>
+
+            <div class="action-buttons">
+              <button type="submit" class="btn btn-add-cart" {% unless product.available %}disabled{% endunless %}>
+                <i class="fas fa-shopping-cart"></i>
+                {%- if product.available -%}
+                  {{ section.settings.add_to_cart_text | default: "Add to Cart" }}
+                {%- else -%}
+                  Sold Out
+                {%- endif -%}
+              </button>
+              <button type="button" class="btn btn-add-list" onclick="window.location.href='/pages/wishlist'">
+                <i class="fas fa-heart"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Instant Access Shipping -->
+        {%- if section.settings.show_shipping_info or shipment_text != blank -%}
+        <div class="instant-access-box">
+          <div class="instant-access-title">🚀 {{ section.settings.shipping_info_title | default: "Shipping Information" }}</div>
+
+          {%- comment %} Display shipment_text metafield if available (multi-line text) {% endcomment -%}
+          {%- if shipment_text != blank -%}
+            <p style="font-size: 14px; font-weight: 600; color: var(--success-green); margin-bottom: 10px; white-space: pre-line;">
+              ✓ {{ shipment_text }}
+            </p>
+            {%- if shipment_text_sub != blank -%}
+              <p style="font-size: 13px; color: var(--neutral-dark); margin-bottom: 10px; white-space: pre-line;">
+                {{ shipment_text_sub }}
+              </p>
+            {%- endif -%}
+          {%- else -%}
+            {%- comment %} Show schema defaults if no shipment_text metafield {% endcomment -%}
+            {%- if section.settings.shipping_info_list != blank -%}
+              <ul class="instant-access-list">
+                {%- assign shipping_items = section.settings.shipping_info_list | split: '|' -%}
+                {%- for item in shipping_items -%}
+                  <li>{{ item }}</li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+            {%- if section.settings.shipping_link_text != blank -%}
+              <a href="{{ section.settings.shipping_link_url }}" class="instant-access-link">
+                {{ section.settings.shipping_link_text }} →
+              </a>
+            {%- endif -%}
+          {%- endif -%}
+        </div>
+        {%- endif -%}
+
+        <!-- Brand Box with Logo (Prominent) -->
+        {%- if product.vendor -%}
+        <div style="background: linear-gradient(135deg, var(--accent-gold) 0%, #f4d03f 100%); border: 3px solid var(--primary-navy); border-radius: 12px; padding: 20px; margin: 20px 0; box-shadow: 0 6px 12px rgba(0,0,0,0.15); text-align: center;">
+          {%- if vendor_logo != blank -%}
+            {%- comment %} Show logo only (no text) {% endcomment -%}
+            <div class="vendor-brand-box" style="justify-content: center;">
+              <img src="{{ vendor_logo }}" alt="{{ product.vendor }}" class="vendor-logo" style="max-width: 150px; max-height: 60px;">
+            </div>
+          {%- else -%}
+            {%- comment %} Show text if no logo {% endcomment -%}
+            <div style="font-size: 12px; font-weight: 600; color: var(--primary-navy); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px;">Brand</div>
+            <div style="font-size: 22px; font-weight: 800; color: var(--primary-navy); text-transform: uppercase; letter-spacing: 1px;">{{ product.vendor }}</div>
+          {%- endif -%}
+        </div>
+        {%- endif -%}
+
+        <!-- Parts & Service Banner -->
+        {%- if section.settings.show_service_banner -%}
+        <div class="sidebar-banner">
+          <div class="promo-banner-2">
+            <div class="icon">{{ section.settings.service_banner_icon | default: "🏆" }}</div>
+            <div class="title">{{ section.settings.service_banner_title }}</div>
+            <div class="description">{{ section.settings.service_banner_description }}</div>
+            {%- if section.settings.service_banner_list != blank -%}
+            <hr>
+            <div class="services-list">
+              {{ section.settings.service_banner_list | newline_to_br }}
+            </div>
+            {%- endif -%}
+            {%- if section.settings.service_banner_button_text != blank -%}
+            <button class="cta-btn" onclick="window.location.href='{{ section.settings.service_banner_button_url }}'">
+              {{ section.settings.service_banner_button_text }}
+            </button>
+            {%- endif -%}
+          </div>
+        </div>
+        {%- endif -%}
+
+        <!-- SPECIFICATIONS IN SIDEBAR -->
+        <div class="sidebar-specs">
+          <h4>📋 Specifications</h4>
+
+          {%- comment %} Display Specs Table Image (always an image) {% endcomment -%}
+          {%- if specs_table != blank -%}
+            {%- assign specs_file_url = specs_table | file_url -%}
+            <div class="spec-item" style="display: block; padding: 10px 0; margin-bottom: 15px;">
+              <img src="{{ specs_file_url }}" alt="Product Specifications" style="width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--neutral-gray);">
+            </div>
+          {%- endif -%}
+
+          {%- comment %} Display Spec Doc - Can be PDF or Image {% endcomment -%}
+          {%- if spec_doc != blank -%}
+            {%- assign spec_doc_url = spec_doc | file_url -%}
+            {%- if spec_doc_url contains '.pdf' -%}
+              <div class="spec-item" style="display: block; text-align: center; padding: 15px 0; margin-bottom: 15px;">
+                <a href="{{ spec_doc_url }}" target="_blank" class="spec-download-btn">
+                  <i class="fas fa-file-pdf"></i> Download Spec Sheet PDF
+                </a>
+              </div>
+            {%- else -%}
+              <div class="spec-item" style="display: block; padding: 10px 0; margin-bottom: 15px;">
+                <img src="{{ spec_doc_url }}" alt="Specification Document" style="width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--neutral-gray);">
+              </div>
+            {%- endif -%}
+          {%- endif -%}
+
+          {%- comment %} Display Spec Sheet Rich Text as Table {% endcomment -%}
+          {%- if spec_sheet != blank -%}
+            <div style="background: var(--neutral-light); border-radius: 12px; padding: 20px; margin: 20px 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+              <h4 style="margin: 0 0 15px 0; color: var(--primary-navy); font-size: 16px; font-weight: 700;">Specification Table</h4>
+              
+              {%- comment %} Convert rich text to plain text and parse by pipe separator {% endcomment -%}
+              {%- assign spec_html = spec_sheet | metafield_tag -%}
+              {%- assign spec_text = spec_html | strip_html | strip -%}
+              {%- assign spec_lines = spec_text | split: '|' -%}
+              
+              <table style="width: 100%; border-collapse: collapse;">
+                {%- for line in spec_lines -%}
+                  {%- assign trimmed_line = line | strip -%}
+                  {%- if trimmed_line != blank -%}
+                    {%- if trimmed_line contains ':' -%}
+                      {%- assign parts = trimmed_line | split: ':' -%}
+                      <tr>
+                        <td style="padding: 12px 15px; font-weight: 600; color: var(--primary-navy); width: 45%; background: rgba(26, 35, 50, 0.04);">
+                          {{ parts[0] | strip }}
+                        </td>
+                        <td style="padding: 12px 15px; color: var(--neutral-dark);">
+                          {{ parts[1] | strip }}
+                        </td>
+                      </tr>
+                    {%- else -%}
+                      <tr>
+                        <td colspan="2" style="padding: 12px 15px; color: var(--neutral-dark); font-weight: 500;">
+                          {{ trimmed_line }}
+                        </td>
+                      </tr>
+                    {%- endif -%}
+                  {%- endif -%}
+                {%- endfor -%}
+              </table>
+            </div>
+          {%- endif -%}
+
+          {%- comment %} Display Material Metaobject List {% endcomment -%}
+          {%- if material != blank -%}
+            {%- if material.value.size > 0 -%}
+              <div class="spec-item">
+                <div class="spec-label">Material:</div>
+                <div class="spec-value">
+                  {%- for mat in material.value -%}
+                    {{ mat.name }}{% unless forloop.last %}, {% endunless %}
+                  {%- endfor -%}
+                </div>
+              </div>
+            {%- elsif material -%}
+              <div class="spec-item">
+                <div class="spec-label">Material:</div>
+                <div class="spec-value">{{ material }}</div>
+              </div>
+            {%- endif -%}
+          {%- endif -%}
+
+          {%- if product.weight -%}
+          <div class="spec-item">
+            <div class="spec-label">Weight:</div>
+            <div class="spec-value">{{ product.weight | weight_with_unit }}</div>
+          </div>
+          {%- endif -%}
+
+          {%- if product.type -%}
+          <div class="spec-item">
+            <div class="spec-label">Type:</div>
+            <div class="spec-value">{{ product.type }}</div>
+          </div>
+          {%- endif -%}
+
+          {%- comment %} Display Warranty Rich Text {% endcomment -%}
+          {%- if warranty_text != blank -%}
+          <div class="spec-item">
+            <div class="spec-label">Warranty:</div>
+            <div class="spec-value">
+              {{ warranty_text | metafield_tag }}
+            </div>
+          </div>
+          {%- endif -%}
+
+          {%- if show_demo and material == blank and spec_sheet == blank -%}
+            <div class="spec-item">
+              <div class="spec-label">Type:</div>
+              <div class="spec-value">Demo Product</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-label">Capacity:</div>
+              <div class="spec-value">Demo Value</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-label">Dimensions:</div>
+              <div class="spec-value">24" x 30" x 36"</div>
+            </div>
+          {%- endif -%}
+        </div>
+
+        <!-- Resources Box -->
+        {%- if warranty_doc != blank or spec_doc != blank or manual_doc != blank or section.settings.show_resources or show_demo -%}
+        <div class="sidebar-info-box">
+          <h4>📄 Resources & Documents</h4>
+          <ul>
+            {%- if spec_doc != blank -%}
+              {%- assign spec_doc_url = spec_doc | file_url -%}
+              {%- if spec_doc_url contains '.pdf' -%}
+                <li><a href="{{ spec_doc_url }}" target="_blank"><i class="fas fa-file-pdf"></i> Spec Sheet (PDF)</a></li>
+              {%- else -%}
+                <li><a href="{{ spec_doc_url }}" target="_blank"><i class="fas fa-image"></i> Spec Sheet (Image)</a></li>
+              {%- endif -%}
+            {%- endif -%}
+            {%- if manual_doc != blank -%}
+              {%- assign manual_doc_url = manual_doc | file_url -%}
+              {%- if manual_doc_url contains '.pdf' -%}
+                <li><a href="{{ manual_doc_url }}" target="_blank"><i class="fas fa-file-pdf"></i> Installation Manual (PDF)</a></li>
+              {%- else -%}
+                <li><a href="{{ manual_doc_url }}" target="_blank"><i class="fas fa-image"></i> Installation Manual (Image)</a></li>
+              {%- endif -%}
+            {%- endif -%}
+            {%- if warranty_doc != blank -%}
+              {%- assign warranty_doc_url = warranty_doc | file_url -%}
+              <li><a href="{{ warranty_doc_url }}" target="_blank"><i class="fas fa-file-pdf"></i> Warranty Information</a></li>
+            {%- endif -%}
+            {%- if section.settings.resource_links != blank -%}
+              {%- assign resources = section.settings.resource_links | split: '|' -%}
+              {%- for resource in resources -%}
+                {%- assign resource_parts = resource | split: '::' -%}
+                <li><a href="{{ resource_parts[1] }}" target="_blank">{{ resource_parts[0] }}</a></li>
+              {%- endfor -%}
+            {%- endif -%}
+            {%- if show_demo and spec_doc == blank -%}
+              <li><a href="#">Demo Spec Sheet</a></li>
+              <li><a href="#">Demo Manual</a></li>
+              <li><a href="#">Demo Warranty Info</a></li>
+            {%- endif -%}
+          </ul>
+        </div>
+        {%- endif -%}
+
+        <!-- Additional Resources Banner -->
+        {%- if section.settings.show_additional_resources -%}
+        <div class="sidebar-banner">
+          <div class="promo-banner-3">
+            <div class="title">{{ section.settings.additional_resources_title | default: "📚 Additional Resources" }}</div>
+            <div class="description">{{ section.settings.additional_resources_description }}</div>
+            {%- if section.settings.video_resources != blank -%}
+            <div class="resource-box">
+              <h5>📹 Video Resources:</h5>
+              <ul>
+                {%- assign videos = section.settings.video_resources | split: '|' -%}
+                {%- for video in videos -%}
+                  <li>{{ video }}</li>
+                {%- endfor -%}
+              </ul>
+            </div>
+            {%- endif -%}
+            {%- if section.settings.guide_resources != blank -%}
+            <div class="resource-box">
+              <h5>📖 Buying Guides:</h5>
+              <ul>
+                {%- assign guides = section.settings.guide_resources | split: '|' -%}
+                {%- for guide in guides -%}
+                  <li>{{ guide }}</li>
+                {%- endfor -%}
+              </ul>
+            </div>
+            {%- endif -%}
+          </div>
+        </div>
+        {%- endif -%}
+
+        <!-- Help Box -->
+        {%- if section.settings.show_help_box -%}
+        <div class="sidebar-info-box">
+          <h4>💡 Need Help?</h4>
+          <ul>
+            {%- if section.settings.help_phone != blank -%}
+              <li>📞 Call: <a href="tel:{{ section.settings.help_phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' }}">{{ section.settings.help_phone }}</a></li>
+            {%- endif -%}
+            {%- if section.settings.help_email != blank -%}
+              <li>📧 <a href="mailto:{{ section.settings.help_email }}">Email Support</a></li>
+            {%- endif -%}
+            {%- if section.settings.help_chat_enabled -%}
+              <li>💬 Live Chat Available</li>
+            {%- endif -%}
+            {%- if section.settings.help_additional_links != blank -%}
+              {%- assign help_links = section.settings.help_additional_links | split: '|' -%}
+              {%- for link in help_links -%}
+                <li>{{ link }}</li>
+              {%- endfor -%}
+            {%- endif -%}
+          </ul>
+        </div>
+        {%- endif -%}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FIX #2: REWRITTEN IMAGE GALLERY + LIGHTBOX -->
+<style>
+/* Lightbox Styles */
+.lightbox-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+
+.lightbox-overlay.active {
+  display: flex;
+}
+
+.lightbox-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-image {
+  max-width: 100%;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+.lightbox-close:hover {
+  transform: scale(1.1);
+  background: #ff6b6b;
+  color: white;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+.lightbox-nav:hover {
+  transform: translateY(-50%) scale(1.1);
+  background: #20C997;
+  color: white;
+}
+
+.lightbox-prev {
+  left: 20px;
+}
+
+.lightbox-next {
+  right: 20px;
+}
+
+.lightbox-counter {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: 600;
+  color: #1A2332;
+}
+</style>
+
+<script>
+(function() {
+  'use strict';
+  
+  console.log('🎯 Starting Image Gallery & Lightbox Init...');
+  
+  let currentImageIndex = 0;
+  let allImages = [];
+  
+  function initImageGallery() {
+    const mainImage = document.getElementById('main-product-image');
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    
+    console.log('📸 Main image found:', !!mainImage);
+    console.log('🖼️ Thumbnails found:', thumbnails.length);
+    
+    if (!mainImage || thumbnails.length === 0) {
+      console.warn('⚠️ Image gallery elements not found');
+      return;
+    }
+    
+    // Build image array from thumbnails (DOM-based, not Shopify JSON)
+    allImages = [];
+    thumbnails.forEach((thumb, index) => {
+      const thumbImg = thumb.querySelector('img');
+      if (thumbImg && thumbImg.src) {
+        // Extract the base URL and create large version
+        let imageSrc = thumbImg.src;
+        // Remove any size parameters
+        imageSrc = imageSrc.replace(/_\d+x\d*\.(jpg|jpeg|png|gif|webp)/i, '.$1');
+        imageSrc = imageSrc.replace(/\?(.*)/i, '');
+        
+        allImages.push({
+          src: imageSrc,
+          alt: thumbImg.alt || `Product image ${index + 1}`
+        });
+      }
+    });
+    
+    console.log('✅ Built image array from DOM:', allImages.length, 'images');
+    console.log('📋 Image URLs:', allImages.map(img => img.src));
+    
+    // Function to switch main image
+    function switchImage(index) {
+      if (index < 0 || index >= allImages.length) {
+        console.warn('⚠️ Invalid image index:', index);
+        return;
+      }
+      
+      currentImageIndex = index;
+      const imageData = allImages[index];
+      
+      console.log('🔄 Switching to image', index + 1, '/', allImages.length);
+      
+      // Update main image
+      const largeSrc = imageData.src.replace(/\.(jpg|jpeg|png|gif|webp)/i, '_1200x1200.$1');
+      mainImage.src = largeSrc;
+      mainImage.alt = imageData.alt;
+      
+      // Update active thumbnail
+      thumbnails.forEach((thumb, i) => {
+        if (i === index) {
+          thumb.classList.add('active');
+          thumb.style.opacity = '1';
+        } else {
+          thumb.classList.remove('active');
+          thumb.style.opacity = '0.6';
+        }
+      });
+      
+      console.log('✅ Image switched successfully');
+    }
+    
+    // Attach click events to thumbnails
+    thumbnails.forEach((thumbnail, index) => {
+      thumbnail.style.cursor = 'pointer';
+      
+      thumbnail.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('👆 Thumbnail clicked:', index);
+        switchImage(index);
+      });
+      
+      // Hover effects
+      thumbnail.addEventListener('mouseenter', function() {
+        if (!this.classList.contains('active')) {
+          this.style.opacity = '0.8';
+        }
+      });
+      
+      thumbnail.addEventListener('mouseleave', function() {
+        if (!this.classList.contains('active')) {
+          this.style.opacity = '0.6';
+        }
+      });
+    });
+    
+    // Create lightbox
+    createLightbox(mainImage);
+    
+    // Initialize first image
+    switchImage(0);
+    
+    console.log('✅ Image gallery initialized successfully!');
+  }
+  
+  function createLightbox(mainImage) {
+    // Create lightbox HTML
+    const lightboxHTML = `
+      <div class="lightbox-overlay" id="product-lightbox">
+        <button class="lightbox-close" id="lightbox-close">✕</button>
+        <button class="lightbox-nav lightbox-prev" id="lightbox-prev">‹</button>
+        <div class="lightbox-content">
+          <img class="lightbox-image" id="lightbox-image" src="" alt="">
+        </div>
+        <button class="lightbox-nav lightbox-next" id="lightbox-next">›</button>
+        <div class="lightbox-counter" id="lightbox-counter">1 / 1</div>
+      </div>
+    `;
+    
+    // Insert lightbox into DOM
+    document.body.insertAdjacentHTML('beforeend', lightboxHTML);
+    
+    const lightbox = document.getElementById('product-lightbox');
+    const lightboxImage = document.getElementById('lightbox-image');
+    const closeBtn = document.getElementById('lightbox-close');
+    const prevBtn = document.getElementById('lightbox-prev');
+    const nextBtn = document.getElementById('lightbox-next');
+    const counter = document.getElementById('lightbox-counter');
+    
+    console.log('🎨 Lightbox created');
+    
+    // Open lightbox when main image is clicked
+    mainImage.style.cursor = 'pointer';
+    mainImage.addEventListener('click', function() {
+      console.log('📸 Main image clicked - Opening lightbox');
+      openLightbox(currentImageIndex);
+    });
+    
+    function openLightbox(index) {
+      if (allImages.length === 0) return;
+      
+      currentImageIndex = index;
+      updateLightboxImage();
+      lightbox.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      console.log('✅ Lightbox opened at index:', index);
+    }
+    
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+      document.body.style.overflow = '';
+      console.log('❌ Lightbox closed');
+    }
+    
+    function updateLightboxImage() {
+      if (currentImageIndex < 0 || currentImageIndex >= allImages.length) return;
+      
+      const imageData = allImages[currentImageIndex];
+      const fullSizeSrc = imageData.src.replace(/\.(jpg|jpeg|png|gif|webp)/i, '_2048x2048.$1');
+      
+      lightboxImage.src = fullSizeSrc;
+      lightboxImage.alt = imageData.alt;
+      counter.textContent = `${currentImageIndex + 1} / ${allImages.length}`;
+      
+      // Hide prev/next if only one image
+      if (allImages.length <= 1) {
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+      }
+    }
+    
+    function navigateLightbox(direction) {
+      currentImageIndex += direction;
+      
+      // Loop around
+      if (currentImageIndex < 0) currentImageIndex = allImages.length - 1;
+      if (currentImageIndex >= allImages.length) currentImageIndex = 0;
+      
+      updateLightboxImage();
+      console.log('🔄 Navigated to image:', currentImageIndex + 1);
+    }
+    
+    // Event listeners
+    closeBtn.addEventListener('click', closeLightbox);
+    prevBtn.addEventListener('click', () => navigateLightbox(-1));
+    nextBtn.addEventListener('click', () => navigateLightbox(1));
+    
+    // Close on background click
+    lightbox.addEventListener('click', function(e) {
+      if (e.target === lightbox) {
+        closeLightbox();
+      }
+    });
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+      if (!lightbox.classList.contains('active')) return;
+      
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') navigateLightbox(-1);
+      if (e.key === 'ArrowRight') navigateLightbox(1);
+    });
+    
+    console.log('✅ Lightbox events attached');
+  }
+  
+  // Initialize with multiple attempts
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initImageGallery);
+  } else {
+    initImageGallery();
+  }
+  
+  window.addEventListener('load', function() {
+    setTimeout(initImageGallery, 100);
+  });
+  
+  setTimeout(initImageGallery, 1000);
+  
+  console.log('🚀 Image gallery script loaded');
+})();
+</script>
+
+<script src="{{ 'product-celebrate-festival.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Product - CF v2.0",
+  "settings": [
+    {
+      "type": "header",
+      "content": "🎨 Demo Mode"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_demo_data",
+      "label": "Show Demo Data",
+      "default": false,
+      "info": "Enable to preview design with sample data. Disable for live products."
+    },
+    {
+      "type": "header",
+      "content": "🛒 General Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumb",
+      "label": "Show Breadcrumb",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "description_heading",
+      "label": "Description Section Heading",
+      "default": "Product Description"
+    },
+    {
+      "type": "header",
+      "content": "💰 Pricing Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_member_pricing",
+      "label": "Enable Member Pricing",
+      "default": true,
+      "info": "Show member vs non-member pricing. Works with WSH Wholesale plugin or manual calculation."
+    },
+    {
+      "type": "range",
+      "id": "member_discount_percent",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "%",
+      "label": "Member Discount Percentage (Fallback)",
+      "default": 2,
+      "info": "Used if WSH plugin not detected. Typically 2%."
+    },
+    {
+      "type": "text",
+      "id": "price_label",
+      "label": "Price Label",
+      "default": "Non-Member Price:"
+    },
+    {
+      "type": "text",
+      "id": "member_price_label",
+      "label": "Member Price Label",
+      "default": "Plus Member Price:"
+    },
+    {
+      "type": "text",
+      "id": "price_unit",
+      "label": "Price Unit",
+      "default": "Each"
+    },
+    {
+      "type": "text",
+      "id": "member_info_text",
+      "label": "Member Info Text",
+      "default": "Plus Members save on this item. Learn more",
+      "info": "Text shown in member info box"
+    },
+    {
+      "type": "header",
+      "content": "🚚 Shipping Settings"
+    },
+    {
+      "type": "text",
+      "id": "shipping_alert_text",
+      "label": "Shipping Alert Text",
+      "default": "This item ships via freight. Additional time and fees may apply.",
+      "info": "Leave blank to hide"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_shipping_info",
+      "label": "Show Shipping Info Box",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "shipping_info_title",
+      "label": "Shipping Info Title",
+      "default": "Instant Access Shipping"
+    },
+    {
+      "type": "textarea",
+      "id": "shipping_info_list",
+      "label": "Shipping Info List",
+      "default": "Ships in 1-2 business days|Ships via freight carrier|Free lift gate service included",
+      "info": "Separate items with | (pipe character)"
+    },
+    {
+      "type": "text",
+      "id": "shipping_link_text",
+      "label": "Shipping Link Text",
+      "default": "See all shipping options"
+    },
+    {
+      "type": "text",
+      "id": "shipping_link_url",
+      "label": "Shipping Link URL",
+      "default": "/pages/shipping",
+      "info": "Enter page URL (e.g., /pages/shipping)"
+    },
+    {
+      "type": "header",
+      "content": "🛍️ Add to Cart"
+    },
+    {
+      "type": "text",
+      "id": "add_to_cart_text",
+      "label": "Add to Cart Button Text",
+      "default": "Add to Cart"
+    },
+    {
+      "type": "header",
+      "content": "🔗 Related Products"
+    },
+    {
+      "type": "text",
+      "id": "related_title_default",
+      "label": "Default Related Products Title",
+      "default": "Other Products from this Line"
+    },
+    {
+      "type": "collection",
+      "id": "related_collection_default",
+      "label": "Default Related Products Collection",
+      "info": "Fallback to same collection if empty"
+    },
+    {
+      "type": "text",
+      "id": "conditional_product_type_1",
+      "label": "Conditional Product Type 1",
+      "info": "If product type matches, use settings below"
+    },
+    {
+      "type": "text",
+      "id": "conditional_title_1",
+      "label": "Conditional Title 1",
+      "info": "Title to show for conditional type 1"
+    },
+    {
+      "type": "collection",
+      "id": "conditional_collection_1",
+      "label": "Conditional Collection 1"
+    },
+    {
+      "type": "text",
+      "id": "conditional_product_type_2",
+      "label": "Conditional Product Type 2"
+    },
+    {
+      "type": "text",
+      "id": "conditional_title_2",
+      "label": "Conditional Title 2"
+    },
+    {
+      "type": "collection",
+      "id": "conditional_collection_2",
+      "label": "Conditional Collection 2"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_bottom_related",
+      "label": "Show Bottom Related Products",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "bottom_related_title",
+      "label": "Bottom Related Products Title",
+      "default": "You May Also Need"
+    },
+    {
+      "type": "header",
+      "content": "❓ Q&A Section"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_qa",
+      "label": "Enable Q&A Section",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "qa_heading",
+      "label": "Q&A Heading",
+      "default": "Questions & Answers"
+    },
+    {
+      "type": "textarea",
+      "id": "qa_items",
+      "label": "Q&A Items",
+      "info": "Format: Question|Answer|Meta||Question|Answer|Meta (use || to separate items)"
+    },
+    {
+      "type": "text",
+      "id": "qa_button_text",
+      "label": "Ask Question Button Text",
+      "default": "Ask a Question"
+    },
+    {
+      "type": "text",
+      "id": "qa_button_link",
+      "label": "Ask Question Button Link",
+      "default": "/pages/contact",
+      "info": "Enter page URL (e.g., /pages/contact)"
+    },
+    {
+      "type": "header",
+      "content": "⚖️ Compare Section"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_compare",
+      "label": "Enable Compare Section",
+      "default": false,
+      "info": "Note: Comparison table requires custom development"
+    },
+    {
+      "type": "text",
+      "id": "compare_heading",
+      "label": "Compare Heading",
+      "default": "Compare to Other Products"
+    },
+    {
+      "type": "header",
+      "content": "⭐ Reviews"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_reviews",
+      "label": "Enable Reviews Section",
+      "default": true,
+      "info": "Requires Shopify Product Reviews app"
+    },
+    {
+      "type": "text",
+      "id": "reviews_heading",
+      "label": "Reviews Heading",
+      "default": "Customer Reviews"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Brand Banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_brand_banner",
+      "label": "Show Brand Banner",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "brand_banner_name",
+      "label": "Brand Banner Name",
+      "info": "Leave blank to use product vendor"
+    },
+    {
+      "type": "text",
+      "id": "brand_banner_tagline",
+      "label": "Brand Banner Tagline"
+    },
+    {
+      "type": "textarea",
+      "id": "brand_banner_description",
+      "label": "Brand Banner Description"
+    },
+    {
+      "type": "textarea",
+      "id": "brand_banner_features",
+      "label": "Brand Banner Features",
+      "info": "Separate features with | (pipe character)"
+    },
+    {
+      "type": "header",
+      "content": "🏆 Service Banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_service_banner",
+      "label": "Show Service Banner",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "service_banner_icon",
+      "label": "Service Banner Icon (Emoji)",
+      "default": "🏆"
+    },
+    {
+      "type": "text",
+      "id": "service_banner_title",
+      "label": "Service Banner Title",
+      "default": "Proud Parts & Service Partner"
+    },
+    {
+      "type": "textarea",
+      "id": "service_banner_description",
+      "label": "Service Banner Description"
+    },
+    {
+      "type": "textarea",
+      "id": "service_banner_list",
+      "label": "Service Banner List",
+      "info": "Services available - use line breaks"
+    },
+    {
+      "type": "text",
+      "id": "service_banner_button_text",
+      "label": "Service Banner Button Text",
+      "default": "Find Parts & Manuals"
+    },
+    {
+      "type": "text",
+      "id": "service_banner_button_url",
+      "label": "Service Banner Button URL",
+      "default": "/pages/parts-and-service",
+      "info": "Enter page URL (e.g., /pages/parts-and-service)"
+    },
+    {
+      "type": "header",
+      "content": "📄 Resources"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_resources",
+      "label": "Show Resources Box",
+      "default": true,
+      "info": "Shows metafield PDFs automatically"
+    },
+    {
+      "type": "textarea",
+      "id": "resource_links",
+      "label": "Additional Resource Links",
+      "info": "Format: Link Text::URL|Link Text::URL"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_additional_resources",
+      "label": "Show Additional Resources Banner",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "additional_resources_title",
+      "label": "Additional Resources Title",
+      "default": "📚 Additional Resources"
+    },
+    {
+      "type": "textarea",
+      "id": "additional_resources_description",
+      "label": "Additional Resources Description"
+    },
+    {
+      "type": "textarea",
+      "id": "video_resources",
+      "label": "Video Resources List",
+      "info": "Separate with | (pipe character)"
+    },
+    {
+      "type": "textarea",
+      "id": "guide_resources",
+      "label": "Guide Resources List",
+      "info": "Separate with | (pipe character)"
+    },
+    {
+      "type": "header",
+      "content": "💡 Help Box"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_help_box",
+      "label": "Show Help Box",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "help_phone",
+      "label": "Help Phone Number",
+      "default": "(408) 673-9999"
+    },
+    {
+      "type": "text",
+      "id": "help_email",
+      "label": "Help Email"
+    },
+    {
+      "type": "checkbox",
+      "id": "help_chat_enabled",
+      "label": "Show Live Chat Option",
+      "default": true
+    },
+    {
+      "type": "textarea",
+      "id": "help_additional_links",
+      "label": "Additional Help Links",
+      "info": "Separate with | (pipe character)"
+    }
+  ]
+}
+{% endschema %}

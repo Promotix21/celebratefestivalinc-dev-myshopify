@@ -1,0 +1,318 @@
+/* ========================================
+   FEATURED CATEGORIES SECTION
+   Restaurant Equipment Supplier Theme
+   ======================================== */
+
+.featured-categories-section {
+  padding: 60px 0;
+  background: white;
+}
+
+/* Section Header */
+.section-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-navy);
+  margin-bottom: 15px;
+}
+
+.section-description {
+  font-size: 1.1rem;
+  color: var(--text-light);
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Categories Grid */
+.featured-categories-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* Category Card */
+.category-feature-card {
+  background: white;
+  border-radius: var(--border-radius-large);
+  overflow: hidden;
+  box-shadow: var(--shadow-light);
+  transition: var(--transition-smooth);
+  display: flex;
+  flex-direction: column;
+}
+
+.category-feature-card:hover {
+  box-shadow: var(--shadow-heavy);
+  transform: translateY(-5px);
+}
+
+/* Category Image */
+.category-feature-link {
+  display: block;
+  text-decoration: none;
+}
+
+.category-feature-image {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+  background: var(--neutral-light);
+}
+
+.category-feature-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.category-feature-card:hover .category-feature-image img {
+  transform: scale(1.08);
+}
+
+.category-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent 0%, rgba(30, 58, 138, 0.7) 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.category-feature-card:hover .category-overlay {
+  opacity: 1;
+}
+
+/* Category Content */
+.category-feature-content {
+  padding: 25px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.category-title-link {
+  text-decoration: none;
+}
+
+.category-feature-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary-navy);
+  margin-bottom: 12px;
+  line-height: 1.3;
+  transition: var(--transition-smooth);
+}
+
+.category-feature-card:hover .category-feature-title {
+  color: var(--primary-coral);
+}
+
+.category-feature-description {
+  font-size: 14px;
+  color: var(--text-light);
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.category-count-info {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--neutral-gray);
+}
+
+.category-shop-link {
+  color: var(--primary-coral);
+  font-weight: 600;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.category-shop-link i {
+  transition: transform 0.3s ease;
+}
+
+.category-feature-card:hover .category-shop-link i {
+  transform: translateX(3px);
+}
+
+/* Subcategories List */
+.subcategories-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.subcategories-list li {
+  position: relative;
+  padding-left: 0;
+}
+
+.subcategory-link {
+  color: var(--text-dark);
+  text-decoration: none;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  padding: 6px 0;
+  transition: var(--transition-smooth);
+  position: relative;
+}
+
+.subcategory-link::before {
+  content: '→';
+  margin-right: 8px;
+  color: var(--primary-coral);
+  font-weight: 600;
+  transition: var(--transition-smooth);
+}
+
+.subcategory-link:hover {
+  color: var(--primary-coral);
+  padding-left: 5px;
+}
+
+.subcategory-link:hover::before {
+  margin-right: 12px;
+}
+
+/* Placeholder SVG */
+.placeholder-svg {
+  width: 100%;
+  height: 100%;
+  opacity: 0.2;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+/* Large Desktop */
+@media (min-width: 1400px) {
+  .featured-categories-grid {
+    gap: 35px;
+  }
+}
+
+/* Desktop */
+@media (max-width: 1200px) {
+  .featured-categories-grid {
+    grid-template-columns: repeat(3, 1fr);
+    padding: 0 30px;
+  }
+}
+
+/* Tablet */
+@media (max-width: 992px) {
+  .featured-categories-section {
+    padding: 50px 0;
+  }
+
+  .section-title {
+    font-size: 2.2rem;
+  }
+
+  .featured-categories-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+  }
+
+  .category-feature-image {
+    height: 200px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .featured-categories-section {
+    padding: 40px 0;
+  }
+
+  .section-header {
+    margin-bottom: 35px;
+  }
+
+  .section-title {
+    font-size: 1.9rem;
+  }
+
+  .section-description {
+    font-size: 1rem;
+  }
+
+  .featured-categories-grid {
+    gap: 20px;
+    padding: 0 20px;
+  }
+
+  .category-feature-content {
+    padding: 20px;
+  }
+
+  .category-feature-title {
+    font-size: 1.15rem;
+  }
+
+  .subcategory-link {
+    font-size: 12px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 576px) {
+  .featured-categories-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .category-feature-image {
+    height: 180px;
+  }
+
+  .section-title {
+    font-size: 1.7rem;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+.category-feature-link:focus,
+.subcategory-link:focus {
+  outline: 3px solid var(--primary-coral);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .category-feature-card,
+  .category-feature-image img,
+  .category-overlay,
+  .subcategory-link {
+    transition: none;
+  }
+
+  .category-feature-card:hover {
+    transform: none;
+  }
+
+  .category-feature-card:hover .category-feature-image img {
+    transform: none;
+  }
+}

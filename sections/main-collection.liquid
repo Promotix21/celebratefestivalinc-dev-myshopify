@@ -1,0 +1,807 @@
+{{ 'collection.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign sort_by = collection.sort_by | default: collection.default_sort_by
+  assign items_per_page = section.settings.products_per_page
+  assign enable_filtering = section.settings.enable_filtering
+  assign enable_sorting = section.settings.enable_sorting
+  assign filter_type = section.settings.filter_type
+-%}
+
+<!-- Breadcrumb -->
+<section class="breadcrumb">
+  <div class="container">
+    <nav class="breadcrumb-nav" role="navigation" aria-label="breadcrumbs">
+      <a href="{{ routes.root_url }}">
+        <i class="fas fa-home"></i> Home
+      </a>
+      <span> > </span>
+      
+      {%- if collection.metafields.custom.parent_collection != blank -%}
+        <a href="{{ collection.metafields.custom.parent_collection.url }}">
+          {{ collection.metafields.custom.parent_collection.title }}
+        </a>
+        <span> > </span>
+      {%- endif -%}
+      
+      <span>{{ collection.title }}</span>
+    </nav>
+  </div>
+</section>
+
+<!-- Collection Header -->
+<section class="collection-header">
+  <div class="container">
+    <h1 class="collection-title">{{ collection.title }}</h1>
+    
+    {%- if collection.description != blank -%}
+      <div class="collection-description">
+        {{ collection.description }}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+<!-- Collection Content -->
+<section class="collection-content">
+  <div class="container">
+    <div class="collection-grid">
+      
+      <!-- Sidebar Filters -->
+      {%- if enable_filtering -%}
+        <aside class="filters-sidebar" id="filters-sidebar">
+          <facet-filters-form>
+            {%- render 'facets-restaurant', 
+              results: collection, 
+              enable_filtering: enable_filtering,
+              filter_type: filter_type,
+              enable_sorting: enable_sorting
+            -%}
+          </facet-filters-form>
+        </aside>
+      {%- endif -%}
+
+      <!-- Products Area -->
+      <div class="products-area">
+        
+        <!-- Mobile Filter Toggle -->
+        {%- if enable_filtering -%}
+          <button class="mobile-filter-toggle" onclick="toggleMobileFilters()" aria-label="Show Filters">
+            <i class="fas fa-filter"></i>
+            Filters
+            {%- if collection.filters.size > 0 -%}
+              <span class="active-filters-count">{{ collection.filters.size }}</span>
+            {%- endif -%}
+          </button>
+        {%- endif -%}
+
+        <!-- Products Header -->
+        <div class="products-header">
+          <div class="products-count">
+           {%- if collection.products_count -%}
+              {%- if collection.results_count == 1 -%}
+                Showing {{ collection.results_count }} product
+              {%- else -%}
+                Showing 
+                {%- if paginate.current_page == 1 -%}
+                  1-{{ items_per_page | at_most: collection.results_count }}
+                {%- else -%}
+                  {{ paginate.current_offset | plus: 1 }}-{{ paginate.current_offset | plus: paginate.page_size | at_most: collection.results_count }}
+                {%- endif -%}
+                of {{ collection.products_count }} products
+              {%- endif -%}
+            {%- else -%}
+             No products in this collection
+            {%- endif -%}
+          </div>
+
+          <div class="products-controls">
+            {%- if enable_sorting -%}
+              <label for="sort-select" class="sort-label">Sort By:</label>
+              <select id="sort-select" class="sort-dropdown" aria-label="Sort products">
+                {%- assign sort_by = collection.sort_by | default: collection.default_sort_by -%}
+                <option value="manual" {% if sort_by == 'manual' %}selected{% endif %}>Featured</option>
+                <option value="price-ascending" {% if sort_by == 'price-ascending' %}selected{% endif %}>Price: Low to High</option>
+                <option value="price-descending" {% if sort_by == 'price-descending' %}selected{% endif %}>Price: High to Low</option>
+                <option value="title-ascending" {% if sort_by == 'title-ascending' %}selected{% endif %}>Name A-Z</option>
+                <option value="title-descending" {% if sort_by == 'title-descending' %}selected{% endif %}>Name Z-A</option>
+                <option value="created-descending" {% if sort_by == 'created-descending' %}selected{% endif %}>Newest First</option>
+                <option value="created-ascending" {% if sort_by == 'created-ascending' %}selected{% endif %}>Oldest First</option>
+                <option value="best-selling" {% if sort_by == 'best-selling' %}selected{% endif %}>Best Selling</option>
+              </select>
+            {%- endif -%}
+
+            {%- if section.settings.enable_view_toggle -%}
+              <label class="view-label">View As:</label>
+              <div class="view-toggle">
+                <button class="view-btn active" onclick="switchView('grid')" aria-label="Grid view">
+                  <i class="fas fa-th"></i>
+                </button>
+                <button class="view-btn" onclick="switchView('list')" aria-label="List view">
+                  <i class="fas fa-list"></i>
+                </button>
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+
+        <!-- Active Filters Display -->
+        {%- if collection.filters.size > 0 -%}
+          <div class="active-filters">
+            <div class="active-filters-inner">
+              <span class="active-filters-label">Active Filters:</span>
+              {%- for filter in collection.filters -%}
+                {%- for filter_value in filter.active_values -%}
+                  <a href="{{ filter_value.url_to_remove }}" class="active-filter-tag">
+                    {{ filter.label }}: {{ filter_value.label }}
+                    <i class="fas fa-times"></i>
+                  </a>
+                {%- endfor -%}
+              {%- endfor -%}
+              <a href="{{ collection.url }}" class="clear-all-filters">Clear All</a>
+            </div>
+          </div>
+        {%- endif -%}
+
+        <!-- Loading State -->
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <p>Loading products...</p>
+        </div>
+
+        <!-- Products Grid -->
+        {%- paginate collection.products by items_per_page -%}
+          <div class="products-grid" id="products-grid" 
+               data-columns="{{ section.settings.products_per_row_desktop }}"
+               data-columns-mobile="{{ section.settings.products_per_row_mobile }}">
+            
+            {%- if collection.products.size > 0 -%}
+              {%- for product in collection.products -%}
+                {%- render 'product-card', 
+                  product: product,
+                  show_vendor: section.settings.show_vendor,
+                  show_rating: section.settings.show_rating,
+                  image_ratio: section.settings.image_ratio
+                -%}
+              {%- endfor -%}
+            {%- else -%}
+              <div class="collection-empty">
+                <i class="fas fa-inbox"></i>
+                <h3>No products found</h3>
+                <p>Try adjusting your filters or search terms</p>
+                <a href="{{ collection.url }}" class="btn btn-primary">Clear Filters</a>
+              </div>
+            {%- endif -%}
+          </div>
+
+          <!-- Products List View -->
+          <div class="products-list" id="products-list" style="display: none;">
+            {%- if collection.products.size > 0 -%}
+              {%- for product in collection.products -%}
+                {%- render 'product-card-list', 
+                  product: product,
+                  show_vendor: section.settings.show_vendor,
+                  show_rating: section.settings.show_rating
+                -%}
+              {%- endfor -%}
+            {%- endif -%}
+          </div>
+
+          <!-- Pagination -->
+          {%- if paginate.pages > 1 -%}
+            <div class="pagination" role="navigation" aria-label="Pagination">
+              {%- if paginate.previous -%}
+                <a href="{{ paginate.previous.url }}" class="page-btn" aria-label="Previous page">
+                  <i class="fas fa-chevron-left"></i>
+                </a>
+              {%- else -%}
+                <span class="page-btn disabled">
+                  <i class="fas fa-chevron-left"></i>
+                </span>
+              {%- endif -%}
+
+              {%- for part in paginate.parts -%}
+                {%- if part.is_link -%}
+                  <a href="{{ part.url }}" class="page-btn" aria-label="Page {{ part.title }}">
+                    {{ part.title }}
+                  </a>
+                {%- else -%}
+                  {%- if part.title == paginate.current_page -%}
+                    <span class="page-btn active" aria-current="page" aria-label="Current page {{ part.title }}">
+                      {{ part.title }}
+                    </span>
+                  {%- else -%}
+                    <span class="page-btn disabled">{{ part.title }}</span>
+                  {%- endif -%}
+                {%- endif -%}
+              {%- endfor -%}
+
+              {%- if paginate.next -%}
+                <a href="{{ paginate.next.url }}" class="page-btn" aria-label="Next page">
+                  <i class="fas fa-chevron-right"></i>
+                </a>
+              {%- else -%}
+                <span class="page-btn disabled">
+                  <i class="fas fa-chevron-right"></i>
+                </span>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- endpaginate -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Mobile Filter Overlay -->
+{%- if enable_filtering -%}
+  <div class="mobile-filter-overlay" id="mobileFilterOverlay" onclick="closeMobileFilters()"></div>
+  
+  <div class="mobile-filters" id="mobileFilters">
+    <div class="mobile-filter-header">
+      <h3 class="mobile-filter-title">Filters</h3>
+      <button class="mobile-filter-close" onclick="closeMobileFilters()" aria-label="Close filters">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <facet-filters-form>
+      {%- render 'facets-restaurant', 
+        results: collection, 
+        enable_filtering: enable_filtering,
+        filter_type: filter_type,
+        enable_sorting: enable_sorting,
+        is_mobile: true
+      -%}
+    </facet-filters-form>
+  </div>
+{%- endif -%}
+
+<script>
+  // Sort functionality
+  document.getElementById('sort-select')?.addEventListener('change', function() {
+    const url = new URL(window.location.href);
+    url.searchParams.set('sort_by', this.value);
+    window.location.href = url.toString();
+  });
+
+  // View toggle
+  function switchView(viewType) {
+    const gridView = document.getElementById('products-grid');
+    const listView = document.getElementById('products-list');
+    const gridBtn = document.querySelector('.view-btn:first-of-type');
+    const listBtn = document.querySelector('.view-btn:last-of-type');
+
+    if (viewType === 'grid') {
+      gridView.style.display = 'grid';
+      listView.style.display = 'none';
+      gridBtn?.classList.add('active');
+      listBtn?.classList.remove('active');
+      localStorage.setItem('collectionView', 'grid');
+    } else {
+      gridView.style.display = 'none';
+      listView.style.display = 'flex';
+      gridBtn?.classList.remove('active');
+      listBtn?.classList.add('active');
+      localStorage.setItem('collectionView', 'list');
+    }
+  }
+
+  // Mobile filters
+  function toggleMobileFilters() {
+    const overlay = document.getElementById('mobileFilterOverlay');
+    const filters = document.getElementById('mobileFilters');
+    overlay?.classList.add('active');
+    filters?.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMobileFilters() {
+    const overlay = document.getElementById('mobileFilterOverlay');
+    const filters = document.getElementById('mobileFilters');
+    overlay?.classList.remove('active');
+    filters?.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function applyMobileFilters() {
+    closeMobileFilters();
+  }
+
+  // Remember view preference
+  document.addEventListener('DOMContentLoaded', function() {
+    const savedView = localStorage.getItem('collectionView');
+    if (savedView === 'list') {
+      switchView('list');
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Collection Page",
+  "settings": [
+    {
+      "type": "header",
+      "content": "📐 Layout Settings"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 12,
+      "label": "Products per page",
+      "info": "Number of products to display per page"
+    },
+    {
+  "type": "range",
+  "id": "filter_values_limit",
+  "min": 50,
+  "max": 500,
+  "step": 50,
+  "default": 100,
+  "label": "Maximum filter values to display",
+  "info": "For large collections, limit the number of filter options shown"
+},
+    {
+      "type": "range",
+      "id": "products_per_row_desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 3,
+      "label": "Products per row (Desktop)",
+      "info": "Grid columns on desktop screens"
+    },
+    {
+      "type": "range",
+      "id": "products_per_row_tablet",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 2,
+      "label": "Products per row (Tablet)"
+    },
+    {
+  "type": "range",
+  "id": "products_per_row_mobile",
+  "min": 1,
+  "max": 4,
+  "step": 1,
+  "default": 2,
+  "label": "Products per row (Mobile)"
+},
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "Adapt to image"
+        },
+        {
+          "value": "portrait",
+          "label": "Portrait (4:5)"
+        },
+        {
+          "value": "square",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "landscape",
+          "label": "Landscape (16:9)"
+        }
+      ],
+      "default": "adapt",
+      "label": "Product image ratio"
+    },
+    {
+      "type": "header",
+      "content": "🎛️ Filtering & Sorting"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_filtering",
+      "default": true,
+      "label": "Enable product filtering",
+      "info": "Allow customers to filter products"
+    },
+    {
+      "type": "select",
+      "id": "filter_type",
+      "options": [
+        {
+          "value": "vertical",
+          "label": "Vertical Sidebar"
+        },
+        {
+          "value": "horizontal",
+          "label": "Horizontal (Top)"
+        },
+        {
+          "value": "drawer",
+          "label": "Drawer (Mobile-style)"
+        }
+      ],
+      "default": "vertical",
+      "label": "Filter layout",
+      "info": "How filters are displayed on desktop"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filter_counts",
+      "default": true,
+      "label": "Show product counts in filters"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sorting",
+      "default": true,
+      "label": "Enable product sorting"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_view_toggle",
+      "default": true,
+      "label": "Enable grid/list view toggle"
+    },
+    {
+      "type": "select",
+      "id": "default_sort",
+      "options": [
+        {
+          "value": "manual",
+          "label": "Featured"
+        },
+        {
+          "value": "best-selling",
+          "label": "Best Selling"
+        },
+        {
+          "value": "title-ascending",
+          "label": "Alphabetically, A-Z"
+        },
+        {
+          "value": "title-descending",
+          "label": "Alphabetically, Z-A"
+        },
+        {
+          "value": "price-ascending",
+          "label": "Price, Low to High"
+        },
+        {
+          "value": "price-descending",
+          "label": "Price, High to Low"
+        },
+        {
+          "value": "created-descending",
+          "label": "Date, New to Old"
+        },
+        {
+          "value": "created-ascending",
+          "label": "Date, Old to New"
+        }
+      ],
+      "default": "manual",
+      "label": "Default sort order"
+    },
+    {
+      "type": "header",
+      "content": "🏷️ Product Card Display"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "default": true,
+      "label": "Show product vendor/brand"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_type",
+      "default": false,
+      "label": "Show product type"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "default": false,
+      "label": "Show product rating",
+      "info": "Requires a product review app"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "default": false,
+      "label": "Enable quick add to cart",
+      "info": "For products with single variants only"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_second_image",
+      "default": true,
+      "label": "Show second image on hover"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_wishlist",
+      "default": true,
+      "label": "Show wishlist button"
+    },
+    {
+      "type": "header",
+      "content": "🎖️ Badges & Labels"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sale_badge",
+      "default": true,
+      "label": "Show sale badge"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sale_percentage",
+      "default": true,
+      "label": "Show percentage saved"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_shipping_badge",
+      "default": true,
+      "label": "Show free shipping badge"
+    },
+    {
+      "type": "text",
+      "id": "free_shipping_tag",
+      "default": "free-shipping",
+      "label": "Free shipping product tag",
+      "info": "Products with this tag will show free shipping badge"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_low_stock_badge",
+      "default": true,
+      "label": "Show low stock badge"
+    },
+    {
+      "type": "range",
+      "id": "low_stock_threshold",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 10,
+      "label": "Low stock threshold",
+      "info": "Products with inventory below this number show low stock badge"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_new_badge",
+      "default": true,
+      "label": "Show new product badge"
+    },
+    {
+      "type": "text",
+      "id": "new_badge_tag",
+      "default": "new",
+      "label": "New product tag"
+    },
+    {
+      "type": "range",
+      "id": "new_badge_duration",
+      "min": 7,
+      "max": 90,
+      "step": 1,
+      "default": 30,
+      "label": "New badge duration (days)",
+      "info": "How many days after creation to show new badge"
+    },
+    {
+      "type": "header",
+      "content": "💰 Pricing Display"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_compare_at_price",
+      "default": true,
+      "label": "Show compare at price (was/now)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_savings_amount",
+      "default": true,
+      "label": "Show savings amount"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_call_for_price",
+      "default": true,
+      "label": "Enable 'Call for Price' option",
+      "info": "Products tagged with 'call-for-price' will show call button instead of price"
+    },
+    {
+      "type": "text",
+      "id": "call_for_price_text",
+      "default": "Call for Best Price",
+      "label": "Call for price text"
+    },
+    {
+      "type": "text",
+      "id": "call_for_price_phone",
+      "default": "(408) 673-9999",
+      "label": "Phone number for quotes"
+    },
+    {
+      "type": "header",
+      "content": "📝 Product Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_features",
+      "default": true,
+      "label": "Show product features/tags"
+    },
+    {
+      "type": "range",
+      "id": "max_features_display",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 3,
+      "label": "Maximum features to display"
+    },
+    {
+      "type": "text",
+      "id": "features_metafield",
+      "default": "custom.key_features",
+      "label": "Features metafield namespace",
+      "info": "Metafield containing comma-separated features"
+    },
+    {
+      "type": "header",
+      "content": "📋 Collection Header"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_description",
+      "default": true,
+      "label": "Show collection description"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumbs",
+      "default": true,
+      "label": "Show breadcrumb navigation"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_count",
+      "default": true,
+      "label": "Show product count"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Styling Options"
+    },
+    {
+      "type": "color",
+      "id": "primary_color",
+      "default": "#ff6b6b",
+      "label": "Primary accent color"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "default": "#ff6b6b",
+      "label": "Button background color"
+    },
+    {
+      "type": "color",
+      "id": "button_text",
+      "default": "#ffffff",
+      "label": "Button text color"
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "default": 12,
+      "unit": "px",
+      "label": "Product card border radius"
+    },
+    {
+      "type": "select",
+      "id": "card_shadow",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "heavy",
+          "label": "Heavy"
+        }
+      ],
+      "default": "light",
+      "label": "Product card shadow"
+    },
+    {
+      "type": "header",
+      "content": "⚡ Performance"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_lazy_loading",
+      "default": true,
+      "label": "Enable lazy loading for images"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_infinite_scroll",
+      "default": false,
+      "label": "Enable infinite scroll",
+      "info": "Load more products automatically when scrolling"
+    },
+    {
+      "type": "header",
+      "content": "📱 Mobile Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_sticky_filters",
+      "default": true,
+      "label": "Sticky filter button on mobile"
+    },
+    {
+      "type": "select",
+      "id": "mobile_filter_position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Slide from left"
+        },
+        {
+          "value": "bottom",
+          "label": "Slide from bottom"
+        }
+      ],
+      "default": "left",
+      "label": "Mobile filter panel position"
+    },
+    {
+      "type": "header",
+      "content": "🔍 SEO & Accessibility"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_schema_markup",
+      "default": true,
+      "label": "Enable schema markup",
+      "info": "Improves SEO with structured data"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_breadcrumb_schema",
+      "default": true,
+      "label": "Enable breadcrumb schema"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS",
+      "info": "Add custom CSS to override default styles",
+      "placeholder": ".product-card { /* Your custom styles */ }"
+    }
+  ]
+}
+{% endschema %}

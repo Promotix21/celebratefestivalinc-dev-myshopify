@@ -1,0 +1,2045 @@
+<!-- Custom Footer Section -->
+<footer class="custom-footer">
+
+  <!-- Newsletter Section -->
+  {% if section.settings.show_newsletter %}
+  <section class="newsletter" 
+           style="padding: {{ section.settings.newsletter_padding_top }}px 0 {{ section.settings.newsletter_padding_bottom }}px;
+                  {% if section.settings.newsletter_bg_type == 'gradient' %}background: linear-gradient(135deg, {{ section.settings.newsletter_bg_color }} 0%, {{ section.settings.newsletter_bg_color_2 }} 100%);{% else %}background: {{ section.settings.newsletter_bg_color }};{% endif %}
+                  color: {{ section.settings.newsletter_text_color }};
+                  text-align: center;">
+    <div class="container" style="max-width: {{ section.settings.newsletter_max_width }}px; margin: 0 auto; padding: 0 20px;">
+      
+      {% if section.settings.newsletter_title != blank %}
+      <h2 style="font-family: {{ section.settings.newsletter_title_font }}, serif;
+                 font-size: {{ section.settings.newsletter_title_size }}px;
+                 font-weight: {{ section.settings.newsletter_title_weight }};
+                 margin-bottom: {{ section.settings.newsletter_title_margin }}px;
+                 color: {{ section.settings.newsletter_title_color }};">
+        {{ section.settings.newsletter_title }}
+      </h2>
+      {% endif %}
+      
+      {% if section.settings.newsletter_description != blank %}
+      <p style="font-size: {{ section.settings.newsletter_description_size }}px;
+                opacity: {{ section.settings.newsletter_description_opacity | divided_by: 100.0 }};
+                margin-bottom: {{ section.settings.newsletter_description_margin }}px;
+                color: {{ section.settings.newsletter_description_color }};">
+        {{ section.settings.newsletter_description }}
+      </p>
+      {% endif %}
+      
+      <form class="newsletter-form" style="max-width: {{ section.settings.newsletter_form_width }}px; margin: 0 auto;">
+        <div class="form-group" style="position: relative; display: flex; border-radius: {{ section.settings.newsletter_border_radius }}px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+          <input type="email" 
+                 class="email-input" 
+                 placeholder="{{ section.settings.newsletter_placeholder | default: 'Enter your email address' }}"
+                 required
+                 style="flex: 1;
+                        padding: {{ section.settings.newsletter_input_padding }}px 25px;
+                        border: none;
+                        outline: none;
+                        font-size: {{ section.settings.newsletter_input_size }}px;
+                        color: {{ section.settings.newsletter_input_text_color }};
+                        background: {{ section.settings.newsletter_input_bg_color }};">
+          <button type="submit" 
+                  class="subscribe-btn"
+                  style="background: {% if section.settings.newsletter_btn_bg_type == 'gradient' %}linear-gradient(135deg, {{ section.settings.newsletter_btn_bg_color }} 0%, {{ section.settings.newsletter_btn_bg_color_2 }} 100%){% else %}{{ section.settings.newsletter_btn_bg_color }}{% endif %};
+                         color: {{ section.settings.newsletter_btn_text_color }};
+                         border: none;
+                         padding: {{ section.settings.newsletter_input_padding }}px 30px;
+                         font-weight: {{ section.settings.newsletter_btn_weight }};
+                         cursor: pointer;
+                         transition: all 0.3s ease;
+                         display: flex;
+                         align-items: center;
+                         gap: 10px;
+                         font-size: {{ section.settings.newsletter_btn_size }}px;">
+            <span>{{ section.settings.newsletter_btn_text | default: 'Subscribe' }}</span>
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+        
+        {% if section.settings.newsletter_note != blank %}
+        <p class="form-note" 
+           style="font-size: {{ section.settings.newsletter_note_size }}px;
+                  opacity: {{ section.settings.newsletter_note_opacity | divided_by: 100.0 }};
+                  margin-top: {{ section.settings.newsletter_note_margin }}px;
+                  color: {{ section.settings.newsletter_note_color }};">
+          {{ section.settings.newsletter_note }}
+        </p>
+        {% endif %}
+      </form>
+    </div>
+  </section>
+  {% endif %}
+
+<!-- Contact Bar -->
+  {% if section.settings.show_contact_bar %}
+  <section class="contact-bar" 
+           style="{% if section.settings.contact_bar_bg_type == 'gradient' %}background: linear-gradient(135deg, {{ section.settings.contact_bar_bg_color }} 0%, {{ section.settings.contact_bar_bg_color_2 }} 100%);{% else %}background: {{ section.settings.contact_bar_bg_color }};{% endif %} 
+                  padding: {{ section.settings.contact_bar_padding_top }}px 0 {{ section.settings.contact_bar_padding_bottom }}px;">
+    <div class="contact-bar-container" style="max-width: {{ section.settings.contact_bar_max_width }}px; margin: 0 auto; padding: 0 20px;">
+      
+      {% if section.settings.contact_bar_title != blank %}
+      <h3 style="text-align: center; 
+                 font-family: {{ section.settings.contact_bar_title_font }}, serif;
+                 font-size: {{ section.settings.contact_bar_title_size }}px;
+                 font-weight: {{ section.settings.contact_bar_title_weight }};
+                 margin-bottom: {{ section.settings.contact_bar_title_margin }}px;
+                 color: {{ section.settings.contact_bar_title_color }};">
+        {{ section.settings.contact_bar_title }}
+      </h3>
+      {% endif %}
+      
+      {% if section.settings.contact_bar_subtitle != blank %}
+      <p style="text-align: center;
+                font-size: 16px;
+                color: rgba(255, 255, 255, 0.9);
+                margin-bottom: 50px;
+                max-width: 800px;
+                margin-left: auto;
+                margin-right: auto;">
+        {{ section.settings.contact_bar_subtitle }}
+      </p>
+      {% endif %}
+      
+      <div class="contact-items" 
+           style="display: grid; 
+                  grid-template-columns: repeat({{ section.settings.contact_items_columns }}, 1fr);
+                  gap: {{ section.settings.contact_items_gap }}px;
+                  max-width: 1200px;
+                  margin: 0 auto;">
+        
+        <!-- Phone Contact -->
+        {% if section.settings.show_phone %}
+        <div class="contact-item contact-card">
+          <div class="contact-icon-wrapper">
+            <i class="fas fa-phone"></i>
+          </div>
+          <h4 class="contact-label">{{ section.settings.phone_label }}</h4>
+          <p class="contact-value">{{ section.settings.phone_number }}</p>
+        </div>
+        {% endif %}
+        
+        <!-- Email Contact -->
+        {% if section.settings.show_email %}
+        <div class="contact-item contact-card">
+          <div class="contact-icon-wrapper">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <h4 class="contact-label">{{ section.settings.email_label }}</h4>
+          <p class="contact-value">{{ section.settings.email_address }}</p>
+        </div>
+        {% endif %}
+        
+        <!-- Address Contact -->
+        {% if section.settings.show_address %}
+        <div class="contact-item contact-card">
+          <div class="contact-icon-wrapper">
+            <i class="fas fa-map-marker-alt"></i>
+          </div>
+          <h4 class="contact-label">{{ section.settings.address_label }}</h4>
+          <p class="contact-value">{{ section.settings.address }}</p>
+        </div>
+        {% endif %}
+        
+        <!-- Hours Contact -->
+        {% if section.settings.show_hours %}
+        <div class="contact-item contact-card">
+          <div class="contact-icon-wrapper">
+            <i class="fas fa-clock"></i>
+          </div>
+          <h4 class="contact-label">{{ section.settings.hours_label }}</h4>
+          <p class="contact-value">{{ section.settings.business_hours }}</p>
+        </div>
+        {% endif %}
+        
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Footer Main -->
+  <div class="footer-main" 
+       style="{% if section.settings.footer_bg_image %}background-image: url('{{ section.settings.footer_bg_image | img_url: '1920x' }}');{% endif %}
+              background-color: {{ section.settings.footer_bg_color }};
+              background-size: cover;
+              background-position: center;
+              position: relative;
+              padding: {{ section.settings.footer_padding_top }}px 0 {{ section.settings.footer_padding_bottom }}px;">
+    
+    <!-- Background Overlay -->
+    {% if section.settings.show_footer_overlay %}
+    <div style="position: absolute; 
+                top: 0; 
+                left: 0; 
+                right: 0; 
+                bottom: 0; 
+                background: {{ section.settings.footer_overlay_color }}; 
+                opacity: {{ section.settings.footer_overlay_opacity | divided_by: 100.0 }};
+                z-index: 1;"></div>
+    {% endif %}
+    
+    <div class="container" style="max-width: {{ section.settings.footer_max_width }}px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 2;">
+      <div class="footer-content" 
+           style="display: grid;
+                  grid-template-columns: {% if section.settings.footer_layout == 'balanced' %}1fr 2fr{% else %}1fr 1fr{% endif %};
+                  gap: {{ section.settings.footer_content_gap }}px;">
+        
+        <!-- Footer Brand Section -->
+        <div class="footer-brand" style="max-width: {{ section.settings.brand_section_max_width }}px;">
+          <!-- Logo -->
+          {% if section.settings.footer_logo %}
+          <img src="{{ section.settings.footer_logo | img_url: section.settings.footer_logo_width | append: 'x' }}" 
+               alt="{{ shop.name }}" 
+               class="footer-logo" 
+               style="width: {{ section.settings.footer_logo_width }}px;
+                      height: auto;
+                      margin-bottom: {{ section.settings.footer_logo_margin }}px;">
+          {% endif %}
+          
+          <!-- Brand Description -->
+          {% if section.settings.footer_description != blank %}
+          <p style="color: {{ section.settings.footer_description_color }};
+                    line-height: {{ section.settings.footer_description_line_height }};
+                    margin-bottom: {{ section.settings.footer_description_margin }}px;
+                    font-size: {{ section.settings.footer_description_size }}px;">
+            {{ section.settings.footer_description }}
+          </p>
+          {% endif %}
+          
+          <!-- Social Links -->
+          {% if section.settings.show_social_links %}
+          <div class="social-links" 
+               style="display: flex; 
+                      gap: {{ section.settings.social_links_gap }}px;">
+            
+            {% for block in section.blocks %}
+              {% case block.type %}
+                {% when 'social_link' %}
+                  {% if block.settings.social_url != blank %}
+                  <a href="{{ block.settings.social_url }}" 
+                     class="social-link social-link-{{ block.settings.social_platform }}"
+                     target="_blank"
+                     style="width: {{ section.settings.social_icon_size }}px;
+                            height: {{ section.settings.social_icon_size }}px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            text-decoration: none;
+                            transition: all 0.3s ease;
+                            font-size: {{ section.settings.social_icon_font_size }}px;
+                            background: {{ section.settings.social_icon_bg_color }};
+                            color: {{ section.settings.social_icon_color }};">
+                    
+                    {% case block.settings.social_platform %}
+                      {% when 'facebook' %}
+                        <i class="fab fa-facebook-f"></i>
+                      {% when 'instagram' %}
+                        <i class="fab fa-instagram"></i>
+                      {% when 'linkedin' %}
+                        <i class="fab fa-linkedin-in"></i>
+                      {% when 'youtube' %}
+                        <i class="fab fa-youtube"></i>
+                      {% when 'twitter' %}
+                        <i class="fab fa-twitter"></i>
+                      {% when 'pinterest' %>
+                        <i class="fab fa-pinterest"></i>
+                      {% when 'tiktok' %}
+                        <i class="fab fa-tiktok"></i>
+                    {% endcase %}
+                  </a>
+                  {% endif %}
+              {% endcase %}
+            {% endfor %}
+            
+          </div>
+          {% endif %}
+        </div>
+        
+        <!-- Footer Links with SHOPIFY MENU INTEGRATION -->
+        <div class="footer-links" 
+             style="display: grid;
+                    grid-template-columns: repeat({{ section.settings.footer_columns }}, 1fr);
+                    gap: {{ section.settings.footer_links_gap }}px;
+                    justify-items: {{ section.settings.footer_links_alignment }};">
+          
+          {% for block in section.blocks %}
+            {% case block.type %}
+              {% when 'menu_section' %}
+                {% if block.settings.menu != blank %}
+                <div class="footer-menu-section">
+                  <!-- Desktop View -->
+                  <div class="footer-menu-desktop">
+                    {% if block.settings.section_title != blank %}
+                    <h4 style="color: {{ section.settings.footer_section_title_color }};
+                               font-weight: {{ section.settings.footer_section_title_weight }};
+                               margin-bottom: {{ section.settings.footer_section_title_margin }}px;
+                               font-size: {{ section.settings.footer_section_title_size }}px;">
+                      {{ block.settings.section_title }}
+                    </h4>
+                    {% endif %}
+                    
+                    <ul style="list-style: none; margin: 0; padding: 0;">
+                      {% for link in linklists[block.settings.menu].links %}
+                      <li style="margin-bottom: {{ section.settings.footer_link_margin }}px;">
+                        <a href="{{ link.url }}" 
+                           style="color: {{ section.settings.footer_link_color }};
+                                  text-decoration: none;
+                                  transition: all 0.2s ease;
+                                  font-size: {{ section.settings.footer_link_size }}px;">
+                          {{ link.title }}
+                        </a>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                  
+                  <!-- Mobile Accordion View -->
+                  <div class="footer-menu-mobile">
+                    {% if block.settings.section_title != blank %}
+                    <div class="footer-accordion-header" data-accordion-trigger>
+                      <h4 style="color: {{ section.settings.footer_section_title_color }};
+                                 font-weight: {{ section.settings.footer_section_title_weight }};
+                                 margin: 0;
+                                 font-size: {{ section.settings.footer_section_title_size }}px;
+                                 cursor: pointer;
+                                 display: flex;
+                                 justify-content: center;
+                                 align-items: center;
+                                 padding: 15px 0;
+                                 gap: 10px;">
+                        {{ block.settings.section_title }}
+                        <i class="fas fa-chevron-down footer-accordion-icon" 
+                           style="color: {{ section.settings.footer_section_title_color }};
+                                  transition: transform 0.3s ease;
+                                  font-size: 14px;"></i>
+                      </h4>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="footer-accordion-content" 
+                         style="max-height: 0;
+                                overflow: hidden;
+                                transition: max-height 0.3s ease;">
+                      <ul style="list-style: none; margin: 0; padding: 0 0 15px 0; text-align: center;">
+                        {% for link in linklists[block.settings.menu].links %}
+                        <li style="margin-bottom: {{ section.settings.footer_link_margin }}px;">
+                          <a href="{{ link.url }}" 
+                             style="color: {{ section.settings.footer_link_color }};
+                                    text-decoration: none;
+                                    transition: all 0.2s ease;
+                                    font-size: {{ section.settings.footer_link_size }}px;">
+                            {{ link.title }}
+                          </a>
+                        </li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
+            {% endcase %}
+          {% endfor %}
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Footer Bottom -->
+  {% if section.settings.show_footer_bottom %}
+  <div class="footer-bottom" 
+       style="background: {{ section.settings.footer_bottom_bg_color }};
+              padding: {{ section.settings.footer_bottom_padding }}px 0;
+              border-top: {{ section.settings.footer_bottom_border_width }}px solid {{ section.settings.footer_bottom_border_color }};">
+    <div class="container" style="max-width: {{ section.settings.footer_bottom_max_width }}px; margin: 0 auto; padding: 0 20px;">
+      <div class="footer-bottom-content" 
+           style="display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  font-size: {{ section.settings.footer_bottom_text_size }}px;
+                  flex-wrap: wrap;
+                  gap: 20px;">
+        
+        <!-- Copyright Text - LEFT SIDE -->
+        <div class="copyright-section" style="flex: 1;">
+          <p style="color: {{ section.settings.footer_bottom_text_color }}; margin: 0;">
+            {% if section.settings.copyright_text != blank %}
+              {{ section.settings.copyright_text }}
+            {% else %}
+              © {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.
+            {% endif %}
+          </p>
+        </div>
+        
+        <!-- Right Side: Policy Links & Payment Methods -->
+        <div class="right-section" style="display: flex; align-items: center; gap: 30px;">
+          
+          <!-- Policy Links -->
+          {% if section.settings.show_policy_links %}
+          <div class="policy-links" style="display: flex; align-items: center; gap: 15px;">
+            {% if section.settings.privacy_policy_url != blank %}
+            <a href="{{ section.settings.privacy_policy_url }}" 
+               style="color: {{ section.settings.footer_bottom_link_color }}; text-decoration: none;">
+              {{ section.settings.privacy_policy_text | default: 'Privacy Policy' }}
+            </a>
+            {% endif %}
+            
+            {% if section.settings.privacy_policy_url != blank and section.settings.terms_service_url != blank %}
+            <span style="color: {{ section.settings.footer_bottom_text_color }};">|</span>
+            {% endif %}
+            
+            {% if section.settings.terms_service_url != blank %}
+            <a href="{{ section.settings.terms_service_url }}" 
+               style="color: {{ section.settings.footer_bottom_link_color }}; text-decoration: none;">
+              {{ section.settings.terms_service_text | default: 'Terms of Service' }}
+            </a>
+            {% endif %}
+          </div>
+          {% endif %}
+          
+          <!-- Payment Methods -->
+          {% if section.settings.show_payment_methods %}
+          <div class="payment-methods" 
+               style="display: flex; 
+                      gap: {{ section.settings.payment_methods_gap }}px;
+                      align-items: center;">
+            
+            {% if section.settings.show_visa %}
+            <i class="fab fa-cc-visa" style="font-size: {{ section.settings.payment_icon_size }}px; color: {{ section.settings.payment_icon_color }};"></i>
+            {% endif %}
+            
+            {% if section.settings.show_mastercard %}
+            <i class="fab fa-cc-mastercard" style="font-size: {{ section.settings.payment_icon_size }}px; color: {{ section.settings.payment_icon_color }};"></i>
+            {% endif %}
+            
+            {% if section.settings.show_amex %}
+            <i class="fab fa-cc-amex" style="font-size: {{ section.settings.payment_icon_size }}px; color: {{ section.settings.payment_icon_color }};"></i>
+            {% endif %}
+            
+            {% if section.settings.show_paypal %}
+            <i class="fab fa-cc-paypal" style="font-size: {{ section.settings.payment_icon_size }}px; color: {{ section.settings.payment_icon_color }};"></i>
+            {% endif %}
+            
+            {% if section.settings.show_apple_pay %}
+            <i class="fab fa-apple-pay" style="font-size: {{ section.settings.payment_icon_size }}px; color: {{ section.settings.payment_icon_color }};"></i>
+            {% endif %}
+            
+            {% if section.settings.show_google_pay %}
+            <i class="fab fa-google-pay" style="font-size: {{ section.settings.payment_icon_size }}px; color: {{ section.settings.payment_icon_color }};"></i>
+            {% endif %}
+            
+          </div>
+          {% endif %}
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</footer>
+
+<!-- Custom Footer Styles & JavaScript -->
+<style>
+  /* Contact Bar Card Design */
+  .custom-footer .contact-item.contact-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 15px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    min-height: 220px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .custom-footer .contact-item.contact-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .custom-footer .contact-icon-wrapper {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+  }
+
+  .custom-footer .contact-item.contact-card:hover .contact-icon-wrapper {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+  }
+
+  .custom-footer .contact-icon-wrapper i {
+    font-size: 28px;
+    color: #ffffff;
+  }
+
+  .custom-footer .contact-card .contact-label {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: 0.5px;
+    text-transform: capitalize;
+  }
+
+  .custom-footer .contact-card .contact-value {
+    font-size: 15px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* Mobile Responsive for Contact Cards */
+  @media (max-width: 1200px) {
+    .custom-footer .contact-items {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 25px !important;
+      max-width: 600px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .custom-footer .contact-items {
+      grid-template-columns: 1fr !important;
+      gap: 20px !important;
+      max-width: 400px;
+    }
+
+    .custom-footer .contact-item.contact-card {
+      padding: 35px 25px;
+      min-height: 200px;
+    }
+
+    .custom-footer .contact-icon-wrapper {
+      width: 60px;
+      height: 60px;
+    }
+
+    .custom-footer .contact-icon-wrapper i {
+      font-size: 24px;
+    }
+
+    .custom-footer .contact-card .contact-label {
+      font-size: 16px;
+    }
+
+    .custom-footer .contact-card .contact-value {
+      font-size: 14px;
+    }
+  }
+
+  /* Hover Effects */
+  .custom-footer .social-link {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .custom-footer .social-link:hover {
+    background: {{ section.settings.social_icon_hover_bg_color | default: '#ff6b6b' }} !important;
+    color: {{ section.settings.social_icon_hover_color | default: '#ffffff' }} !important;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+  }
+
+  .custom-footer .footer-links a:hover {
+    color: {{ section.settings.footer_link_hover_color | default: '#ff6b6b' }};
+    padding-left: 5px;
+  }
+
+  .custom-footer .payment-methods i:hover {
+    color: {{ section.settings.footer_link_hover_color | default: '#ff6b6b' }};
+  }
+
+  /* Mobile Accordion Styles */
+  .footer-menu-mobile {
+    display: none;
+  }
+
+  .footer-menu-desktop {
+    display: block;
+  }
+
+  .footer-accordion-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .footer-accordion-header.active .footer-accordion-icon {
+    transform: rotate(180deg);
+  }
+
+  /* Contact Item Animation */
+  .contact-item {
+    transition: transform 0.3s ease;
+  }
+
+  .contact-item:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Newsletter Specific Styles */
+  .newsletter {
+    position: relative;
+    z-index: 2;
+  }
+
+  .newsletter .form-group {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  .newsletter .subscribe-btn:hover {
+    transform: scale(1.05);
+  }
+
+  .newsletter .email-input::placeholder {
+    color: rgba(45, 55, 72, 0.6);
+  }
+
+  /* Mobile Responsive Design */
+  @media (max-width: 1200px) {
+    .custom-footer .container {
+      max-width: 95vw !important;
+    }
+    
+    .custom-footer .contact-items {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 30px !important;
+    }
+
+    .custom-footer .footer-content {
+      grid-template-columns: 1fr !important;
+      gap: 40px !important;
+    }
+    
+    .custom-footer .footer-links {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 30px !important;
+    }
+  }
+
+  @media (max-width: 992px) {
+    .custom-footer .contact-items {
+      grid-template-columns: 1fr !important;
+      gap: 25px !important;
+    }
+
+    /* Switch to accordion on mobile */
+    .footer-menu-mobile {
+      display: block !important;
+    }
+
+    .footer-menu-desktop {
+      display: none !important;
+    }
+
+    .custom-footer .footer-links {
+      grid-template-columns: 1fr !important;
+      gap: 0px !important;
+    }
+
+    .footer-menu-mobile .footer-accordion-header {
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin: 0 auto;
+      max-width: 300px;
+    }
+    
+    .footer-menu-mobile .footer-accordion-content {
+      text-align: center;
+      margin: 0 auto;
+      max-width: 300px;
+    }
+    
+    .footer-accordion-icon {
+      margin-left: 10px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .custom-footer .footer-content {
+      text-align: center !important;
+    }
+    
+    .custom-footer .footer-brand {
+      max-width: 100% !important;
+    }
+    
+    .custom-footer .footer-bottom-content {
+      flex-direction: column !important;
+      gap: 20px !important;
+      text-align: center !important;
+    }
+
+    .custom-footer .footer-bottom-content .right-section {
+      flex-direction: column !important;
+      gap: 15px !important;
+    }
+
+    .custom-footer .contact-bar h3 {
+      font-size: 24px !important;
+    }
+
+    .custom-footer .social-links {
+      justify-content: center !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .custom-footer .contact-items {
+      grid-template-columns: 1fr !important;
+      gap: 20px !important;
+    }
+
+    .custom-footer .contact-item {
+      flex-direction: column !important;
+      text-align: center !important;
+      gap: 8px !important;
+    }
+
+    .custom-footer .payment-methods {
+      flex-wrap: wrap !important;
+      justify-content: center !important;
+    }
+
+    .custom-footer .right-section {
+      width: 100% !important;
+    }
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Mobile Footer Accordion Functionality
+  const accordionHeaders = document.querySelectorAll('[data-accordion-trigger]');
+  
+  accordionHeaders.forEach(header => {
+    header.addEventListener('click', function() {
+      const content = this.nextElementSibling;
+      const icon = this.querySelector('.footer-accordion-icon');
+      
+      // Toggle active class
+      this.classList.toggle('active');
+      
+      // Toggle content
+      if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+        content.style.maxHeight = '0px';
+        icon.style.transform = 'rotate(0deg)';
+      } else {
+        content.style.maxHeight = content.scrollHeight + 'px';
+        icon.style.transform = 'rotate(180deg)';
+      }
+    });
+  });
+
+  // Enhanced Contact Item Interactions
+  const contactItems = document.querySelectorAll('.contact-item');
+  contactItems.forEach(item => {
+    item.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-2px)';
+    });
+    
+    item.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0)';
+    });
+  });
+
+  // Social Links Enhanced Hover
+  const socialLinks = document.querySelectorAll('.social-link');
+  socialLinks.forEach(link => {
+    link.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-3px)';
+      this.style.boxShadow = '0 8px 20px rgba(255, 107, 107, 0.3)';
+    });
+    
+    link.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0)';
+      this.style.boxShadow = 'none';
+    });
+  });
+});
+</script>
+
+{% schema %}
+{
+  "name": "Custom Footer",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Newsletter Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_newsletter",
+      "label": "Show Newsletter Section",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "newsletter_title",
+      "label": "Newsletter Title",
+      "default": "Stay Updated with Latest Deals"
+    },
+    {
+      "type": "textarea",
+      "id": "newsletter_description",
+      "label": "Newsletter Description",
+      "default": "Get exclusive offers, new product alerts, and industry insights delivered to your inbox"
+    },
+    {
+      "type": "select",
+      "id": "newsletter_bg_type",
+      "label": "Newsletter Background Type",
+      "options": [
+        {
+          "value": "solid",
+          "label": "Solid Color"
+        },
+        {
+          "value": "gradient",
+          "label": "Gradient"
+        }
+      ],
+      "default": "gradient"
+    },
+    {
+      "type": "color",
+      "id": "newsletter_bg_color",
+      "label": "Newsletter Background Color",
+      "default": "#8b1538"
+    },
+    {
+      "type": "color",
+      "id": "newsletter_bg_color_2",
+      "label": "Newsletter Gradient Color 2",
+      "default": "#ff6b6b"
+    },
+    {
+      "type": "color",
+      "id": "newsletter_text_color",
+      "label": "Newsletter Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "newsletter_title_color",
+      "label": "Newsletter Title Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "newsletter_description_color",
+      "label": "Newsletter Description Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "newsletter_padding_top",
+      "label": "Newsletter Top Padding",
+      "min": 40,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "newsletter_padding_bottom",
+      "label": "Newsletter Bottom Padding",
+      "min": 40,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "newsletter_max_width",
+      "label": "Newsletter Max Width",
+      "min": 800,
+      "max": 1400,
+      "step": 20,
+      "unit": "px",
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "newsletter_title_size",
+      "label": "Newsletter Title Size",
+      "min": 24,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "newsletter_title_weight",
+      "label": "Newsletter Title Weight",
+      "min": 300,
+      "max": 900,
+      "step": 100,
+      "default": 700
+    },
+    {
+      "type": "range",
+      "id": "newsletter_title_margin",
+      "label": "Newsletter Title Bottom Margin",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "newsletter_description_size",
+      "label": "Newsletter Description Size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "newsletter_description_opacity",
+      "label": "Newsletter Description Opacity",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 90
+    },
+    {
+      "type": "range",
+      "id": "newsletter_description_margin",
+      "label": "Newsletter Description Bottom Margin",
+      "min": 20,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "newsletter_form_width",
+      "label": "Newsletter Form Width",
+      "min": 300,
+      "max": 600,
+      "step": 20,
+      "unit": "px",
+      "default": 500
+    },
+    {
+      "type": "range",
+      "id": "newsletter_border_radius",
+      "label": "Newsletter Form Border Radius",
+      "min": 0,
+      "max": 25,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "newsletter_input_padding",
+      "label": "Newsletter Input Padding",
+      "min": 12,
+      "max": 25,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "newsletter_input_size",
+      "label": "Newsletter Input Font Size",
+      "min": 14,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "newsletter_input_text_color",
+      "label": "Newsletter Input Text Color",
+      "default": "#2d3748"
+    },
+    {
+      "type": "color",
+      "id": "newsletter_input_bg_color",
+      "label": "Newsletter Input Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "newsletter_btn_bg_type",
+      "label": "Newsletter Button Background Type",
+      "options": [
+        {
+          "value": "solid",
+          "label": "Solid Color"
+        },
+        {
+          "value": "gradient",
+          "label": "Gradient"
+        }
+      ],
+      "default": "gradient"
+    },
+    {
+      "type": "color",
+      "id": "newsletter_btn_bg_color",
+      "label": "Newsletter Button Background Color",
+      "default": "#ff6b6b"
+    },
+    {
+      "type": "color",
+      "id": "newsletter_btn_bg_color_2",
+      "label": "Newsletter Button Gradient Color 2",
+      "default": "#e85a4f"
+    },
+    {
+      "type": "color",
+      "id": "newsletter_btn_text_color",
+      "label": "Newsletter Button Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "newsletter_btn_weight",
+      "label": "Newsletter Button Font Weight",
+      "min": 400,
+      "max": 900,
+      "step": 100,
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "newsletter_btn_size",
+      "label": "Newsletter Button Font Size",
+      "min": 14,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "text",
+      "id": "newsletter_btn_text",
+      "label": "Newsletter Button Text",
+      "default": "Subscribe"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_placeholder",
+      "label": "Newsletter Email Placeholder",
+      "default": "Enter your email address"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_note",
+      "label": "Newsletter Note",
+      "default": "Join 5,000+ restaurant owners who trust our updates"
+    },
+    {
+      "type": "color",
+      "id": "newsletter_note_color",
+      "label": "Newsletter Note Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "newsletter_note_size",
+      "label": "Newsletter Note Font Size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "newsletter_note_opacity",
+      "label": "Newsletter Note Opacity",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "newsletter_note_margin",
+      "label": "Newsletter Note Top Margin",
+      "min": 10,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "Contact Bar Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_contact_bar",
+      "label": "Show Contact Bar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "contact_bar_title",
+      "label": "Contact Bar Title",
+      "default": "Get In Touch"
+    },
+    {
+      "type": "select",
+      "id": "contact_bar_bg_type",
+      "label": "Contact Bar Background Type",
+      "options": [
+        {
+          "value": "solid",
+          "label": "Solid Color"
+        },
+        {
+          "value": "gradient",
+          "label": "Gradient"
+        }
+      ],
+      "default": "gradient"
+    },
+    {
+      "type": "color",
+      "id": "contact_bar_bg_color",
+      "label": "Contact Bar Background Color",
+      "default": "#1a365d"
+    },
+    {
+      "type": "color",
+      "id": "contact_bar_bg_color_2",
+      "label": "Contact Bar Gradient Color 2",
+      "default": "#2d5a87"
+    },
+    {
+      "type": "range",
+      "id": "contact_bar_padding_top",
+      "label": "Contact Bar Top Padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "contact_bar_padding_bottom",
+      "label": "Contact Bar Bottom Padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "contact_bar_max_width",
+      "label": "Contact Bar Max Width",
+      "min": 1000,
+      "max": 1920,
+      "step": 20,
+      "unit": "px",
+      "default": 1400
+    },
+    {
+      "type": "select",
+      "id": "contact_bar_title_font",
+      "label": "Contact Bar Title Font",
+      "options": [
+        {
+          "value": "Playfair Display",
+          "label": "Playfair Display"
+        },
+        {
+          "value": "Inter",
+          "label": "Inter"
+        },
+        {
+          "value": "Georgia",
+          "label": "Georgia"
+        },
+        {
+          "value": "Arial",
+          "label": "Arial"
+        }
+      ],
+      "default": "Playfair Display"
+    },
+    {
+      "type": "range",
+      "id": "contact_bar_title_size",
+      "label": "Contact Bar Title Size",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "contact_bar_title_weight",
+      "label": "Contact Bar Title Weight",
+      "min": 300,
+      "max": 900,
+      "step": 100,
+      "default": 700
+    },
+    {
+      "type": "color",
+      "id": "contact_bar_title_color",
+      "label": "Contact Bar Title Color",
+      "default": "#d4af37"
+    },
+    {
+      "type": "range",
+      "id": "contact_bar_title_margin",
+      "label": "Contact Bar Title Bottom Margin",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "contact_items_columns",
+      "label": "Contact Items Columns (Desktop)",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "contact_items_gap",
+      "label": "Contact Items Gap",
+      "min": 10,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "contact_icon_size",
+      "label": "Contact Icon Size",
+      "min": 16,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "contact_icon_color",
+      "label": "Contact Icon Color",
+      "default": "#ff6b6b"
+    },
+    {
+      "type": "range",
+      "id": "contact_label_size",
+      "label": "Contact Label Size",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "contact_label_weight",
+      "label": "Contact Label Weight",
+      "min": 300,
+      "max": 900,
+      "step": 100,
+      "default": 600
+    },
+    {
+      "type": "color",
+      "id": "contact_label_color",
+      "label": "Contact Label Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "contact_value_size",
+      "label": "Contact Value Size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "contact_value_weight",
+      "label": "Contact Value Weight",
+      "min": 300,
+      "max": 900,
+      "step": 100,
+      "default": 500
+    },
+    {
+      "type": "color",
+      "id": "contact_value_color",
+      "label": "Contact Value Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Contact Information"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_phone",
+      "label": "Show Phone",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "phone_label",
+      "label": "Phone Label",
+      "default": "Call Us"
+    },
+    {
+      "type": "text",
+      "id": "phone_number",
+      "label": "Phone Number",
+      "default": "(408) 673-9999"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_email",
+      "label": "Show Email",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "email_label",
+      "label": "Email Label",
+      "default": "Email"
+    },
+    {
+      "type": "text",
+      "id": "email_address",
+      "label": "Email Address",
+      "default": "sales@celebratefestivalinc.com"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_address",
+      "label": "Show Address",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "address_label",
+      "label": "Address Label",
+      "default": "Address"
+    },
+    {
+      "type": "text",
+      "id": "address",
+      "label": "Address",
+      "default": "235 Whitney Pl, Fremont, CA 94539"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_hours",
+      "label": "Show Business Hours",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "hours_label",
+      "label": "Hours Label",
+      "default": "Hours"
+    },
+    {
+      "type": "text",
+      "id": "business_hours",
+      "label": "Business Hours",
+      "default": "Mon-Fri: 9AM-6PM"
+    },
+    {
+      "type": "header",
+      "content": "Footer Main Settings"
+    },
+    {
+      "type": "image_picker",
+      "id": "footer_bg_image",
+      "label": "Footer Background Image"
+    },
+    {
+      "type": "color",
+      "id": "footer_bg_color",
+      "label": "Footer Background Color",
+      "default": "#1b2b47"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_footer_overlay",
+      "label": "Show Background Overlay",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "footer_overlay_color",
+      "label": "Footer Overlay Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "footer_overlay_opacity",
+      "label": "Footer Overlay Opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "footer_padding_top",
+      "label": "Footer Top Padding",
+      "min": 20,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "footer_padding_bottom",
+      "label": "Footer Bottom Padding",
+      "min": 20,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "footer_max_width",
+      "label": "Footer Max Width",
+      "min": 1000,
+      "max": 1920,
+      "step": 20,
+      "unit": "px",
+      "default": 1400
+    },
+    {
+      "type": "select",
+      "id": "footer_layout",
+      "label": "Footer Layout",
+      "options": [
+        {
+          "value": "balanced",
+          "label": "Balanced (1fr 2fr)"
+        },
+        {
+          "value": "equal",
+          "label": "Equal Columns"
+        }
+      ],
+      "default": "balanced"
+    },
+    {
+      "type": "range",
+      "id": "footer_content_gap",
+      "label": "Footer Content Gap",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Brand Section"
+    },
+    {
+      "type": "image_picker",
+      "id": "footer_logo",
+      "label": "Footer Logo"
+    },
+    {
+      "type": "range",
+      "id": "footer_logo_width",
+      "label": "Footer Logo Width",
+      "min": 100,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "default": 200
+    },
+    {
+      "type": "range",
+      "id": "footer_logo_margin",
+      "label": "Footer Logo Bottom Margin",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 25
+    },
+    {
+      "type": "range",
+      "id": "brand_section_max_width",
+      "label": "Brand Section Max Width",
+      "min": 200,
+      "max": 500,
+      "step": 10,
+      "unit": "px",
+      "default": 350
+    },
+    {
+      "type": "textarea",
+      "id": "footer_description",
+      "label": "Footer Description",
+      "default": "Your trusted partner for commercial kitchen equipment. Serving restaurants nationwide with premium products and expert support."
+    },
+    {
+      "type": "color",
+      "id": "footer_description_color",
+      "label": "Footer Description Color",
+      "default": "rgba(255, 255, 255, 0.8)"
+    },
+    {
+      "type": "range",
+      "id": "footer_description_size",
+      "label": "Footer Description Size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "footer_description_line_height",
+      "label": "Footer Description Line Height",
+      "min": 1.2,
+      "max": 2.0,
+      "step": 0.1,
+      "default": 1.7
+    },
+    {
+      "type": "range",
+      "id": "footer_description_margin",
+      "label": "Footer Description Bottom Margin",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Social Media Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social_links",
+      "label": "Show Social Links",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "social_links_gap",
+      "label": "Social Links Gap",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "social_icon_size",
+      "label": "Social Icon Container Size",
+      "min": 30,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 45
+    },
+    {
+      "type": "range",
+      "id": "social_icon_font_size",
+      "label": "Social Icon Font Size",
+      "min": 14,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "color",
+      "id": "social_icon_bg_color",
+      "label": "Social Icon Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "social_icon_color",
+      "label": "Social Icon Color",
+      "default": "#1a365d"
+    },
+    {
+      "type": "color",
+      "id": "social_icon_hover_bg_color",
+      "label": "Social Icon Hover Background Color",
+      "default": "#ff6b6b"
+    },
+    {
+      "type": "color",
+      "id": "social_icon_hover_color",
+      "label": "Social Icon Hover Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Footer Links Settings"
+    },
+    {
+      "type": "range",
+      "id": "footer_columns",
+      "label": "Footer Link Columns (Desktop)",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "footer_links_gap",
+      "label": "Footer Links Gap",
+      "min": 20,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "select",
+      "id": "footer_links_alignment",
+      "label": "Footer Links Alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "end",
+          "label": "Right"
+        }
+      ],
+      "default": "end"
+    },
+    {
+      "type": "color",
+      "id": "footer_section_title_color",
+      "label": "Section Title Color",
+      "default": "#ff6b6b"
+    },
+    {
+      "type": "range",
+      "id": "footer_section_title_size",
+      "label": "Section Title Size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "footer_section_title_weight",
+      "label": "Section Title Weight",
+      "min": 300,
+      "max": 900,
+      "step": 100,
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "footer_section_title_margin",
+      "label": "Section Title Bottom Margin",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "footer_link_color",
+      "label": "Footer Link Color",
+      "default": "rgba(255, 255, 255, 0.8)"
+    },
+    {
+      "type": "color",
+      "id": "footer_link_hover_color",
+      "label": "Footer Link Hover Color",
+      "default": "#ff6b6b"
+    },
+    {
+      "type": "range",
+      "id": "footer_link_size",
+      "label": "Footer Link Size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "footer_link_margin",
+      "label": "Footer Link Bottom Margin",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Footer Bottom Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_footer_bottom",
+      "label": "Show Footer Bottom",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "footer_bottom_bg_color",
+      "label": "Footer Bottom Background Color",
+      "default": "#070c14"
+    },
+    {
+      "type": "range",
+      "id": "footer_bottom_padding",
+      "label": "Footer Bottom Padding",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 25
+    },
+    {
+      "type": "range",
+      "id": "footer_bottom_border_width",
+      "label": "Footer Bottom Border Width",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "color",
+      "id": "footer_bottom_border_color",
+      "label": "Footer Bottom Border Color",
+      "default": "rgba(255, 255, 255, 0.1)"
+    },
+    {
+      "type": "range",
+      "id": "footer_bottom_max_width",
+      "label": "Footer Bottom Max Width",
+      "min": 1000,
+      "max": 1920,
+      "step": 20,
+      "unit": "px",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "footer_bottom_text_size",
+      "label": "Footer Bottom Text Size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "footer_bottom_text_color",
+      "label": "Footer Bottom Text Color",
+      "default": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "type": "color",
+      "id": "footer_bottom_link_color",
+      "label": "Footer Bottom Link Color",
+      "default": "#ff6b6b"
+    },
+    {
+      "type": "header",
+      "content": "Copyright & Legal"
+    },
+    {
+      "type": "text",
+      "id": "copyright_text",
+      "label": "Copyright Text",
+      "info": "Leave blank for auto-generated copyright"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_policy_links",
+      "label": "Show Policy Links",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "privacy_policy_text",
+      "label": "Privacy Policy Text",
+      "default": "Privacy Policy"
+    },
+    {
+      "type": "url",
+      "id": "privacy_policy_url",
+      "label": "Privacy Policy URL"
+    },
+    {
+      "type": "text",
+      "id": "terms_service_text",
+      "label": "Terms of Service Text",
+      "default": "Terms of Service"
+    },
+    {
+      "type": "url",
+      "id": "terms_service_url",
+      "label": "Terms of Service URL"
+    },
+    {
+      "type": "header",
+      "content": "Payment Methods"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_methods",
+      "label": "Show Payment Methods",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "payment_methods_gap",
+      "label": "Payment Methods Gap",
+      "min": 5,
+      "max": 25,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "payment_icon_size",
+      "label": "Payment Icon Size",
+      "min": 16,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "payment_icon_color",
+      "label": "Payment Icon Color",
+      "default": "rgba(255, 255, 255, 0.6)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_visa",
+      "label": "Show Visa",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_mastercard",
+      "label": "Show Mastercard",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_amex",
+      "label": "Show American Express",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_paypal",
+      "label": "Show PayPal",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_apple_pay",
+      "label": "Show Apple Pay",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_google_pay",
+      "label": "Show Google Pay",
+      "default": false
+    }
+  ],
+  "blocks": [
+    {
+      "type": "social_link",
+      "name": "Social Link",
+      "settings": [
+        {
+          "type": "select",
+          "id": "social_platform",
+          "label": "Social Platform",
+          "options": [
+            {
+              "value": "facebook",
+              "label": "Facebook"
+            },
+            {
+              "value": "instagram",
+              "label": "Instagram"
+            },
+            {
+              "value": "linkedin",
+              "label": "LinkedIn"
+            },
+            {
+              "value": "youtube",
+              "label": "YouTube"
+            },
+            {
+              "value": "twitter",
+              "label": "Twitter"
+            },
+            {
+              "value": "pinterest",
+              "label": "Pinterest"
+            },
+            {
+              "value": "tiktok",
+              "label": "TikTok"
+            }
+          ],
+          "default": "facebook"
+        },
+        {
+          "type": "url",
+          "id": "social_url",
+          "label": "Social URL"
+        }
+      ]
+    },
+    {
+      "type": "menu_section",
+      "name": "Footer Menu Section",
+      "settings": [
+        {
+          "type": "text",
+          "id": "section_title",
+          "label": "Section Title",
+          "default": "Quick Links"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Select Menu",
+          "info": "Choose a menu from Navigation settings"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Footer",
+      "blocks": [
+        {
+          "type": "social_link",
+          "settings": {
+            "social_platform": "facebook",
+            "social_url": ""
+          }
+        },
+        {
+          "type": "social_link",
+          "settings": {
+            "social_platform": "instagram",
+            "social_url": ""
+          }
+        },
+        {
+          "type": "social_link",
+          "settings": {
+            "social_platform": "linkedin",
+            "social_url": ""
+          }
+        },
+        {
+          "type": "social_link",
+          "settings": {
+            "social_platform": "youtube",
+            "social_url": ""
+          }
+        },
+        {
+          "type": "menu_section",
+          "settings": {
+            "section_title": "Equipment Categories"
+          }
+        },
+        {
+          "type": "menu_section",
+          "settings": {
+            "section_title": "Popular Brands"
+          }
+        },
+        {
+          "type": "menu_section",
+          "settings": {
+            "section_title": "Customer Support"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

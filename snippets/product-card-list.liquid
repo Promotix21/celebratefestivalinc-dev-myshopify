@@ -1,0 +1,474 @@
+{%- comment -%}
+  Renders a product card for list view
+  
+  Accepts:
+  - product: {Object} Product object
+  - show_vendor: {Boolean} Show brand/vendor
+  - show_rating: {Boolean} Show product rating
+  
+  Usage:
+  {% render 'product-card-list', product: product, show_vendor: true %}
+{%- endcomment -%}
+
+{%- liquid
+  assign show_vendor = show_vendor | default: true
+  assign show_rating = show_rating | default: false
+  
+  assign on_sale = false
+  if product.compare_at_price > product.price
+    assign on_sale = true
+  endif
+  
+  assign call_for_price = false
+  if product.metafields.custom.call_for_price == true or product.tags contains 'call-for-price'
+    assign call_for_price = true
+  endif
+  
+  assign has_free_shipping = false
+  if product.tags contains 'free-shipping'
+    assign has_free_shipping = true
+  endif
+-%}
+
+<div class="product-card list-item" data-product-id="{{ product.id }}">
+  
+  <!-- Product Image -->
+  <a href="{{ product.url }}" class="product-image-link">
+    <div class="product-image-list">
+      {%- if product.featured_media -%}
+        <img
+          src="{{ product.featured_media | image_url: width: 300 }}"
+          alt="{{ product.featured_media.alt | escape }}"
+          loading="lazy"
+          width="200"
+          height="200"
+        >
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+      
+      <!-- Badges on Image -->
+      <div class="product-badges-list">
+        {%- if has_free_shipping -%}
+          <span class="badge free-shipping-badge">Free Shipping</span>
+        {%- endif -%}
+        {%- if on_sale -%}
+          {%- assign savings_percent = product.compare_at_price | minus: product.price | times: 100.0 | divided_by: product.compare_at_price | round -%}
+          <span class="badge sale-badge">{{ savings_percent }}% OFF</span>
+        {%- endif -%}
+      </div>
+    </div>
+  </a>
+
+  <!-- Product Info -->
+  <div class="product-info-list">
+    <div class="product-header-list">
+      {%- if show_vendor and product.vendor != blank -%}
+        <div class="product-brand">{{ product.vendor }}</div>
+      {%- endif -%}
+
+      <a href="{{ product.url }}" class="product-title-link">
+        <h3 class="product-title">{{ product.title }}</h3>
+      </a>
+
+      {%- if show_rating -%}
+        <div class="product-rating">
+          <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+        </div>
+      {%- endif -%}
+    </div>
+
+    <!-- Product Description -->
+    {%- if product.description != blank -%}
+      <div class="product-description-list">
+        {{ product.description | strip_html | truncatewords: 30 }}
+      </div>
+    {%- endif -%}
+
+    <!-- Product Features/Specs -->
+    {%- if product.metafields.custom.key_features != blank -%}
+      <div class="product-specs-list">
+        <ul>
+          {%- assign features = product.metafields.custom.key_features | split: ',' -%}
+          {%- for feature in features limit: 4 -%}
+            <li><i class="fas fa-check-circle"></i> {{ feature | strip }}</li>
+          {%- endfor -%}
+        </ul>
+      </div>
+    {%- endif -%}
+
+    <!-- Additional Info Tags -->
+    <div class="product-tags-list">
+      {%- if product.tags contains 'energy-star' -%}
+        <span class="tag-badge"><i class="fas fa-leaf"></i> Energy Star</span>
+      {%- endif -%}
+      {%- if product.tags contains 'led-lighting' -%}
+        <span class="tag-badge"><i class="fas fa-lightbulb"></i> LED Lighting</span>
+      {%- endif -%}
+      {%- if product.tags contains 'digital-controls' -%}
+        <span class="tag-badge"><i class="fas fa-microchip"></i> Digital Controls</span>
+      {%- endif -%}
+      {%- if product.tags contains 'nsf-certified' -%}
+        <span class="tag-badge"><i class="fas fa-certificate"></i> NSF Certified</span>
+      {%- endif -%}
+    </div>
+  </div>
+
+  <!-- Product Actions Column -->
+  <div class="product-actions-list">
+    <!-- Pricing -->
+    {%- if call_for_price -%}
+      <div class="contact-price-list">
+        <i class="fas fa-phone"></i>
+        <span>Call for Best Price</span>
+      </div>
+    {%- else -%}
+      <div class="product-pricing-list">
+        <div class="price-main">
+          <span class="current-price">{{ product.price | money }}</span>
+          {%- if on_sale -%}
+            <span class="original-price">{{ product.compare_at_price | money }}</span>
+          {%- endif -%}
+        </div>
+        {%- if on_sale -%}
+          {%- assign savings = product.compare_at_price | minus: product.price -%}
+          <div class="savings-text">You save {{ savings | money }}</div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <!-- Stock Status -->
+    {%- assign total_inventory = 0 -%}
+    {%- for variant in product.variants -%}
+      {%- assign total_inventory = total_inventory | plus: variant.inventory_quantity -%}
+    {%- endfor -%}
+    
+    {%- if product.available -%}
+      {%- if total_inventory > 0 and total_inventory <= 10 -%}
+        <div class="stock-status low-stock">
+          <i class="fas fa-exclamation-circle"></i>
+          Only {{ total_inventory }} left in stock
+        </div>
+      {%- elsif total_inventory > 10 -%}
+        <div class="stock-status in-stock">
+          <i class="fas fa-check-circle"></i>
+          In Stock
+        </div>
+      {%- endif -%}
+    {%- else -%}
+      <div class="stock-status out-of-stock">
+        <i class="fas fa-times-circle"></i>
+        Out of Stock
+      </div>
+    {%- endif -%}
+
+    <!-- Action Buttons -->
+    <div class="buttons-group-list">
+      {%- if call_for_price -%}
+        <a href="{{ product.url }}" class="btn btn-primary btn-block">
+          <i class="fas fa-eye"></i>
+          View Details
+        </a>
+      {%- elsif product.available -%}
+        {%- if product.variants.size == 1 -%}
+          <button 
+            type="button" 
+            class="btn btn-primary btn-block quick-add-btn"
+            data-product-id="{{ product.id }}"
+            data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+          >
+            <i class="fas fa-shopping-cart"></i>
+            Add to Cart
+          </button>
+        {%- else -%}
+          <a href="{{ product.url }}" class="btn btn-primary btn-block">
+            <i class="fas fa-eye"></i>
+            Select Options
+          </a>
+        {%- endif -%}
+      {%- else -%}
+        <button class="btn btn-primary btn-block btn-sold-out" disabled>
+          <i class="fas fa-times-circle"></i>
+          Sold Out
+        </button>
+      {%- endif -%}
+
+      <div class="secondary-actions-list">
+        <button 
+          class="btn btn-secondary btn-icon wishlist-btn" 
+          data-product-id="{{ product.id }}"
+          aria-label="Add to wishlist"
+        >
+          <i class="fas fa-heart"></i>
+        </button>
+        <a 
+          href="{{ product.url }}" 
+          class="btn btn-secondary btn-icon"
+          aria-label="View product"
+        >
+          <i class="fas fa-eye"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .product-card.list-item {
+    display: grid;
+    grid-template-columns: 200px 1fr auto;
+    gap: 30px;
+    align-items: start;
+    padding: 20px;
+    background: white;
+    border-radius: var(--border-radius-large);
+    box-shadow: var(--shadow-light);
+    transition: var(--transition-smooth);
+  }
+
+  .product-card.list-item:hover {
+    box-shadow: var(--shadow-medium);
+  }
+
+  .product-image-list {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    background: #f5f5f5;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+  }
+
+  .product-image-list img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 10px;
+  }
+
+  .product-badges-list {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .product-info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .product-header-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .product-description-list {
+    color: var(--text-light);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .product-specs-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .product-specs-list li {
+    font-size: 13px;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .product-specs-list i {
+    color: var(--success-green);
+    font-size: 12px;
+  }
+
+  .product-tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tag-badge {
+    background: var(--neutral-light);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .product-actions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-width: 200px;
+    align-items: flex-end;
+  }
+
+  .product-pricing-list {
+    text-align: right;
+  }
+
+  .price-main {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .price-main .current-price {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-coral);
+  }
+
+  .price-main .original-price {
+    font-size: 1rem;
+    color: var(--text-light);
+    text-decoration: line-through;
+  }
+
+  .savings-text {
+    font-size: 12px;
+    color: var(--success-green);
+    font-weight: 600;
+    margin-top: 5px;
+  }
+
+  .contact-price-list {
+    background: var(--neutral-light);
+    padding: 15px 20px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    border: 2px solid var(--primary-coral);
+    font-weight: 600;
+    color: var(--primary-navy);
+  }
+
+  .contact-price-list i {
+    display: block;
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: var(--primary-coral);
+  }
+
+  .stock-status {
+    padding: 8px 15px;
+    border-radius: var(--border-radius);
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .stock-status.in-stock {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .stock-status.low-stock {
+    background: #fed7aa;
+    color: #9a3412;
+  }
+
+  .stock-status.out-of-stock {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .buttons-group-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .btn-block {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .secondary-actions-list {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .btn-icon {
+    flex: 1;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media (max-width: 992px) {
+    .product-card.list-item {
+      grid-template-columns: 150px 1fr;
+      gap: 20px;
+    }
+
+    .product-image-list {
+      width: 150px;
+      height: 150px;
+    }
+
+    .product-actions-list {
+      grid-column: 1 / -1;
+      width: 100%;
+      align-items: stretch;
+    }
+
+    .product-pricing-list {
+      text-align: left;
+    }
+
+    .buttons-group-list {
+      flex-direction: row;
+    }
+
+    .secondary-actions-list {
+      width: auto;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .product-card.list-item {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+
+    .product-image-list {
+      width: 100%;
+      height: 200px;
+      margin: 0 auto;
+    }
+
+    .product-specs-list ul {
+      grid-template-columns: 1fr;
+    }
+
+    .buttons-group-list {
+      flex-direction: column;
+    }
+
+    .secondary-actions-list {
+      width: 100%;
+    }
+  }
+</style>

@@ -1,0 +1,74 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "featured-categories": {
+      "type": "featured-categories-hierarchical",
+      "settings": {
+        "heading": "Our Top Categories",
+        "description": "Browse our complete range of commercial kitchen equipment organized by category",
+        "show_subcategories": true
+      },
+      "blocks": {
+        "category-1": {
+          "type": "category",
+          "settings": {
+            "main_collection": "",
+            "category_count": "14"
+          }
+        },
+        "category-2": {
+          "type": "category",
+          "settings": {
+            "main_collection": "",
+            "category_count": "8"
+          }
+        },
+        "category-3": {
+          "type": "category",
+          "settings": {
+            "main_collection": "",
+            "category_count": "17"
+          }
+        },
+        "category-4": {
+          "type": "category",
+          "settings": {
+            "main_collection": "",
+            "category_count": "20"
+          }
+        }
+      },
+      "block_order": [
+        "category-1",
+        "category-2",
+        "category-3",
+        "category-4"
+      ]
+    },
+    "main": {
+      "type": "main-list-collections",
+      "settings": {
+        "show_breadcrumbs": true,
+        "title": "All Collections",
+        "header_bg_color": "#1e3a8a",
+        "header_overlay_color": "rgba(30, 58, 138, 0.85)",
+        "card_overlay_color": "rgba(30, 58, 138, 0.85)",
+        "columns_desktop": 3,
+        "columns_mobile": "2",
+        "image_ratio": "portrait",
+        "show_description": true,
+        "show_product_count": true,
+        "sort": "alphabetical"
+      }
+    }
+  },
+  "order": ["featured-categories", "main"]
+}

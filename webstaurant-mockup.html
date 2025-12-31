@@ -1,0 +1,2111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebstaurantStore Design Mockup - 3 Level Category Pages</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', Arial, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        /* ========================================
+           DESIGN SYSTEM - WebstaurantStore Colors
+           ======================================== */
+        :root {
+            /* Primary Colors */
+            --primary-green: #4a7c34;
+            --primary-green-hover: #3d6a2b;
+            --link-green: #508028;
+            --link-green-hover: #3d6a2b;
+            
+            /* Orange/CTA Colors */
+            --cta-orange: #f47321;
+            --cta-orange-hover: #e06010;
+            --price-orange: #f47321;
+            
+            /* Neutral Colors */
+            --text-dark: #333333;
+            --text-medium: #666666;
+            --text-light: #888888;
+            --border-color: #e0e0e0;
+            --bg-light: #f5f5f5;
+            --bg-white: #ffffff;
+            
+            /* Rating Colors */
+            --rating-gold: #f5a623;
+            
+            /* Plus Badge */
+            --plus-green: #4a7c34;
+        }
+
+        /* ========================================
+           PAGE LAYOUT WRAPPER
+           ======================================== */
+        .page-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+            background: var(--bg-white);
+        }
+
+        .section-divider {
+            height: 60px;
+            background: linear-gradient(to bottom, #e0e0e0, #f5f5f5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #4a7c34;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-top: 3px solid #4a7c34;
+            border-bottom: 3px solid #4a7c34;
+            margin: 40px 0;
+        }
+
+        /* ========================================
+           LEVEL 1 - MAIN CATEGORY PAGE
+           (Restaurant Equipment)
+           ======================================== */
+        
+        /* Hero Banner */
+        .hero-banner {
+            position: relative;
+            height: 180px;
+            background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
+            overflow: hidden;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: 1;
+        }
+
+        .hero-banner-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.7;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 40px 30px;
+            color: white;
+        }
+
+        .hero-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            max-width: 500px;
+        }
+
+        /* Main Categories Grid - 4 Columns */
+        .main-categories-section {
+            padding: 25px 20px;
+            background: var(--bg-white);
+        }
+
+        .main-categories-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .main-category-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            overflow: hidden;
+        }
+
+        .main-category-image {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+
+        .main-category-content {
+            padding: 12px 15px 15px;
+        }
+
+        .main-category-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .main-category-count {
+            font-size: 12px;
+            color: var(--link-green);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .main-category-count:hover {
+            color: var(--link-green-hover);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .main-category-desc {
+            font-size: 12px;
+            color: var(--text-medium);
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .main-category-links {
+            list-style: none;
+        }
+
+        .main-category-links li {
+            margin-bottom: 4px;
+        }
+
+        .main-category-links a {
+            font-size: 12px;
+            color: var(--link-green);
+            text-decoration: none;
+        }
+
+        .main-category-links a:hover {
+            text-decoration: underline;
+            color: var(--link-green-hover);
+        }
+
+        /* Icon Categories Row */
+        .icon-categories-section {
+            padding: 15px 20px 25px;
+            background: var(--bg-white);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .icon-categories-grid {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .icon-category-item {
+            text-align: center;
+            flex: 1;
+            max-width: 110px;
+        }
+
+        .icon-category-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 4px;
+            object-fit: cover;
+            margin: 0 auto 8px;
+            display: block;
+            background: #f8f8f8;
+            border: 1px solid var(--border-color);
+        }
+
+        .icon-category-label {
+            font-size: 11px;
+            color: var(--link-green);
+            text-decoration: none;
+            line-height: 1.3;
+            display: block;
+        }
+
+        .icon-category-label:hover {
+            text-decoration: underline;
+        }
+
+        /* Secondary Categories Grid - 4 Columns with Images */
+        .secondary-categories-section {
+            padding: 25px 20px;
+            background: var(--bg-white);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .secondary-categories-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .secondary-category-card {
+            background: var(--bg-white);
+        }
+
+        .secondary-category-image-wrapper {
+            position: relative;
+            width: 100%;
+            height: 160px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .secondary-category-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+
+        .secondary-category-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .secondary-category-count {
+            font-size: 12px;
+            color: var(--link-green);
+            font-weight: 600;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .secondary-category-count:hover {
+            text-decoration: underline;
+        }
+
+        .secondary-category-desc {
+            font-size: 12px;
+            color: var(--text-medium);
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .secondary-category-links {
+            list-style: none;
+        }
+
+        .secondary-category-links li {
+            margin-bottom: 4px;
+        }
+
+        .secondary-category-links a {
+            font-size: 12px;
+            color: var(--link-green);
+            text-decoration: none;
+        }
+
+        .secondary-category-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* Another Icon Row */
+        .icon-categories-section-2 {
+            padding: 15px 20px 25px;
+            background: var(--bg-white);
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Brand Logos Row */
+        .brands-section {
+            padding: 20px;
+            background: var(--bg-white);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .brands-grid {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .brand-logo {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .brand-logo img {
+            max-height: 35px;
+            max-width: 100%;
+            opacity: 0.85;
+        }
+
+        .brand-logo-placeholder {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+
+        .brand-logo-subtitle {
+            font-size: 9px;
+            color: var(--text-light);
+        }
+
+        /* Top Products Section */
+        .top-products-section {
+            padding: 25px 20px;
+            background: var(--bg-white);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+        }
+
+        .products-carousel {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .product-card {
+            flex: 0 0 160px;
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: center;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 120px;
+            object-fit: contain;
+            margin-bottom: 10px;
+            background: #fafafa;
+        }
+
+        .product-title {
+            font-size: 12px;
+            color: var(--link-green);
+            text-decoration: none;
+            line-height: 1.4;
+            display: block;
+            margin-bottom: 8px;
+            min-height: 50px;
+        }
+
+        .product-title:hover {
+            text-decoration: underline;
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 6px;
+        }
+
+        .plus-badge {
+            background: var(--plus-green);
+            color: white;
+            font-size: 9px;
+            padding: 2px 5px;
+            border-radius: 2px;
+            font-weight: 700;
+        }
+
+        .stars {
+            color: var(--rating-gold);
+            font-size: 12px;
+        }
+
+        .product-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--price-orange);
+            margin-bottom: 10px;
+        }
+
+        .product-price-unit {
+            font-size: 11px;
+            font-weight: 400;
+            color: var(--text-medium);
+        }
+
+        .add-to-cart-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .qty-input {
+            width: 40px;
+            height: 32px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .add-to-cart-btn {
+            flex: 1;
+            height: 32px;
+            background: var(--link-green);
+            color: white;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .add-to-cart-btn:hover {
+            background: var(--primary-green-hover);
+        }
+
+        /* ========================================
+           LEVEL 2 - SUBCATEGORY PAGE
+           (Reach-In Refrigerators and Freezers)
+           ======================================== */
+
+        /* Level 2 uses same hero banner style */
+
+        /* Level 2 - Three Column Category Cards */
+        .level2-categories-section {
+            padding: 25px 20px;
+            background: var(--bg-white);
+        }
+
+        .level2-categories-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .level2-category-card {
+            display: flex;
+            gap: 15px;
+        }
+
+        .level2-category-image-wrapper {
+            flex: 0 0 280px;
+            height: 180px;
+            overflow: hidden;
+        }
+
+        .level2-category-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+
+        .level2-category-content {
+            flex: 1;
+            padding-top: 5px;
+        }
+
+        .level2-category-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .level2-category-count {
+            font-size: 12px;
+            color: var(--link-green);
+            font-weight: 600;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .level2-category-count:hover {
+            text-decoration: underline;
+        }
+
+        .level2-category-desc {
+            font-size: 12px;
+            color: var(--text-medium);
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .level2-category-links {
+            list-style: none;
+        }
+
+        .level2-category-links li {
+            margin-bottom: 5px;
+        }
+
+        .level2-category-links a {
+            font-size: 12px;
+            color: var(--link-green);
+            text-decoration: none;
+        }
+
+        .level2-category-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* Level 2 - 8 Column Icon Grid */
+        .level2-icon-section {
+            padding: 20px;
+            background: var(--bg-white);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .level2-icon-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 15px;
+        }
+
+        .level2-icon-item {
+            text-align: center;
+        }
+
+        .level2-icon-image {
+            width: 100%;
+            height: 80px;
+            object-fit: contain;
+            background: #f8f8f8;
+            border: 1px solid var(--border-color);
+            margin-bottom: 8px;
+        }
+
+        .level2-icon-label {
+            font-size: 11px;
+            color: var(--link-green);
+            text-decoration: none;
+            line-height: 1.3;
+        }
+
+        .level2-icon-label:hover {
+            text-decoration: underline;
+        }
+
+        /* Other Equipment Section */
+        .other-equipment-section {
+            padding: 25px 20px;
+            background: var(--bg-white);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .other-equipment-grid {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+        }
+
+        .other-equipment-item {
+            flex: 0 0 120px;
+            text-align: center;
+        }
+
+        .other-equipment-image {
+            width: 100px;
+            height: 80px;
+            object-fit: contain;
+            margin: 0 auto 8px;
+            background: #fafafa;
+        }
+
+        .other-equipment-label {
+            font-size: 11px;
+            color: var(--link-green);
+            text-decoration: none;
+            line-height: 1.3;
+        }
+
+        .other-equipment-label:hover {
+            text-decoration: underline;
+        }
+
+        /* ========================================
+           LEVEL 3 - PRODUCT LISTING PAGE
+           (Commercial Gas Ranges)
+           ======================================== */
+
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 12px 20px;
+            background: var(--bg-white);
+            font-size: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .breadcrumb a {
+            color: var(--link-green);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb span {
+            color: var(--text-medium);
+            margin: 0 5px;
+        }
+
+        .breadcrumb .current {
+            color: var(--text-dark);
+        }
+
+        /* Level 3 Page Title */
+        .level3-header {
+            padding: 20px 20px 15px;
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .level3-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .level3-subtitle {
+            font-size: 13px;
+            color: var(--text-medium);
+        }
+
+        /* Level 3 Layout - Sidebar + Products */
+        .level3-container {
+            display: flex;
+            background: var(--bg-white);
+        }
+
+        /* Filters Sidebar */
+        .filters-sidebar {
+            width: 220px;
+            flex-shrink: 0;
+            padding: 15px;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .filters-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .filter-group:last-child {
+            border-bottom: none;
+        }
+
+        .filter-group-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .filter-group-title::after {
+            content: '▾';
+            font-size: 10px;
+        }
+
+        .filter-options {
+            list-style: none;
+        }
+
+        .filter-options li {
+            margin-bottom: 8px;
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-dark);
+            cursor: pointer;
+        }
+
+        .filter-option input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            accent-color: var(--primary-green);
+        }
+
+        .filter-count {
+            color: var(--text-light);
+            margin-left: auto;
+        }
+
+        .suggested-brand {
+            font-size: 10px;
+            color: var(--link-green);
+            font-weight: 600;
+            display: block;
+            margin-left: 22px;
+        }
+
+        /* Products Area */
+        .products-area {
+            flex: 1;
+            padding: 15px 20px;
+        }
+
+        /* Toolbar */
+        .products-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 5px;
+        }
+
+        .view-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-white);
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .view-btn.active {
+            background: #f0f0f0;
+        }
+
+        .sort-dropdown {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sort-dropdown label {
+            font-size: 12px;
+            color: var(--text-medium);
+        }
+
+        .sort-dropdown select {
+            padding: 6px 25px 6px 10px;
+            border: 1px solid var(--border-color);
+            font-size: 12px;
+            background: var(--bg-white);
+        }
+
+        .compare-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-medium);
+        }
+
+        .toggle-switch {
+            width: 36px;
+            height: 20px;
+            background: #ccc;
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: 0.2s;
+        }
+
+        /* Power Type Selector */
+        .power-type-section {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .power-type-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+        }
+
+        .power-type-options {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .power-type-btn {
+            width: 100px;
+            padding: 15px 20px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-white);
+            cursor: pointer;
+            text-align: center;
+            transition: 0.2s;
+        }
+
+        .power-type-btn:hover,
+        .power-type-btn.active {
+            border-color: var(--primary-green);
+        }
+
+        .power-type-icon {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .power-type-icon.propane {
+            color: #f47321;
+        }
+
+        .power-type-icon.gas {
+            color: #2196F3;
+        }
+
+        .power-type-name {
+            font-size: 12px;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .power-type-subtitle {
+            font-size: 11px;
+            color: var(--link-green);
+            margin-top: 5px;
+        }
+
+        /* Product Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+        }
+
+        .product-card-plp {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            position: relative;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #666;
+            color: white;
+            font-size: 10px;
+            padding: 3px 8px;
+            font-weight: 600;
+        }
+
+        .product-card-plp .product-image {
+            width: 100%;
+            height: 140px;
+            object-fit: contain;
+            margin-bottom: 12px;
+            background: #fafafa;
+        }
+
+        .product-fuel-type {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: var(--text-medium);
+            margin-bottom: 5px;
+        }
+
+        .fuel-icon {
+            width: 12px;
+            height: 12px;
+        }
+
+        .product-card-plp .product-title {
+            font-size: 12px;
+            color: var(--link-green);
+            min-height: 55px;
+            margin-bottom: 8px;
+        }
+
+        .product-sku {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .price-box {
+            background: #f8fff5;
+            border: 1px solid #e0f0d8;
+            padding: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .price-label {
+            font-size: 10px;
+            color: var(--link-green);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .price-main {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--price-orange);
+        }
+
+        .price-unit {
+            font-size: 11px;
+            color: var(--text-medium);
+        }
+
+        .price-regular {
+            font-size: 11px;
+            color: var(--text-light);
+            text-decoration: line-through;
+            margin-top: 4px;
+        }
+
+        .free-shipping-badge {
+            display: inline-block;
+            background: var(--link-green);
+            color: white;
+            font-size: 10px;
+            padding: 3px 8px;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        .product-card-plp .add-to-cart-row {
+            margin-top: 10px;
+        }
+
+        /* ========================================
+           PLACEHOLDER IMAGES (SVG Data URIs)
+           ======================================== */
+        
+        .placeholder-kitchen {
+            background: linear-gradient(135deg, #3a4a5c 0%, #2c3e50 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .placeholder-equipment {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+        }
+
+        .placeholder-product {
+            background: #fafafa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-size: 40px;
+        }
+
+        /* ========================================
+           ANNOTATION LABELS FOR MOCKUP
+           ======================================== */
+        
+        .design-annotation {
+            background: #fff3cd;
+            border: 2px dashed #ffc107;
+            padding: 12px 15px;
+            margin: 10px 20px;
+            font-size: 12px;
+            color: #856404;
+        }
+
+        .design-annotation strong {
+            color: #664d03;
+        }
+
+        /* ========================================
+           RESPONSIVE ADJUSTMENTS
+           ======================================== */
+        
+        @media (max-width: 1200px) {
+            .products-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .main-categories-grid,
+            .secondary-categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .level2-categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .level2-icon-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+    <!-- ============================================
+         LEVEL 1 - MAIN CATEGORY PAGE
+         Example: Restaurant Equipment
+         ============================================ -->
+    
+    <div class="section-divider">⬇ Level 1 — Main Category Page ⬇</div>
+
+    <div class="design-annotation">
+        <strong>Level 1 Pattern:</strong> Hero banner → 4-column main category cards with images, descriptions & links → 
+        Icon grid row (8 items) → Secondary 4-column cards → Another icon row → Brand logos → Top Products carousel
+    </div>
+
+    <!-- Hero Banner with Background Image -->
+    <div class="hero-banner" style="background: url('https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=1200&h=300&fit=crop') center/cover no-repeat;">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">Restaurant Equipment</h1>
+            <p class="hero-subtitle">Reliable Commercial Restaurant Kitchen Equipment For Every Application</p>
+        </div>
+    </div>
+
+    <!-- Main Categories - 4 Column Grid -->
+    <section class="main-categories-section">
+        <div class="main-categories-grid">
+            
+            <!-- Category Card 1 -->
+            <div class="main-category-card">
+                <div class="main-category-image placeholder-equipment" style="height: 140px;"></div>
+                <div class="main-category-content">
+                    <h3 class="main-category-title">Cooking Equipment</h3>
+                    <div class="main-category-count">Shop 21 Categories ›</div>
+                    <p class="main-category-desc">Equip your kitchen with top-quality commercial cooking equipment. We carry reputable brands at prices that can't be beat.</p>
+                    <ul class="main-category-links">
+                        <li><a href="#">Gas Fryers</a></li>
+                        <li><a href="#">Commercial Gas Ranges</a></li>
+                        <li><a href="#">Griddles</a></li>
+                        <li><a href="#">Charbroilers</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Category Card 2 -->
+            <div class="main-category-card">
+                <div class="main-category-image placeholder-equipment" style="height: 140px;"></div>
+                <div class="main-category-content">
+                    <h3 class="main-category-title">Refrigeration Equipment</h3>
+                    <div class="main-category-count">Shop 19 Categories ›</div>
+                    <p class="main-category-desc">With hundreds of commercial refrigeration equipment products to choose from, you're sure to find a unit that's suitable for your needs.</p>
+                    <ul class="main-category-links">
+                        <li><a href="#">Reach-In Refrigerators and Freezers</a></li>
+                        <li><a href="#">Refrigerated Prep Tables</a></li>
+                        <li><a href="#">Merchandising and Display Refrigeration</a></li>
+                        <li><a href="#">Bar Refrigeration</a></li>
+                        <li><a href="#">Ice Machines</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Category Card 3 -->
+            <div class="main-category-card">
+                <div class="main-category-image placeholder-equipment" style="height: 140px;"></div>
+                <div class="main-category-content">
+                    <h3 class="main-category-title">Commercial Work Tables and Stations</h3>
+                    <div class="main-category-count">Shop 23 Categories ›</div>
+                    <p class="main-category-desc">Whether you need economy or top of the line, undershelf or open base, we have the perfect work table for you.</p>
+                    <ul class="main-category-links">
+                        <li><a href="#">Stainless Steel Work Tables with Undershelf</a></li>
+                        <li><a href="#">Stainless Steel Open Base Work Tables</a></li>
+                        <li><a href="#">Equipment Stands and Mixer Tables</a></li>
+                        <li><a href="#">Stainless Steel Enclosed Base Commercial Work Tables</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Category Card 4 -->
+            <div class="main-category-card">
+                <div class="main-category-image placeholder-equipment" style="height: 140px;"></div>
+                <div class="main-category-content">
+                    <h3 class="main-category-title">Food Preparation</h3>
+                    <div class="main-category-count">Shop 64 Categories ›</div>
+                    <p class="main-category-desc">Our food preparation section has everything you need to transform basic, raw ingredients into culinary masterpieces.</p>
+                    <ul class="main-category-links">
+                        <li><a href="#">Meat Choppers and Meat Grinders</a></li>
+                        <li><a href="#">Commercial Immersion Blenders</a></li>
+                        <li><a href="#">Dough Sheeters, Rounders & Dividers</a></li>
+                        <li><a href="#">Cutters and Slicers</a></li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Icon Categories Row -->
+    <section class="icon-categories-section">
+        <div class="icon-categories-grid">
+            <div class="icon-category-item">
+                <div class="icon-category-image placeholder-equipment"></div>
+                <a href="#" class="icon-category-label">Dish Washing Equipment</a>
+            </div>
+            <div class="icon-category-item">
+                <div class="icon-category-image placeholder-equipment"></div>
+                <a href="#" class="icon-category-label">Restaurant Ranges</a>
+            </div>
+            <div class="icon-category-item">
+                <div class="icon-category-image placeholder-equipment"></div>
+                <a href="#" class="icon-category-label">Fryers</a>
+            </div>
+            <div class="icon-category-item">
+                <div class="icon-category-image placeholder-equipment"></div>
+                <a href="#" class="icon-category-label">Grills & Griddles</a>
+            </div>
+            <div class="icon-category-item">
+                <div class="icon-category-image placeholder-equipment"></div>
+                <a href="#" class="icon-category-label">Food Processors</a>
+            </div>
+            <div class="icon-category-item">
+                <div class="icon-category-image placeholder-equipment"></div>
+                <a href="#" class="icon-category-label">Meat Slicers</a>
+            </div>
+            <div class="icon-category-item">
+                <div class="icon-category-image placeholder-equipment"></div>
+                <a href="#" class="icon-category-label">Commercial Mixers</a>
+            </div>
+            <div class="icon-category-item">
+                <div class="icon-category-image placeholder-equipment"></div>
+                <a href="#" class="icon-category-label">Outdoor Cooking Equipment</a>
+            </div>
+            <div class="icon-category-item">
+                <div class="icon-category-image placeholder-equipment"></div>
+                <a href="#" class="icon-category-label">Smart Kitchen Appliances</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Secondary Categories Grid -->
+    <section class="secondary-categories-section">
+        <div class="secondary-categories-grid">
+            
+            <div class="secondary-category-card">
+                <div class="secondary-category-image-wrapper">
+                    <div class="secondary-category-image placeholder-equipment"></div>
+                </div>
+                <h3 class="secondary-category-title">Commercial Sinks</h3>
+                <div class="secondary-category-count">Shop 17 Categories ›</div>
+                <p class="secondary-category-desc">With hand sinks, bar sinks, pot washing sinks, and much more, you'll find the perfect commercial sink at an industry-leading price.</p>
+                <ul class="secondary-category-links">
+                    <li><a href="#">3 Compartment Sinks</a></li>
+                    <li><a href="#">Hand Sinks and Accessories</a></li>
+                    <li><a href="#">Utility Sinks</a></li>
+                    <li><a href="#">Underbar Sinks</a></li>
+                </ul>
+            </div>
+
+            <div class="secondary-category-card">
+                <div class="secondary-category-image-wrapper">
+                    <div class="secondary-category-image placeholder-equipment"></div>
+                </div>
+                <h3 class="secondary-category-title">Commercial Ovens</h3>
+                <div class="secondary-category-count">Shop 18 Categories ›</div>
+                <p class="secondary-category-desc">From conveyor models to convection, we've got the right type of oven for your pizzeria, bakery, cafeteria, and other foodservice operation.</p>
+                <ul class="secondary-category-links">
+                    <li><a href="#">Commercial Convection Ovens</a></li>
+                    <li><a href="#">Commercial Microwaves</a></li>
+                    <li><a href="#">Rapid Cook / High Speed Hybrid Ovens</a></li>
+                    <li><a href="#">Conveyor Ovens and Impinger Ovens</a></li>
+                </ul>
+            </div>
+
+            <div class="secondary-category-card">
+                <div class="secondary-category-image-wrapper">
+                    <div class="secondary-category-image placeholder-equipment"></div>
+                </div>
+                <h3 class="secondary-category-title">Food Holding and Warming Equipment</h3>
+                <div class="secondary-category-count">Shop 34 Categories ›</div>
+                <p class="secondary-category-desc">Our heated cabinets, food warmers, and holding equipment will keep your meals at the perfect serving temperatures.</p>
+                <ul class="secondary-category-links">
+                    <li><a href="#">Commercial Steam Tables</a></li>
+                    <li><a href="#">Countertop Food Warmers</a></li>
+                    <li><a href="#">Cold Food Tables</a></li>
+                </ul>
+            </div>
+
+            <div class="secondary-category-card">
+                <div class="secondary-category-image-wrapper">
+                    <div class="secondary-category-image placeholder-equipment"></div>
+                </div>
+                <h3 class="secondary-category-title">Storage / Transport</h3>
+                <div class="secondary-category-count">Shop 10 Categories ›</div>
+                <p class="secondary-category-desc">From insulated food carriers to dish dollies, we have all of the packaging and transport equipment you need to keep your business running smoothly.</p>
+                <ul class="secondary-category-links">
+                    <li><a href="#">Sheet Pan Racks</a></li>
+                    <li><a href="#">Plastic Utility Carts and Bus Carts</a></li>
+                    <li><a href="#">Dunnage Racks</a></li>
+                </ul>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Another Icon Row -->
+    <section class="icon-categories-section-2">
+        <div class="icon-categories-grid">
+            <div class="icon-category-item">
+                <div class="icon-category-image placeholder-equipment"></div>
+                <a href="#" class="icon-category-label">Shelving</a>
+            </div>
+            <div class="icon-category-item">
+                <div class="icon-category-image placeholder-equipment"></div>
+                <a href="#" class="icon-category-label">Exhaust Hoods</a>
+            </div>
+            <div class="icon-category-item">
+                <div class="icon-category-image placeholder-equipment"></div>
+                <a href="#" class="icon-category-label">Ice Equipment</a>
+            </div>
+            <div class="icon-category-item">
+                <div class="icon-category-image placeholder-equipment"></div>
+                <a href="#" class="icon-category-label">Commercial Plumbing</a>
+            </div>
+            <div class="icon-category-item">
+                <div class="icon-category-image placeholder-equipment"></div>
+                <a href="#" class="icon-category-label">Blenders</a>
+            </div>
+            <div class="icon-category-item">
+                <div class="icon-category-image placeholder-equipment"></div>
+                <a href="#" class="icon-category-label">Commercial Scales</a>
+            </div>
+            <div class="icon-category-item">
+                <div class="icon-category-image placeholder-equipment"></div>
+                <a href="#" class="icon-category-label">Vacuum Sealers</a>
+            </div>
+            <div class="icon-category-item">
+                <div class="icon-category-image placeholder-equipment"></div>
+                <a href="#" class="icon-category-label">Candy Making Machines</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Brand Logos -->
+    <section class="brands-section">
+        <div class="brands-grid">
+            <div class="brand-logo">
+                <div class="brand-logo-placeholder">Avantco</div>
+                <div class="brand-logo-subtitle">Refrigeration</div>
+            </div>
+            <div class="brand-logo">
+                <div class="brand-logo-placeholder">CPG</div>
+                <div class="brand-logo-subtitle">Cooking Performance Group</div>
+            </div>
+            <div class="brand-logo">
+                <div class="brand-logo-placeholder">REGENCY</div>
+            </div>
+            <div class="brand-logo">
+                <div class="brand-logo-placeholder">NOBLE</div>
+                <div class="brand-logo-subtitle">Warewashing</div>
+            </div>
+            <div class="brand-logo">
+                <div class="brand-logo-placeholder">BEVERAGE-AIR</div>
+            </div>
+            <div class="brand-logo">
+                <div class="brand-logo-placeholder">VULCAN</div>
+            </div>
+            <div class="brand-logo">
+                <div class="brand-logo-placeholder">Scotsman</div>
+                <div class="brand-logo-subtitle">Ice Systems</div>
+            </div>
+            <div class="brand-logo">
+                <div class="brand-logo-placeholder">VOLLRATH</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Top Products -->
+    <section class="top-products-section">
+        <h2 class="section-title">Top Products</h2>
+        <div class="products-carousel">
+            
+            <div class="product-card">
+                <div class="product-image placeholder-product">📦</div>
+                <a href="#" class="product-title">Avantco HPI-1836 Full Size Insulated Heated Holding / Proofing Cabinet</a>
+                <div class="product-rating">
+                    <span class="plus-badge">plus</span>
+                    <span class="stars">★★★★☆</span>
+                </div>
+                <div class="product-price">$1,499.00<span class="product-price-unit">/Each</span></div>
+                <div class="add-to-cart-row">
+                    <input type="number" class="qty-input" value="1">
+                    <button class="add-to-cart-btn">Add to Cart</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image placeholder-product">📦</div>
+                <a href="#" class="product-title">Choice Full Size 18 Gauge 18" x 26" Wire in Rim Aluminum Bun Pans</a>
+                <div class="product-rating">
+                    <span class="plus-badge">plus</span>
+                    <span class="stars">★★★★★</span>
+                </div>
+                <div class="product-price">$84.99<span class="product-price-unit">/Case</span></div>
+                <div class="add-to-cart-row">
+                    <input type="number" class="qty-input" value="1">
+                    <button class="add-to-cart-btn">Add to Cart</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image placeholder-product">📦</div>
+                <a href="#" class="product-title">T&S HG-4D-48K Safe-T-Link Quick Disconnect 48" Yellow Coated Steel</a>
+                <div class="product-rating">
+                    <span class="plus-badge">plus</span>
+                    <span class="stars">★★★★★</span>
+                </div>
+                <div class="product-price">$235.40<span class="product-price-unit">/Each</span></div>
+                <div class="add-to-cart-row">
+                    <input type="number" class="qty-input" value="1">
+                    <button class="add-to-cart-btn">Add to Cart</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image placeholder-product">📦</div>
+                <a href="#" class="product-title">Avantco FF50 Natural Gas 50 lb. Stainless Steel Floor Fryer - 120,000</a>
+                <div class="product-rating">
+                    <span class="plus-badge">plus</span>
+                    <span class="stars">★★★★☆</span>
+                </div>
+                <div class="product-price">$949.00<span class="product-price-unit">/Each</span></div>
+                <div class="add-to-cart-row">
+                    <input type="number" class="qty-input" value="1">
+                    <button class="add-to-cart-btn">Add to Cart</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image placeholder-product">📦</div>
+                <a href="#" class="product-title">Cooking Performance Group P4C-100-N Single Deck Standard Depth</a>
+                <div class="product-rating">
+                    <span class="plus-badge">plus</span>
+                    <span class="stars">★★★★★</span>
+                </div>
+                <div class="product-price">$2,879.00<span class="product-price-unit">/Each</span></div>
+                <div class="add-to-cart-row">
+                    <input type="number" class="qty-input" value="1">
+                    <button class="add-to-cart-btn">Add to Cart</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image placeholder-product">📦</div>
+                <a href="#" class="product-title">Avantco F4-ES-N 45-50 lb. Natural Gas Stainless Steel Floor Fryer</a>
+                <div class="product-rating">
+                    <span class="plus-badge">plus</span>
+                    <span class="stars">★★★★★</span>
+                </div>
+                <div class="product-price">$1,119.00<span class="product-price-unit">/Each</span></div>
+                <div class="add-to-cart-row">
+                    <input type="number" class="qty-input" value="1">
+                    <button class="add-to-cart-btn">Add to Cart</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image placeholder-product">📦</div>
+                <a href="#" class="product-title">Avantco FF100 Natural Gas 70-100 lb. Stainless Steel Tube Fired Floor Fryer</a>
+                <div class="product-rating">
+                    <span class="plus-badge">plus</span>
+                    <span class="stars">★★★★★</span>
+                </div>
+                <div class="product-price">$999.00<span class="product-price-unit">/Each</span></div>
+                <div class="add-to-cart-row">
+                    <input type="number" class="qty-input" value="1">
+                    <button class="add-to-cart-btn">Add to Cart</button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         LEVEL 2 - SUBCATEGORY PAGE
+         Example: Reach-In Refrigerators and Freezers
+         ============================================ -->
+    
+    <div class="section-divider">⬇ Level 2 — Subcategory Page ⬇</div>
+
+    <div class="design-annotation">
+        <strong>Level 2 Pattern:</strong> Hero banner → 3-column category cards (large image + content side by side) → 
+        8-column icon grid → Top Products carousel → Other Equipment section
+    </div>
+
+    <!-- Hero Banner with Background Image -->
+    <div class="hero-banner" style="background: url('https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?w=1200&h=300&fit=crop') center/cover no-repeat;">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">Reach-In Refrigerators and Freezers</h1>
+            <p class="hero-subtitle">Keep Cold and Frozen Foods Organized and Properly Stored Using Reach-In Refrigerators and Freezers</p>
+        </div>
+    </div>
+
+    <!-- Level 2 Categories - 3 Column Cards -->
+    <section class="level2-categories-section">
+        <div class="main-categories-grid" style="grid-template-columns: repeat(3, 1fr);">
+            
+            <!-- Category Card 1 -->
+            <div class="main-category-card">
+                <div class="main-category-image placeholder-equipment" style="height: 180px;"></div>
+                <div class="main-category-content">
+                    <h3 class="main-category-title">Reach-In Refrigerators</h3>
+                    <div class="main-category-count">Shop 555 Products ›</div>
+                    <p class="main-category-desc">Outfit your establishment with reach-in refrigerators, so you can keep items like meats, vegetables, fruits, condiments, and garnishes within reach.</p>
+                    <ul class="main-category-links">
+                        <li><a href="#">Solid Door Reach-In Refrigerators</a></li>
+                        <li><a href="#">Glass Door Reach-In Refrigerators</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Category Card 2 -->
+            <div class="main-category-card">
+                <div class="main-category-image placeholder-equipment" style="height: 180px;"></div>
+                <div class="main-category-content">
+                    <h3 class="main-category-title">Reach-In Freezers</h3>
+                    <div class="main-category-count">Shop 362 Products ›</div>
+                    <p class="main-category-desc">Reach-in freezers keep your bagged ice, burger patties, ice cream, and other essentials frozen until they're ready to be prepared or served.</p>
+                    <ul class="main-category-links">
+                        <li><a href="#">Solid Door Reach-In Freezers</a></li>
+                        <li><a href="#">Glass Door Reach-In Freezers</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Category Card 3 -->
+            <div class="main-category-card">
+                <div class="main-category-image placeholder-equipment" style="height: 180px;"></div>
+                <div class="main-category-content">
+                    <h3 class="main-category-title">Combination Reach-In Refrigerators and Freezers</h3>
+                    <div class="main-category-count">Shop 61 Products ›</div>
+                    <p class="main-category-desc">If you need to store chilled and frozen foods in the same unit, then check out our selection of combination reach-in refrigerators and freezers.</p>
+                    <ul class="main-category-links">
+                        <li><a href="#">Solid Door Combination Refrigerators / Freezers</a></li>
+                        <li><a href="#">Glass Door Combination Refrigerators / Freezers</a></li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Level 2 - 8 Column Icon Grid -->
+    <section class="level2-icon-section">
+        <div class="level2-icon-grid">
+            <div class="level2-icon-item">
+                <div class="level2-icon-image placeholder-equipment"></div>
+                <a href="#" class="level2-icon-label">Bottom Mounted Freezers</a>
+            </div>
+            <div class="level2-icon-item">
+                <div class="level2-icon-image placeholder-equipment"></div>
+                <a href="#" class="level2-icon-label">Top Mounted Freezers</a>
+            </div>
+            <div class="level2-icon-item">
+                <div class="level2-icon-image placeholder-equipment"></div>
+                <a href="#" class="level2-icon-label">Bottom Mounted Refrigerators</a>
+            </div>
+            <div class="level2-icon-item">
+                <div class="level2-icon-image placeholder-equipment"></div>
+                <a href="#" class="level2-icon-label">Top Mounted Refrigerators</a>
+            </div>
+            <div class="level2-icon-item">
+                <div class="level2-icon-image placeholder-equipment"></div>
+                <a href="#" class="level2-icon-label">Spec Line Freezers</a>
+            </div>
+            <div class="level2-icon-item">
+                <div class="level2-icon-image placeholder-equipment"></div>
+                <a href="#" class="level2-icon-label">Pass Through Freezers</a>
+            </div>
+            <div class="level2-icon-item">
+                <div class="level2-icon-image placeholder-equipment"></div>
+                <a href="#" class="level2-icon-label">Spec Line Refrigerators</a>
+            </div>
+            <div class="level2-icon-item">
+                <div class="level2-icon-image placeholder-equipment"></div>
+                <a href="#" class="level2-icon-label">Pass Through Refrigerators</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Top Products for Level 2 -->
+    <section class="top-products-section">
+        <h2 class="section-title">Top Products</h2>
+        <div class="products-carousel">
+            
+            <div class="product-card">
+                <div class="product-image placeholder-product">📦</div>
+                <a href="#" class="product-title">Avantco A-49R-HC 54" Solid Door Reach-In Refrigerator</a>
+                <div class="product-rating">
+                    <span class="plus-badge">plus</span>
+                    <span class="stars">★★★★★</span>
+                </div>
+                <div class="product-price">$1,949.00<span class="product-price-unit">/Each</span></div>
+                <div class="add-to-cart-row">
+                    <input type="number" class="qty-input" value="1">
+                    <button class="add-to-cart-btn">Add to Cart</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image placeholder-product">📦</div>
+                <a href="#" class="product-title">Avantco A-49F-HC 54" Solid Door Reach-In Freezer</a>
+                <div class="product-rating">
+                    <span class="plus-badge">plus</span>
+                    <span class="stars">★★★★★</span>
+                </div>
+                <div class="product-price">$2,099.00<span class="product-price-unit">/Each</span></div>
+                <div class="add-to-cart-row">
+                    <input type="number" class="qty-input" value="1">
+                    <button class="add-to-cart-btn">Add to Cart</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image placeholder-product">📦</div>
+                <a href="#" class="product-title">Avantco A-23F-HC 29" Solid Door Reach-In Freezer</a>
+                <div class="product-rating">
+                    <span class="plus-badge">plus</span>
+                    <span class="stars">★★★★★</span>
+                </div>
+                <div class="product-price">$1,549.00<span class="product-price-unit">/Each</span></div>
+                <div class="add-to-cart-row">
+                    <input type="number" class="qty-input" value="1">
+                    <button class="add-to-cart-btn">Add to Cart</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image placeholder-product">📦</div>
+                <a href="#" class="product-title">Avantco SS-3F-HC 81 5/16" Stainless Steel Solid Door Reach-In</a>
+                <div class="product-rating">
+                    <span class="plus-badge">plus</span>
+                    <span class="stars">★★★★★</span>
+                </div>
+                <div class="product-price">$3,779.00<span class="product-price-unit">/Each</span></div>
+                <div class="add-to-cart-row">
+                    <input type="number" class="qty-input" value="1">
+                    <button class="add-to-cart-btn">Add to Cart</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image placeholder-product">📦</div>
+                <a href="#" class="product-title">Avantco SS-2F-HC 54" Stainless Steel Two Section Solid Door</a>
+                <div class="product-rating">
+                    <span class="plus-badge">plus</span>
+                    <span class="stars">★★★★☆</span>
+                </div>
+                <div class="product-price">$2,619.00<span class="product-price-unit">/Each</span></div>
+                <div class="add-to-cart-row">
+                    <input type="number" class="qty-input" value="1">
+                    <button class="add-to-cart-btn">Add to Cart</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image placeholder-product">📦</div>
+                <a href="#" class="product-title">Avantco SS-2R-HC 54" Stainless Steel Solid Door Reach-In</a>
+                <div class="product-rating">
+                    <span class="plus-badge">plus</span>
+                    <span class="stars">★★★★★</span>
+                </div>
+                <div class="product-price">$2,549.00<span class="product-price-unit">/Each</span></div>
+                <div class="add-to-cart-row">
+                    <input type="number" class="qty-input" value="1">
+                    <button class="add-to-cart-btn">Add to Cart</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image placeholder-product">📦</div>
+                <a href="#" class="product-title">Avantco A-23R-HC 29" Solid Door Reach-In Refrigerator</a>
+                <div class="product-rating">
+                    <span class="plus-badge">plus</span>
+                    <span class="stars">★★★★☆</span>
+                </div>
+                <div class="product-price">$1,359.00<span class="product-price-unit">/Each</span></div>
+                <div class="add-to-cart-row">
+                    <input type="number" class="qty-input" value="1">
+                    <button class="add-to-cart-btn">Add to Cart</button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Other Equipment Section -->
+    <section class="other-equipment-section">
+        <h2 class="section-title">Other Refrigeration Equipment</h2>
+        <div class="other-equipment-grid">
+            <div class="other-equipment-item">
+                <div class="other-equipment-image placeholder-equipment"></div>
+                <a href="#" class="other-equipment-label">Door Heater Parts for Refrigeration Equipment</a>
+            </div>
+            <div class="other-equipment-item">
+                <div class="other-equipment-image placeholder-equipment"></div>
+                <a href="#" class="other-equipment-label">Lock, Latch, and Handle Hardware for Refrigeration Equipment</a>
+            </div>
+            <div class="other-equipment-item">
+                <div class="other-equipment-image placeholder-equipment"></div>
+                <a href="#" class="other-equipment-label">Refrigeration Compressors</a>
+            </div>
+            <div class="other-equipment-item">
+                <div class="other-equipment-image placeholder-equipment"></div>
+                <a href="#" class="other-equipment-label">Walk-In Cooler Box Only</a>
+            </div>
+            <div class="other-equipment-item">
+                <div class="other-equipment-image placeholder-equipment"></div>
+                <a href="#" class="other-equipment-label">Defrost Timers</a>
+            </div>
+            <div class="other-equipment-item">
+                <div class="other-equipment-image placeholder-equipment"></div>
+                <a href="#" class="other-equipment-label">Countertop Glass Door Refrigerators and Freezers</a>
+            </div>
+            <div class="other-equipment-item">
+                <div class="other-equipment-image placeholder-equipment"></div>
+                <a href="#" class="other-equipment-label">Refrigeration Defrost and Drain System Parts</a>
+            </div>
+            <div class="other-equipment-item">
+                <div class="other-equipment-image placeholder-equipment"></div>
+                <a href="#" class="other-equipment-label">Beer Dispensers</a>
+            </div>
+            <div class="other-equipment-item">
+                <div class="other-equipment-image placeholder-equipment"></div>
+                <a href="#" class="other-equipment-label">Capillary Tubes Expansion Valves</a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         LEVEL 3 - PRODUCT LISTING PAGE (PLP)
+         Example: Commercial Gas Ranges
+         ============================================ -->
+    
+    <div class="section-divider">⬇ Level 3 — Product Listing Page (PLP) ⬇</div>
+
+    <div class="design-annotation">
+        <strong>Level 3 Pattern:</strong> Breadcrumb → Page title + subtitle → 
+        Left sidebar filters (checkboxes) + Main content area with toolbar (grid/list toggle, sort, compare) → 
+        Power type selector (if applicable) → 5-column product grid with pricing cards
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="#">WebstaurantStore</a>
+        <span>›</span>
+        <a href="#">Restaurant Equipment</a>
+        <span>›</span>
+        <a href="#">Cooking Equipment</a>
+        <span>›</span>
+        <a href="#">Commercial Restaurant Ranges</a>
+        <span>›</span>
+        <span class="current">Commercial Gas Ranges</span>
+    </div>
+
+    <!-- Level 3 Header -->
+    <div class="level3-header">
+        <h1 class="level3-title">Commercial Gas Ranges</h1>
+        <p class="level3-subtitle">A Commercial Gas Stove with a Griddle Allows You to Cook, Bake, and Grill</p>
+    </div>
+
+    <!-- Level 3 Container -->
+    <div class="level3-container">
+        
+        <!-- Filters Sidebar -->
+        <aside class="filters-sidebar">
+            <div class="filters-title">Filters</div>
+
+            <!-- WebstaurantPlus Filter -->
+            <div class="filter-group">
+                <div class="filter-group-title">WebstaurantPlus</div>
+                <ul class="filter-options">
+                    <li>
+                        <label class="filter-option">
+                            <input type="checkbox">
+                            <span class="plus-badge">plus</span> Eligible
+                            <span class="filter-count">1187</span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Quick Ship Filter -->
+            <div class="filter-group">
+                <div class="filter-group-title">Quick Ship</div>
+                <ul class="filter-options">
+                    <li>
+                        <label class="filter-option">
+                            <input type="checkbox">
+                            <span style="color: #f47321;">⚡</span> Quick Shipping
+                            <span class="filter-count">102</span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Brand Filter -->
+            <div class="filter-group">
+                <div class="filter-group-title">Brand</div>
+                <ul class="filter-options">
+                    <li>
+                        <label class="filter-option">
+                            <input type="checkbox">
+                            Cooking Performance Group
+                            <span class="filter-count">21</span>
+                        </label>
+                        <span class="suggested-brand">SUGGESTED BRAND</span>
+                    </li>
+                    <li>
+                        <label class="filter-option">
+                            <input type="checkbox">
+                            MainStreet Equipment
+                            <span class="filter-count">10</span>
+                        </label>
+                        <span class="suggested-brand">SUGGESTED BRAND</span>
+                    </li>
+                    <li>
+                        <label class="filter-option">
+                            <input type="checkbox">
+                            American Range
+                            <span class="filter-count">46</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="filter-option">
+                            <input type="checkbox">
+                            Garland / US Range
+                            <span class="filter-count">554</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="filter-option">
+                            <input type="checkbox">
+                            Imperial Range
+                            <span class="filter-count">96</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="filter-option">
+                            <input type="checkbox">
+                            Southbend
+                            <span class="filter-count">26</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="filter-option">
+                            <input type="checkbox">
+                            Vulcan
+                            <span class="filter-count">326</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="filter-option">
+                            <input type="checkbox">
+                            Wolf
+                            <span class="filter-count">118</span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Nominal Width Filter -->
+            <div class="filter-group">
+                <div class="filter-group-title">Nominal Width <span style="font-weight: normal; color: #888;">ⓘ</span></div>
+                <ul class="filter-options">
+                    <li>
+                        <label class="filter-option">
+                            <input type="checkbox">
+                            12 Inches
+                            <span class="filter-count">28</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="filter-option">
+                            <input type="checkbox">
+                            18 Inches
+                            <span class="filter-count">60</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="filter-option">
+                            <input type="checkbox">
+                            24 Inches
+                            <span class="filter-count">100</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="filter-option">
+                            <input type="checkbox">
+                            36 Inches
+                            <span class="filter-count">471</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="filter-option">
+                            <input type="checkbox">
+                            48 Inches
+                            <span class="filter-count">162</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="filter-option">
+                            <input type="checkbox">
+                            60 Inches
+                            <span class="filter-count">292</span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+
+        </aside>
+
+        <!-- Products Area -->
+        <main class="products-area">
+            
+            <!-- Toolbar -->
+            <div class="products-toolbar">
+                <div class="view-toggle">
+                    <button class="view-btn active">
+                        <span>⊞</span> Grid
+                    </button>
+                    <button class="view-btn">
+                        <span>☰</span> List
+                    </button>
+                </div>
+                <div class="sort-dropdown">
+                    <label>Sort by</label>
+                    <select>
+                        <option>Most Popular</option>
+                        <option>Price: Low to High</option>
+                        <option>Price: High to Low</option>
+                        <option>Newest</option>
+                        <option>Best Rating</option>
+                    </select>
+                </div>
+                <div class="compare-toggle">
+                    Compare Products
+                    <div class="toggle-switch"></div>
+                    <span>Off</span>
+                </div>
+            </div>
+
+            <!-- Power Type Selector -->
+            <div class="power-type-section">
+                <div class="power-type-label">Choose Power Type:</div>
+                <div class="power-type-options">
+                    <button class="power-type-btn">
+                        <div class="power-type-icon propane">🔥</div>
+                        <div class="power-type-name">Propane</div>
+                        <div class="power-type-subtitle">Liquid Propane</div>
+                    </button>
+                    <button class="power-type-btn active">
+                        <div class="power-type-icon gas">💧</div>
+                        <div class="power-type-name">Natural Gas</div>
+                        <div class="power-type-subtitle">Natural Gas</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="products-grid">
+                
+                <!-- Product Card 1 -->
+                <div class="product-card-plp">
+                    <div class="product-badge">Better</div>
+                    <div class="product-image placeholder-product">📦</div>
+                    <div class="product-fuel-type">
+                        <span class="fuel-icon">💧</span> Natural Gas
+                    </div>
+                    <a href="#" class="product-title">Cooking Performance Group S36-N Natural Gas 6 Burner 36" Range with Standard...</a>
+                    <div class="product-rating">
+                        <span class="plus-badge">plus</span>
+                        <span class="stars">★★★★☆</span>
+                    </div>
+                    <div class="product-sku">#35IS36N</div>
+                    <div class="price-box">
+                        <div class="price-label">Plus Member Price</div>
+                        <div class="price-main">$1,249.00<span class="price-unit">/Each</span></div>
+                        <div class="price-regular">Regularly $1,369.00</div>
+                    </div>
+                    <div class="free-shipping-badge">Free Shipping</div>
+                    <div class="add-to-cart-row">
+                        <input type="number" class="qty-input" value="1">
+                        <button class="add-to-cart-btn">Add to Cart</button>
+                    </div>
+                </div>
+
+                <!-- Product Card 2 -->
+                <div class="product-card-plp">
+                    <div class="product-badge">Better</div>
+                    <div class="product-image placeholder-product">📦</div>
+                    <div class="product-fuel-type">
+                        <span class="fuel-icon">💧</span> Natural Gas
+                    </div>
+                    <a href="#" class="product-title">Cooking Performance Group S60-N Natural Gas 10 Burner 60" Range with 2 Standard...</a>
+                    <div class="product-rating">
+                        <span class="plus-badge">plus</span>
+                        <span class="stars">★★★★★</span>
+                    </div>
+                    <div class="product-sku">#35IS60N</div>
+                    <div class="price-box">
+                        <div class="price-label">Plus Member Price</div>
+                        <div class="price-main">$2,279.00<span class="price-unit">/Each</span></div>
+                        <div class="price-regular">Regularly $2,529.00</div>
+                    </div>
+                    <div class="free-shipping-badge">Free Shipping</div>
+                    <div class="add-to-cart-row">
+                        <input type="number" class="qty-input" value="1">
+                        <button class="add-to-cart-btn">Add to Cart</button>
+                    </div>
+                </div>
+
+                <!-- Product Card 3 -->
+                <div class="product-card-plp">
+                    <div class="product-badge">Better</div>
+                    <div class="product-image placeholder-product">📦</div>
+                    <div class="product-fuel-type">
+                        <span class="fuel-icon">💧</span> Natural Gas
+                    </div>
+                    <a href="#" class="product-title">Cooking Performance Group S60-G36-N Natural Gas 4 Burner 60" Range with 36"...</a>
+                    <div class="product-rating">
+                        <span class="plus-badge">plus</span>
+                        <span class="stars">★★★★★</span>
+                    </div>
+                    <div class="product-sku">#35IS60G36N</div>
+                    <div class="price-box">
+                        <div class="price-label">Plus Member Price</div>
+                        <div class="price-main">$3,099.00<span class="price-unit">/Each</span></div>
+                        <div class="price-regular">Regularly $3,349.00</div>
+                    </div>
+                    <div class="free-shipping-badge">Free Shipping</div>
+                    <div class="add-to-cart-row">
+                        <input type="number" class="qty-input" value="1">
+                        <button class="add-to-cart-btn">Add to Cart</button>
+                    </div>
+                </div>
+
+                <!-- Product Card 4 -->
+                <div class="product-card-plp">
+                    <div class="product-badge">Better</div>
+                    <div class="product-image placeholder-product">📦</div>
+                    <div class="product-fuel-type">
+                        <span class="fuel-icon">💧</span> Natural Gas
+                    </div>
+                    <a href="#" class="product-title">Cooking Performance Group S24-N Natural Gas 4 Burner 24" Range with Space Saver...</a>
+                    <div class="product-rating">
+                        <span class="plus-badge">plus</span>
+                        <span class="stars">★★★★★</span>
+                    </div>
+                    <div class="product-sku">#35IS24N</div>
+                    <div class="price-box">
+                        <div class="price-label">Plus Member Price</div>
+                        <div class="price-main">$1,219.00<span class="price-unit">/Each</span></div>
+                        <div class="price-regular">Regularly $1,339.00</div>
+                    </div>
+                    <div class="free-shipping-badge">Free Shipping</div>
+                    <div class="add-to-cart-row">
+                        <input type="number" class="qty-input" value="1">
+                        <button class="add-to-cart-btn">Add to Cart</button>
+                    </div>
+                </div>
+
+                <!-- Product Card 5 -->
+                <div class="product-card-plp">
+                    <div class="product-badge">Better</div>
+                    <div class="product-image placeholder-product">📦</div>
+                    <div class="product-fuel-type">
+                        <span class="fuel-icon">💧</span> Natural Gas
+                    </div>
+                    <a href="#" class="product-title">Cooking Performance Group S60-GS24-N Natural Gas 6 Burner 60" Range with 24"...</a>
+                    <div class="product-rating">
+                        <span class="plus-badge">plus</span>
+                        <span class="stars">★★★★★</span>
+                    </div>
+                    <div class="product-sku">#35IS60GS24N</div>
+                    <div class="price-box">
+                        <div class="price-label">Plus Member Price</div>
+                        <div class="price-main">$2,439.00<span class="price-unit">/Each</span></div>
+                        <div class="price-regular">Regularly $2,689.00</div>
+                    </div>
+                    <div class="free-shipping-badge">Free Shipping</div>
+                    <div class="add-to-cart-row">
+                        <input type="number" class="qty-input" value="1">
+                        <button class="add-to-cart-btn">Add to Cart</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+
+</div>
+
+</body>
+</html>

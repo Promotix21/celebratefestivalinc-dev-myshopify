@@ -1,0 +1,70 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "product-celebrate-festival",
+      "settings": {
+        "show_demo_data": false,
+        "show_breadcrumb": true,
+        "description_heading": "Product Description",
+        "enable_member_pricing": true,
+        "member_discount_percent": 2,
+        "price_label": "Non-Member Price:",
+        "member_price_label": "Plus Member Price:",
+        "price_unit": "Each",
+        "member_info_text": "Plus Members save on this item. Learn more",
+        "shipping_alert_text": "This item ships via freight. Additional time and fees may apply.",
+        "show_shipping_info": true,
+        "shipping_info_title": "Instant Access Shipping",
+        "shipping_info_list": "Ships in 1-2 business days|Ships via freight carrier|Eligible for expedited shipping|Original packaging to reduce damage|Free lift gate service included",
+        "shipping_link_text": "See all shipping options",
+        "shipping_link_url": "/pages/shipping",
+        "add_to_cart_text": "Add to Cart",
+        "related_title_default": "Other Products from this Line",
+        "enable_bottom_related": true,
+        "bottom_related_title": "You May Also Need to Complete Your Order",
+        "enable_qa": true,
+        "qa_heading": "Questions & Answers",
+        "qa_button_text": "Ask a Question",
+        "qa_button_link": "/pages/contact",
+        "enable_compare": false,
+        "compare_heading": "Compare to Other Products",
+        "enable_reviews": true,
+        "reviews_heading": "Customer Reviews",
+        "show_brand_banner": true,
+        "brand_banner_tagline": "PREMIUM QUALITY",
+        "brand_banner_description": "Premium quality commercial equipment designed for professional use. Trusted by businesses worldwide.",
+        "brand_banner_features": "Energy Efficient|NSF Certified|Extended Warranty",
+        "show_service_banner": true,
+        "service_banner_icon": "🏆",
+        "service_banner_title": "Proud Parts & Service Partner",
+        "service_banner_description": "We stock genuine replacement parts and provide expert technical support.",
+        "service_banner_list": "<strong>Services Available:</strong><br>• Genuine OEM Parts<br>• Technical Support<br>• Installation Assistance<br>• Warranty Service",
+        "service_banner_button_text": "Find Parts & Manuals",
+        "service_banner_button_url": "/pages/parts-and-service",
+        "show_resources": true,
+        "show_additional_resources": false,
+        "additional_resources_title": "📚 Additional Resources",
+        "additional_resources_description": "Everything you need to make an informed decision about your purchase.",
+        "video_resources": "Product Overview Video|Installation Guide Video|Maintenance Tips Video|Troubleshooting Guide",
+        "guide_resources": "Buying Guide|Kitchen Planning|Energy Efficiency Tips|Sizing Calculator",
+        "show_help_box": true,
+        "help_phone": "(408) 673-9999",
+        "help_email": "support@celebratefestivalinc.com",
+        "help_chat_enabled": true,
+        "help_additional_links": "🎥 Product Videos|❓ FAQ Section|🛠️ Installation Service"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

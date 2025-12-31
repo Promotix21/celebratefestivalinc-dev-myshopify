@@ -1,0 +1,864 @@
+{% comment %}
+  Save this file as: templates/search.liquid
+  This replaces the default Dawn theme search template
+{% endcomment %}
+
+{{ 'search-results.css' | asset_url | stylesheet_tag }}
+
+<div class="search-page-wrapper">
+  <!-- Breadcrumb -->
+  <section class="breadcrumb">
+    <div class="container">
+      <nav class="breadcrumb-nav">
+        <a href="{{ routes.root_url }}"><i class="fas fa-home"></i> Home</a>
+        <span> > </span>
+        <span>Search Results{% if search.terms %}: "{{ search.terms }}"{% endif %}</span>
+      </nav>
+    </div>
+  </section>
+
+  <!-- Search Header -->
+  <section class="search-header">
+    <div class="container">
+      <h1 class="search-title">
+        {% if search.performed %}
+          {% if search.results_count > 0 %}
+            Search Results for "{{ search.terms }}"
+          {% else %}
+            No results found for "{{ search.terms }}"
+          {% endif %}
+        {% else %}
+          Search Our Products
+        {% endif %}
+      </h1>
+      
+  
+
+      {% if search.performed and search.results_count > 0 %}
+        <p class="search-description">
+          Found {{ search.results_count }} {{ search.results_count | pluralize: 'result', 'results' }} for your search
+        </p>
+      {% endif %}
+    </div>
+  </section>
+
+  {% if search.performed %}
+    <!-- Search Results Content -->
+    <section class="search-content">
+      <div class="container">
+        <div class="search-grid">
+          <!-- Sidebar Filters -->
+         <aside class="filters-sidebar">
+ <!-- Collections Filter -->
+<div class="filter-section">
+  <div class="filter-title-row">
+    <h3 class="filter-title">Collections</h3>
+    <a href="/collections" class="view-all-filter-link">View All</a>
+  </div>
+  <div class="filter-group" id="collection-filter-group">
+      {% assign all_collections = '' | split: '' %}
+      {% for item in search.results %}
+        {% if item.object_type == 'product' %}
+          {% for collection in item.collections %}
+            {% unless all_collections contains collection.handle %}
+              {% assign all_collections = all_collections | push: collection.handle %}
+            {% endunless %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+      
+      {% assign collection_count = 0 %}
+      {% for item in search.results %}
+        {% if item.object_type == 'product' %}
+          {% for collection in item.collections %}
+            {% assign collection_count = collection_count | plus: 1 %}
+            {% if collection_count <= 5 %}
+              <div class="filter-item" 
+                   data-filter-type="collection" 
+                   data-filter-value="{{ collection.handle }}">
+                <div class="filter-checkbox">
+                  <i class="fas fa-check"></i>
+                </div>
+                <span class="filter-label">{{ collection.title }}</span>
+                <span class="filter-count">
+                  {% assign coll_count = 0 %}
+                  {% for prod in search.results %}
+                    {% if prod.object_type == 'product' %}
+                      {% for pc in prod.collections %}
+                        {% if pc.handle == collection.handle %}
+                          {% assign coll_count = coll_count | plus: 1 %}
+                          {% break %}
+                        {% endif %}
+                      {% endfor %}
+                    {% endif %}
+                  {% endfor %}
+                  {{ coll_count }}
+                </span>
+              </div>
+            {% else %}
+              <div class="filter-item filter-item-hidden" 
+                   data-filter-type="collection" 
+                   data-filter-value="{{ collection.handle }}">
+                <div class="filter-checkbox">
+                  <i class="fas fa-check"></i>
+                </div>
+                <span class="filter-label">{{ collection.title }}</span>
+                <span class="filter-count">
+                  {% assign coll_count = 0 %}
+                  {% for prod in search.results %}
+                    {% if prod.object_type == 'product' %}
+                      {% for pc in prod.collections %}
+                        {% if pc.handle == collection.handle %}
+                          {% assign coll_count = coll_count | plus: 1 %}
+                          {% break %}
+                        {% endif %}
+                      {% endfor %}
+                    {% endif %}
+                  {% endfor %}
+                  {{ coll_count }}
+                </span>
+              </div>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% if all_collections.size > 5 %}
+      <button class="btn-show-more" onclick="toggleShowMore('collection-filter-group', this)">
+        <span class="show-more-text">Show More</span>
+        <i class="fas fa-chevron-down"></i>
+      </button>
+    {% endif %}
+  </div>
+
+  <!-- Product Type Filter -->
+ <div class="filter-section">
+  <div class="filter-title-row">
+    <h3 class="filter-title">Product Type</h3>
+    <a href="/collections/all" class="view-all-filter-link">Browse All</a>
+  </div>
+  <div class="filter-group" id="type-filter-group">
+      {% assign product_types = search.results | map: 'type' | uniq | sort %}
+      {% assign type_count = 0 %}
+      {% for type in product_types %}
+        {% if type != blank %}
+          {% assign type_count = type_count | plus: 1 %}
+          <div class="filter-item {% if type_count > 5 %}filter-item-hidden{% endif %}" 
+               data-filter-type="type" 
+               data-filter-value="{{ type | handleize }}">
+            <div class="filter-checkbox">
+              <i class="fas fa-check"></i>
+            </div>
+            <span class="filter-label">{{ type }}</span>
+            <span class="filter-count">
+              {{ search.results | where: 'type', type | size }}
+            </span>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% if product_types.size > 5 %}
+      <button class="btn-show-more" onclick="toggleShowMore('type-filter-group', this)">
+        <span class="show-more-text">Show More</span>
+        <i class="fas fa-chevron-down"></i>
+      </button>
+    {% endif %}
+  </div>
+
+  <!-- Vendor/Brand Filter -->
+ <div class="filter-section">
+  <div class="filter-title-row">
+    <h3 class="filter-title">Brand</h3>
+    <a href="/pages/brands" class="view-all-filter-link">All Brands</a>
+  </div>
+  <div class="filter-group" id="vendor-filter-group">
+      {% assign vendors = search.results | map: 'vendor' | uniq | sort %}
+      {% assign vendor_count = 0 %}
+      {% for vendor in vendors %}
+        {% if vendor != blank %}
+          {% assign vendor_count = vendor_count | plus: 1 %}
+          <div class="filter-item {% if vendor_count > 5 %}filter-item-hidden{% endif %}" 
+               data-filter-type="vendor" 
+               data-filter-value="{{ vendor | handleize }}">
+            <div class="filter-checkbox">
+              <i class="fas fa-check"></i>
+            </div>
+            <span class="filter-label">{{ vendor }}</span>
+            <span class="filter-count">
+              {{ search.results | where: 'vendor', vendor | size }}
+            </span>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% if vendors.size > 5 %}
+      <button class="btn-show-more" onclick="toggleShowMore('vendor-filter-group', this)">
+        <span class="show-more-text">Show More</span>
+        <i class="fas fa-chevron-down"></i>
+      </button>
+    {% endif %}
+  </div>
+
+  <!-- Product Category (Shopify Standard Taxonomy) -->
+  <div class="filter-section">
+    <h3 class="filter-title">Category</h3>
+    <div class="filter-group" id="category-filter-group">
+      {% assign categories = search.results | map: 'product_category' | compact | uniq | sort %}
+      {% assign category_count = 0 %}
+      {% for category in categories %}
+        {% if category != blank %}
+          {% assign category_count = category_count | plus: 1 %}
+          {% assign category_name = category.name | default: category %}
+          <div class="filter-item {% if category_count > 5 %}filter-item-hidden{% endif %}" 
+               data-filter-type="category" 
+               data-filter-value="{{ category_name | handleize }}">
+            <div class="filter-checkbox">
+              <i class="fas fa-check"></i>
+            </div>
+            <span class="filter-label">{{ category_name }}</span>
+            <span class="filter-count">
+              {% assign cat_count = 0 %}
+              {% for prod in search.results %}
+                {% if prod.product_category.name == category_name or prod.product_category == category %}
+                  {% assign cat_count = cat_count | plus: 1 %}
+                {% endif %}
+              {% endfor %}
+              {{ cat_count }}
+            </span>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% if categories.size > 5 %}
+      <button class="btn-show-more" onclick="toggleShowMore('category-filter-group', this)">
+        <span class="show-more-text">Show More</span>
+        <i class="fas fa-chevron-down"></i>
+      </button>
+    {% endif %}
+  </div>
+
+  <!-- Tags Filter -->
+ <div class="filter-section">
+  <div class="filter-title-row">
+    <h3 class="filter-title">Tags</h3>
+    <a href="/blogs/news/tags" class="view-all-filter-link">All Tags</a>
+  </div>
+  <div class="filter-group" id="tags-filter-group">
+      {% assign all_tags = '' | split: '' %}
+      {% for item in search.results %}
+        {% if item.object_type == 'product' %}
+          {% for tag in item.tags %}
+            {% unless all_tags contains tag %}
+              {% assign all_tags = all_tags | push: tag %}
+            {% endunless %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+      
+      {% assign sorted_tags = all_tags | sort %}
+      {% assign tag_count = 0 %}
+      {% for tag in sorted_tags %}
+        {% assign tag_count = tag_count | plus: 1 %}
+        <div class="filter-item {% if tag_count > 5 %}filter-item-hidden{% endif %}" 
+             data-filter-type="tag" 
+             data-filter-value="{{ tag | handleize }}">
+          <div class="filter-checkbox">
+            <i class="fas fa-check"></i>
+          </div>
+          <span class="filter-label">{{ tag }}</span>
+          <span class="filter-count">
+            {% assign tag_prod_count = 0 %}
+            {% for prod in search.results %}
+              {% if prod.object_type == 'product' and prod.tags contains tag %}
+                {% assign tag_prod_count = tag_prod_count | plus: 1 %}
+              {% endif %}
+            {% endfor %}
+            {{ tag_prod_count }}
+          </span>
+        </div>
+      {% endfor %}
+    </div>
+    {% if sorted_tags.size > 5 %}
+      <button class="btn-show-more" onclick="toggleShowMore('tags-filter-group', this)">
+        <span class="show-more-text">Show More</span>
+        <i class="fas fa-chevron-down"></i>
+      </button>
+    {% endif %}
+  </div>
+
+  <!-- Price Range Filter -->
+  <div class="filter-section">
+    <h3 class="filter-title">Price Range</h3>
+    <div class="price-range">
+      <div class="price-inputs">
+        <input type="number" class="price-input" id="minPrice" placeholder="$0" min="0">
+        <input type="number" class="price-input" id="maxPrice" placeholder="$10000" min="0">
+      </div>
+      <button class="btn-apply-price" onclick="applyPriceFilter()">Apply</button>
+    </div>
+  </div>
+
+  <!-- Availability Filter -->
+  <div class="filter-section">
+    <h3 class="filter-title">Availability</h3>
+    <div class="filter-group">
+      <div class="filter-item" data-filter-type="availability" data-filter-value="in-stock">
+        <div class="filter-checkbox">
+          <i class="fas fa-check"></i>
+        </div>
+        <span class="filter-label">In Stock</span>
+        <span class="filter-count">
+          {% assign in_stock = 0 %}
+          {% for item in search.results %}
+            {% if item.object_type == 'product' and item.available %}
+              {% assign in_stock = in_stock | plus: 1 %}
+            {% endif %}
+          {% endfor %}
+          {{ in_stock }}
+        </span>
+      </div>
+      <div class="filter-item" data-filter-type="availability" data-filter-value="out-of-stock">
+        <div class="filter-checkbox">
+          <i class="fas fa-check"></i>
+        </div>
+        <span class="filter-label">Out of Stock</span>
+        <span class="filter-count">
+          {% assign out_stock = 0 %}
+          {% for item in search.results %}
+            {% if item.object_type == 'product' and item.available == false %}
+              {% assign out_stock = out_stock | plus: 1 %}
+            {% endif %}
+          {% endfor %}
+          {{ out_stock }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clear Filters Button -->
+  <button class="btn-clear-filters" onclick="clearAllFilters()">
+    <i class="fas fa-times"></i>
+    Clear All Filters
+  </button>
+</aside>
+
+
+          <!-- Products Area -->
+          <div class="products-area">
+            <!-- Mobile Filter Toggle -->
+            <button class="mobile-filter-toggle" onclick="toggleMobileFilters()">
+              <i class="fas fa-filter"></i>
+              Filters
+            </button>
+
+            {% if search.results_count > 0 %}
+              <!-- Products Header -->
+              <div class="products-header">
+                <div class="products-count">
+                  Showing <span id="showing-count">{{ search.results.size }}</span> of {{ search.results_count }} results
+                </div>
+                <div class="products-controls">
+                  <label for="sort-select">Sort By:</label>
+                  <select id="sort-select" class="sort-dropdown" onchange="sortProducts(this.value)">
+                    <option value="relevance">Most Relevant</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="title-asc">Name A-Z</option>
+                    <option value="title-desc">Name Z-A</option>
+                    <option value="created-desc">Newest First</option>
+                    <option value="created-asc">Oldest First</option>
+                  </select>
+                  <label>View:</label>
+                  <div class="view-toggle">
+                    <button class="view-btn active" onclick="switchView('grid')">
+                      <i class="fas fa-th"></i>
+                    </button>
+                    <button class="view-btn" onclick="switchView('list')">
+                      <i class="fas fa-list"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Products Grid -->
+              <div class="products-grid" id="products-grid">
+                {% for item in search.results %}
+                  {% if item.object_type == 'product' %}
+                  <div class="product-card" 
+     data-product-id="{{ item.id }}"
+     data-product-type="{{ item.type | handleize }}"
+     data-product-vendor="{{ item.vendor | handleize }}"
+     data-product-collections="{% for coll in item.collections %}{{ coll.handle }}{% unless forloop.last %},{% endunless %}{% endfor %}"
+     data-product-category="{{ item.product_category.name | handleize }}"
+     data-product-tags="{% for tag in item.tags %}{{ tag | handleize }}{% unless forloop.last %},{% endunless %}{% endfor %}"
+     data-product-price="{{ item.price }}"
+     data-product-available="{{ item.available }}">
+                      
+                      <div class="product-image">
+                        {% if item.featured_image %}
+                          <img src="{{ item.featured_image | image_url: width: 400 }}" 
+                               alt="{{ item.featured_image.alt | escape | default: item.title }}"
+                               loading="lazy">
+                        {% else %}
+                          <img src="{{ 'product-placeholder.png' | asset_url }}" alt="{{ item.title }}">
+                        {% endif %}
+                        
+                        <div class="product-badges">
+                          {% if item.available == false %}
+                            <span class="badge out-of-stock-badge">Out of Stock</span>
+                          {% elsif item.tags contains 'free-shipping' %}
+                            <span class="badge free-shipping-badge">Free Shipping</span>
+                          {% endif %}
+                          
+                          {% if item.compare_at_price > item.price %}
+                            {% assign savings = item.compare_at_price | minus: item.price %}
+                            {% assign percent = savings | times: 100.0 | divided_by: item.compare_at_price | round %}
+                            <span class="badge sale-badge">Save {{ percent }}%</span>
+                          {% endif %}
+                        </div>
+                      </div>
+
+                      <div class="product-info">
+                        <div class="product-content">
+                          {% if item.vendor %}
+                            <div class="product-brand">{{ item.vendor }}</div>
+                          {% endif %}
+                          
+                          <h3 class="product-title">
+                            <a href="{{ item.url }}">{{ item.title }}</a>
+                          </h3>
+
+                          {% if item.tags.size > 0 %}
+                            <div class="product-features">
+                              {% for tag in item.tags limit: 3 %}
+                                {% unless tag contains 'free-shipping' %}
+                                  <span class="feature-tag">{{ tag }}</span>
+                                {% endunless %}
+                              {% endfor %}
+                            </div>
+                          {% endif %}
+
+                          <div class="product-pricing">
+                            {% if item.available %}
+                              <div class="price-group">
+                                <span class="current-price">{{ item.price | money }}</span>
+                                {% if item.compare_at_price > item.price %}
+                                  <span class="original-price">{{ item.compare_at_price | money }}</span>
+                                {% endif %}
+                              </div>
+                              {% if item.compare_at_price > item.price %}
+                                {% assign savings = item.compare_at_price | minus: item.price %}
+                                <span class="savings">Save {{ savings | money }}</span>
+                              {% endif %}
+                            {% else %}
+                              <div class="contact-price">
+                                <i class="fas fa-phone"></i>
+                                Call for Availability
+                              </div>
+                            {% endif %}
+                          </div>
+                        </div>
+
+                        <div class="product-actions">
+                          <a href="{{ item.url }}" class="btn btn-primary">
+                            <i class="fas fa-eye"></i>
+                            View Details
+                          </a>
+                          <button class="btn btn-secondary wishlist-btn" onclick="toggleWishlist(this)">
+                            <i class="fas fa-heart"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+
+              <!-- No Results After Filter -->
+              <div class="no-filtered-results" id="no-filtered-results" style="display: none;">
+                <div class="no-results-icon">
+                  <i class="fas fa-filter"></i>
+                </div>
+                <h3>No products match your filters</h3>
+                <p>Try adjusting your filters to see more results</p>
+                <button class="btn btn-primary" onclick="clearAllFilters()">
+                  Clear All Filters
+                </button>
+              </div>
+
+            {% else %}
+              <!-- No Search Results -->
+              <div class="no-results">
+                <div class="no-results-icon">
+                  <i class="fas fa-search"></i>
+                </div>
+                <h2>No results found for "{{ search.terms }}"</h2>
+                <p>Try different keywords or check the spelling</p>
+                
+                <div class="search-suggestions">
+                  <h3>Search Suggestions:</h3>
+                  <ul>
+                    <li>Use more general terms</li>
+                    <li>Check your spelling</li>
+                    <li>Try searching for product categories</li>
+                    <li>Browse our popular categories below</li>
+                  </ul>
+                </div>
+
+                <div class="popular-categories">
+                  <h3>Popular Categories</h3>
+                  <div class="category-grid">
+                    <a href="/collections/refrigeration" class="category-card">
+                      <i class="fas fa-snowflake"></i>
+                      <span>Refrigeration</span>
+                    </a>
+                    <a href="/collections/cooking-equipment" class="category-card">
+                      <i class="fas fa-fire"></i>
+                      <span>Cooking Equipment</span>
+                    </a>
+                    <a href="/collections/food-prep" class="category-card">
+                      <i class="fas fa-utensils"></i>
+                      <span>Food Prep</span>
+                    </a>
+                    <a href="/collections/dishwashing" class="category-card">
+                      <i class="fas fa-soap"></i>
+                      <span>Dishwashing</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+  {% else %}
+    <!-- Search Instructions (when no search performed yet) -->
+    <section class="search-instructions">
+      <div class="container">
+        <div class="instructions-content">
+          <i class="fas fa-search search-big-icon"></i>
+          <h2>Enter a search term above</h2>
+          <p>Search through our catalog of 10,000+ commercial kitchen products</p>
+        </div>
+      </div>
+    </section>
+  {% endif %}
+</div>
+
+<!-- Mobile Filter Overlay -->
+<div class="mobile-filter-overlay" id="mobileFilterOverlay" onclick="closeMobileFilters()"></div>
+
+<!-- Mobile Filters -->
+<div class="mobile-filters" id="mobileFilters">
+  <div class="mobile-filter-header">
+    <h3 class="mobile-filter-title">Filters</h3>
+    <button class="mobile-filter-close" onclick="closeMobileFilters()">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+  
+  <!-- Mobile filters content (same as sidebar) -->
+  <div class="mobile-filters-content">
+    <!-- Filters will be cloned here by JavaScript -->
+  </div>
+
+  <button class="mobile-filter-apply" onclick="applyMobileFilters()">
+    Apply Filters
+  </button>
+</div>
+
+<script>
+  // Filter functionality
+let activeFilters = {
+  type: [],
+  vendor: [],
+  collection: [],
+  category: [],
+  tag: [],
+  availability: [],
+  priceMin: null,
+  priceMax: null
+};
+
+  // Toggle filter
+ document.querySelectorAll('.filter-item').forEach(item => {
+  item.addEventListener('click', function() {
+    const checkbox = this.querySelector('.filter-checkbox');
+    const filterType = this.dataset.filterType;
+    const filterValue = this.dataset.filterValue;
+    
+    checkbox.classList.toggle('checked');
+    
+    if (checkbox.classList.contains('checked')) {
+      if (!activeFilters[filterType].includes(filterValue)) {
+        activeFilters[filterType].push(filterValue);
+      }
+    } else {
+      activeFilters[filterType] = activeFilters[filterType].filter(v => v !== filterValue);
+    }
+    
+    applyFilters();
+  });
+});
+
+  // Apply filters
+// Apply filters
+function applyFilters() {
+  const products = document.querySelectorAll('.product-card');
+  let visibleCount = 0;
+
+  products.forEach(product => {
+    let shouldShow = true;
+
+    // Type filter
+    if (activeFilters.type.length > 0) {
+      const productType = product.dataset.productType;
+      if (!activeFilters.type.includes(productType)) {
+        shouldShow = false;
+      }
+    }
+
+    // Vendor filter
+    if (activeFilters.vendor.length > 0) {
+      const productVendor = product.dataset.productVendor;
+      if (!activeFilters.vendor.includes(productVendor)) {
+        shouldShow = false;
+      }
+    }
+
+    // Collection filter
+    if (activeFilters.collection.length > 0) {
+      const productCollections = product.dataset.productCollections ? 
+        product.dataset.productCollections.split(',') : [];
+      const hasMatch = activeFilters.collection.some(col => productCollections.includes(col));
+      if (!hasMatch) {
+        shouldShow = false;
+      }
+    }
+
+    // Category filter
+    if (activeFilters.category.length > 0) {
+      const productCategory = product.dataset.productCategory;
+      if (!activeFilters.category.includes(productCategory)) {
+        shouldShow = false;
+      }
+    }
+
+    // Tag filter
+    if (activeFilters.tag.length > 0) {
+      const productTags = product.dataset.productTags ? 
+        product.dataset.productTags.split(',') : [];
+      const hasMatch = activeFilters.tag.some(tag => productTags.includes(tag));
+      if (!hasMatch) {
+        shouldShow = false;
+      }
+    }
+
+    // Availability filter
+    if (activeFilters.availability.length > 0) {
+      const isAvailable = product.dataset.productAvailable === 'true';
+      const hasInStock = activeFilters.availability.includes('in-stock');
+      const hasOutOfStock = activeFilters.availability.includes('out-of-stock');
+      
+      if ((hasInStock && !isAvailable) || (hasOutOfStock && isAvailable)) {
+        if (!(hasInStock && hasOutOfStock)) {
+          shouldShow = false;
+        }
+      }
+    }
+
+    // Price filter
+    const productPrice = parseFloat(product.dataset.productPrice) / 100;
+    if (activeFilters.priceMin !== null && productPrice < activeFilters.priceMin) {
+      shouldShow = false;
+    }
+    if (activeFilters.priceMax !== null && productPrice > activeFilters.priceMax) {
+      shouldShow = false;
+    }
+
+    // Show/hide product
+    if (shouldShow) {
+      product.style.display = '';
+      visibleCount++;
+    } else {
+      product.style.display = 'none';
+    }
+  });
+
+  // Update count
+  document.getElementById('showing-count').textContent = visibleCount;
+
+  // Show/hide no results message
+  const noResults = document.getElementById('no-filtered-results');
+  if (visibleCount === 0) {
+    noResults.style.display = 'block';
+    document.getElementById('products-grid').style.display = 'none';
+  } else {
+    noResults.style.display = 'none';
+    document.getElementById('products-grid').style.display = 'grid';
+  }
+}
+
+  // Price filter
+  function applyPriceFilter() {
+    const minPrice = parseFloat(document.getElementById('minPrice').value) || null;
+    const maxPrice = parseFloat(document.getElementById('maxPrice').value) || null;
+    
+    activeFilters.priceMin = minPrice;
+    activeFilters.priceMax = maxPrice;
+    
+    applyFilters();
+  }
+
+  // Clear all filters
+ // Clear all filters
+function clearAllFilters() {
+  activeFilters = {
+    type: [],
+    vendor: [],
+    collection: [],
+    category: [],
+    tag: [],
+    availability: [],
+    priceMin: null,
+    priceMax: null
+  };
+
+  document.querySelectorAll('.filter-checkbox.checked').forEach(cb => {
+    cb.classList.remove('checked');
+  });
+
+  document.getElementById('minPrice').value = '';
+  document.getElementById('maxPrice').value = '';
+
+  applyFilters();
+}
+
+  // Sort products
+  function sortProducts(sortValue) {
+    const grid = document.getElementById('products-grid');
+    const products = Array.from(grid.querySelectorAll('.product-card'));
+
+    products.sort((a, b) => {
+      switch(sortValue) {
+        case 'price-low':
+          return parseFloat(a.dataset.productPrice) - parseFloat(b.dataset.productPrice);
+        case 'price-high':
+          return parseFloat(b.dataset.productPrice) - parseFloat(a.dataset.productPrice);
+        case 'title-asc':
+          return a.querySelector('.product-title').textContent.localeCompare(b.querySelector('.product-title').textContent);
+        case 'title-desc':
+          return b.querySelector('.product-title').textContent.localeCompare(a.querySelector('.product-title').textContent);
+        default:
+          return 0;
+      }
+    });
+
+    products.forEach(product => grid.appendChild(product));
+  }
+
+  // View toggle
+  function switchView(viewType) {
+    const grid = document.getElementById('products-grid');
+    const gridBtn = document.querySelector('.view-btn:first-child');
+    const listBtn = document.querySelector('.view-btn:last-child');
+
+    if (viewType === 'grid') {
+      grid.classList.remove('list-view');
+      gridBtn.classList.add('active');
+      listBtn.classList.remove('active');
+    } else {
+      grid.classList.add('list-view');
+      listBtn.classList.add('active');
+      gridBtn.classList.remove('active');
+    }
+  }
+
+  // Wishlist toggle
+  function toggleWishlist(btn) {
+    const icon = btn.querySelector('i');
+    if (icon.style.color === 'rgb(255, 107, 107)' || icon.style.color === '#FF6B6B') {
+      icon.style.color = '';
+      btn.style.borderColor = '';
+    } else {
+      icon.style.color = '#FF6B6B';
+      btn.style.borderColor = '#FF6B6B';
+    }
+  }
+
+  // Mobile filters
+  function toggleMobileFilters() {
+    const overlay = document.getElementById('mobileFilterOverlay');
+    const filters = document.getElementById('mobileFilters');
+    
+    // Clone desktop filters to mobile if not already done
+    const mobileContent = filters.querySelector('.mobile-filters-content');
+    if (mobileContent.children.length === 0) {
+      const desktopFilters = document.querySelector('.filters-sidebar').cloneNode(true);
+      mobileContent.appendChild(desktopFilters);
+      
+      // Re-attach event listeners
+      mobileContent.querySelectorAll('.filter-item').forEach(item => {
+        item.addEventListener('click', function() {
+          const checkbox = this.querySelector('.filter-checkbox');
+          checkbox.classList.toggle('checked');
+        });
+      });
+    }
+    
+    overlay.classList.add('active');
+    filters.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMobileFilters() {
+    const overlay = document.getElementById('mobileFilterOverlay');
+    const filters = document.getElementById('mobileFilters');
+    
+    overlay.classList.remove('active');
+    filters.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function applyMobileFilters() {
+    closeMobileFilters();
+    applyFilters();
+  }
+
+  // Initialize on load
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('Search page loaded');
+  });
+
+  // Show More / Show Less for filters
+function toggleShowMore(groupId, button) {
+  const group = document.getElementById(groupId);
+  const hiddenItems = group.querySelectorAll('.filter-item-hidden');
+  const icon = button.querySelector('i');
+  const text = button.querySelector('.show-more-text');
+  
+  if (button.classList.contains('expanded')) {
+    // Collapse
+    hiddenItems.forEach(item => {
+      item.classList.add('filter-item-hidden');
+    });
+    button.classList.remove('expanded');
+    text.textContent = 'Show More';
+    icon.style.transform = 'rotate(0deg)';
+  } else {
+    // Expand
+    hiddenItems.forEach(item => {
+      item.classList.remove('filter-item-hidden');
+    });
+    button.classList.add('expanded');
+    text.textContent = 'Show Less';
+    icon.style.transform = 'rotate(180deg)';
+  }
+}
+</script>
+
+<style>
+  /* Import Font Awesome if not already loaded */
+  @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css');
+</style>
