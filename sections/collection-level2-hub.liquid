@@ -1,438 +1,2190 @@
 {% comment %}
-  Level 2 Collection Hub - WebstaurantStore Style
-  Shows Level 3 categories as featured cards with images and descriptions
-  Also shows Level 4 quick links under each Level 3 card
+  Collection Level 2 Hub - Product Listing Page (PLP)
+  Same design as Level 3, but with L3 subcategory filter pills at top
 {% endcomment %}
 
-{%- style -%}
-  .level2-hub {
-    padding: 0 0 40px;
-  }
+{% comment %} ========================================
+   COLLECTION HANDLE FALLBACK LOGIC
+   Menu URLs may point to empty collections.
+   Try: original -> new-theme-{handle} -> special mappings
+======================================== {% endcomment %}
 
-  /* Container */
-  .level2-hub__container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 30px 20px;
-  }
+{% assign menu_handle = section.settings.menu | default: 'main-menu' %}
+{% assign l3_children = blank %}
+{% assign found_in_menu = false %}
 
-  /* Hero Banner */
-  .level2-hub__hero {
-    width: 100%;
-    height: 300px;
-    background-size: cover;
-    background-position: center;
-    background-color: #f0f0f0;
-    margin-bottom: 30px;
-    border-radius: 8px;
-    overflow: hidden;
-  }
+{% comment %} Find current collection in menu and get L3 children {% endcomment %}
+{% for link in linklists[menu_handle].links %}
+  {% for l2_link in link.links %}
+    {% assign l2_handle = l2_link.url | split: '/' | last | split: '?' | first %}
+    {% if l2_handle == collection.handle %}
+      {% assign l3_children = l2_link.links %}
+      {% assign found_in_menu = true %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+  {% if found_in_menu %}{% break %}{% endif %}
+{% endfor %}
 
-  .level2-hub__hero img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+{% comment %} Collect L3 collection handles with fallback {% endcomment %}
+{% assign l3_collection_handles = '' %}
+{% assign handle_mappings = 'meat-processing-equipment:new-theme-meat-process-equipment,vegetable-slicers-and-cutters-2:new-theme-vegetable-slicers-and-cutters,rice-cooker:new-theme-rice-cooker,commercial-can-openers:new-theme-commercial-can-openers' %}
 
-  .level2-hub__hero-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8f 100%);
-    color: rgba(255,255,255,0.3);
-  }
+{% if l3_children.size > 0 %}
+  {% for child_link in l3_children %}
+    {% assign child_handle = child_link.url | split: '/' | last | split: '?' | first %}
+    {% assign child_coll = collections[child_handle] %}
+    {% assign final_coll = nil %}
+    {% assign used_handle = child_handle %}
 
-  @media (max-width: 768px) {
-    .level2-hub__hero {
-      height: 180px;
-    }
-  }
+    {% assign new_theme_handle = 'new-theme-' | append: child_handle %}
+    {% assign new_theme_coll = collections[new_theme_handle] %}
 
-  /* Featured Categories Grid - 3 columns */
-  .level2-hub__grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    margin-bottom: 40px;
-  }
+    {% assign orig_count = child_coll.products_count | default: 0 | plus: 0 %}
+    {% assign new_count = new_theme_coll.products_count | default: 0 | plus: 0 %}
 
-  @media (max-width: 990px) {
-    .level2-hub__grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
+    {% if child_coll and orig_count > 0 %}
+      {% assign final_coll = child_coll %}
+    {% elsif new_theme_coll and new_count > 0 %}
+      {% assign final_coll = new_theme_coll %}
+      {% assign used_handle = new_theme_handle %}
+    {% else %}
+      {% assign mappings_array = handle_mappings | split: ',' %}
+      {% for mapping in mappings_array %}
+        {% assign mapping_parts = mapping | split: ':' %}
+        {% assign map_from = mapping_parts[0] %}
+        {% assign map_to = mapping_parts[1] %}
+        {% if map_from == child_handle %}
+          {% assign mapped_coll = collections[map_to] %}
+          {% assign map_count = mapped_coll.products_count | default: 0 | plus: 0 %}
+          {% if mapped_coll and map_count > 0 %}
+            {% assign final_coll = mapped_coll %}
+            {% assign used_handle = map_to %}
+          {% endif %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
 
-  @media (max-width: 600px) {
-    .level2-hub__grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  /* Featured Card */
-  .level2-hub__card {
-    background: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    overflow: hidden;
-    transition: box-shadow 0.3s ease, transform 0.2s ease;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .level2-hub__card:hover {
-    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-    transform: translateY(-2px);
-  }
-
-  /* Card Image */
-  .level2-hub__card-image {
-    position: relative;
-    width: 100%;
-    height: 200px;
-    overflow: hidden;
-    background: #f5f5f5;
-  }
-
-  .level2-hub__card-image a {
-    display: block;
-    height: 100%;
-  }
-
-  .level2-hub__card-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.4s ease;
-  }
-
-  .level2-hub__card:hover .level2-hub__card-image img {
-    transform: scale(1.05);
-  }
-
-  .level2-hub__card-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f5 100%);
-    color: #999;
-  }
-
-  /* Card Content */
-  .level2-hub__card-content {
-    padding: 20px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .level2-hub__card-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: #1e3a5f;
-    margin: 0 0 8px;
-    line-height: 1.3;
-  }
-
-  .level2-hub__card-title a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .level2-hub__card-title a:hover {
-    color: #2d5a8f;
-  }
-
-  .level2-hub__card-desc {
-    font-size: 13px;
-    color: #666;
-    margin: 0 0 16px;
-    line-height: 1.5;
-    flex: 1;
-  }
-
-  /* Quick Links */
-  .level2-hub__quick-links {
-    list-style: none;
-    margin: 0 0 16px;
-    padding: 0;
-    border-top: 1px solid #eee;
-    padding-top: 12px;
-  }
-
-  .level2-hub__quick-link {
-    margin-bottom: 6px;
-    font-size: 13px;
-    line-height: 1.4;
-  }
-
-  .level2-hub__quick-link a {
-    color: #555;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .level2-hub__quick-link a:hover {
-    color: #1e3a5f;
-  }
-
-  .level2-hub__quick-link a::before {
-    content: "";
-    width: 4px;
-    height: 4px;
-    background: #ccc;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  /* View All Button */
-  .level2-hub__view-all {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 16px;
-    background: #1e3a5f;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    font-size: 13px;
-    font-weight: 500;
-    transition: background 0.2s ease;
-    margin-top: auto;
-  }
-
-  .level2-hub__view-all:hover {
-    background: #2d5a8f;
-    color: white;
-  }
-
-  .level2-hub__view-all svg {
-    width: 14px;
-    height: 14px;
-  }
-
-  /* All Categories Section */
-  .level2-hub__all-categories {
-    margin-top: 40px;
-    padding-top: 30px;
-    border-top: 1px solid #e0e0e0;
-  }
-
-  .level2-hub__section-title {
-    font-size: 20px;
-    font-weight: 600;
-    color: #333;
-    margin: 0 0 20px;
-  }
-
-  .level2-hub__category-list {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-  }
-
-  @media (max-width: 990px) {
-    .level2-hub__category-list {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  @media (max-width: 600px) {
-    .level2-hub__category-list {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  .level2-hub__category-item {
-    background: #f8f9fa;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    padding: 12px 16px;
-    text-decoration: none;
-    color: #333;
-    font-size: 14px;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .level2-hub__category-item:hover {
-    background: #1e3a5f;
-    color: white;
-    border-color: #1e3a5f;
-  }
-
-  .level2-hub__category-item-image {
-    width: 40px;
-    height: 40px;
-    border-radius: 4px;
-    object-fit: cover;
-    flex-shrink: 0;
-  }
-
-  /* Empty State */
-  .level2-hub__empty {
-    text-align: center;
-    padding: 60px 20px;
-    color: #666;
-  }
-{%- endstyle -%}
-
-{% assign current_handle = collection.handle %}
-{% assign display_title = collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
-
-{% comment %} Find parent for breadcrumb {% endcomment %}
-{% assign parent_handle = collection.metafields.custom.parent_handle.value %}
-{% assign parent_collection = nil %}
-{% if parent_handle != blank %}
-  {% assign parent_collection = collections[parent_handle] %}
+    {% if final_coll %}
+      {% if l3_collection_handles == '' %}
+        {% assign l3_collection_handles = used_handle %}
+      {% else %}
+        {% assign l3_collection_handles = l3_collection_handles | append: ',' | append: used_handle %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
 {% endif %}
 
-<section class="level2-hub">
-  <div class="level2-hub__container">
-    <!-- Hero Banner -->
-    <div class="level2-hub__hero">
-      {% if collection.image %}
-        <img src="{{ collection.image | image_url: width: 1400 }}" alt="{{ display_title | escape }}" loading="eager">
-      {% else %}
-        <div class="level2-hub__hero-placeholder">
-          <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-            <rect x="3" y="3" width="18" height="18" rx="2"/>
-            <circle cx="8.5" cy="8.5" r="1.5"/>
-            <path d="M21 15l-5-5L5 21"/>
-          </svg>
-        </div>
-      {% endif %}
-    </div>
+{% assign l3_handle_array = l3_collection_handles | split: ',' %}
 
-    {% comment %} Find Level 3 children of this collection {% endcomment %}
-    {% assign child_count = 0 %}
-    {% for coll in collections %}
-      {% assign parent_val = coll.metafields.custom.parent_handle.value %}
-      {% if parent_val == current_handle %}
-        {% assign child_count = child_count | plus: 1 %}
-      {% endif %}
-    {% endfor %}
+{% comment %} Calculate totals {% endcomment %}
+{% assign total_l3_products = 0 %}
+{% for handle in l3_handle_array %}
+  {% assign handle_clean = handle | strip %}
+  {% if handle_clean != blank %}
+    {% assign coll = collections[handle_clean] %}
+    {% if coll %}
+      {% assign total_l3_products = total_l3_products | plus: coll.products_count %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
 
-    {% if child_count > 0 %}
-      <!-- Featured Categories Grid -->
-      <div class="level2-hub__grid">
-        {% for coll in collections %}
-          {% assign parent_val = coll.metafields.custom.parent_handle.value %}
-          {% if parent_val == current_handle %}
-            {% assign child_title = coll.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
-            {% assign child_handle = coll.handle %}
+{% comment %} L2 collection fallback {% endcomment %}
+{% assign l2_collection = collection %}
+{% if collection.products_count == 0 %}
+  {% assign l2_new_theme_handle = 'new-theme-' | append: collection.handle %}
+  {% assign l2_new_theme_coll = collections[l2_new_theme_handle] %}
+  {% if l2_new_theme_coll and l2_new_theme_coll.products_count > 0 %}
+    {% assign l2_collection = l2_new_theme_coll %}
+  {% endif %}
+{% endif %}
 
-            <div class="level2-hub__card">
-              <!-- Card Image -->
-              <div class="level2-hub__card-image">
-                <a href="{{ coll.url }}">
-                  {% if coll.image %}
-                    <img src="{{ coll.image | image_url: width: 600 }}" alt="{{ child_title | escape }}" loading="lazy">
-                  {% elsif coll.products.first.featured_image %}
-                    <img src="{{ coll.products.first.featured_image | image_url: width: 600 }}" alt="{{ child_title | escape }}" loading="lazy">
-                  {% else %}
-                    <div class="level2-hub__card-placeholder">
-                      <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                        <rect x="3" y="3" width="18" height="18" rx="2"/>
-                        <circle cx="8.5" cy="8.5" r="1.5"/>
-                        <path d="M21 15l-5-5L5 21"/>
-                      </svg>
-                    </div>
-                  {% endif %}
-                </a>
-              </div>
+{% assign grand_total_products = l2_collection.products_count | plus: total_l3_products %}
 
-              <!-- Card Content -->
-              <div class="level2-hub__card-content">
-                <h3 class="level2-hub__card-title">
-                  <a href="{{ coll.url }}">{{ child_title }}</a>
-                </h3>
+<style>
+/* ========================================
+   LEVEL 2/3 PLP STYLES - Matching Mockup
+   ======================================== */
 
-                {% if coll.description != blank %}
-                  <p class="level2-hub__card-desc">{{ coll.description | strip_html | truncate: 100 }}</p>
-                {% else %}
-                  <p class="level2-hub__card-desc">Browse our selection of {{ child_title | downcase }} products.</p>
-                {% endif %}
+/* Color Variables */
+.cf-plp {
+  --deep-blue: #1a3a5c;
+  --primary-blue: #2563eb;
+  --medium-blue: #3b82f6;
+  --light-blue: #60a5fa;
+  --pale-blue: #dbeafe;
+  --sky-blue: #e0f2fe;
+  --deep-red: #991b1b;
+  --primary-red: #dc2626;
+  --bright-red: #ef4444;
+  --text-dark: #0f172a;
+  --text-medium: #475569;
+  --text-light: #64748b;
+  --text-muted: #94a3b8;
+  --border-color: #e2e8f0;
+  --bg-light: #f8fafc;
+  --bg-white: #ffffff;
+  --rating-gold: #f59e0b;
+  --success-green: #10b981;
+}
 
-                <!-- Level 4 Quick Links -->
-                <ul class="level2-hub__quick-links">
-                  {% assign sublink_count = 0 %}
-                  {% for subcoll in collections %}
-                    {% assign sub_parent = subcoll.metafields.custom.parent_handle.value %}
-                    {% if sub_parent == child_handle and sublink_count < 5 %}
-                      {% assign sub_title = subcoll.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
-                      <li class="level2-hub__quick-link">
-                        <a href="{{ subcoll.url }}">{{ sub_title }}</a>
-                      </li>
-                      {% assign sublink_count = sublink_count | plus: 1 %}
-                    {% endif %}
-                  {% endfor %}
-                </ul>
+.cf-plp {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-white);
+}
 
-                <a href="{{ coll.url }}" class="level2-hub__view-all">
-                  View All {{ child_title }}
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                  </svg>
-                </a>
-              </div>
-            </div>
+/* Combined Breadcrumb + Header Bar */
+.cf-plp__header-combined {
+  padding: 16px 40px;
+  background: var(--bg-white);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Inline Breadcrumb (compact) */
+.cf-plp__breadcrumb-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.cf-plp__breadcrumb-inline a {
+  color: var(--primary-blue);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.cf-plp__breadcrumb-inline a:hover {
+  color: var(--primary-red);
+}
+
+.cf-plp__breadcrumb-sep {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.cf-plp__breadcrumb-current {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* Inline Title */
+.cf-plp__title-inline {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--deep-blue);
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+
+.cf-plp__subtitle-inline {
+  font-size: 13px;
+  color: var(--text-light);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Mobile: Show home icon + title only */
+@media (max-width: 768px) {
+  .cf-plp__header-combined {
+    padding: 16px 20px;
+  }
+
+  .cf-plp__breadcrumb-inline a:not(:first-child),
+  .cf-plp__breadcrumb-inline .cf-plp__breadcrumb-sep:not(:first-of-type),
+  .cf-plp__breadcrumb-current {
+    display: none;
+  }
+
+  .cf-plp__breadcrumb-inline {
+    margin-bottom: 6px;
+  }
+
+  .cf-plp__breadcrumb-inline a:first-child::before {
+    content: '🏠';
+    margin-right: 4px;
+  }
+
+  .cf-plp__title-inline {
+    font-size: 22px;
+  }
+
+  .cf-plp__subtitle-inline {
+    font-size: 12px;
+  }
+}
+
+/* L3 Filter Pills (L2 only) */
+.cf-plp__pills {
+  padding: 14px 40px;
+  background: var(--bg-light);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cf-plp__pills-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-medium);
+}
+
+.cf-plp__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 25px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cf-plp__pill:hover {
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+}
+
+.cf-plp__pill.active {
+  background: var(--deep-blue);
+  border-color: var(--deep-blue);
+  color: white;
+}
+
+.cf-plp__pill-count {
+  background: rgba(0,0,0,0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.cf-plp__pill.active .cf-plp__pill-count {
+  background: rgba(255,255,255,0.2);
+}
+
+/* Main Container */
+.cf-plp__container {
+  display: flex;
+  background: var(--bg-white);
+  min-height: 800px;
+}
+
+/* Filters Sidebar */
+.cf-plp__sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  padding: 24px;
+  border-right: 1px solid var(--border-color);
+  background: var(--bg-light);
+}
+
+.cf-plp__filters-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--deep-blue);
+  margin: 0 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cf-plp__filters-title::before {
+  content: '';
+  width: 3px;
+  height: 18px;
+  background: var(--primary-red);
+  border-radius: 2px;
+}
+
+.cf-plp__filter-group {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cf-plp__filter-group:last-child {
+  border-bottom: none;
+}
+
+.cf-plp__filter-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--deep-blue);
+  margin: 0 0 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.cf-plp__filter-title::after {
+  content: '−';
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+.cf-plp__filter-options {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cf-plp__filter-options li {
+  margin-bottom: 10px;
+}
+
+.cf-plp__filter-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-medium);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.cf-plp__filter-option:hover {
+  color: var(--deep-blue);
+}
+
+.cf-plp__filter-option input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary-blue);
+  cursor: pointer;
+}
+
+.cf-plp__filter-count {
+  color: var(--text-muted);
+  margin-left: auto;
+  font-size: 12px;
+}
+
+/* Range Slider Styles */
+.cf-plp__range-filter {
+  margin-top: 10px;
+}
+
+.cf-plp__range-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+
+.cf-plp__range-min-val,
+.cf-plp__range-max-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--deep-blue);
+}
+
+.cf-plp__range-sep {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.cf-plp__range-slider-wrap {
+  position: relative;
+  height: 24px;
+  margin: 0 8px;
+}
+
+.cf-plp__range-slider {
+  position: absolute;
+  width: 100%;
+  height: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  -webkit-appearance: none;
+  pointer-events: none;
+}
+
+.cf-plp__range-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  background: linear-gradient(to right, var(--pale-blue) 0%, var(--primary-blue) 50%, var(--pale-blue) 100%);
+  border-radius: 3px;
+}
+
+.cf-plp__range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--primary-blue);
+  border: 3px solid var(--bg-white);
+  border-radius: 50%;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+  margin-top: -7px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cf-plp__range-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.4);
+}
+
+.cf-plp__range-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: var(--primary-blue);
+  border: 3px solid var(--bg-white);
+  border-radius: 50%;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+}
+
+.cf-plp__range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+/* Quick Select Buttons */
+.cf-plp__quick-select {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.cf-plp__quick-btn {
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  color: var(--text-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cf-plp__quick-btn:hover {
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+}
+
+.cf-plp__quick-btn.active {
+  background: var(--primary-blue);
+  border-color: var(--primary-blue);
+  color: white;
+}
+
+/* Show More Button */
+.cf-plp__show-more {
+  margin-top: 6px;
+}
+
+.cf-plp__show-more-btn {
+  background: transparent;
+  border: none;
+  color: var(--primary-blue);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.cf-plp__show-more-btn:hover {
+  color: var(--primary-red);
+  text-decoration: underline;
+}
+
+.cf-plp__suggested-brand {
+  font-size: 10px;
+  color: var(--primary-red);
+  font-weight: 700;
+  display: block;
+  margin-left: 26px;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Products Area */
+.cf-plp__products {
+  flex: 1;
+  padding: 20px 30px;
+}
+
+/* Toolbar */
+.cf-plp__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.cf-plp__view-toggle {
+  display: flex;
+  gap: 0;
+}
+
+.cf-plp__view-btn {
+  padding: 10px 16px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-white);
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-medium);
+  transition: all 0.2s ease;
+}
+
+.cf-plp__view-btn:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.cf-plp__view-btn:last-child {
+  border-radius: 0 6px 6px 0;
+  border-left: none;
+}
+
+.cf-plp__view-btn.active {
+  background: var(--deep-blue);
+  color: white;
+  border-color: var(--deep-blue);
+}
+
+.cf-plp__sort {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cf-plp__sort label {
+  font-size: 13px;
+  color: var(--text-medium);
+}
+
+.cf-plp__sort select {
+  padding: 10px 36px 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 13px;
+  background: var(--bg-white);
+  cursor: pointer;
+}
+
+.cf-plp__results-count {
+  font-size: 13px;
+  color: var(--text-medium);
+}
+
+/* Product Grid */
+.cf-plp__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 1200px) {
+  .cf-plp__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .cf-plp__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .cf-plp__sidebar {
+    display: none;
+  }
+}
+
+/* List View */
+.cf-plp__grid.list-view {
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.cf-plp__grid.list-view .cf-plp__card {
+  display: flex;
+  flex-direction: row;
+  padding: 16px;
+  gap: 24px;
+}
+
+.cf-plp__grid.list-view .cf-plp__card-image-wrap {
+  width: 180px;
+  height: 180px;
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+
+.cf-plp__grid.list-view .cf-plp__card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.cf-plp__grid.list-view .cf-plp__card-category {
+  margin-bottom: 8px;
+}
+
+.cf-plp__grid.list-view .cf-plp__card-title {
+  font-size: 16px;
+  min-height: auto;
+  margin-bottom: 8px;
+}
+
+.cf-plp__grid.list-view .cf-plp__card-rating {
+  margin-bottom: 8px;
+}
+
+.cf-plp__grid.list-view .cf-plp__card-sku {
+  margin-bottom: 4px;
+}
+
+.cf-plp__grid.list-view .cf-plp__card-variants {
+  margin-bottom: 12px;
+}
+
+.cf-plp__grid.list-view .cf-plp__price-box {
+  max-width: 200px;
+  margin-bottom: 12px;
+}
+
+.cf-plp__grid.list-view .cf-plp__cart-row {
+  max-width: 280px;
+}
+
+.cf-plp__grid.list-view .cf-plp__card-badge {
+  top: 12px;
+  left: 12px;
+}
+
+/* Product Card */
+.cf-plp__card {
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.cf-plp__card:hover {
+  border-color: var(--primary-blue);
+  box-shadow: 0 12px 40px rgba(37, 99, 235, 0.12);
+  transform: translateY(-4px);
+}
+
+.cf-plp__card-badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: var(--deep-blue);
+  color: white;
+  font-size: 10px;
+  padding: 4px 10px;
+  font-weight: 700;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 2;
+}
+
+.cf-plp__card-image-wrap {
+  display: block;
+  width: 100%;
+  height: 160px;
+  margin-bottom: 16px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.cf-plp__card-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.cf-plp__card:hover .cf-plp__card-image {
+  filter: brightness(1.08);
+  transform: scale(1.02);
+}
+
+/* Shine Sweep Effect */
+.cf-plp__card-image-wrap::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0) 20%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0) 80%,
+    transparent 100%
+  );
+  transform: skewX(-25deg);
+  z-index: 1;
+  transition: left 0.7s ease;
+  pointer-events: none;
+}
+
+.cf-plp__card:hover .cf-plp__card-image-wrap::before {
+  left: 150%;
+}
+
+.cf-plp__card-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  background: var(--sky-blue);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.cf-plp__card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--deep-blue);
+  text-decoration: none;
+  line-height: 1.4;
+  display: block;
+  min-height: 54px;
+  margin-bottom: 8px;
+  transition: color 0.2s ease;
+}
+
+.cf-plp__card-title:hover {
+  color: var(--primary-blue);
+}
+
+.cf-plp__card-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.cf-plp__plus-badge {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--deep-blue) 100%);
+  color: white;
+  font-size: 9px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cf-plp__stars {
+  color: var(--rating-gold);
+  font-size: 12px;
+}
+
+.cf-plp__card-sku {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+/* Variants Badge (on image) */
+.cf-plp__variants-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--deep-blue);
+  color: white;
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  z-index: 5;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.cf-plp__variants-text {
+  display: block;
+}
+
+.cf-plp__variants-tooltip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--deep-blue);
+  color: white;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  min-width: 180px;
+  max-width: 280px;
+  white-space: normal;
+  text-align: left;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.cf-plp__variants-tooltip::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: 12px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid var(--deep-blue);
+}
+
+.cf-plp__variants-badge:hover {
+  background: var(--primary-blue);
+}
+
+.cf-plp__variants-badge:hover .cf-plp__variants-tooltip {
+  display: block;
+}
+
+/* Price Box */
+.cf-plp__price-box {
+  background: linear-gradient(135deg, var(--pale-blue) 0%, #eff6ff 100%);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  padding: 14px;
+  margin-bottom: 12px;
+  text-align: center;
+  border-radius: 10px;
+}
+
+.cf-plp__price-label {
+  font-size: 10px;
+  color: var(--primary-blue);
+  font-weight: 700;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cf-plp__price-main {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary-red);
+}
+
+.cf-plp__price-unit {
+  font-size: 12px;
+  color: var(--text-medium);
+  font-weight: 400;
+}
+
+.cf-plp__price-regular {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-decoration: line-through;
+  margin-top: 4px;
+}
+
+/* Login Prompt */
+.cf-plp__login-prompt {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(26, 58, 92, 0.1) 100%);
+  border: 1px dashed var(--primary-blue);
+  border-radius: 6px;
+  color: var(--primary-blue);
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.cf-plp__login-prompt:hover {
+  background: var(--primary-blue);
+  color: white;
+  border-style: solid;
+}
+
+/* Shipping Badge */
+.cf-plp__shipping {
+  display: inline-block;
+  font-size: 10px;
+  padding: 5px 12px;
+  font-weight: 700;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.cf-plp__shipping--free {
+  background: linear-gradient(135deg, var(--success-green) 0%, #059669 100%);
+  color: white;
+}
+
+.cf-plp__shipping--quick {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--deep-blue) 100%);
+  color: white;
+}
+
+.cf-plp__shipping--regular {
+  background: var(--bg-light);
+  color: var(--text-medium);
+}
+
+/* Add to Cart Row */
+.cf-plp__cart-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.cf-plp__qty-input {
+  width: 50px;
+  height: 38px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cf-plp__add-btn {
+  flex: 1;
+  height: 38px;
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--deep-blue) 100%);
+  color: white;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.cf-plp__add-btn:hover {
+  background: linear-gradient(135deg, var(--medium-blue) 0%, var(--primary-blue) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+
+/* No Products */
+.cf-plp__no-products {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-light);
+}
+
+/* Pagination */
+.cf-plp__pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 30px 0;
+  margin-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.cf-plp__page-btn {
+  padding: 10px 20px;
+  border: 1px solid var(--border-color);
+  background: white;
+  color: var(--text-dark);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cf-plp__page-btn:hover:not(:disabled) {
+  border-color: var(--primary-navy);
+  color: var(--primary-navy);
+  background: var(--bg-light);
+}
+
+.cf-plp__page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cf-plp__page-numbers {
+  display: flex;
+  gap: 4px;
+}
+
+.cf-plp__page-num {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  background: white;
+  color: var(--text-dark);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cf-plp__page-num:hover {
+  border-color: var(--primary-navy);
+  color: var(--primary-navy);
+}
+
+.cf-plp__page-num.active {
+  background: var(--primary-navy);
+  border-color: var(--primary-navy);
+  color: white;
+}
+
+.cf-plp__page-ellipsis {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+</style>
+
+<div class="cf-plp" data-section-id="{{ section.id }}">
+
+  {% comment %} Combined Breadcrumb + Header Bar {% endcomment %}
+  <header class="cf-plp__header-combined">
+    <nav class="cf-plp__breadcrumb-inline" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span class="cf-plp__breadcrumb-sep">›</span>
+      {% for link in linklists[menu_handle].links %}
+        {% for l2_link in link.links %}
+          {% assign l2_handle = l2_link.url | split: '/' | last | split: '?' | first %}
+          {% if l2_handle == collection.handle %}
+            <a href="{{ link.url }}">{{ link.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</a>
+            <span class="cf-plp__breadcrumb-sep">›</span>
+            {% break %}
           {% endif %}
         {% endfor %}
-      </div>
+      {% endfor %}
+      <span class="cf-plp__breadcrumb-current">{{ collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</span>
+    </nav>
+    <h1 class="cf-plp__title-inline">{{ collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</h1>
+    {% if collection.description != blank %}
+      <p class="cf-plp__subtitle-inline">{{ collection.description | strip_html | truncate: 150 }}</p>
+    {% endif %}
+  </header>
 
-      <!-- All Categories List -->
-      <div class="level2-hub__all-categories">
-        <h2 class="level2-hub__section-title">All {{ display_title }} Categories</h2>
-        <div class="level2-hub__category-list">
-          {% for coll in collections %}
-            {% assign parent_val = coll.metafields.custom.parent_handle.value %}
-            {% if parent_val == current_handle %}
-              {% assign child_title = coll.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
-              <a href="{{ coll.url }}" class="level2-hub__category-item">
-                {% if coll.image %}
-                  <img src="{{ coll.image | image_url: width: 80 }}" alt="{{ child_title | escape }}" class="level2-hub__category-item-image" loading="lazy">
-                {% elsif coll.products.first.featured_image %}
-                  <img src="{{ coll.products.first.featured_image | image_url: width: 80 }}" alt="{{ child_title | escape }}" class="level2-hub__category-item-image" loading="lazy">
+  {% comment %} L3 Filter Pills (L2 only) {% endcomment %}
+  {% if l3_handle_array.size > 0 %}
+    <nav class="cf-plp__pills" aria-label="Filter by category">
+      <span class="cf-plp__pills-label">Filter:</span>
+
+      <button type="button" class="cf-plp__pill active" data-filter="all">
+        All Products
+      </button>
+
+      {% for handle in l3_handle_array limit: 10 %}
+        {% assign handle_clean = handle | strip %}
+        {% if handle_clean != blank %}
+          {% assign pill_coll = collections[handle_clean] %}
+          {% assign pill_title = pill_coll.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
+          <button type="button" class="cf-plp__pill" data-filter="{{ handle_clean }}">
+            {{ pill_title }}
+          </button>
+        {% endif %}
+      {% endfor %}
+    </nav>
+  {% endif %}
+
+  {% comment %} Main Container {% endcomment %}
+  <div class="cf-plp__container">
+
+    {% comment %} Filters Sidebar {% endcomment %}
+    <aside class="cf-plp__sidebar">
+      <h2 class="cf-plp__filters-title">Filters</h2>
+
+      {% comment %} Brand Filter - Collect unique vendors {% endcomment %}
+      <div class="cf-plp__filter-group">
+        <h3 class="cf-plp__filter-title">Brand</h3>
+        <ul class="cf-plp__filter-options">
+          {% assign brand_string = '' %}
+          {% for handle in l3_handle_array limit: 5 %}
+            {% assign handle_clean = handle | strip %}
+            {% if handle_clean != blank %}
+              {% assign coll = collections[handle_clean] %}
+              {% for product in coll.products limit: 15 %}
+                {% if product.vendor != blank %}
+                  {% unless brand_string contains product.vendor %}
+                    {% if brand_string == '' %}
+                      {% assign brand_string = product.vendor %}
+                    {% else %}
+                      {% assign brand_string = brand_string | append: '|||' | append: product.vendor %}
+                    {% endif %}
+                  {% endunless %}
                 {% endif %}
-                {{ child_title }}
-              </a>
+              {% endfor %}
             {% endif %}
           {% endfor %}
+          {% assign brands_array = brand_string | split: '|||' %}
+          {% for brand in brands_array limit: 10 %}
+            {% if brand != blank %}
+              <li>
+                <label class="cf-plp__filter-option">
+                  <input type="checkbox" name="brand" value="{{ brand | handleize }}">
+                  {{ brand }}
+                </label>
+              </li>
+            {% endif %}
+          {% endfor %}
+          {% if brands_array.size == 0 %}
+            <li><span style="color: var(--text-muted); font-size: 12px;">No brands found</span></li>
+          {% endif %}
+        </ul>
+      </div>
+
+      {% comment %} Quick Ship Filter {% endcomment %}
+      <div class="cf-plp__filter-group">
+        <h3 class="cf-plp__filter-title">Quick Ship</h3>
+        <ul class="cf-plp__filter-options">
+          <li>
+            <label class="cf-plp__filter-option">
+              <input type="checkbox" name="quickship">
+              ⚡ Quick Shipping
+            </label>
+          </li>
+        </ul>
+      </div>
+
+      {% comment %} Membership Filter {% endcomment %}
+      <div class="cf-plp__filter-group">
+        <h3 class="cf-plp__filter-title">Membership</h3>
+        <ul class="cf-plp__filter-options">
+          <li>
+            <label class="cf-plp__filter-option">
+              <input type="checkbox" name="plus">
+              <span class="cf-plp__plus-badge">Plus</span> Eligible
+            </label>
+          </li>
+        </ul>
+      </div>
+
+      {% comment %} Price Range Filter {% endcomment %}
+      <div class="cf-plp__filter-group">
+        <h3 class="cf-plp__filter-title">Price Range</h3>
+        <ul class="cf-plp__filter-options">
+          <li>
+            <label class="cf-plp__filter-option">
+              <input type="checkbox" name="price" value="0-500">
+              Under $500
+            </label>
+          </li>
+          <li>
+            <label class="cf-plp__filter-option">
+              <input type="checkbox" name="price" value="500-1000">
+              $500 - $1,000
+            </label>
+          </li>
+          <li>
+            <label class="cf-plp__filter-option">
+              <input type="checkbox" name="price" value="1000-2500">
+              $1,000 - $2,500
+            </label>
+          </li>
+          <li>
+            <label class="cf-plp__filter-option">
+              <input type="checkbox" name="price" value="2500+">
+              $2,500+
+            </label>
+          </li>
+        </ul>
+      </div>
+
+      {% comment %} ========================================
+         VARIATION FILTERS (Width, Depth, Height, etc.)
+         Collect from product options and display as range/checkbox
+      ======================================== {% endcomment %}
+      {% assign variation_options = '' %}
+      {% assign all_option_values = '' %}
+
+      {% comment %} Collect all unique options from products {% endcomment %}
+      {% for handle in l3_handle_array limit: 5 %}
+        {% assign handle_clean = handle | strip %}
+        {% if handle_clean != blank %}
+          {% assign coll = collections[handle_clean] %}
+          {% for product in coll.products limit: 20 %}
+            {% for option in product.options_with_values %}
+              {% assign opt_name = option.name %}
+              {% unless variation_options contains opt_name %}
+                {% if variation_options == '' %}
+                  {% assign variation_options = opt_name %}
+                {% else %}
+                  {% assign variation_options = variation_options | append: '|||' | append: opt_name %}
+                {% endif %}
+              {% endunless %}
+            {% endfor %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+
+      {% assign option_names_array = variation_options | split: '|||' %}
+
+      {% comment %} Render each option type as a filter {% endcomment %}
+      {% for opt_name in option_names_array limit: 5 %}
+        {% assign option_values = '' %}
+        {% assign numeric_values = '' %}
+        {% assign is_numeric = false %}
+
+        {% comment %} Collect all values for this option {% endcomment %}
+        {% for handle in l3_handle_array limit: 5 %}
+          {% assign handle_clean = handle | strip %}
+          {% if handle_clean != blank %}
+            {% assign coll = collections[handle_clean] %}
+            {% for product in coll.products limit: 20 %}
+              {% for option in product.options_with_values %}
+                {% if option.name == opt_name %}
+                  {% for val in option.values %}
+                    {% unless option_values contains val %}
+                      {% if option_values == '' %}
+                        {% assign option_values = val %}
+                      {% else %}
+                        {% assign option_values = option_values | append: '|||' | append: val %}
+                      {% endif %}
+                    {% endunless %}
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+
+        {% assign values_array = option_values | split: '|||' %}
+
+        {% comment %} Check if values are numeric (contain numbers like 24", 36", etc.) {% endcomment %}
+        {% assign numeric_count = 0 %}
+        {% assign min_numeric = 99999 %}
+        {% assign max_numeric = 0 %}
+        {% for val in values_array %}
+          {% assign clean_val = val | remove: '"' | remove: "'" | remove: ' inch' | remove: 'inch' | remove: ' in' | remove: 'in' | remove: ' ' %}
+          {% assign num_val = clean_val | plus: 0 %}
+          {% if num_val > 0 %}
+            {% assign numeric_count = numeric_count | plus: 1 %}
+            {% if num_val < min_numeric %}
+              {% assign min_numeric = num_val %}
+            {% endif %}
+            {% if num_val > max_numeric %}
+              {% assign max_numeric = num_val %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+
+        {% if numeric_count > 2 and values_array.size > 2 %}
+          {% assign is_numeric = true %}
+        {% endif %}
+
+        {% if values_array.size > 0 %}
+          <div class="cf-plp__filter-group">
+            <h3 class="cf-plp__filter-title">{{ opt_name }}</h3>
+
+            {% if is_numeric %}
+              {% comment %} Range Slider for Numeric Options {% endcomment %}
+              <div class="cf-plp__range-filter" data-option="{{ opt_name | handleize }}">
+                <div class="cf-plp__range-display">
+                  <span class="cf-plp__range-min-val">{{ min_numeric }}"</span>
+                  <span class="cf-plp__range-sep">to</span>
+                  <span class="cf-plp__range-max-val">{{ max_numeric }}"</span>
+                </div>
+                <div class="cf-plp__range-slider-wrap">
+                  <input type="range"
+                         class="cf-plp__range-slider cf-plp__range-min"
+                         min="{{ min_numeric }}"
+                         max="{{ max_numeric }}"
+                         value="{{ min_numeric }}"
+                         data-option="{{ opt_name | handleize }}">
+                  <input type="range"
+                         class="cf-plp__range-slider cf-plp__range-max"
+                         min="{{ min_numeric }}"
+                         max="{{ max_numeric }}"
+                         value="{{ max_numeric }}"
+                         data-option="{{ opt_name | handleize }}">
+                </div>
+                <div class="cf-plp__range-labels">
+                  <span>{{ min_numeric }}"</span>
+                  <span>{{ max_numeric }}"</span>
+                </div>
+              </div>
+
+              {% comment %} Also show quick select buttons {% endcomment %}
+              <div class="cf-plp__quick-select">
+                {% for val in values_array limit: 6 %}
+                  <button type="button" class="cf-plp__quick-btn" data-option="{{ opt_name | handleize }}" data-value="{{ val }}">
+                    {{ val }}
+                  </button>
+                {% endfor %}
+              </div>
+            {% else %}
+              {% comment %} Checkboxes for Non-Numeric Options {% endcomment %}
+              <ul class="cf-plp__filter-options">
+                {% for val in values_array limit: 10 %}
+                  <li>
+                    <label class="cf-plp__filter-option">
+                      <input type="checkbox" name="option_{{ opt_name | handleize }}" value="{{ val | handleize }}" data-option="{{ opt_name }}" data-value="{{ val }}">
+                      {{ val }}
+                    </label>
+                  </li>
+                {% endfor %}
+                {% if values_array.size > 10 %}
+                  <li class="cf-plp__show-more">
+                    <button type="button" class="cf-plp__show-more-btn" data-target="option_{{ opt_name | handleize }}">
+                      + {{ values_array.size | minus: 10 }} more
+                    </button>
+                  </li>
+                {% endif %}
+              </ul>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </aside>
+
+    {% comment %} Products Area {% endcomment %}
+    <main class="cf-plp__products">
+
+      {% comment %} Toolbar {% endcomment %}
+      <div class="cf-plp__toolbar">
+        <div class="cf-plp__view-toggle">
+          <button class="cf-plp__view-btn active" data-view="grid">⊞ Grid</button>
+          <button class="cf-plp__view-btn" data-view="list">☰ List</button>
+        </div>
+
+        <div class="cf-plp__sort">
+          <label for="plp-sort">Sort by</label>
+          <select id="plp-sort" onchange="handleSort(this.value)">
+            <option value="best-selling">Most Popular</option>
+            <option value="price-ascending">Price: Low to High</option>
+            <option value="price-descending">Price: High to Low</option>
+            <option value="title-ascending">Name: A-Z</option>
+          </select>
+        </div>
+
+        <div class="cf-plp__results-count">
+          <strong>{{ grand_total_products }}</strong> products
         </div>
       </div>
 
-    {% else %}
-      <div class="level2-hub__empty">
-        <p>No subcategories found for this collection.</p>
+      {% comment %} Product Grid {% endcomment %}
+      <div class="cf-plp__grid" id="product-grid">
+        {% assign products_shown = 0 %}
+        {% assign products_limit = section.settings.products_per_page | default: 48 %}
+
+        {% for handle in l3_handle_array %}
+          {% assign handle_clean = handle | strip %}
+          {% if handle_clean != blank %}
+            {% assign l3_coll = collections[handle_clean] %}
+            {% assign l3_category = l3_coll.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
+            {% for product in l3_coll.products %}
+              {% if products_shown < products_limit %}
+                {% assign products_shown = products_shown | plus: 1 %}
+                {% assign shipment_text = product.metafields.custom.shipment_text %}
+                {% assign shipping_class = 'cf-plp__shipping--regular' %}
+                {% if shipment_text contains 'Free' %}
+                  {% assign shipping_class = 'cf-plp__shipping--free' %}
+                {% elsif shipment_text contains 'Quick' %}
+                  {% assign shipping_class = 'cf-plp__shipping--quick' %}
+                {% endif %}
+
+                {% comment %} Collect variant options for filtering {% endcomment %}
+                {% assign variant_options_data = '' %}
+                {% for option in product.options_with_values %}
+                  {% assign opt_name_handle = option.name | handleize %}
+                  {% assign opt_values_joined = option.values | join: ',' %}
+                  {% if variant_options_data == '' %}
+                    {% assign variant_options_data = opt_name_handle | append: ':' | append: opt_values_joined %}
+                  {% else %}
+                    {% assign variant_options_data = variant_options_data | append: '|' | append: opt_name_handle | append: ':' | append: opt_values_joined %}
+                  {% endif %}
+                {% endfor %}
+
+                <div class="cf-plp__card" data-category="{{ handle_clean }}" data-vendor="{{ product.vendor | handleize }}" data-price="{{ product.price }}" data-options="{{ variant_options_data }}">
+                  {% if product.tags contains 'best-seller' or product.tags contains 'featured' %}
+                    <span class="cf-plp__card-badge">Best Seller</span>
+                  {% elsif product.compare_at_price > product.price %}
+                    <span class="cf-plp__card-badge">Sale</span>
+                  {% endif %}
+
+                  <a href="{{ product.url }}" class="cf-plp__card-image-wrap">
+                    {% if product.featured_image %}
+                      <img src="{{ product.featured_image | image_url: width: 320 }}"
+                           alt="{{ product.title }}"
+                           class="cf-plp__card-image"
+                           loading="lazy">
+                    {% else %}
+                      <div class="cf-plp__card-image" style="display:flex;align-items:center;justify-content:center;font-size:40px;color:#94a3b8;">📦</div>
+                    {% endif %}
+                    {% if product.variants.size > 1 %}
+                      {% comment %} Build variation options list for tooltip {% endcomment %}
+                      {% assign variation_list = '' %}
+                      {% for option in product.options_with_values %}
+                        {% assign opt_values = option.values | join: ', ' %}
+                        {% if variation_list == '' %}
+                          {% assign variation_list = option.name | append: ': ' | append: opt_values %}
+                        {% else %}
+                          {% assign variation_list = variation_list | append: ' | ' | append: option.name | append: ': ' | append: opt_values %}
+                        {% endif %}
+                      {% endfor %}
+                      <span class="cf-plp__variants-badge" data-variants="{{ product.variants.size }}">
+                        <span class="cf-plp__variants-text">{{ product.variants.size }} Variations</span>
+                        <span class="cf-plp__variants-tooltip">{{ variation_list | truncate: 150 }}</span>
+                      </span>
+                    {% endif %}
+                  </a>
+
+                  <div class="cf-plp__card-content">
+                    <span class="cf-plp__card-category">{{ l3_category | truncate: 25 }}</span>
+
+                    <a href="{{ product.url }}" class="cf-plp__card-title">
+                      {{ product.title | truncate: 60 }}
+                    </a>
+
+                    <div class="cf-plp__card-rating">
+                      <span class="cf-plp__plus-badge">Plus</span>
+                      <span class="cf-plp__stars">★★★★☆</span>
+                    </div>
+
+                    {% if product.variants.first.sku %}
+                      <div class="cf-plp__card-sku">#{{ product.variants.first.sku }}</div>
+                    {% endif %}
+
+                    <div class="cf-plp__price-box">
+                      {% comment %} Check if user is logged in and is a member {% endcomment %}
+                      {% assign is_logged_in = false %}
+                      {% assign is_member = false %}
+                      {% if customer %}
+                        {% assign is_logged_in = true %}
+                        {% if customer.tags contains 'plus-member' or customer.tags contains 'wholesale' or customer.tags contains 'member' %}
+                          {% assign is_member = true %}
+                        {% endif %}
+                      {% endif %}
+
+                      {% if is_logged_in and is_member %}
+                        {% comment %} Member view - show member price {% endcomment %}
+                        {% if product.compare_at_price > product.price %}
+                          <div class="cf-plp__price-label">Plus Member Sale</div>
+                          <div class="cf-plp__price-main">
+                            {{ product.price | money }}<span class="cf-plp__price-unit">/Each</span>
+                          </div>
+                          <div class="cf-plp__price-regular">
+                            Was {{ product.compare_at_price | money }}
+                          </div>
+                        {% else %}
+                          <div class="cf-plp__price-label">Plus Member Price</div>
+                          <div class="cf-plp__price-main">
+                            {{ product.price | money }}<span class="cf-plp__price-unit">/Each</span>
+                          </div>
+                        {% endif %}
+                      {% else %}
+                        {% comment %} Non-member view - show regular price + login prompt {% endcomment %}
+                        <div class="cf-plp__price-label">Price</div>
+                        <div class="cf-plp__price-main">
+                          {{ product.price | money }}<span class="cf-plp__price-unit">/Each</span>
+                        </div>
+                        <a href="/account/login" class="cf-plp__login-prompt">
+                          🔒 Login for member pricing
+                        </a>
+                      {% endif %}
+                    </div>
+
+                    {% if shipment_text != blank %}
+                      <div class="cf-plp__shipping {{ shipping_class }}">
+                        {% if shipment_text contains 'Free' %}
+                          🚚 Free Shipping
+                        {% elsif shipment_text contains 'Quick' %}
+                          ⚡ Quick Ship
+                        {% else %}
+                          📦 {{ shipment_text | truncate: 20 }}
+                        {% endif %}
+                      </div>
+                    {% endif %}
+
+                    <div class="cf-plp__cart-row">
+                      <input type="number" class="cf-plp__qty-input" value="1" min="1" aria-label="Quantity">
+                      <button type="button" class="cf-plp__add-btn" data-variant-id="{{ product.variants.first.id }}">
+                        Add to Cart
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+
+        {% comment %} Fallback: Show L2 products if no L3 products {% endcomment %}
+        {% if products_shown == 0 %}
+          {% for product in l2_collection.products limit: products_limit %}
+            {% assign shipment_text = product.metafields.custom.shipment_text %}
+            {% assign shipping_class = 'cf-plp__shipping--regular' %}
+            {% if shipment_text contains 'Free' %}
+              {% assign shipping_class = 'cf-plp__shipping--free' %}
+            {% elsif shipment_text contains 'Quick' %}
+              {% assign shipping_class = 'cf-plp__shipping--quick' %}
+            {% endif %}
+
+            <div class="cf-plp__card" data-category="all">
+              {% if product.compare_at_price > product.price %}
+                <span class="cf-plp__card-badge">Sale</span>
+              {% endif %}
+
+              <a href="{{ product.url }}" class="cf-plp__card-image-wrap">
+                {% if product.featured_image %}
+                  <img src="{{ product.featured_image | image_url: width: 320 }}"
+                       alt="{{ product.title }}"
+                       class="cf-plp__card-image"
+                       loading="lazy">
+                {% else %}
+                  <div class="cf-plp__card-image" style="display:flex;align-items:center;justify-content:center;font-size:40px;color:#94a3b8;">📦</div>
+                {% endif %}
+                {% if product.variants.size > 1 %}
+                  <span class="cf-plp__variants-badge" data-variants="{{ product.variants.size }}">
+                    <span class="cf-plp__variants-count">{{ product.variants.size }}</span>
+                    <span class="cf-plp__variants-tooltip">{{ product.variants.size }} variations available</span>
+                  </span>
+                {% endif %}
+              </a>
+
+              <div class="cf-plp__card-content">
+                <a href="{{ product.url }}" class="cf-plp__card-title">
+                  {{ product.title | truncate: 60 }}
+                </a>
+
+                <div class="cf-plp__card-rating">
+                  <span class="cf-plp__plus-badge">Plus</span>
+                  <span class="cf-plp__stars">★★★★☆</span>
+                </div>
+
+                {% if product.variants.first.sku %}
+                  <div class="cf-plp__card-sku">#{{ product.variants.first.sku }}</div>
+                {% endif %}
+
+                <div class="cf-plp__price-box">
+                  {% comment %} Check if user is logged in and is a member {% endcomment %}
+                  {% assign is_logged_in = false %}
+                  {% assign is_member = false %}
+                  {% if customer %}
+                    {% assign is_logged_in = true %}
+                    {% if customer.tags contains 'plus-member' or customer.tags contains 'wholesale' or customer.tags contains 'member' %}
+                      {% assign is_member = true %}
+                    {% endif %}
+                  {% endif %}
+
+                  {% if is_logged_in and is_member %}
+                    {% comment %} Member view - show member price {% endcomment %}
+                    {% if product.compare_at_price > product.price %}
+                      <div class="cf-plp__price-label">Plus Member Sale</div>
+                      <div class="cf-plp__price-main">
+                        {{ product.price | money }}<span class="cf-plp__price-unit">/Each</span>
+                      </div>
+                      <div class="cf-plp__price-regular">
+                        Was {{ product.compare_at_price | money }}
+                      </div>
+                    {% else %}
+                      <div class="cf-plp__price-label">Plus Member Price</div>
+                      <div class="cf-plp__price-main">
+                        {{ product.price | money }}<span class="cf-plp__price-unit">/Each</span>
+                      </div>
+                    {% endif %}
+                  {% else %}
+                    {% comment %} Non-member view - show regular price + login prompt {% endcomment %}
+                    <div class="cf-plp__price-label">Price</div>
+                    <div class="cf-plp__price-main">
+                      {{ product.price | money }}<span class="cf-plp__price-unit">/Each</span>
+                    </div>
+                    <a href="/account/login" class="cf-plp__login-prompt">
+                      🔒 Login for member pricing
+                    </a>
+                  {% endif %}
+                </div>
+
+                {% if shipment_text != blank %}
+                  <div class="cf-plp__shipping {{ shipping_class }}">
+                    {% if shipment_text contains 'Free' %}
+                      🚚 Free Shipping
+                    {% elsif shipment_text contains 'Quick' %}
+                      ⚡ Quick Ship
+                    {% else %}
+                      📦 {{ shipment_text | truncate: 20 }}
+                    {% endif %}
+                  </div>
+                {% endif %}
+
+                <div class="cf-plp__cart-row">
+                  <input type="number" class="cf-plp__qty-input" value="1" min="1" aria-label="Quantity">
+                  <button type="button" class="cf-plp__add-btn" data-variant-id="{{ product.variants.first.id }}">
+                    Add to Cart
+                  </button>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        {% if products_shown == 0 and l2_collection.products_count == 0 %}
+          <div class="cf-plp__no-products">
+            <p>No products found in this category.</p>
+          </div>
+        {% endif %}
       </div>
-    {% endif %}
+
+      {% comment %} Pagination {% endcomment %}
+      <div class="cf-plp__pagination" id="pagination">
+        <button type="button" class="cf-plp__page-btn cf-plp__page-prev" id="prev-page" disabled>
+          ← Previous
+        </button>
+        <div class="cf-plp__page-numbers" id="page-numbers">
+          <!-- Generated by JavaScript -->
+        </div>
+        <button type="button" class="cf-plp__page-btn cf-plp__page-next" id="next-page">
+          Next →
+        </button>
+      </div>
+
+    </main>
   </div>
-</section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  'use strict';
+
+  // Filter State
+  const filterState = {
+    category: 'all',
+    brands: [],
+    priceRanges: [],
+    options: {},
+    optionRanges: {}
+  };
+
+  // Pagination State
+  const paginationState = {
+    currentPage: 1,
+    itemsPerPage: {{ section.settings.products_per_page | default: 48 }},
+    totalPages: 1,
+    filteredCards: []
+  };
+
+  // Get cards fresh each time (not cached)
+  function getCards() {
+    return document.querySelectorAll('.cf-plp__card');
+  }
+
+  const resultsCount = document.querySelector('.cf-plp__results-count strong');
+  const paginationContainer = document.getElementById('pagination');
+  const pageNumbersContainer = document.getElementById('page-numbers');
+  const prevBtn = document.getElementById('prev-page');
+  const nextBtn = document.getElementById('next-page');
+
+  console.log('CF-PLP: Filter JS loaded, found', getCards().length, 'cards');
+
+  // Parse product options from data attribute
+  function parseProductOptions(optionsStr) {
+    if (!optionsStr) return {};
+    const result = {};
+    optionsStr.split('|').forEach(optGroup => {
+      const [name, values] = optGroup.split(':');
+      if (name && values) {
+        result[name] = values.split(',').map(v => v.trim());
+      }
+    });
+    return result;
+  }
+
+  // Extract numeric value from string (e.g., "24"" -> 24)
+  function extractNumeric(val) {
+    const cleaned = val.replace(/[^\d.]/g, '');
+    return parseFloat(cleaned) || 0;
+  }
+
+  // Apply all filters
+  function applyFilters(resetPage = true) {
+    const cards = getCards();
+    paginationState.filteredCards = [];
+    console.log('CF-PLP: Applying filters, category:', filterState.category, 'to', cards.length, 'cards');
+
+    cards.forEach(card => {
+      let visible = true;
+
+      // Category filter
+      if (filterState.category !== 'all' && card.dataset.category !== filterState.category) {
+        visible = false;
+      }
+
+      // Brand filter
+      if (visible && filterState.brands.length > 0) {
+        if (!filterState.brands.includes(card.dataset.vendor)) {
+          visible = false;
+        }
+      }
+
+      // Price range filter
+      if (visible && filterState.priceRanges.length > 0) {
+        const price = parseInt(card.dataset.price) / 100;
+        let priceMatch = false;
+        filterState.priceRanges.forEach(range => {
+          if (range === '0-500' && price < 500) priceMatch = true;
+          else if (range === '500-1000' && price >= 500 && price < 1000) priceMatch = true;
+          else if (range === '1000-2500' && price >= 1000 && price < 2500) priceMatch = true;
+          else if (range === '2500+' && price >= 2500) priceMatch = true;
+        });
+        if (!priceMatch) visible = false;
+      }
+
+      // Option filters (checkboxes)
+      if (visible && Object.keys(filterState.options).length > 0) {
+        const productOptions = parseProductOptions(card.dataset.options);
+        for (const [optName, selectedVals] of Object.entries(filterState.options)) {
+          if (selectedVals.length > 0) {
+            const productVals = productOptions[optName] || [];
+            const productValsHandled = productVals.map(v => v.toLowerCase().replace(/[^a-z0-9]/g, '-'));
+            let optMatch = false;
+            for (const selVal of selectedVals) {
+              if (productValsHandled.some(pv => pv.includes(selVal) || selVal.includes(pv))) {
+                optMatch = true;
+                break;
+              }
+            }
+            if (!optMatch) visible = false;
+          }
+        }
+      }
+
+      // Option range filters (sliders)
+      if (visible && Object.keys(filterState.optionRanges).length > 0) {
+        const productOptions = parseProductOptions(card.dataset.options);
+        for (const [optName, range] of Object.entries(filterState.optionRanges)) {
+          const productVals = productOptions[optName] || [];
+          if (productVals.length > 0) {
+            let rangeMatch = false;
+            for (const val of productVals) {
+              const numVal = extractNumeric(val);
+              if (numVal >= range.min && numVal <= range.max) {
+                rangeMatch = true;
+                break;
+              }
+            }
+            if (!rangeMatch) visible = false;
+          }
+        }
+      }
+
+      // Collect filtered cards (don't show yet - pagination will handle display)
+      card.style.display = 'none';
+      if (visible) {
+        paginationState.filteredCards.push(card);
+      }
+    });
+
+    // Reset to page 1 when filters change
+    if (resetPage) {
+      paginationState.currentPage = 1;
+    }
+
+    // Apply pagination
+    applyPagination();
+  }
+
+  // Apply pagination to filtered cards
+  function applyPagination() {
+    const { filteredCards, currentPage, itemsPerPage } = paginationState;
+    const totalItems = filteredCards.length;
+    paginationState.totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    // Update results count
+    if (resultsCount) resultsCount.textContent = totalItems;
+
+    // Show only current page items
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
+    filteredCards.forEach((card, index) => {
+      card.style.display = (index >= startIndex && index < endIndex) ? '' : 'none';
+    });
+
+    // Render pagination controls
+    renderPagination();
+  }
+
+  // Render pagination buttons
+  function renderPagination() {
+    const { currentPage, totalPages } = paginationState;
+
+    // Hide pagination if only 1 page
+    if (totalPages <= 1) {
+      paginationContainer.style.display = 'none';
+      return;
+    }
+    paginationContainer.style.display = 'flex';
+
+    // Update prev/next buttons
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = currentPage === totalPages;
+
+    // Generate page numbers
+    pageNumbersContainer.innerHTML = '';
+    const maxVisible = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+    if (endPage - startPage < maxVisible - 1) {
+      startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+
+    // First page + ellipsis
+    if (startPage > 1) {
+      pageNumbersContainer.appendChild(createPageButton(1));
+      if (startPage > 2) {
+        const ellipsis = document.createElement('span');
+        ellipsis.className = 'cf-plp__page-ellipsis';
+        ellipsis.textContent = '...';
+        pageNumbersContainer.appendChild(ellipsis);
+      }
+    }
+
+    // Page numbers
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbersContainer.appendChild(createPageButton(i));
+    }
+
+    // Last page + ellipsis
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        const ellipsis = document.createElement('span');
+        ellipsis.className = 'cf-plp__page-ellipsis';
+        ellipsis.textContent = '...';
+        pageNumbersContainer.appendChild(ellipsis);
+      }
+      pageNumbersContainer.appendChild(createPageButton(totalPages));
+    }
+  }
+
+  // Create page button
+  function createPageButton(pageNum) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'cf-plp__page-num' + (pageNum === paginationState.currentPage ? ' active' : '');
+    btn.textContent = pageNum;
+    btn.addEventListener('click', () => goToPage(pageNum));
+    return btn;
+  }
+
+  // Go to specific page
+  function goToPage(pageNum) {
+    paginationState.currentPage = pageNum;
+    applyPagination();
+    // Scroll to top of product grid
+    document.querySelector('.cf-plp__products').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Pagination event listeners
+  prevBtn.addEventListener('click', () => {
+    if (paginationState.currentPage > 1) {
+      goToPage(paginationState.currentPage - 1);
+    }
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if (paginationState.currentPage < paginationState.totalPages) {
+      goToPage(paginationState.currentPage + 1);
+    }
+  });
+
+  // View Toggle (Grid/List)
+  const productGrid = document.getElementById('product-grid');
+  document.querySelectorAll('.cf-plp__view-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.cf-plp__view-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+
+      const viewType = this.dataset.view;
+      if (viewType === 'list') {
+        productGrid.classList.add('list-view');
+      } else {
+        productGrid.classList.remove('list-view');
+      }
+    });
+  });
+
+  // Category Pills
+  document.querySelectorAll('.cf-plp__pill').forEach(pill => {
+    pill.addEventListener('click', function() {
+      document.querySelectorAll('.cf-plp__pill').forEach(p => p.classList.remove('active'));
+      this.classList.add('active');
+      filterState.category = this.dataset.filter;
+      applyFilters();
+    });
+  });
+
+  // Brand Checkboxes
+  document.querySelectorAll('input[name="brand"]').forEach(cb => {
+    cb.addEventListener('change', function() {
+      if (this.checked) {
+        filterState.brands.push(this.value);
+      } else {
+        filterState.brands = filterState.brands.filter(b => b !== this.value);
+      }
+      applyFilters();
+    });
+  });
+
+  // Price Range Checkboxes
+  document.querySelectorAll('input[name="price"]').forEach(cb => {
+    cb.addEventListener('change', function() {
+      if (this.checked) {
+        filterState.priceRanges.push(this.value);
+      } else {
+        filterState.priceRanges = filterState.priceRanges.filter(p => p !== this.value);
+      }
+      applyFilters();
+    });
+  });
+
+  // Option Checkboxes (variation filters)
+  document.querySelectorAll('.cf-plp__filter-options input[type="checkbox"][data-option]').forEach(cb => {
+    cb.addEventListener('change', function() {
+      const optName = this.dataset.option.toLowerCase().replace(/[^a-z0-9]/g, '-');
+      if (!filterState.options[optName]) filterState.options[optName] = [];
+
+      if (this.checked) {
+        filterState.options[optName].push(this.value);
+      } else {
+        filterState.options[optName] = filterState.options[optName].filter(v => v !== this.value);
+      }
+      applyFilters();
+    });
+  });
+
+  // Range Sliders
+  document.querySelectorAll('.cf-plp__range-filter').forEach(rangeWrap => {
+    const optName = rangeWrap.dataset.option;
+    const minSlider = rangeWrap.querySelector('.cf-plp__range-min');
+    const maxSlider = rangeWrap.querySelector('.cf-plp__range-max');
+    const minDisplay = rangeWrap.querySelector('.cf-plp__range-min-val');
+    const maxDisplay = rangeWrap.querySelector('.cf-plp__range-max-val');
+
+    if (minSlider && maxSlider) {
+      const updateRange = () => {
+        let minVal = parseInt(minSlider.value);
+        let maxVal = parseInt(maxSlider.value);
+
+        // Prevent crossover
+        if (minVal > maxVal) {
+          [minVal, maxVal] = [maxVal, minVal];
+        }
+
+        if (minDisplay) minDisplay.textContent = minVal + '"';
+        if (maxDisplay) maxDisplay.textContent = maxVal + '"';
+
+        filterState.optionRanges[optName] = { min: minVal, max: maxVal };
+        applyFilters();
+      };
+
+      minSlider.addEventListener('input', updateRange);
+      maxSlider.addEventListener('input', updateRange);
+    }
+  });
+
+  // Quick Select Buttons
+  document.querySelectorAll('.cf-plp__quick-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const optName = this.dataset.option;
+      const value = this.dataset.value;
+      const numVal = extractNumeric(value);
+
+      // Toggle active state
+      this.classList.toggle('active');
+
+      // Update range slider if exists
+      const rangeWrap = document.querySelector(`.cf-plp__range-filter[data-option="${optName}"]`);
+      if (rangeWrap) {
+        const minSlider = rangeWrap.querySelector('.cf-plp__range-min');
+        const maxSlider = rangeWrap.querySelector('.cf-plp__range-max');
+        const minDisplay = rangeWrap.querySelector('.cf-plp__range-min-val');
+        const maxDisplay = rangeWrap.querySelector('.cf-plp__range-max-val');
+
+        // If button is active, set both to same value
+        const activeButtons = document.querySelectorAll(`.cf-plp__quick-btn[data-option="${optName}"].active`);
+        if (activeButtons.length > 0) {
+          const activeVals = Array.from(activeButtons).map(b => extractNumeric(b.dataset.value));
+          const minActive = Math.min(...activeVals);
+          const maxActive = Math.max(...activeVals);
+
+          if (minSlider) minSlider.value = minActive;
+          if (maxSlider) maxSlider.value = maxActive;
+          if (minDisplay) minDisplay.textContent = minActive + '"';
+          if (maxDisplay) maxDisplay.textContent = maxActive + '"';
+
+          filterState.optionRanges[optName] = { min: minActive, max: maxActive };
+        } else {
+          // Reset to full range
+          if (minSlider) minSlider.value = minSlider.min;
+          if (maxSlider) maxSlider.value = maxSlider.max;
+          if (minDisplay) minDisplay.textContent = minSlider.min + '"';
+          if (maxDisplay) maxDisplay.textContent = maxSlider.max + '"';
+          delete filterState.optionRanges[optName];
+        }
+      }
+
+      applyFilters();
+    });
+  });
+
+  // Add to Cart - triggers cart drawer/notification
+  document.querySelectorAll('.cf-plp__add-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const variantId = this.dataset.variantId;
+      const card = this.closest('.cf-plp__card');
+      const qty = card ? parseInt(card.querySelector('.cf-plp__qty-input').value) || 1 : 1;
+      const button = this;
+
+      button.disabled = true;
+      button.textContent = 'Adding...';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: parseInt(variantId), quantity: qty })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Add to cart failed');
+        return res.json();
+      })
+      .then(data => {
+        button.textContent = 'Added!';
+        button.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+
+        // Update cart count in header
+        fetch('/cart.js').then(r => r.json()).then(cart => {
+          const countEls = document.querySelectorAll('.cart-count-bubble span, .cart-count, [data-cart-count]');
+          countEls.forEach(el => el.textContent = cart.item_count);
+        });
+
+        // Open cart drawer (using custom quick-cart implementation)
+        if (typeof window.openCartDrawer === 'function') {
+          window.openCartDrawer();
+        } else {
+          // Fallback
+          const customCartDrawer = document.getElementById('cartDrawer');
+          if (customCartDrawer) {
+            customCartDrawer.classList.add('active');
+            document.body.style.overflow = 'hidden';
+          } else {
+            // Final fallback: trigger cart notification
+            const cartNotification = document.querySelector('cart-notification');
+            if (cartNotification) {
+              cartNotification.renderContents(data);
+            }
+          }
+        }
+
+        setTimeout(() => {
+          button.textContent = 'Add to Cart';
+          button.style.background = '';
+          button.disabled = false;
+        }, 2000);
+      })
+      .catch(err => {
+        console.error('Cart error:', err);
+        button.textContent = 'Error';
+        button.style.background = '#ef4444';
+        setTimeout(() => {
+          button.textContent = 'Add to Cart';
+          button.style.background = '';
+          button.disabled = false;
+        }, 2000);
+      });
+    });
+  });
+
+  // Sort Handler
+  window.handleSort = function(value) {
+    const url = new URL(window.location);
+    url.searchParams.set('sort_by', value);
+    window.location = url;
+  };
+
+  // Initialize - apply filters and pagination on page load
+  applyFilters();
+
+  console.log('CF-PLP: All event listeners attached, pagination initialized');
+});
+</script>
 
 {% schema %}
 {
-  "name": "Level 2 Category Hub",
+  "name": "L2 Collection Hub",
   "tag": "section",
-  "class": "section-level2-hub",
+  "class": "section-collection-level2",
   "settings": [
     {
-      "type": "checkbox",
-      "id": "show_all_categories",
-      "label": "Show all categories section",
-      "default": true
+      "type": "link_list",
+      "id": "menu",
+      "label": "Navigation Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 24,
+      "max": 480,
+      "step": 24,
+      "default": 48,
+      "label": "Products per page"
     }
   ],
   "presets": [
     {
-      "name": "Level 2 Category Hub"
+      "name": "L2 Collection Hub"
     }
   ]
 }
