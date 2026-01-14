@@ -600,6 +600,82 @@
   color: var(--text-medium);
 }
 
+/* Active Filters Display */
+.cf-plp__active-filters {
+  padding: 16px 0;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cf-plp__active-filters-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.cf-plp__active-filters-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.cf-plp__clear-all {
+  padding: 6px 12px;
+  background: var(--primary-red);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cf-plp__clear-all:hover {
+  background: var(--deep-red);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+.cf-plp__active-filters-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cf-plp__filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--pale-blue);
+  border: 1px solid var(--primary-blue);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--deep-blue);
+}
+
+.cf-plp__filter-chip-remove {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-blue);
+  color: white;
+  border-radius: 50%;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cf-plp__filter-chip-remove:hover {
+  background: var(--primary-red);
+  transform: scale(1.1);
+}
+
 /* Product Grid */
 .cf-plp__grid {
   display: grid;
@@ -1408,21 +1484,33 @@
         </div>
 
         <div class="cf-plp__results-count">
-          <strong>{{ grand_total_products }}</strong> products
+          <strong id="filtered-count">{{ grand_total_products }}</strong> products
+        </div>
+      </div>
+
+      {% comment %} Active Filters Display {% endcomment %}
+      <div class="cf-plp__active-filters" id="active-filters" style="display: none;">
+        <div class="cf-plp__active-filters-header">
+          <span class="cf-plp__active-filters-label">Active Filters:</span>
+          <button type="button" class="cf-plp__clear-all" id="clear-all-filters">Clear All</button>
+        </div>
+        <div class="cf-plp__active-filters-list" id="active-filters-list">
+          <!-- Dynamically populated by JavaScript -->
         </div>
       </div>
 
       {% comment %} Product Grid {% endcomment %}
       <div class="cf-plp__grid" id="product-grid">
         {% assign products_shown = 0 %}
-        {% assign products_limit = section.settings.products_per_page | default: 48 %}
+        {% assign products_limit = 500 %}
+        {% comment %} Render ALL products from all L3 collections for client-side filtering {% endcomment %}
 
         {% for handle in l3_handle_array %}
           {% assign handle_clean = handle | strip %}
           {% if handle_clean != blank %}
             {% assign l3_coll = collections[handle_clean] %}
             {% assign l3_category = l3_coll.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
-            {% for product in l3_coll.products %}
+            {% for product in l3_coll.products limit: 50 %}
               {% if products_shown < products_limit %}
                 {% assign products_shown = products_shown | plus: 1 %}
                 {% assign shipment_text = product.metafields.custom.shipment_text %}
@@ -1570,7 +1658,7 @@
               {% assign shipping_class = 'cf-plp__shipping--quick' %}
             {% endif %}
 
-            <div class="cf-plp__card" data-category="all">
+            <div class="cf-plp__card" data-category="all" data-vendor="{{ product.vendor | handleize }}" data-price="{{ product.price }}">
               {% if product.compare_at_price > product.price %}
                 <span class="cf-plp__card-badge">Sale</span>
               {% endif %}
@@ -1723,6 +1811,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const pageNumbersContainer = document.getElementById('page-numbers');
   const prevBtn = document.getElementById('prev-page');
   const nextBtn = document.getElementById('next-page');
+  const activeFiltersContainer = document.getElementById('active-filters');
+  const activeFiltersList = document.getElementById('active-filters-list');
+  const clearAllBtn = document.getElementById('clear-all-filters');
 
   console.log('CF-PLP: Filter JS loaded, found', getCards().length, 'cards');
 
@@ -1744,6 +1835,159 @@ document.addEventListener('DOMContentLoaded', function() {
     const cleaned = val.replace(/[^\d.]/g, '');
     return parseFloat(cleaned) || 0;
   }
+
+  // Update active filters display
+  function updateActiveFiltersDisplay() {
+    const activeChips = [];
+
+    // Category filter (skip if 'all')
+    if (filterState.category !== 'all') {
+      const categoryPill = document.querySelector(`.cf-plp__pill[data-filter="${filterState.category}"]`);
+      const categoryName = categoryPill ? categoryPill.textContent.trim() : filterState.category;
+      activeChips.push({
+        type: 'category',
+        label: `Category: ${categoryName}`,
+        value: filterState.category
+      });
+    }
+
+    // Brand filters
+    filterState.brands.forEach(brand => {
+      const brandCheckbox = document.querySelector(`input[name="brand"][value="${brand}"]`);
+      const brandLabel = brandCheckbox ? brandCheckbox.parentElement.textContent.trim() : brand;
+      activeChips.push({
+        type: 'brand',
+        label: `Brand: ${brandLabel}`,
+        value: brand
+      });
+    });
+
+    // Price range filters
+    filterState.priceRanges.forEach(range => {
+      let rangeLabel = '';
+      if (range === '0-500') rangeLabel = 'Under $500';
+      else if (range === '500-1000') rangeLabel = '$500 - $1,000';
+      else if (range === '1000-2500') rangeLabel = '$1,000 - $2,500';
+      else if (range === '2500+') rangeLabel = '$2,500+';
+
+      activeChips.push({
+        type: 'price',
+        label: `Price: ${rangeLabel}`,
+        value: range
+      });
+    });
+
+    // Option filters
+    for (const [optName, selectedVals] of Object.entries(filterState.options)) {
+      if (selectedVals.length > 0) {
+        selectedVals.forEach(val => {
+          activeChips.push({
+            type: 'option',
+            label: `${optName}: ${val}`,
+            value: val,
+            optName: optName
+          });
+        });
+      }
+    }
+
+    // Option range filters
+    for (const [optName, range] of Object.entries(filterState.optionRanges)) {
+      activeChips.push({
+        type: 'range',
+        label: `${optName}: ${range.min}" - ${range.max}"`,
+        value: optName
+      });
+    }
+
+    // Show/hide active filters section
+    if (activeChips.length > 0) {
+      activeFiltersContainer.style.display = 'block';
+
+      // Render chips
+      activeFiltersList.innerHTML = activeChips.map(chip => `
+        <div class="cf-plp__filter-chip" data-type="${chip.type}" data-value="${chip.value}" ${chip.optName ? `data-opt-name="${chip.optName}"` : ''}>
+          <span>${chip.label}</span>
+          <span class="cf-plp__filter-chip-remove" onclick="removeFilter('${chip.type}', '${chip.value}', '${chip.optName || ''}')">×</span>
+        </div>
+      `).join('');
+    } else {
+      activeFiltersContainer.style.display = 'none';
+    }
+  }
+
+  // Remove individual filter
+  window.removeFilter = function(type, value, optName) {
+    if (type === 'category') {
+      filterState.category = 'all';
+      document.querySelectorAll('.cf-plp__pill').forEach(p => p.classList.remove('active'));
+      document.querySelector('.cf-plp__pill[data-filter="all"]').classList.add('active');
+    } else if (type === 'brand') {
+      filterState.brands = filterState.brands.filter(b => b !== value);
+      const checkbox = document.querySelector(`input[name="brand"][value="${value}"]`);
+      if (checkbox) checkbox.checked = false;
+    } else if (type === 'price') {
+      filterState.priceRanges = filterState.priceRanges.filter(p => p !== value);
+      const checkbox = document.querySelector(`input[name="price"][value="${value}"]`);
+      if (checkbox) checkbox.checked = false;
+    } else if (type === 'option') {
+      if (filterState.options[optName]) {
+        filterState.options[optName] = filterState.options[optName].filter(v => v !== value);
+      }
+      const checkbox = document.querySelector(`input[data-option="${optName}"][value="${value}"]`);
+      if (checkbox) checkbox.checked = false;
+    } else if (type === 'range') {
+      delete filterState.optionRanges[value];
+      // Reset sliders
+      const rangeWrap = document.querySelector(`.cf-plp__range-filter[data-option="${value}"]`);
+      if (rangeWrap) {
+        const minSlider = rangeWrap.querySelector('.cf-plp__range-min');
+        const maxSlider = rangeWrap.querySelector('.cf-plp__range-max');
+        if (minSlider) minSlider.value = minSlider.min;
+        if (maxSlider) maxSlider.value = maxSlider.max;
+      }
+      // Deactivate quick buttons
+      document.querySelectorAll(`.cf-plp__quick-btn[data-option="${value}"]`).forEach(btn => {
+        btn.classList.remove('active');
+      });
+    }
+
+    applyFilters();
+  };
+
+  // Clear all filters
+  clearAllBtn.addEventListener('click', function() {
+    // Reset filter state
+    filterState.category = 'all';
+    filterState.brands = [];
+    filterState.priceRanges = [];
+    filterState.options = {};
+    filterState.optionRanges = {};
+
+    // Reset UI
+    document.querySelectorAll('.cf-plp__pill').forEach(p => p.classList.remove('active'));
+    document.querySelector('.cf-plp__pill[data-filter="all"]').classList.add('active');
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+    document.querySelectorAll('.cf-plp__quick-btn').forEach(btn => btn.classList.remove('active'));
+
+    // Reset sliders
+    document.querySelectorAll('.cf-plp__range-filter').forEach(rangeWrap => {
+      const minSlider = rangeWrap.querySelector('.cf-plp__range-min');
+      const maxSlider = rangeWrap.querySelector('.cf-plp__range-max');
+      const minDisplay = rangeWrap.querySelector('.cf-plp__range-min-val');
+      const maxDisplay = rangeWrap.querySelector('.cf-plp__range-max-val');
+      if (minSlider) {
+        minSlider.value = minSlider.min;
+        if (minDisplay) minDisplay.textContent = minSlider.min + '"';
+      }
+      if (maxSlider) {
+        maxSlider.value = maxSlider.max;
+        if (maxDisplay) maxDisplay.textContent = maxSlider.max + '"';
+      }
+    });
+
+    applyFilters();
+  });
 
   // Apply all filters
   function applyFilters(resetPage = true) {
@@ -1828,6 +2072,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (resetPage) {
       paginationState.currentPage = 1;
     }
+
+    // Update active filters display
+    updateActiveFiltersDisplay();
 
     // Apply pagination
     applyPagination();
