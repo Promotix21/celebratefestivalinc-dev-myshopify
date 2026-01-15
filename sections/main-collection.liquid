@@ -41,6 +41,29 @@
   assign filter_type = section.settings.filter_type
 -%}
 
+<script>
+  console.log('L3 Collection: Page Load Started');
+  performance.mark('l3-start');
+
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('L3 Collection: DOMContentLoaded');
+    performance.mark('l3-dom-content-loaded');
+    performance.measure('L3 DOM Parse Time', 'l3-start', 'l3-dom-content-loaded');
+    
+    // Check for heavy DOM elements
+    const productCards = document.querySelectorAll('.l3-product-card');
+    console.log(`L3 Collection: Found ${productCards.length} product cards`);
+    
+    const hiddenInputs = document.querySelectorAll('input[type="hidden"]');
+    console.log(`L3 Collection: Found ${hiddenInputs.length} hidden inputs (potential variant bloat)`);
+  });
+
+  window.addEventListener('load', () => {
+    console.log('L3 Collection: Window Load (All resources loaded)');
+    performance.mark('l3-window-load');
+  });
+</script>
+
 <style>
 /* ========================================
    LEVEL 3 PRODUCT LISTING PAGE STYLES
@@ -1588,7 +1611,8 @@
 
       {% comment %} Check if this is an L2 aggregated view {% endcomment %}
       {%- assign coll_count_check = collection.products_count | default: 0 | plus: 0 -%}
-      {%- if coll_count_check == 0 and subcategory_links and subcategory_links.size > 0 -%}
+      {%- assign all_products_count_check = collection.all_products_count | default: 0 | plus: 0 -%}
+      {%- if coll_count_check == 0 and all_products_count_check == 0 and subcategory_links and subcategory_links.size > 0 -%}
         {% comment %}
           L2 AGGREGATED VIEW: Collect all brands and tags from L3 subcategories
         {% endcomment %}
@@ -1596,7 +1620,7 @@
         {%- assign all_tags = '' -%}
         {%- assign brand_category_map = '' -%}
 
-        {%- for sub_link in subcategory_links limit: 8 -%}
+        {%- for sub_link in subcategory_links limit: 6 -%}
           {%- assign sub_handle = sub_link.url | split: '/' | last | split: '?' | first -%}
           {%- assign sub_coll = collections[sub_handle] -%}
           {%- assign sub_count = sub_coll.products_count | default: 0 | plus: 0 -%}
@@ -1607,15 +1631,15 @@
             {%- if sub_count > 0 -%}{%- assign sub_handle = sub_new_handle -%}{%- endif -%}
           {%- endunless -%}
           {%- if sub_coll and sub_count > 0 -%}
-            {%- for product in sub_coll.products limit: 15 -%}
+            {%- for product in sub_coll.products limit: 8 -%}
               {%- if product.vendor != blank -%}
                 {%- unless all_brands contains product.vendor -%}
                   {%- assign all_brands = all_brands | append: product.vendor | append: '|||' -%}
                 {%- endunless -%}
-                {%- assign brand_entry = product.vendor | append: ':' | append: sub_handle | append: ',' -%}
+                {%- assign brand_entry = product.vendor | append: ':' | append: sub_handle | append: '|||' -%}
                 {%- assign brand_category_map = brand_category_map | append: brand_entry -%}
               {%- endif -%}
-              {%- for tag in product.tags -%}
+              {%- for tag in product.tags limit: 5 -%}
                 {%- unless all_tags contains tag -%}
                   {%- assign all_tags = all_tags | append: tag | append: '|||' -%}
                 {%- endunless -%}
@@ -1672,12 +1696,12 @@
           </button>
           <div class="l3-filter-options" id="brand-filter-options" data-filter-type="brand">
             {%- assign brand_index = 0 -%}
+            {%- assign map_entries = brand_category_map | split: '|||' -%}
             {%- for brand in brands_array -%}
               {%- if brand != blank -%}
                 {%- assign brand_index = brand_index | plus: 1 -%}
                 {%- comment %} Find which categories this brand belongs to {% endcomment -%}
                 {%- assign brand_cats = '' -%}
-                {%- assign map_entries = brand_category_map | split: ',' -%}
                 {%- for entry in map_entries -%}
                   {%- assign entry_parts = entry | split: ':' -%}
                   {%- if entry_parts[0] == brand -%}
@@ -1686,10 +1710,12 @@
                     {%- endunless -%}
                   {%- endif -%}
                 {%- endfor -%}
-                <label class="l3-filter-option{% if brand_index > 8 %} l3-filter-hidden{% endif %}" data-brand-categories="{{ brand_cats }}">
-                  <input type="checkbox" class="l3-brand-filter" data-brand="{{ brand | handleize }}" onchange="filterByBrand(this)">
-                  <span>{{ brand }}</span>
-                </label>
+                {%- if brand_index <= 20 -%}
+                  <label class="l3-filter-option{% if brand_index > 8 %} l3-filter-hidden{% endif %}" data-brand-categories="{{ brand_cats }}">
+                    <input type="checkbox" class="l3-brand-filter" data-brand="{{ brand | handleize }}" onchange="filterByBrand(this)">
+                    <span>{{ brand }}</span>
+                  </label>
+                {%- endif -%}
               {%- endif -%}
             {%- endfor -%}
             {%- if brand_index > 8 -%}
@@ -1712,10 +1738,12 @@
             {%- for tag in tags_array -%}
               {%- if tag != blank -%}
                 {%- assign tag_index = tag_index | plus: 1 -%}
-                <label class="l3-filter-option{% if tag_index > 8 %} l3-filter-hidden{% endif %}">
-                  <input type="checkbox" class="l3-tag-filter" data-tag="{{ tag | handleize }}" onchange="filterByTag(this)">
-                  <span>{{ tag }}</span>
-                </label>
+                {%- if tag_index <= 20 -%}
+                  <label class="l3-filter-option{% if tag_index > 8 %} l3-filter-hidden{% endif %}">
+                    <input type="checkbox" class="l3-tag-filter" data-tag="{{ tag | handleize }}" onchange="filterByTag(this)">
+                    <span>{{ tag }}</span>
+                  </label>
+                {%- endif -%}
               {%- endif -%}
             {%- endfor -%}
             {%- if tag_index > 8 -%}
@@ -1728,7 +1756,9 @@
         </div>
 
         {% comment %} Store brand-category mapping for JS filtering {% endcomment %}
-        <script type="application/json" id="brand-category-data">{{ brand_category_map | json }}</script>
+        {% if brand_category_map != blank %}
+          <script type="application/json" id="brand-category-data">{{ brand_category_map | json }}</script>
+        {% endif %}
       {%- else -%}
         {% comment %} Normal collection filters {% endcomment %}
         {%- if collection.filters.size > 0 -%}
@@ -1847,7 +1877,8 @@
     {%- assign aggregated_products = '' -%}
 
     {%- assign coll_count = collection.products_count | default: 0 | plus: 0 -%}
-    {%- if coll_count == 0 and subcategory_links and subcategory_links.size > 0 -%}
+    {%- assign coll_all_count = collection.all_products_count | default: 0 | plus: 0 -%}
+    {%- if coll_count == 0 and coll_all_count == 0 and subcategory_links and subcategory_links.size > 0 -%}
       {%- assign show_aggregated = true -%}
     {%- endif -%}
 
@@ -1855,7 +1886,7 @@
       {% comment %} AGGREGATED VIEW: Show products from L3 subcategories {% endcomment %}
       <div class="l3-products-grid" id="l3-products-grid">
         {%- assign products_shown = 0 -%}
-        {%- for sub_link in subcategory_links limit: 8 -%}
+        {%- for sub_link in subcategory_links limit: 6 -%}
           {%- assign sub_handle = sub_link.url | split: '/' | last | split: '?' | first -%}
           {%- assign sub_coll = collections[sub_handle] -%}
           {%- assign sub_count = sub_coll.products_count | default: 0 | plus: 0 -%}
@@ -1865,7 +1896,7 @@
             {%- assign sub_count = sub_coll.products_count | default: 0 | plus: 0 -%}
           {%- endunless -%}
           {%- if sub_coll and sub_count > 0 -%}
-            {%- for product in sub_coll.products limit: 16 -%}
+            {%- for product in sub_coll.products limit: 8 -%}
               {%- if products_shown < items_per_page -%}
                 {%- assign products_shown = products_shown | plus: 1 -%}
                 {%- liquid
@@ -1899,8 +1930,23 @@
                   if has_member_pricing and member_price
                     assign savings_amount = product.compare_at_price | minus: product.price
                   endif
-                  assign images_json = product.media | map: 'src' | json
-                  assign product_tags_joined = product.tags | join: ','
+
+                  {% comment %} Build images array properly for hover effect {% endcomment %}
+                  {% assign images_array = '' %}
+                  {% for media in product.media limit: 5 %}
+                    {% if media.media_type == 'image' %}
+                      {% assign img_url = media.preview_image | image_url: width: 400 %}
+                      {% if images_array == '' %}
+                        {% assign images_array = img_url %}
+                      {% else %}
+                        {% assign images_array = images_array | append: '|||' | append: img_url %}
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+                  {% assign images_split = images_array | split: '|||' %}
+                  {% assign images_json = images_split | json %}
+
+                  {% assign product_tags_joined = product.tags | join: ',' %}
                 -%}
                 <div class="l3-product-card" data-product-id="{{ product.id }}" data-images="{{ images_json | escape }}" data-category="{{ sub_handle }}" data-vendor="{{ product.vendor | handleize }}" data-tags="{{ product_tags_joined | handleize }}">
                   {%- if product_badge != blank -%}
@@ -1994,7 +2040,9 @@
               assign price_source = 'none'
               assign has_member_pricing = false
 
-              # Try WSH Wholesale Plugin metafield paths
+              comment
+                Try WSH Wholesale Plugin metafield paths
+              endcomment
               if product.metafields.wsh.wholesale_price
                 assign member_price = product.metafields.wsh.wholesale_price
                 assign price_source = 'wsh-plugin'
@@ -2012,13 +2060,17 @@
                 assign price_source = 'custom-member'
                 assign has_member_pricing = true
               elsif on_sale
-                # Use sale price as member price
+                comment
+                  Use sale price as member price
+                endcomment
                 assign member_price = product.price
                 assign price_source = 'sale-price'
                 assign has_member_pricing = true
               endif
 
-              # Calculate savings if member pricing exists
+              comment
+                Calculate savings if member pricing exists
+              endcomment
               assign savings_amount = nil
               if has_member_pricing and member_price
                 if price_source == 'sale-price'
@@ -2028,7 +2080,22 @@
                 endif
               endif
 
-              assign images_json = product.media | map: 'src' | json
+              comment
+                Build images array properly for hover effect
+              endcomment
+              assign images_array = ''
+              for media in product.media limit: 5
+                if media.media_type == 'image'
+                  assign img_url = media.preview_image | image_url: width: 400
+                  if images_array == ''
+                    assign images_array = img_url
+                  else
+                    assign images_array = images_array | append: '|||' | append: img_url
+                  endif
+                endif
+              endfor
+              assign images_split = images_array | split: '|||'
+              assign images_json = images_split | json
             -%}
 
             <div class="l3-product-card" data-product-id="{{ product.id }}" data-images="{{ images_json | escape }}">
@@ -2524,18 +2591,28 @@
 
   // Remember view preference
   document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔧 L3: Starting main DOMContentLoaded handler');
+
     const savedView = localStorage.getItem('l3CollectionView');
     if (savedView === 'list') {
       switchL3View('list');
     }
+    console.log('🔧 L3: View preference loaded');
 
     // Product image hover - cycle through variation images
+    console.log('🔧 L3: Setting up image hover...');
     const productCards = document.querySelectorAll('.l3-product-card[data-images]');
+    console.log('🔧 L3: Found', productCards.length, 'cards with images');
     productCards.forEach(card => {
       let intervalId = null;
       let currentIndex = 0;
+      let isHovering = false;
 
       card.addEventListener('mouseenter', () => {
+        // Prevent duplicate intervals from accumulating
+        if (isHovering) return;
+        isHovering = true;
+
         try {
           const images = JSON.parse(card.dataset.images || '[]');
           if (images.length > 1) {
@@ -2556,6 +2633,7 @@
       });
 
       card.addEventListener('mouseleave', () => {
+        isHovering = false;
         if (intervalId) {
           clearInterval(intervalId);
           intervalId = null;
@@ -2563,8 +2641,10 @@
         }
       });
     });
+    console.log('🔧 L3: Image hover setup complete');
 
     // Quick add functionality with quantity support
+    console.log('🔧 L3: Setting up add to cart buttons...');
     document.querySelectorAll('.l3-add-to-cart-btn').forEach(btn => {
       btn.addEventListener('click', function(e) {
         e.preventDefault();
@@ -2648,8 +2728,10 @@
         });
       });
     });
+    console.log('🔧 L3: Add to cart setup complete');
 
     // Quantity input validation
+    console.log('🔧 L3: Setting up quantity inputs...');
     document.querySelectorAll('.l3-qty-input').forEach(input => {
       input.addEventListener('change', function() {
         let value = parseInt(this.value, 10);
@@ -2669,7 +2751,13 @@
         e.preventDefault();
       });
     });
+    console.log('✅ L3: ALL initialization complete!');
   });
+
+  // Monitor if DOMContentLoaded completes
+  setTimeout(() => {
+    console.log('⏱️  L3: 2 seconds after page load - checking status');
+  }, 2000);
 </script>
 
 {% schema %}
@@ -2696,7 +2784,7 @@
       "min": 8,
       "max": 48,
       "step": 4,
-      "default": 12,
+      "default": 24,
       "label": "Products per page",
       "info": "Number of products to display per page"
     },
