@@ -6,41 +6,168 @@
   font-family: var(--font-body-family);
 }
 
-/* Top Bar */
-.enhanced-header-wrapper .top-bar {
-  background: #FF6B6B;
-  color: white;
-  padding: 8px 0;
-  overflow: hidden;
-  position: relative;
-}
-
-.enhanced-header-wrapper .marquee-container {
-  width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.enhanced-header-wrapper .marquee-text {
-  display: inline-block;
-  animation: enhanced-marquee 80s linear infinite;
-  white-space: nowrap;
+/* ============================================
+   WARM HOSPITALITY TOPBAR STYLES
+   Adapted to Celebrate Festival brand colors
+   ============================================ */
+.topbar-hospitality {
+  background: linear-gradient(90deg, #1a365d 0%, #0f172a 100%);
+  padding: 10px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-size: 13px;
-  font-weight: 500;
+  color: #fff;
 }
 
-.enhanced-header-wrapper .marquee-text::after {
-  content: " 🚨 MEGA SALE: Up to 40% OFF Commercial Equipment 🚨 Free Installation on Orders $5000+ 🚨 Free Nationwide Shipping on Select Items 🚨 Price Match Guarantee";
-  margin-left: 50px;
+.topbar-hospitality .welcome {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-@keyframes enhanced-marquee {
-  0% { transform: translateX(100vw); }
-  100% { transform: translateX(-100%); }
+.topbar-hospitality .welcome i,
+.topbar-hospitality .welcome svg {
+  color: #d4af37;
+  font-size: 16px;
+  width: 18px;
+  height: 18px;
+  fill: #d4af37;
 }
 
-.enhanced-header-wrapper .top-bar:hover .marquee-text {
-  animation-play-state: paused;
+.topbar-hospitality .welcome span {
+  color: #93c5fd;
+}
+
+.topbar-hospitality .center-info {
+  display: flex;
+  gap: 40px;
+}
+
+.topbar-hospitality .info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topbar-hospitality .info-item i,
+.topbar-hospitality .info-item svg {
+  color: #d4af37;
+  width: 16px;
+  height: 16px;
+  fill: #d4af37;
+}
+
+.topbar-hospitality .right-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.topbar-hospitality .right-actions a {
+  color: #93c5fd;
+  text-decoration: none;
+  transition: color 0.2s;
+  font-size: 13px;
+}
+
+.topbar-hospitality .right-actions a:hover {
+  color: #fff;
+}
+
+.topbar-hospitality .divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(255,255,255,0.3);
+}
+
+.topbar-hospitality .live-chat {
+  background: #ff6b6b;
+  color: #fff;
+  padding: 5px 14px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.topbar-hospitality .live-chat:hover {
+  background: #ff5252;
+  transform: scale(1.02);
+  color: #fff;
+}
+
+.topbar-hospitality .live-chat .pulse {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: topbar-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes topbar-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+/* Topbar Mobile Responsive */
+@media (max-width: 992px) {
+  .topbar-hospitality {
+    padding: 10px 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .topbar-hospitality .center-info {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .topbar-hospitality {
+    padding: 8px 15px;
+  }
+  .topbar-hospitality .welcome {
+    display: none;
+  }
+  .topbar-hospitality .center-info {
+    gap: 15px;
+    flex: 1;
+  }
+  .topbar-hospitality .info-item span {
+    font-size: 12px;
+  }
+  .topbar-hospitality .right-actions a:not(.live-chat) {
+    display: none;
+  }
+  .topbar-hospitality .divider {
+    display: none;
+  }
+  .topbar-hospitality .live-chat {
+    padding: 4px 12px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar-hospitality {
+    justify-content: center;
+  }
+  .topbar-hospitality .center-info {
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+    text-align: center;
+  }
+  .topbar-hospitality .info-item {
+    font-size: 11px;
+  }
+  .topbar-hospitality .right-actions {
+    display: none;
+  }
 }
 
 /* Main Header */

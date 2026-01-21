@@ -4,9 +4,6 @@
   .enhanced-header-wrapper .header-logo {
     max-width: {{ section.settings.logo_max_width | default: 180 }}px !important;
   }
-  .enhanced-header-wrapper .marquee-text {
-    font-size: {{ section.settings.marquee_text_size | default: 13 }}px !important;
-  }
   .enhanced-header-wrapper .header-logo img {
     max-height: {{ section.settings.logo_height | default: 55 }}px !important;
   }
@@ -14,17 +11,297 @@
     width: {{ section.settings.nav_icon_size | default: 20 }}px !important;
     height: {{ section.settings.nav_icon_size | default: 20 }}px !important;
   }
- 
+
+  /* ============================================
+     NEW WARM HOSPITALITY TOPBAR STYLES
+     Adapted to Celebrate Festival brand colors
+     ============================================ */
+  .topbar-hospitality {
+    background: linear-gradient(90deg, #1a365d 0%, #0f172a 100%);
+    padding: 10px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: #fff;
+  }
+
+  .topbar-hospitality .welcome {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .topbar-hospitality .welcome i,
+  .topbar-hospitality .welcome svg {
+    color: #d4af37;
+    font-size: 16px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .topbar-hospitality .welcome span {
+    color: #93c5fd;
+  }
+
+  .topbar-hospitality .center-info {
+    display: flex;
+    gap: 40px;
+  }
+
+  .topbar-hospitality .info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .topbar-hospitality .info-item i,
+  .topbar-hospitality .info-item svg {
+    color: #d4af37;
+    width: 16px;
+    height: 16px;
+  }
+
+  .topbar-hospitality .right-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .topbar-hospitality .right-actions a {
+    color: #93c5fd;
+    text-decoration: none;
+    transition: color 0.2s;
+    font-size: 13px;
+  }
+
+  .topbar-hospitality .right-actions a:hover {
+    color: #fff;
+  }
+
+  .topbar-hospitality .divider {
+    width: 1px;
+    height: 16px;
+    background: rgba(255,255,255,0.3);
+  }
+
+  .topbar-hospitality .live-chat {
+    background: #ff6b6b;
+    color: #fff;
+    padding: 5px 14px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+
+  .topbar-hospitality .live-chat:hover {
+    background: #ff5252;
+    transform: scale(1.02);
+    color: #fff;
+  }
+
+  .topbar-hospitality .live-chat .pulse {
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+  }
+
+  /* Topbar Mobile Responsive */
+  @media (max-width: 992px) {
+    .topbar-hospitality {
+      padding: 10px 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .topbar-hospitality .center-info {
+      gap: 20px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .topbar-hospitality {
+      padding: 8px 15px;
+    }
+    .topbar-hospitality .welcome {
+      display: none;
+    }
+    .topbar-hospitality .center-info {
+      gap: 15px;
+      flex: 1;
+    }
+    .topbar-hospitality .info-item span {
+      font-size: 12px;
+    }
+    .topbar-hospitality .right-actions a:not(.live-chat) {
+      display: none;
+    }
+    .topbar-hospitality .divider {
+      display: none;
+    }
+    .topbar-hospitality .live-chat {
+      padding: 4px 12px;
+      font-size: 11px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .topbar-hospitality {
+      justify-content: center;
+    }
+    .topbar-hospitality .center-info {
+      flex-direction: column;
+      gap: 4px;
+      align-items: center;
+      text-align: center;
+    }
+    .topbar-hospitality .info-item {
+      font-size: 11px;
+    }
+    .topbar-hospitality .right-actions {
+      display: none;
+    }
+  }
+
+  /* Account Dropdown Styles */
+  .account-dropdown-wrapper {
+    position: relative;
+  }
+
+  .account-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    min-width: 250px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+  }
+
+  .account-dropdown-wrapper:hover .account-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .account-dropdown-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+    border-radius: 8px 8px 0 0;
+  }
+
+  .account-dropdown-name {
+    font-weight: 700;
+    font-size: 15px;
+    color: #1a365d;
+    margin-bottom: 4px;
+  }
+
+  .account-dropdown-email {
+    font-size: 12px;
+    color: #64748b;
+  }
+
+  .account-dropdown-menu {
+    list-style: none;
+    margin: 0;
+    padding: 8px 0;
+  }
+
+  .account-dropdown-menu li {
+    margin: 0;
+  }
+
+  .account-dropdown-menu a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    color: #475569;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .account-dropdown-menu a:hover {
+    background: #f8fafc;
+    color: #1a365d;
+  }
+
+  .account-dropdown-menu svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  .account-dropdown-divider {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 8px 0;
+  }
+
+  .account-dropdown-menu li:last-child a {
+    color: #dc2626;
+  }
+
+  .account-dropdown-menu li:last-child a:hover {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
 </style>
 
 <div class="enhanced-header-wrapper">
-  <!-- Top Bar -->
+  <!-- Warm Hospitality Top Bar -->
   {% if section.settings.enable_top_bar %}
-    <div class="top-bar">
-      <div class="marquee-container">
-        <div class="marquee-text">
-          {{ section.settings.marquee_text | default: '🚨 MEGA SALE: Up to 40% OFF Commercial Equipment 🚨 Free Installation on Orders $5000+ 🚨 Free Nationwide Shipping on Select Items 🚨 Price Match Guarantee 🚨' }}
+    <div class="topbar-hospitality">
+      <div class="welcome">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+          <path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/>
+        </svg>
+        <span>{{ section.settings.topbar_welcome_text | default: 'Welcome to Celebrate Festival — Your Partner in Foodservice Excellence' }}</span>
+      </div>
+      <div class="center-info">
+        <div class="info-item">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+          </svg>
+          <span>{{ section.settings.topbar_phone | default: '(408) 673-9999' }}</span>
         </div>
+        <div class="info-item">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+          </svg>
+          <span>{{ section.settings.topbar_hours | default: 'Mon-Sat: 9AM-6PM PST' }}</span>
+        </div>
+      </div>
+      <div class="right-actions">
+        <a href="{{ section.settings.topbar_link_1_url | default: '/pages/track-order' }}">{{ section.settings.topbar_link_1_text | default: 'Track Order' }}</a>
+        <span class="divider"></span>
+        <a href="{{ section.settings.topbar_link_2_url | default: '/pages/financing' }}">{{ section.settings.topbar_link_2_text | default: 'Financing' }}</a>
+        <span class="divider"></span>
+        <a href="{{ section.settings.topbar_chat_url | default: '/pages/contact' }}" class="live-chat">
+          <span class="pulse"></span>
+          {{ section.settings.topbar_chat_text | default: 'Live Chat' }}
+        </a>
       </div>
     </div>
   {% endif %}
@@ -94,12 +371,64 @@
 
         <!-- Header Links -->
         <div class="header-links">
-          <a href="{{ routes.account_url }}" class="header-link">
-            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-            </svg>
-            Login
-          </a>
+          <div class="header-link account-dropdown-wrapper">
+            <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}?return_url={{ request.path | url_param_escape }}{% endif %}" class="header-link">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+              </svg>
+              {% if customer %}My Account{% else %}Login{% endif %}
+            </a>
+
+            {% if customer %}
+            <div class="account-dropdown">
+              <div class="account-dropdown-header">
+                <div class="account-dropdown-name">{{ customer.first_name | default: customer.name }}</div>
+                <div class="account-dropdown-email">{{ customer.email }}</div>
+              </div>
+              <ul class="account-dropdown-menu">
+                <li>
+                  <a href="{{ routes.account_url }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    Account Dashboard
+                  </a>
+                </li>
+                <li>
+                  <a href="{{ routes.account_url }}/orders">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                      <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                    </svg>
+                    Orders
+                  </a>
+                </li>
+                <li>
+                  <a href="{{ routes.account_url }}/addresses">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    Addresses
+                  </a>
+                </li>
+                <li class="account-dropdown-divider"></li>
+                <li>
+                  <a href="{{ routes.account_logout_url }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                      <polyline points="16 17 21 12 16 7"/>
+                      <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    Logout
+                  </a>
+                </li>
+              </ul>
+            </div>
+            {% endif %}
+          </div>
+
           <a href="{{ routes.cart_url }}" class="header-link cart-link">
             <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
               <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
@@ -192,13 +521,10 @@
                           <!-- Column 1 -->
                           <div class="subcategory-column">
                             {% for child_link in link.links limit: items_per_column %}
-                              {% assign thumbnail_image = '' %}
-                              {% for block in section.blocks %}
-                                {% if block.type == 'menu_thumbnail' and block.settings.menu_item_title == child_link.title %}
-                                  {% assign thumbnail_image = block.settings.thumbnail_image %}
-                                  {% break %}
-                                {% endif %}
-                              {% endfor %}
+                              {% comment %} Get collection handle from URL {% endcomment %}
+                              {% assign collection_handle = child_link.url | split: '/collections/' | last | split: '/' | first %}
+                              {% assign current_collection = collections[collection_handle] %}
+                              {% assign thumbnail_image = current_collection.featured_image %}
 
                               <div class="subcategory-item" data-subcategory-id="{{ child_link.handle }}" data-has-children="{{ child_link.links.size | default: 0 }}">
                                 <a href="{{ child_link.url }}" class="subcategory-link">
@@ -220,13 +546,10 @@
                           <!-- Column 2 -->
                           <div class="subcategory-column">
                             {% for child_link in link.links offset: items_per_column %}
-                              {% assign thumbnail_image = '' %}
-                              {% for block in section.blocks %}
-                                {% if block.type == 'menu_thumbnail' and block.settings.menu_item_title == child_link.title %}
-                                  {% assign thumbnail_image = block.settings.thumbnail_image %}
-                                  {% break %}
-                                {% endif %}
-                              {% endfor %}
+                              {% comment %} Get collection handle from URL {% endcomment %}
+                              {% assign collection_handle = child_link.url | split: '/collections/' | last | split: '/' | first %}
+                              {% assign current_collection = collections[collection_handle] %}
+                              {% assign thumbnail_image = current_collection.featured_image %}
 
                               <div class="subcategory-item" data-subcategory-id="{{ child_link.handle }}" data-has-children="{{ child_link.links.size | default: 0 }}">
                                 <a href="{{ child_link.url }}" class="subcategory-link">
@@ -247,91 +570,61 @@
                         </div>
                       </div>
 
-                      <!-- RIGHT SIDE: 40% - Dynamic More Items Section -->
+                      <!-- RIGHT SIDE: 40% - Static L3 Items List -->
                       <div class="mega-menu-more" data-parent-handle="{{ link.handle }}">
-                        <!-- Default "More Items" content -->
                         <div class="more-content-default more-content-active">
-                          <h3 class="more-title">More in {{ link.title }}</h3>
+                          <h3 class="more-title">All {{ link.title }}</h3>
 
-                          {% if current_block.settings.more_items_menu != blank %}
-                            {% assign more_menu = linklists[current_block.settings.more_items_menu] %}
-                            {% if more_menu.links.size > 0 %}
-                              {% assign max_items_per_column = 10 %}
-                              {% assign max_total_items = 20 %}
-                              {% assign total_more = more_menu.links.size %}
-                              {% assign show_view_all = false %}
-                              {% if total_more > max_total_items %}
-                                {% assign show_view_all = true %}
+                          {% comment %} Flatten all L3 items into a single loop {% endcomment %}
+                          {% assign l3_items = '' %}
+                          {% assign item_count = 0 %}
+
+                          {% for child_link in link.links %}
+                            {% for grandchild_link in child_link.links %}
+                              {% if item_count < 15 %}
+                                {% assign l3_items = l3_items | append: grandchild_link.title | append: '|' | append: grandchild_link.url | append: '||' %}
+                                {% assign item_count = item_count | plus: 1 %}
                               {% endif %}
+                            {% endfor %}
+                          {% endfor %}
 
-                              <div class="more-items-grid">
-                                <!-- More Column 1 -->
-                                <div class="more-column">
-                                  {% for menu_link in more_menu.links limit: max_items_per_column %}
-                                    <a href="{{ menu_link.url }}" class="more-link">
-                                      {{ menu_link.title }}
-                                    </a>
-                                  {% endfor %}
-                                </div>
+                          {% if item_count > 0 %}
+                            {% assign items_array = l3_items | split: '||' %}
 
-                                <!-- More Column 2 -->
-                                <div class="more-column">
-                                  {% for menu_link in more_menu.links offset: max_items_per_column limit: max_items_per_column %}
-                                    <a href="{{ menu_link.url }}" class="more-link">
-                                      {{ menu_link.title }}
+                            <div class="more-items-grid">
+                              <!-- Column 1: First 8 items -->
+                              <div class="more-column">
+                                {% for i in (0..7) %}
+                                  {% if items_array[i] and items_array[i] != '' %}
+                                    {% assign item_data = items_array[i] | split: '|' %}
+                                    <a href="{{ item_data[1] }}" class="more-link">
+                                      {{ item_data[0] }}
                                     </a>
-                                  {% endfor %}
-                                </div>
+                                  {% endif %}
+                                {% endfor %}
                               </div>
 
-                              {% if show_view_all %}
-                                <a href="{{ link.url }}" class="more-view-all">
-                                  View All {{ link.title }} →
+                              <!-- Column 2: Next 7 items + View More -->
+                              <div class="more-column">
+                                {% for i in (8..14) %}
+                                  {% if items_array[i] and items_array[i] != '' %}
+                                    {% assign item_data = items_array[i] | split: '|' %}
+                                    <a href="{{ item_data[1] }}" class="more-link">
+                                      {{ item_data[0] }}
+                                    </a>
+                                  {% endif %}
+                                {% endfor %}
+
+                                {% comment %} View More link {% endcomment %}
+                                <a href="{{ link.url }}" class="more-link more-view-more">
+                                  View More →
                                 </a>
-                              {% endif %}
-                            {% endif %}
+                              </div>
+                            </div>
+                          {% else %}
+                            <p style="color: #999; padding: 20px;">No subcategories available.</p>
                           {% endif %}
                         </div>
-
-                        <!-- Dynamic Level 3 content for each Level 2 item -->
-                        {% for child_link in link.links %}
-                          {% if child_link.links.size > 0 %}
-                            <div class="more-content-dynamic" data-for-subcategory="{{ child_link.handle }}" style="display: none;">
-                              <h3 class="more-title">{{ child_link.title }}</h3>
-
-                              {% assign l3_total = child_link.links.size %}
-                              {% assign l3_max_per_column = 10 %}
-                              {% assign l3_show_view_all = false %}
-                              {% if l3_total > 20 %}
-                                {% assign l3_show_view_all = true %}
-                              {% endif %}
-
-                              <div class="more-items-grid">
-                                <div class="more-column">
-                                  {% for grandchild_link in child_link.links limit: l3_max_per_column %}
-                                    <a href="{{ grandchild_link.url }}" class="more-link">
-                                      {{ grandchild_link.title }}
-                                    </a>
-                                  {% endfor %}
-                                </div>
-
-                                <div class="more-column">
-                                  {% for grandchild_link in child_link.links offset: l3_max_per_column limit: l3_max_per_column %}
-                                    <a href="{{ grandchild_link.url }}" class="more-link">
-                                      {{ grandchild_link.title }}
-                                    </a>
-                                  {% endfor %}
-                                </div>
-                              </div>
-
-                              {% if l3_show_view_all %}
-                                <a href="{{ child_link.url }}" class="more-view-all">
-                                  View All {{ child_link.title }} →
-                                </a>
-                              {% endif %}
-                            </div>
-                          {% endif %}
-                        {% endfor %}
                       </div>
 
                     </div>
@@ -472,7 +765,7 @@
           </div>
           
           <div class="mobile-actions-right">
-            <a href="{{ routes.account_url }}" class="mobile-icon-action">
+            <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}?return_url={{ request.path | url_param_escape }}{% endif %}" class="mobile-icon-action">
               <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
               </svg>
@@ -889,67 +1182,9 @@
     });
 
     // ============================================
-    // DYNAMIC LEVEL 3 HOVER INTERACTION
+    // STATIC L3 LIST - No hover interaction needed
     // ============================================
-    const subcategoryItems = document.querySelectorAll('.subcategory-item');
-
-    subcategoryItems.forEach((item) => {
-      const subcategoryId = item.dataset.subcategoryId;
-      const hasChildren = parseInt(item.dataset.hasChildren) > 0;
-      const megaMenu = item.closest('.mega-menu');
-      const moreSection = megaMenu ? megaMenu.querySelector('.mega-menu-more') : null;
-
-      if (moreSection && hasChildren) {
-        const defaultContent = moreSection.querySelector('.more-content-default');
-        const dynamicContent = moreSection.querySelector(`[data-for-subcategory="${subcategoryId}"]`);
-
-        if (dynamicContent) {
-          item.addEventListener('mouseenter', () => {
-            // Hide default content
-            if (defaultContent) {
-              defaultContent.style.display = 'none';
-              defaultContent.classList.remove('more-content-active');
-            }
-            // Hide all dynamic content
-            moreSection.querySelectorAll('.more-content-dynamic').forEach((content) => {
-              content.style.display = 'none';
-            });
-            // Show this subcategory's content
-            dynamicContent.style.display = 'block';
-          });
-
-          item.addEventListener('mouseleave', () => {
-            // Don't immediately hide - let mouse move to more section
-            setTimeout(() => {
-              const isHoveringMore = moreSection.matches(':hover');
-              const isHoveringItem = item.matches(':hover');
-              if (!isHoveringMore && !isHoveringItem) {
-                // Reset to default
-                dynamicContent.style.display = 'none';
-                if (defaultContent) {
-                  defaultContent.style.display = 'block';
-                  defaultContent.classList.add('more-content-active');
-                }
-              }
-            }, 150);
-          });
-        }
-      }
-    });
-
-    // Reset to default when mouse leaves the more section
-    document.querySelectorAll('.mega-menu-more').forEach((moreSection) => {
-      moreSection.addEventListener('mouseleave', () => {
-        const defaultContent = moreSection.querySelector('.more-content-default');
-        moreSection.querySelectorAll('.more-content-dynamic').forEach((content) => {
-          content.style.display = 'none';
-        });
-        if (defaultContent) {
-          defaultContent.style.display = 'block';
-          defaultContent.classList.add('more-content-active');
-        }
-      });
-    });
+    // Removed dynamic hover JavaScript since L3 items now show statically
   });
 </script>
 
@@ -970,19 +1205,58 @@
     },
     {
       "type": "text",
-      "id": "marquee_text",
-      "label": "Marquee text",
-      "default": "🚨 MEGA SALE: Up to 40% OFF Commercial Equipment 🚨 Free Installation on Orders $5000+ 🚨 Free Nationwide Shipping on Select Items 🚨 Price Match Guarantee 🚨"
+      "id": "topbar_welcome_text",
+      "label": "Welcome message",
+      "default": "Welcome to Celebrate Festival — Your Partner in Foodservice Excellence"
     },
     {
-      "type": "range",
-      "id": "marquee_text_size",
-      "label": "Marquee text size",
-      "min": 10,
-      "max": 18,
-      "step": 1,
-      "unit": "px",
-      "default": 13
+      "type": "text",
+      "id": "topbar_phone",
+      "label": "Phone number",
+      "default": "(408) 673-9999"
+    },
+    {
+      "type": "text",
+      "id": "topbar_hours",
+      "label": "Business hours",
+      "default": "Mon-Sat: 9AM-6PM PST"
+    },
+    {
+      "type": "header",
+      "content": "Top Bar Links"
+    },
+    {
+      "type": "text",
+      "id": "topbar_link_1_text",
+      "label": "Link 1 text",
+      "default": "Track Order"
+    },
+    {
+      "type": "url",
+      "id": "topbar_link_1_url",
+      "label": "Link 1 URL"
+    },
+    {
+      "type": "text",
+      "id": "topbar_link_2_text",
+      "label": "Link 2 text",
+      "default": "Financing"
+    },
+    {
+      "type": "url",
+      "id": "topbar_link_2_url",
+      "label": "Link 2 URL"
+    },
+    {
+      "type": "text",
+      "id": "topbar_chat_text",
+      "label": "Live chat button text",
+      "default": "Live Chat"
+    },
+    {
+      "type": "url",
+      "id": "topbar_chat_url",
+      "label": "Live chat URL"
     },
     {
       "type": "header",
