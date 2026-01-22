@@ -1,6 +1,6 @@
 {%- comment -%}
-  Renders a product card for grid view
-  
+  Renders a product card for grid view (PLP style)
+
   Accepts:
   - product: {Object} Product object
   - show_vendor: {Boolean} Show brand/vendor
@@ -8,32 +8,27 @@
   - image_ratio: {String} Image aspect ratio
   - show_quick_add: {Boolean} Show quick add button
   - show_sale_badge: {Boolean} Show sale badge
-  - show_shipping_badge: {Boolean} Show free shipping badge
-  - free_shipping_tag: {String} Tag for free shipping
-  
+  - show_sku: {Boolean} Show product SKU
+  - show_qty_input: {Boolean} Show quantity input with add to cart
+
   Usage:
   {% render 'product-card', product: product, show_vendor: true %}
 {%- endcomment -%}
 
 {%- liquid
   assign show_vendor = show_vendor | default: true
-  assign show_rating = show_rating | default: false
+  assign show_rating = show_rating | default: true
   assign image_ratio = image_ratio | default: 'adapt'
   assign show_quick_add = show_quick_add | default: false
   assign show_sale_badge = show_sale_badge | default: true
-  assign show_shipping_badge = show_shipping_badge | default: true
-  assign free_shipping_tag = free_shipping_tag | default: 'free-shipping'
-  
+  assign show_sku = show_sku | default: true
+  assign show_qty_input = show_qty_input | default: true
+
   assign on_sale = false
   if product.compare_at_price > product.price
     assign on_sale = true
   endif
-  
-  assign has_free_shipping = false
-  if product.tags contains free_shipping_tag
-    assign has_free_shipping = true
-  endif
-  
+
   assign low_stock = false
   assign total_inventory = 0
   for variant in product.variants
@@ -42,33 +37,122 @@
   if total_inventory > 0 and total_inventory <= 10
     assign low_stock = true
   endif
-  
+
   assign call_for_price = false
   if product.metafields.custom.call_for_price == true or product.tags contains 'call-for-price'
     assign call_for_price = true
+  endif
+
+  assign product_sku = product.selected_or_first_available_variant.sku
+
+  comment
+    Check if customer is a member (logged in with wholesale tags)
+  endcomment
+  assign is_member = false
+  if customer
+    for tag in customer.tags
+      assign tag_lower = tag | downcase
+      if tag_lower contains 'wholesale' or tag_lower contains 'plus' or tag_lower contains 'member' or tag_lower contains 'cph' or tag_lower contains 'rou' or tag_lower contains 'margin'
+        assign is_member = true
+        break
+      endif
+    endfor
+  endif
+
+  comment
+    Check if product is own-brand (Celebrate Festival Inc)
+  endcomment
+  assign is_own_brand = false
+  assign vendor_lower = product.vendor | downcase
+  if vendor_lower contains 'celebrate festival' or vendor_lower contains 'celebratefest'
+    assign is_own_brand = true
+  endif
+
+  comment
+    Get voltage/power info from tags
+  endcomment
+  assign voltage_badge = blank
+  for tag in product.tags
+    assign tag_lower = tag | downcase
+    if tag_lower contains 'volt' or tag_lower contains '115v' or tag_lower contains '208v' or tag_lower contains '220v' or tag_lower contains '240v'
+      assign voltage_badge = tag
+      break
+    endif
+  endfor
+-%}
+
+{%- comment -%} Calculate WSH wholesale pricing {%- endcomment -%}
+{%- render 'wcp_discount', wcp_discount: product -%}
+
+{%- liquid
+  comment
+    Determine if we have a wholesale price different from regular
+  endcomment
+  assign has_wholesale_price = false
+  assign wholesale_price = wcp_price
+  assign regular_price = product.price
+
+  if wcp_price != blank and wcp_price < product.price
+    assign has_wholesale_price = true
+    assign wholesale_price = wcp_price
+  endif
+
+  comment
+    Fallback: if no WSH price, check compare_at_price
+  endcomment
+  if has_wholesale_price == false and on_sale
+    assign has_wholesale_price = true
+    assign wholesale_price = product.price
+    assign regular_price = product.compare_at_price
+  endif
+
+  comment
+    Calculate savings for display
+  endcomment
+  assign savings_amount = 0
+  assign savings_percent = 0
+  if has_wholesale_price and regular_price > wholesale_price
+    assign savings_amount = regular_price | minus: wholesale_price
+    assign savings_percent = savings_amount | times: 100.0 | divided_by: regular_price | round
+  endif
+
+  comment
+    Determine pricing display mode:
+    - price-single: Non-member viewing restricted product (retail only)
+    - price-dual: Non-member viewing own-brand product (both prices)
+    - price-member-view: Member viewing any product (member pricing)
+  endcomment
+  assign pricing_mode = 'price-single'
+  if is_member and has_wholesale_price
+    assign pricing_mode = 'price-member-view'
+  elsif is_member
+    assign pricing_mode = 'price-member-view'
+  elsif is_own_brand and has_wholesale_price
+    assign pricing_mode = 'price-dual'
+  else
+    assign pricing_mode = 'price-single'
   endif
 -%}
 
 <div class="product-card" data-product-id="{{ product.id }}">
   <a href="{{ product.url }}" class="product-link">
-    
+
     <!-- Product Image -->
-    <div class="product-image" style="{% if image_ratio == 'square' %}padding-bottom: 100%;{% elsif image_ratio == 'portrait' %}padding-bottom: 125%;{% endif %}">
+    <div class="card-image">
       {%- if product.featured_media -%}
         <img
-          src="{{ product.featured_media | image_url: width: 600 }}"
-          srcset="{{ product.featured_media | image_url: width: 300 }} 300w,
-                  {{ product.featured_media | image_url: width: 600 }} 600w,
-                  {{ product.featured_media | image_url: width: 900 }} 900w"
+          src="{{ product.featured_media | image_url: width: 400 }}"
+          srcset="{{ product.featured_media | image_url: width: 200 }} 200w,
+                  {{ product.featured_media | image_url: width: 400 }} 400w"
           alt="{{ product.featured_media.alt | escape }}"
           loading="lazy"
-          width="{{ product.featured_media.width }}"
-          height="{{ product.featured_media.height }}"
+          width="160"
+          height="160"
         >
-        
+
         {%- if product.media[1] != nil -%}
           <img
-            src="{{ product.media[1] | image_url: width: 600 }}"
+            src="{{ product.media[1] | image_url: width: 400 }}"
             alt="{{ product.media[1].alt | escape }}"
             loading="lazy"
             class="product-image-hover"
@@ -77,296 +161,653 @@
       {%- else -%}
         {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
       {%- endif -%}
-      
+
       <!-- Product Badges -->
-      <div class="product-badges">
-        {%- if has_free_shipping and show_shipping_badge -%}
-          <span class="badge free-shipping-badge">
-            <i class="fas fa-shipping-fast"></i> Free Shipping
-          </span>
+      <div class="badge-container">
+        {%- if voltage_badge != blank -%}
+          <span class="voltage-badge">{{ voltage_badge }}</span>
         {%- endif -%}
-        
+
         {%- if low_stock -%}
-          <span class="badge low-stock-badge">
-            <i class="fas fa-exclamation-circle"></i> Low Stock
-          </span>
+          <span class="badge low-stock-badge">Low Stock</span>
         {%- endif -%}
-        
-        {%- if on_sale and show_sale_badge -%}
-          {%- assign savings = product.compare_at_price | minus: product.price -%}
-          {%- assign savings_percent = savings | times: 100.0 | divided_by: product.compare_at_price | round -%}
-          <span class="badge sale-badge">
-            Save {{ savings_percent }}%
-          </span>
-        {%- endif -%}
-        
+
         {%- if product.tags contains 'new' -%}
           <span class="badge new-badge">New</span>
         {%- endif -%}
-        
-        {%- if product.tags contains 'energy-star' -%}
-          <span class="badge energy-badge">
-            <i class="fas fa-leaf"></i> Energy Star
-          </span>
+
+        {%- if is_own_brand and has_wholesale_price and is_member == false -%}
+          <span class="member-badge">Member Pricing</span>
         {%- endif -%}
       </div>
+
+      <!-- Wishlist Button -->
+      <button
+        type="button"
+        class="wishlist-btn"
+        data-wishlist-btn
+        data-product-id="{{ product.id }}"
+        data-product-title="{{ product.title | escape }}"
+        data-product-handle="{{ product.handle }}"
+        data-product-image="{{ product.featured_media | image_url: width: 400 }}"
+        data-product-price="{{ product.price }}"
+        data-product-compare-price="{{ product.compare_at_price }}"
+        data-product-url="{{ product.url }}"
+        aria-label="Add to wishlist"
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+      </button>
     </div>
   </a>
 
   <!-- Product Info -->
-  <div class="product-info">
-    <div class="product-content">
-      
-      {%- if show_vendor and product.vendor != blank -%}
-        <div class="product-brand">{{ product.vendor }}</div>
-      {%- endif -%}
+  <div class="card-content">
+    <a href="{{ product.url }}" class="product-title-link">
+      <h3 class="card-title">{{ product.title }}</h3>
+    </a>
 
-      <a href="{{ product.url }}" class="product-title-link">
-        <h3 class="product-title">{{ product.title }}</h3>
-      </a>
-
-      {%- if show_rating -%}
-        <div class="product-rating">
-          <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+    {%- if show_rating -%}
+      <div class="card-meta">
+        <div class="rating">
+          <span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="empty">&#9733;</span></span>
         </div>
-      {%- endif -%}
-
-      <!-- Product Features/Tags -->
-      {%- if product.metafields.custom.key_features != blank -%}
-        <div class="product-features">
-          {%- assign features = product.metafields.custom.key_features | split: ',' -%}
-          {%- for feature in features limit: 3 -%}
-            <span class="feature-tag">{{ feature | strip }}</span>
-          {%- endfor -%}
-        </div>
-      {%- else -%}
-        {%- comment -%} Fallback to product tags if no metafield {%- endcomment -%}
-        {%- assign feature_tags = product.tags | where_exp: "tag", "tag contains 'feature_'" -%}
-        {%- if feature_tags.size > 0 -%}
-          <div class="product-features">
-            {%- for tag in feature_tags limit: 3 -%}
-              {%- assign feature_name = tag | remove: 'feature_' | replace: '-', ' ' | capitalize -%}
-              <span class="feature-tag">{{ feature_name }}</span>
-            {%- endfor -%}
-          </div>
+        {%- if show_sku and product_sku != blank -%}
+          <span class="sku">#{{ product_sku }}</span>
         {%- endif -%}
-      {%- endif -%}
+      </div>
+    {%- elsif show_sku and product_sku != blank -%}
+      <div class="card-meta">
+        <span class="sku">#{{ product_sku }}</span>
+      </div>
+    {%- endif -%}
 
-      <!-- Pricing -->
-      {%- if call_for_price -%}
-        <div class="contact-price">
-          <i class="fas fa-phone"></i>
-          Call for Best Price
-        </div>
-      {%- else -%}
-        {%- comment -%} Check for member/wholesale pricing {%- endcomment -%}
-        {%- assign member_price = product.metafields.custom.member_price.value -%}
-        {%- assign is_member = false -%}
-        {%- if customer and customer.tags.size > 0 -%}
-          {%- for tag in customer.tags -%}
-            {%- assign tag_lower = tag | downcase -%}
-            {%- if tag_lower contains 'wholesale' or tag_lower contains 'member' or tag_lower contains 'plus' -%}
-              {%- assign is_member = true -%}
-              {%- break -%}
-            {%- endif -%}
-          {%- endfor -%}
-        {%- endif -%}
+    <!-- Pricing Container -->
+    {%- if call_for_price -%}
+      <div class="price-single">
+        <div class="price-label-single">Contact Us</div>
+        <a href="{{ product.url }}" class="price-amount-single" style="font-size: 18px; color: #2d5a87; text-decoration: none;">Call for Best Price</a>
+      </div>
+    {%- else -%}
 
-        <div class="product-pricing">
-          {%- if member_price != blank -%}
-            {%- comment -%} Has member price metafield - show both prices {%- endcomment -%}
-            <div class="member-pricing">
-              <span class="member-price-label">Plus Member Price:</span>
-              <span class="member-price">{{ member_price | times: 100 | money }}</span>
-            </div>
-            <div class="regular-pricing">
-              <span class="regular-price-label">Regularly:</span>
-              <span class="regular-price">{{ product.price | money }}</span>
-            </div>
-          {%- elsif is_member and on_sale -%}
-            {%- comment -%} Member viewing sale price {%- endcomment -%}
-            <div class="member-pricing">
-              <span class="member-price-label">Your Price:</span>
-              <span class="member-price">{{ product.price | money }}</span>
-            </div>
-            <div class="regular-pricing">
-              <span class="regular-price-label">Regularly:</span>
-              <span class="regular-price">{{ product.compare_at_price | money }}</span>
-            </div>
-            {%- assign savings = product.compare_at_price | minus: product.price -%}
-            <span class="savings">You Save {{ savings | money }}</span>
-          {%- else -%}
-            {%- comment -%} Standard pricing {%- endcomment -%}
-            <div class="price-group">
-              <span class="current-price">
+      {%- case pricing_mode -%}
+
+        {%- when 'price-member-view' -%}
+          <!-- MEMBER VIEW - Always shows member pricing with coral border -->
+          <div class="price-member-view">
+            <div class="member-view-price">
+              {%- if has_wholesale_price -%}
+                {{ wholesale_price | money }}
+              {%- else -%}
                 {{ product.price | money }}
-              </span>
-              {%- if on_sale -%}
-                <span class="original-price">
-                  {{ product.compare_at_price | money }}
-                </span>
               {%- endif -%}
             </div>
-            {%- if on_sale -%}
-              {%- assign savings = product.compare_at_price | minus: product.price -%}
-              <span class="savings">Save {{ savings | money }}</span>
+            {%- if has_wholesale_price -%}
+              <div class="member-view-regular">Retail: <s>{{ regular_price | money }}</s></div>
+              <div class="member-view-savings">You Save {{ savings_amount | money }}</div>
             {%- endif -%}
-          {%- endif -%}
-        </div>
-      {%- endif -%}
-    </div>
+          </div>
 
-    <!-- Product Actions -->
-    <div class="product-actions">
+        {%- when 'price-dual' -%}
+          <!-- PUBLIC VIEW - Own Brand Products: Show both prices -->
+          <div class="price-dual">
+            <div class="member-price-label">Member Price</div>
+            <div class="member-price-amount">{{ wholesale_price | money }}</div>
+            <div class="regular-price-strike">Retail: <s>{{ regular_price | money }}</s></div>
+            <div class="savings-tag">Save {{ savings_amount | money }} ({{ savings_percent }}%)</div>
+          </div>
+
+        {%- else -%}
+          <!-- PUBLIC VIEW - Restricted Products: Single retail price only -->
+          <div class="price-single">
+            <div class="price-label-single">Retail Price</div>
+            <div class="price-amount-single">{{ product.price | money }}<span class="price-unit">/Each</span></div>
+          </div>
+          <!-- Login for Member Pricing Label -->
+          {%- unless customer -%}
+            <a href="/account/login?return_url={{ product.url | url_encode }}" class="login-member-pricing-link">
+              <span class="lock-icon">&#128274;</span> Login for Member Pricing
+            </a>
+          {%- endunless -%}
+
+      {%- endcase -%}
+
+    {%- endif -%}
+
+    <!-- Product Actions - Qty Input + Add to Cart Row -->
+    <div class="card-actions">
       {%- if call_for_price -%}
-        <a href="{{ product.url }}" class="btn btn-primary">
-          <i class="fas fa-eye"></i>
+        <a href="{{ product.url }}" class="add-to-cart" style="text-decoration: none; display: block; text-align: center;">
           View Details
         </a>
       {%- elsif product.available -%}
-        {%- if show_quick_add and product.variants.size == 1 -%}
-          <button 
-            type="button" 
-            class="btn btn-primary quick-add-btn"
+        {%- if show_qty_input and product.variants.size == 1 -%}
+          <input
+            type="number"
+            class="qty-input"
+            value="1"
+            min="1"
+            aria-label="Quantity"
+            data-product-id="{{ product.id }}"
+          >
+          <button
+            type="button"
+            class="add-to-cart quick-add-btn"
             data-product-id="{{ product.id }}"
             data-variant-id="{{ product.selected_or_first_available_variant.id }}"
           >
-            <i class="fas fa-shopping-cart"></i>
             Add to Cart
           </button>
-        {%- else -%}
-          <a href="{{ product.url }}" class="btn btn-primary">
-            {%- if product.variants.size > 1 -%}
-              <i class="fas fa-eye"></i>
-              Select Options
-            {%- else -%}
-              <i class="fas fa-shopping-cart"></i>
-              Add to Cart
-            {%- endif -%}
+        {%- elsif product.variants.size > 1 -%}
+          <a href="{{ product.url }}" class="add-to-cart" style="text-decoration: none; display: block; text-align: center; flex: 1;">
+            Select Options
           </a>
+        {%- else -%}
+          <input
+            type="number"
+            class="qty-input"
+            value="1"
+            min="1"
+            aria-label="Quantity"
+            data-product-id="{{ product.id }}"
+          >
+          <button
+            type="button"
+            class="add-to-cart quick-add-btn"
+            data-product-id="{{ product.id }}"
+            data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+          >
+            Add to Cart
+          </button>
         {%- endif -%}
       {%- else -%}
-        <button class="btn btn-primary btn-sold-out" disabled>
-          <i class="fas fa-times-circle"></i>
+        <button class="add-to-cart" disabled style="background: #999; cursor: not-allowed; flex: 1;">
           Sold Out
         </button>
       {%- endif -%}
-
-      <button 
-        class="btn btn-secondary wishlist-btn" 
-        data-product-id="{{ product.id }}"
-        aria-label="Add to wishlist"
-      >
-        <i class="fas fa-heart"></i>
-      </button>
     </div>
   </div>
 </div>
 
 <style>
+  /* ========== PRODUCT CARD BASE STYLES ========== */
   .product-card {
-    position: relative;
-  }
-
-  .product-image {
-    position: relative;
+    width: 220px;
+    background: #ffffff;
+    border-radius: 8px;
     overflow: hidden;
-    background: #f5f5f5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
   }
 
-  .product-image img {
-    width: 100%;
-    height: 100%;
+  .product-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(26, 54, 93, 0.15);
+  }
+
+  /* Image Section */
+  .product-card .card-image {
+    height: 160px;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 12px;
+    overflow: hidden;
+  }
+
+  .product-card .card-image img {
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
-    padding: 20px;
-    transition: var(--transition-smooth);
-  }
-
-  .product-image-hover {
-    position: absolute;
-    top: 0;
-    left: 0;
-    opacity: 0;
     transition: opacity 0.3s ease;
   }
 
-  .product-card:hover .product-image-hover {
+  .product-card .card-image .product-image-hover {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: calc(100% - 24px);
+    max-height: calc(100% - 24px);
+    opacity: 0;
+  }
+
+  .product-card:hover .card-image .product-image-hover {
     opacity: 1;
   }
 
-  .product-card:hover .product-image img:not(.product-image-hover) {
-    transform: scale(1.05);
+  .product-card:hover .card-image img:not(.product-image-hover) {
+    opacity: 0;
   }
 
-  .wishlist-btn.active {
-    color: var(--primary-coral);
-    border-color: var(--primary-coral);
-  }
-
-  .wishlist-btn.active i {
-    color: var(--primary-coral);
-  }
-
-  .btn-sold-out {
-    background: #ccc;
-    cursor: not-allowed;
-  }
-
-  .energy-badge {
-    background: #22c55e;
-  }
-
-  .new-badge {
-    background: var(--primary-navy);
-  }
-
-  /* Member Pricing Styles */
-  .member-pricing {
+  /* Badges */
+  .product-card .badge-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
     display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
+    flex-direction: column;
     gap: 6px;
-    margin-bottom: 4px;
+    z-index: 2;
   }
 
-  .member-price-label {
-    font-size: 11px;
-    color: #1e8e3e;
+  .product-card .voltage-badge {
+    background: #2d5a87;
+    color: #ffffff;
+    font-size: 10px;
     font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .product-card .member-badge {
+    background: #1a365d;
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
-  .member-price {
-    font-size: 18px;
-    font-weight: 700;
-    color: #1e8e3e;
+  .product-card .badge {
+    font-size: 10px;
+    padding: 3px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+    color: white;
   }
 
-  .regular-pricing {
+  .product-card .low-stock-badge {
+    background: #ef4444;
+  }
+
+  .product-card .new-badge {
+    background: #1a365d;
+  }
+
+  /* Content Section */
+  .product-card .card-content {
+    padding: 14px;
     display: flex;
-    align-items: baseline;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .product-card .card-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1a365d;
+    line-height: 1.4;
+    height: 54px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+
+  .product-card .product-title-link {
+    text-decoration: none;
+  }
+
+  .product-card .card-title:hover {
+    color: #2d5a87;
+  }
+
+  /* Rating & SKU */
+  .product-card .card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .product-card .rating {
+    display: flex;
+    align-items: center;
     gap: 4px;
   }
 
-  .regular-price-label {
+  .product-card .stars {
+    color: #d4af37;
     font-size: 11px;
-    color: #888;
+    letter-spacing: -1px;
   }
 
-  .regular-price {
-    font-size: 13px;
-    color: #888;
+  .product-card .stars .empty {
+    color: #e2e8f0;
+  }
+
+  .product-card .sku {
+    font-size: 10px;
+    font-weight: 600;
+    color: #1a365d;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+  }
+
+  /* ========== PRICING SECTIONS ========== */
+
+  /* PUBLIC VIEW - Single Price (Restricted Products) */
+  .product-card .price-single {
+    text-align: center;
+    padding: 16px 10px;
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+    border-radius: 6px;
+    margin-bottom: 12px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .product-card .price-label-single {
+    font-size: 10px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+
+  .product-card .price-amount-single {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a365d;
+    letter-spacing: -0.5px;
+  }
+
+  .product-card .price-unit {
+    font-size: 12px;
+    font-weight: 400;
+    color: #64748b;
+  }
+
+  /* PUBLIC VIEW - Dual Price (Own Brand Products) */
+  .product-card .price-dual {
+    padding: 12px 10px;
+    background: linear-gradient(135deg, #1a365d 0%, #2d5a87 100%);
+    border-radius: 6px;
+    margin-bottom: 12px;
+    position: relative;
+  }
+
+  .product-card .price-dual::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #d4af37, #1a365d, #d4af37);
+  }
+
+  .product-card .member-price-label {
+    font-size: 9px;
+    color: rgba(255,255,255,0.8);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  .product-card .member-price-amount {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    text-align: center;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+
+  .product-card .regular-price-strike {
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .product-card .regular-price-strike s {
     text-decoration: line-through;
+  }
+
+  .product-card .savings-tag {
+    text-align: center;
+    font-size: 10px;
+    color: #d4af37;
+    font-weight: 600;
+    margin-top: 6px;
+  }
+
+  /* MEMBER VIEW - Always Dual Price with coral border */
+  .product-card .price-member-view {
+    background: linear-gradient(135deg, #1a365d 0%, #2d5a87 100%);
+    border-radius: 6px;
+    padding: 14px 10px;
+    margin-bottom: 12px;
+    position: relative;
+    border: 2px solid #ff6b6b;
+  }
+
+  .product-card .price-member-view::after {
+    content: 'MEMBER PRICING';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ff6b6b;
+    color: #ffffff;
+    font-size: 7.5px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 10px;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+
+  .product-card .member-view-price {
+    font-size: 30px;
+    font-weight: 700;
+    color: #ffffff;
+    text-align: center;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+
+  .product-card .member-view-regular {
+    text-align: center;
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 4px;
+  }
+
+  .product-card .member-view-regular s {
+    text-decoration: line-through;
+  }
+
+  .product-card .member-view-savings {
+    text-align: center;
+    font-size: 11px;
+    color: #d4af37;
+    font-weight: 600;
+  }
+
+  /* Login for Member Pricing Link */
+  .product-card .login-member-pricing-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #2d5a87;
+    text-decoration: none;
+    padding: 8px 10px;
+    background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+    border: 1px solid rgba(45, 90, 135, 0.2);
+    border-radius: 6px;
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
+  }
+
+  .product-card .login-member-pricing-link:hover {
+    background: linear-gradient(135deg, #bfdbfe 0%, #dbeafe 100%);
+    color: #1a365d;
+    border-color: rgba(45, 90, 135, 0.3);
+  }
+
+  .product-card .login-member-pricing-link .lock-icon {
+    font-size: 12px;
+  }
+
+  /* ========== ACTION BUTTONS ========== */
+  .product-card .card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+  }
+
+  .product-card .qty-input {
+    width: 45px;
+    height: 40px;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+  }
+
+  .product-card .qty-input:focus {
+    outline: none;
+    border-color: #2d5a87;
+  }
+
+  .product-card .add-to-cart {
+    flex: 1;
+    height: 40px;
+    background: #ff6b6b;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .product-card .add-to-cart:hover {
+    background: #ff5252;
+  }
+
+  .product-card .add-to-cart:disabled {
+    background: #999;
+    cursor: not-allowed;
+  }
+
+  .product-card .add-to-cart.added {
+    background: #22c55e;
+  }
+
+  /* Wishlist Button */
+  .product-card .wishlist-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    transition: all 0.2s ease;
+  }
+
+  .product-card .wishlist-btn svg {
+    width: 16px;
+    height: 16px;
+    color: #ccc;
+    transition: color 0.2s ease;
+  }
+
+  .product-card .wishlist-btn:hover {
+    border-color: #ff6b6b;
+  }
+
+  .product-card .wishlist-btn:hover svg {
+    color: #ff6b6b;
+  }
+
+  .product-card .wishlist-btn.active svg {
+    color: #ff6b6b;
+  }
+
+  /* Product link */
+  .product-card .product-link {
+    text-decoration: none;
+    display: block;
+  }
+
+  /* ========== RESPONSIVE ========== */
+  @media (max-width: 768px) {
+    .product-card {
+      width: 100%;
+    }
+
+    .product-card .price-amount-single {
+      font-size: 22px;
+    }
+
+    .product-card .member-price-amount {
+      font-size: 24px;
+    }
+
+    .product-card .member-view-price {
+      font-size: 26px;
+    }
   }
 </style>
 
 <script>
-  // Quick add functionality
-  document.querySelectorAll('.quick-add-btn').forEach(btn => {
+  // Quick add functionality with quantity support
+  document.querySelectorAll('.product-card .quick-add-btn').forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
       const variantId = this.dataset.variantId;
-      
+      const productId = this.dataset.productId;
+
+      // Find the quantity input in the same card-actions
+      const cardActions = this.closest('.card-actions');
+      let quantity = 1;
+      if (cardActions) {
+        const qtyInput = cardActions.querySelector('.qty-input');
+        if (qtyInput) {
+          quantity = parseInt(qtyInput.value, 10) || 1;
+        }
+      }
+
+      // Disable button during request
+      this.disabled = true;
+      const originalText = this.innerHTML;
+      this.innerHTML = 'Adding...';
+
       fetch('/cart/add.js', {
         method: 'POST',
         headers: {
@@ -374,7 +815,7 @@
         },
         body: JSON.stringify({
           id: variantId,
-          quantity: 1
+          quantity: quantity
         })
       })
       .then(response => response.json())
@@ -383,50 +824,40 @@
         fetch('/cart.js')
           .then(res => res.json())
           .then(cart => {
-            document.querySelector('.cart-count').textContent = cart.item_count;
+            const cartCount = document.querySelector('.cart-count');
+            if (cartCount) {
+              cartCount.textContent = cart.item_count;
+            }
           });
-        
+
         // Show success message
-        this.innerHTML = '<i class="fas fa-check"></i> Added!';
-        this.style.background = 'var(--success-green)';
-        
+        this.innerHTML = 'Added!';
+        this.classList.add('added');
+
         setTimeout(() => {
-          this.innerHTML = '<i class="fas fa-shopping-cart"></i> Add to Cart';
-          this.style.background = '';
+          this.innerHTML = 'Add to Cart';
+          this.classList.remove('added');
+          this.disabled = false;
         }, 2000);
       })
       .catch(error => {
         console.error('Error:', error);
-        this.innerHTML = '<i class="fas fa-times"></i> Error';
+        this.innerHTML = 'Error';
+        setTimeout(() => {
+          this.innerHTML = 'Add to Cart';
+          this.disabled = false;
+        }, 2000);
       });
     });
   });
 
-  // Wishlist functionality
-  document.querySelectorAll('.wishlist-btn').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-      e.preventDefault();
-      this.classList.toggle('active');
-      
-      const productId = this.dataset.productId;
-      let wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-      
-      if (this.classList.contains('active')) {
-        if (!wishlist.includes(productId)) {
-          wishlist.push(productId);
-        }
-      } else {
-        wishlist = wishlist.filter(id => id !== productId);
+  // Quantity input validation
+  document.querySelectorAll('.product-card .qty-input').forEach(input => {
+    input.addEventListener('change', function() {
+      let value = parseInt(this.value, 10);
+      if (isNaN(value) || value < 1) {
+        this.value = 1;
       }
-      
-      localStorage.setItem('wishlist', JSON.stringify(wishlist));
     });
-    
-    // Check if already in wishlist
-    const productId = btn.dataset.productId;
-    const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-    if (wishlist.includes(productId)) {
-      btn.classList.add('active');
-    }
   });
 </script>

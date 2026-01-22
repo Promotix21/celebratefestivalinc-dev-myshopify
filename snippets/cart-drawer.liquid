@@ -42,14 +42,19 @@
                   {{- 'icon-close.svg' | inline_asset_content -}}
                 </span>
               </button>
-              <a href="{{ routes.all_products_collection_url }}" class="button">
+              <button
+                type="button"
+                class="button continue-shopping-btn"
+                onclick="this.closest('cart-drawer').close();"
+              >
                 {{ 'general.continue_shopping' | t }}
-              </a>
+              </button>
 
               {%- if shop.customer_accounts_enabled and customer == null -%}
                 <p class="cart__login-title h3">{{ 'sections.cart.login.title' | t }}</p>
                 <p class="cart__login-paragraph">
-                  {{ 'sections.cart.login.paragraph_html' | t: link: routes.account_login_url }}
+                  {% assign login_url_with_return = routes.account_login_url | append: '?return_url=' | append: request.path | url_encode %}
+                  {{ 'sections.cart.login.paragraph_html' | t: link: login_url_with_return }}
                 </p>
               {%- endif -%}
             </div>
@@ -579,3 +584,22 @@
     </div>
   </div>
 </cart-drawer>
+
+<script>
+// Close order notes when clicking outside
+document.addEventListener('DOMContentLoaded', function() {
+  const orderNotesDetails = document.getElementById('Details-CartDrawer');
+
+  if (orderNotesDetails) {
+    document.addEventListener('click', function(event) {
+      // Check if the details element is open
+      if (orderNotesDetails.open) {
+        // Check if the click was outside the details element
+        if (!orderNotesDetails.contains(event.target)) {
+          orderNotesDetails.open = false;
+        }
+      }
+    });
+  }
+});
+</script>

@@ -1,5 +1,11 @@
 {{ 'enhanced-header.css' | asset_url | stylesheet_tag }}
 
+{% comment %} Set member promo visibility - defaults to true {% endcomment %}
+{% assign show_member_promo = section.settings.show_member_promo %}
+{% if show_member_promo == nil %}
+  {% assign show_member_promo = true %}
+{% endif %}
+
 <style>
   .enhanced-header-wrapper .header-logo {
     max-width: {{ section.settings.logo_max_width | default: 180 }}px !important;
@@ -19,11 +25,12 @@
   .topbar-hospitality {
     background: linear-gradient(90deg, #1a365d 0%, #0f172a 100%);
     padding: 10px 40px;
-    display: flex;
+    display: flex !important;
     justify-content: space-between;
     align-items: center;
     font-size: 13px;
     color: #fff;
+    min-height: 42px;
   }
 
   .topbar-hospitality .welcome {
@@ -170,6 +177,105 @@
       font-size: 11px;
     }
     .topbar-hospitality .right-actions {
+      display: none;
+    }
+  }
+
+  /* ============================================
+     MEMBER PRICING PROMO PILL STYLES
+     ============================================ */
+  .member-promo-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1a365d;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .member-promo-pill::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: shimmer 3s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { left: -100%; }
+    50%, 100% { left: 100%; }
+  }
+
+  .member-promo-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+    border-color: rgba(212, 175, 55, 0.6);
+  }
+
+  .member-promo-pill .promo-icon {
+    width: 16px;
+    height: 16px;
+    color: #d4af37;
+  }
+
+  .member-promo-pill .promo-text {
+    position: relative;
+    z-index: 1;
+  }
+
+  .member-promo-pill .promo-arrow {
+    font-size: 14px;
+    transition: transform 0.2s ease;
+  }
+
+  .member-promo-pill:hover .promo-arrow {
+    transform: translateX(3px);
+  }
+
+  /* Logged-in member version */
+  .member-promo-pill.is-member {
+    background: linear-gradient(135deg, #dcfce7 0%, #d1fae5 100%);
+    border-color: rgba(16, 185, 129, 0.4);
+  }
+
+  .member-promo-pill.is-member .promo-icon {
+    color: #10b981;
+  }
+
+  /* Mega menu promo pill container */
+  .mega-menu-member-promo {
+    padding: 12px 20px;
+    background: linear-gradient(90deg, rgba(26, 54, 93, 0.03) 0%, transparent 100%);
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  /* Navigation bar member promo (subtle) */
+  .nav-member-promo {
+    margin-left: auto;
+    padding-right: 20px;
+  }
+
+  .nav-member-promo .member-promo-pill {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+
+  @media (max-width: 1200px) {
+    .nav-member-promo {
       display: none;
     }
   }
@@ -490,6 +596,44 @@
         {% endfor %}
       </ul>
 
+      <!-- Member Pricing Promo Pill (Navigation Bar) -->
+      {% if show_member_promo %}
+      <div class="nav-member-promo">
+        {% if customer %}
+          {% comment %} Check if customer is a member {% endcomment %}
+          {% assign is_member = false %}
+          {% if customer.tags contains 'plus-member' or customer.tags contains 'wholesale' or customer.tags contains 'member' %}
+            {% assign is_member = true %}
+          {% endif %}
+
+          {% if is_member %}
+            <span class="member-promo-pill is-member">
+              <svg class="promo-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+              <span class="promo-text">{{ section.settings.member_promo_member_text | default: 'Member Pricing Active' }}</span>
+            </span>
+          {% else %}
+            <a href="/account" class="member-promo-pill">
+              <svg class="promo-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+              </svg>
+              <span class="promo-text">{{ section.settings.member_promo_nonmember_text | default: 'Unlock Member Pricing' }}</span>
+              <span class="promo-arrow">→</span>
+            </a>
+          {% endif %}
+        {% else %}
+          <a href="{{ routes.account_login_url }}?return_url={{ request.path | url_param_escape }}" class="member-promo-pill">
+            <svg class="promo-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/>
+            </svg>
+            <span class="promo-text">{{ section.settings.member_promo_guest_text | default: 'Members Save More' }}</span>
+            <span class="promo-arrow">→</span>
+          </a>
+        {% endif %}
+      </div>
+      {% endif %}
+
       <!-- Mega Menu Containers -->
       <div class="mega-menu-containers">
         {% for link in linklists[section.settings.main_menu].links %}
@@ -628,6 +772,21 @@
                       </div>
 
                     </div>
+
+                    <!-- Member Pricing Banner at bottom of mega menu -->
+                    {% if show_member_promo %}
+                    {% unless customer %}
+                    <div class="mega-menu-member-promo">
+                      <a href="{{ routes.account_login_url }}?return_url={{ request.path | url_param_escape }}" class="member-promo-pill">
+                        <svg class="promo-icon" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/>
+                        </svg>
+                        <span class="promo-text">{{ section.settings.member_promo_megamenu_text | default: 'Login to unlock exclusive member pricing on all products' }}</span>
+                        <span class="promo-arrow">→</span>
+                      </a>
+                    </div>
+                    {% endunless %}
+                    {% endif %}
                   </div>
                 </div>
               {% endif %}
@@ -673,6 +832,21 @@
                         {% endif %}
                       </div>
                     </div>
+
+                    <!-- Member Pricing Banner at bottom of classic mega menu -->
+                    {% if show_member_promo %}
+                    {% unless customer %}
+                    <div class="mega-menu-member-promo">
+                      <a href="{{ routes.account_login_url }}?return_url={{ request.path | url_param_escape }}" class="member-promo-pill">
+                        <svg class="promo-icon" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/>
+                        </svg>
+                        <span class="promo-text">{{ section.settings.member_promo_megamenu_text | default: 'Login to unlock exclusive member pricing on all products' }}</span>
+                        <span class="promo-arrow">→</span>
+                      </a>
+                    </div>
+                    {% endunless %}
+                    {% endif %}
                   </div>
                 </div>
               {% endif %}
@@ -704,6 +878,21 @@
           <div class="logo-grid-footer">
             <a href="{{ current_block.settings.view_all_url }}" class="view-all-brands-btn">{{ current_block.settings.view_all_text | default: 'View All Brands' }}</a>
           </div>
+        {% endif %}
+
+        <!-- Member Pricing Banner at bottom of logo grid menu -->
+        {% if show_member_promo %}
+        {% unless customer %}
+        <div class="mega-menu-member-promo">
+          <a href="{{ routes.account_login_url }}?return_url={{ request.path | url_param_escape }}" class="member-promo-pill">
+            <svg class="promo-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/>
+            </svg>
+            <span class="promo-text">{{ section.settings.member_promo_megamenu_text | default: 'Login to unlock exclusive member pricing on all products' }}</span>
+            <span class="promo-arrow">→</span>
+          </a>
+        </div>
+        {% endunless %}
         {% endif %}
       {% endif %}
     </div>
@@ -1328,6 +1517,40 @@
       "id": "expert_help_phone",
       "label": "Expert help phone",
       "default": "(408) 673-9999"
+    },
+    {
+      "type": "header",
+      "content": "Member Pricing Promo"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_member_promo",
+      "label": "Show member pricing promo",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "member_promo_guest_text",
+      "label": "Text for guests (not logged in)",
+      "default": "Members Save More"
+    },
+    {
+      "type": "text",
+      "id": "member_promo_nonmember_text",
+      "label": "Text for logged-in non-members",
+      "default": "Unlock Member Pricing"
+    },
+    {
+      "type": "text",
+      "id": "member_promo_member_text",
+      "label": "Text for members",
+      "default": "Member Pricing Active"
+    },
+    {
+      "type": "text",
+      "id": "member_promo_megamenu_text",
+      "label": "Mega menu banner text",
+      "default": "Login to unlock exclusive member pricing on all products"
     },
     {
       "type": "header",
