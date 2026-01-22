@@ -98,7 +98,7 @@
 .topbar-hospitality .live-chat:hover {
   background: #ff5252;
   transform: scale(1.02);
-  color: #fff;
+  color: #000;
 }
 
 .topbar-hospitality .live-chat .pulse {
