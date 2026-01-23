@@ -1,136 +1,225 @@
 {{ 'customer.css' | asset_url | stylesheet_tag }}
+{{ 'customer-accounts.css' | asset_url | stylesheet_tag }}
 
-{%- style -%}
-  .section-{{ section.id }}-padding {
-    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
-    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
-  }
+<div class="cf-auth-split">
+  <!-- Left Side - Benefits -->
+  <div class="cf-auth-benefits">
+    <div class="cf-benefits-content">
+      <div class="cf-benefits-logo">
+        <a href="{{ routes.root_url }}">
+          {%- if settings.logo != blank -%}
+            <img src="{{ settings.logo | image_url: width: 180 }}" alt="{{ shop.name }}">
+          {%- else -%}
+            <img src="https://celebratefestivalinc.com/cdn/shop/files/celebrate-logo.png" alt="{{ shop.name }}">
+          {%- endif -%}
+        </a>
+      </div>
 
-  @media screen and (min-width: 750px) {
-    .section-{{ section.id }}-padding {
-      padding-top: {{ section.settings.padding_top }}px;
-      padding-bottom: {{ section.settings.padding_bottom }}px;
-    }
-  }
-{%- endstyle -%}
+      <h2 class="cf-benefits-title">Why Create an Account?</h2>
 
-<div class="customer register section-{{ section.id }}-padding">
-  <h1>
-    {{ 'customer.register.title' | t }}
-  </h1>
-  {%- form 'create_customer', novalidate: 'novalidate' -%}
-    {%- if form.errors -%}
-      <h2 class="form__message" tabindex="-1" autofocus>
-        <span class="svg-wrapper">
-          {{- 'icon-error.svg' | inline_asset_content -}}
-        </span>
-        {{ 'templates.contact.form.error_heading' | t }}
-      </h2>
-      <ul>
-        {%- for field in form.errors -%}
-          <li>
-            {%- if field == 'form' -%}
-              {{ form.errors.messages[field] }}
-            {%- else -%}
-              <a href="#RegisterForm-{{ field }}">
-                {{ form.errors.translated_fields[field] | capitalize }}
-                {{ form.errors.messages[field] }}
-              </a>
-            {%- endif -%}
-          </li>
-        {%- endfor -%}
-      </ul>
-    {%- endif -%}
-    <div class="field">
-      <input
-        type="text"
-        name="customer[first_name]"
-        id="RegisterForm-FirstName"
-        {% if form.first_name %}
-          value="{{ form.first_name }}"
-        {% endif %}
-        autocomplete="given-name"
-        placeholder="{{ 'customer.register.first_name' | t }}"
-      >
-      <label for="RegisterForm-FirstName">
-        {{ 'customer.register.first_name' | t }}
-      </label>
+      <div class="cf-benefits-list">
+        <div class="cf-benefit-item">
+          <div class="cf-benefit-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+            </svg>
+          </div>
+          <div class="cf-benefit-text">
+            <strong>Unlock Member Pricing</strong>
+            <span>Exclusive discounts on all products</span>
+          </div>
+        </div>
+
+        <div class="cf-benefit-item">
+          <div class="cf-benefit-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <div class="cf-benefit-text">
+            <strong>Faster Checkout</strong>
+            <span>Save your info for quick ordering</span>
+          </div>
+        </div>
+
+        <div class="cf-benefit-item">
+          <div class="cf-benefit-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+          </div>
+          <div class="cf-benefit-text">
+            <strong>Order History</strong>
+            <span>Track and reorder with ease</span>
+          </div>
+        </div>
+
+        <div class="cf-benefit-item">
+          <div class="cf-benefit-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+          </div>
+          <div class="cf-benefit-text">
+            <strong>Exclusive Updates</strong>
+            <span>Be first to know about new products</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cf-benefits-footer">
+        <p>Join 10,000+ restaurant professionals today</p>
+      </div>
     </div>
-    <div class="field">
-      <input
-        type="text"
-        name="customer[last_name]"
-        id="RegisterForm-LastName"
-        {% if form.last_name %}
-          value="{{ form.last_name }}"
-        {% endif %}
-        autocomplete="family-name"
-        placeholder="{{ 'customer.register.last_name' | t }}"
-      >
-      <label for="RegisterForm-LastName">
-        {{ 'customer.register.last_name' | t }}
-      </label>
+  </div>
+
+  <!-- Right Side - Form -->
+  <div class="cf-auth-form-side">
+    <div class="cf-auth-form-container">
+      <h1 class="cf-auth-title">Create Your Account</h1>
+      <p class="cf-auth-subtitle">Join us for exclusive deals and faster checkout</p>
+
+      {%- form 'create_customer', novalidate: 'novalidate' -%}
+        {%- comment %} Capture return_url from query string to redirect back after registration {% endcomment -%}
+        {%- assign return_url = request.path -%}
+        {%- if request.query_string contains 'return_url=' -%}
+          {%- assign return_url_parts = request.query_string | split: 'return_url=' -%}
+          {%- if return_url_parts.size > 1 -%}
+            {%- assign return_url = return_url_parts[1] | split: '&' | first | url_decode -%}
+          {%- endif -%}
+        {%- endif -%}
+        {%- if return_url != blank and return_url != request.path -%}
+          <input type="hidden" name="return_to" value="{{ return_url }}">
+        {%- endif -%}
+
+        {%- if form.errors -%}
+          <div class="cf-alert cf-alert-error">
+            <span class="cf-alert-icon">!</span>
+            <div>
+              <strong>Please fix the following:</strong>
+              <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+                {%- for field in form.errors -%}
+                  <li>
+                    {%- if field == 'form' -%}
+                      {{ form.errors.messages[field] }}
+                    {%- else -%}
+                      {{ form.errors.translated_fields[field] | capitalize }} {{ form.errors.messages[field] }}
+                    {%- endif -%}
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          </div>
+        {%- endif -%}
+
+        <div class="cf-form-row">
+          <div class="cf-form-group">
+            <label class="cf-form-label" for="RegisterForm-FirstName">
+              First Name <span class="required">*</span>
+            </label>
+            <input
+              type="text"
+              class="cf-form-input"
+              name="customer[first_name]"
+              id="RegisterForm-FirstName"
+              {% if form.first_name %}value="{{ form.first_name }}"{% endif %}
+              autocomplete="given-name"
+              placeholder="John"
+            >
+          </div>
+          <div class="cf-form-group">
+            <label class="cf-form-label" for="RegisterForm-LastName">
+              Last Name <span class="required">*</span>
+            </label>
+            <input
+              type="text"
+              class="cf-form-input"
+              name="customer[last_name]"
+              id="RegisterForm-LastName"
+              {% if form.last_name %}value="{{ form.last_name }}"{% endif %}
+              autocomplete="family-name"
+              placeholder="Doe"
+            >
+          </div>
+        </div>
+
+        <div class="cf-form-group">
+          <label class="cf-form-label" for="RegisterForm-email">
+            Email Address <span class="required">*</span>
+          </label>
+          <input
+            type="email"
+            class="cf-form-input {% if form.errors contains 'email' %}error{% endif %}"
+            name="customer[email]"
+            id="RegisterForm-email"
+            {% if form.email %}value="{{ form.email }}"{% endif %}
+            spellcheck="false"
+            autocapitalize="off"
+            autocomplete="email"
+            aria-required="true"
+            {% if form.errors contains 'email' %}
+              aria-invalid="true"
+              aria-describedby="RegisterForm-email-error"
+            {% endif %}
+            placeholder="you@company.com"
+          >
+          {%- if form.errors contains 'email' -%}
+            <span class="cf-form-error" id="RegisterForm-email-error">
+              {{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}.
+            </span>
+          {%- endif -%}
+        </div>
+
+        <div class="cf-form-group">
+          <label class="cf-form-label" for="RegisterForm-password">
+            Password <span class="required">*</span>
+          </label>
+          <input
+            type="password"
+            class="cf-form-input {% if form.errors contains 'password' %}error{% endif %}"
+            name="customer[password]"
+            id="RegisterForm-password"
+            aria-required="true"
+            {% if form.errors contains 'password' %}
+              aria-invalid="true"
+              aria-describedby="RegisterForm-password-error"
+            {% endif %}
+            placeholder="Create a password"
+          >
+          <span class="cf-form-hint">Must be at least 5 characters</span>
+          {%- if form.errors contains 'password' -%}
+            <span class="cf-form-error" id="RegisterForm-password-error">
+              {{ form.errors.translated_fields.password | capitalize }} {{ form.errors.messages.password }}.
+            </span>
+          {%- endif -%}
+        </div>
+
+        <div class="cf-form-group">
+          <label class="cf-checkbox-label">
+            <input type="checkbox" name="customer[accepts_marketing]" value="true">
+            Subscribe to our newsletter for exclusive offers
+          </label>
+        </div>
+
+        <button type="submit" class="cf-btn cf-btn-primary">
+          Create Account
+        </button>
+      {%- endform -%}
+
+      <div class="cf-auth-divider">
+        <span>Already have an account?</span>
+      </div>
+
+      <a href="{{ routes.account_login_url }}{% if return_url != blank and return_url != request.path %}?return_url={{ return_url | url_param_escape }}{% endif %}" class="cf-btn cf-btn-outline">
+        Sign In
+      </a>
     </div>
-    <div class="field">
-      <input
-        type="email"
-        name="customer[email]"
-        id="RegisterForm-email"
-        {% if form.email %}
-          value="{{ form.email }}"
-        {% endif %}
-        spellcheck="false"
-        autocapitalize="off"
-        autocomplete="email"
-        aria-required="true"
-        {% if form.errors contains 'email' %}
-          aria-invalid="true"
-          aria-describedby="RegisterForm-email-error"
-        {% endif %}
-        placeholder="{{ 'customer.register.email' | t }}"
-      >
-      <label for="RegisterForm-email">
-        {{ 'customer.register.email' | t }}
-      </label>
-    </div>
-    {%- if form.errors contains 'email' -%}
-      <span id="RegisterForm-email-error" class="form__message">
-        <span class="svg-wrapper">
-          {{- 'icon-error.svg' | inline_asset_content -}}
-        </span>
-        {{ form.errors.translated_fields.email | capitalize }}
-        {{ form.errors.messages.email }}.
-      </span>
-    {%- endif -%}
-    <div class="field">
-      <input
-        type="password"
-        name="customer[password]"
-        id="RegisterForm-password"
-        aria-required="true"
-        {% if form.errors contains 'password' %}
-          aria-invalid="true"
-          aria-describedby="RegisterForm-password-error"
-        {% endif %}
-        placeholder="{{ 'customer.register.password' | t }}"
-      >
-      <label for="RegisterForm-password">
-        {{ 'customer.register.password' | t }}
-      </label>
-    </div>
-    {%- if form.errors contains 'password' -%}
-      <span id="RegisterForm-password-error" class="form__message">
-        <span class="svg-wrapper">
-          {{- 'icon-error.svg' | inline_asset_content -}}
-        </span>
-        {{ form.errors.translated_fields.password | capitalize }}
-        {{ form.errors.messages.password }}.
-      </span>
-    {%- endif -%}
-    <button>
-      {{ 'customer.register.submit' | t }}
-    </button>
-  {%- endform -%}
+  </div>
 </div>
 
 {% schema %}
@@ -149,7 +238,7 @@
       "step": 4,
       "unit": "px",
       "label": "t:sections.all.padding.padding_top",
-      "default": 36
+      "default": 0
     },
     {
       "type": "range",
@@ -159,7 +248,7 @@
       "step": 4,
       "unit": "px",
       "label": "t:sections.all.padding.padding_bottom",
-      "default": 36
+      "default": 0
     }
   ]
 }

@@ -43,6 +43,7 @@
   </section>
 
   {% if search.performed %}
+    {% paginate search.results by 24 %}
     <!-- Search Results Content -->
     <section class="search-content">
       <div class="container">
@@ -355,7 +356,7 @@
               <!-- Products Header -->
               <div class="products-header">
                 <div class="products-count">
-                  Showing <span id="showing-count">{{ search.results.size }}</span> of {{ search.results_count }} results
+                  Showing <span id="showing-count">{{ paginate.current_offset | plus: 1 }}-{{ paginate.current_offset | plus: paginate.page_size | at_most: search.results_count }}</span> of {{ search.results_count }} results
                 </div>
                 <div class="products-controls">
                   <label for="sort-select">Sort By:</label>
@@ -384,91 +385,24 @@
               <div class="products-grid" id="products-grid">
                 {% for item in search.results %}
                   {% if item.object_type == 'product' %}
-                  <div class="product-card" 
-     data-product-id="{{ item.id }}"
-     data-product-type="{{ item.type | handleize }}"
-     data-product-vendor="{{ item.vendor | handleize }}"
-     data-product-collections="{% for coll in item.collections %}{{ coll.handle }}{% unless forloop.last %},{% endunless %}{% endfor %}"
-     data-product-category="{{ item.product_category.name | handleize }}"
-     data-product-tags="{% for tag in item.tags %}{{ tag | handleize }}{% unless forloop.last %},{% endunless %}{% endfor %}"
-     data-product-price="{{ item.price }}"
-     data-product-available="{{ item.available }}">
-                      
-                      <div class="product-image">
-                        {% if item.featured_image %}
-                          <img src="{{ item.featured_image | image_url: width: 400 }}" 
-                               alt="{{ item.featured_image.alt | escape | default: item.title }}"
-                               loading="lazy">
-                        {% else %}
-                          <img src="{{ 'product-placeholder.png' | asset_url }}" alt="{{ item.title }}">
-                        {% endif %}
-                        
-                        <div class="product-badges">
-                          {% if item.available == false %}
-                            <span class="badge out-of-stock-badge">Out of Stock</span>
-                          {% elsif item.tags contains 'free-shipping' %}
-                            <span class="badge free-shipping-badge">Free Shipping</span>
-                          {% endif %}
-                          
-                          {% if item.compare_at_price > item.price %}
-                            {% assign savings = item.compare_at_price | minus: item.price %}
-                            {% assign percent = savings | times: 100.0 | divided_by: item.compare_at_price | round %}
-                            <span class="badge sale-badge">Save {{ percent }}%</span>
-                          {% endif %}
-                        </div>
-                      </div>
-
-                      <div class="product-info">
-                        <div class="product-content">
-                          {% if item.vendor %}
-                            <div class="product-brand">{{ item.vendor }}</div>
-                          {% endif %}
-                          
-                          <h3 class="product-title">
-                            <a href="{{ item.url }}">{{ item.title }}</a>
-                          </h3>
-
-                          {% if item.tags.size > 0 %}
-                            <div class="product-features">
-                              {% for tag in item.tags limit: 3 %}
-                                {% unless tag contains 'free-shipping' %}
-                                  <span class="feature-tag">{{ tag }}</span>
-                                {% endunless %}
-                              {% endfor %}
-                            </div>
-                          {% endif %}
-
-                          <div class="product-pricing">
-                            {% if item.available %}
-                              <div class="price-group">
-                                <span class="current-price">{{ item.price | money }}</span>
-                                {% if item.compare_at_price > item.price %}
-                                  <span class="original-price">{{ item.compare_at_price | money }}</span>
-                                {% endif %}
-                              </div>
-                              {% if item.compare_at_price > item.price %}
-                                {% assign savings = item.compare_at_price | minus: item.price %}
-                                <span class="savings">Save {{ savings | money }}</span>
-                              {% endif %}
-                            {% else %}
-                              <div class="contact-price">
-                                <i class="fas fa-phone"></i>
-                                Call for Availability
-                              </div>
-                            {% endif %}
-                          </div>
-                        </div>
-
-                        <div class="product-actions">
-                          <a href="{{ item.url }}" class="btn btn-primary">
-                            <i class="fas fa-eye"></i>
-                            View Details
-                          </a>
-                          <button class="btn btn-secondary wishlist-btn" onclick="toggleWishlist(this)">
-                            <i class="fas fa-heart"></i>
-                          </button>
-                        </div>
-                      </div>
+                    <div class="search-product-wrapper"
+                         data-product-id="{{ item.id }}"
+                         data-product-type="{{ item.type | handleize }}"
+                         data-product-vendor="{{ item.vendor | handleize }}"
+                         data-product-collections="{% for coll in item.collections %}{{ coll.handle }}{% unless forloop.last %},{% endunless %}{% endfor %}"
+                         data-product-category="{{ item.product_category.name | handleize }}"
+                         data-product-tags="{% for tag in item.tags %}{{ tag | handleize }}{% unless forloop.last %},{% endunless %}{% endfor %}"
+                         data-product-price="{{ item.price }}"
+                         data-product-available="{{ item.available }}">
+                      {%- render 'product-card',
+                        product: item,
+                        show_vendor: true,
+                        show_rating: false,
+                        show_sale_badge: true,
+                        show_shipping_badge: true,
+                        show_sku: true,
+                        show_qty_input: true
+                      -%}
                     </div>
                   {% endif %}
                 {% endfor %}
@@ -485,6 +419,39 @@
                   Clear All Filters
                 </button>
               </div>
+
+              <!-- Pagination -->
+              {% if paginate.pages > 1 %}
+              <div class="search-pagination">
+                <nav class="pagination-nav" aria-label="Search results pagination">
+                  {% if paginate.previous %}
+                    <a href="{{ paginate.previous.url }}" class="pagination-btn pagination-prev">
+                      <i class="fas fa-chevron-left"></i> Previous
+                    </a>
+                  {% endif %}
+
+                  <div class="pagination-numbers">
+                    {% for part in paginate.parts %}
+                      {% if part.is_link %}
+                        <a href="{{ part.url }}" class="pagination-number">{{ part.title }}</a>
+                      {% else %}
+                        {% if part.title == paginate.current_page %}
+                          <span class="pagination-number pagination-current">{{ part.title }}</span>
+                        {% else %}
+                          <span class="pagination-ellipsis">{{ part.title }}</span>
+                        {% endif %}
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+
+                  {% if paginate.next %}
+                    <a href="{{ paginate.next.url }}" class="pagination-btn pagination-next">
+                      Next <i class="fas fa-chevron-right"></i>
+                    </a>
+                  {% endif %}
+                </nav>
+              </div>
+              {% endif %}
 
             {% else %}
               <!-- No Search Results -->
@@ -532,6 +499,7 @@
         </div>
       </div>
     </section>
+    {% endpaginate %}
   {% else %}
     <!-- Search Instructions (when no search performed yet) -->
     <section class="search-instructions">
@@ -605,7 +573,7 @@ let activeFilters = {
   // Apply filters
 // Apply filters
 function applyFilters() {
-  const products = document.querySelectorAll('.product-card');
+  const products = document.querySelectorAll('.search-product-wrapper');
   let visibleCount = 0;
 
   products.forEach(product => {
@@ -738,18 +706,28 @@ function clearAllFilters() {
   // Sort products
   function sortProducts(sortValue) {
     const grid = document.getElementById('products-grid');
-    const products = Array.from(grid.querySelectorAll('.product-card'));
+    const products = Array.from(grid.querySelectorAll('.search-product-wrapper'));
 
     products.sort((a, b) => {
       switch(sortValue) {
         case 'price-low':
-          return parseFloat(a.dataset.productPrice) - parseFloat(b.dataset.productPrice);
+          return parseFloat(a.dataset.productPrice || 0) - parseFloat(b.dataset.productPrice || 0);
         case 'price-high':
-          return parseFloat(b.dataset.productPrice) - parseFloat(a.dataset.productPrice);
+          return parseFloat(b.dataset.productPrice || 0) - parseFloat(a.dataset.productPrice || 0);
         case 'title-asc':
-          return a.querySelector('.product-title').textContent.localeCompare(b.querySelector('.product-title').textContent);
+          const titleA = a.querySelector('.product-title, .card__heading, .product-card-title');
+          const titleB = b.querySelector('.product-title, .card__heading, .product-card-title');
+          return (titleA?.textContent || '').localeCompare(titleB?.textContent || '');
         case 'title-desc':
-          return b.querySelector('.product-title').textContent.localeCompare(a.querySelector('.product-title').textContent);
+          const titleA2 = a.querySelector('.product-title, .card__heading, .product-card-title');
+          const titleB2 = b.querySelector('.product-title, .card__heading, .product-card-title');
+          return (titleB2?.textContent || '').localeCompare(titleA2?.textContent || '');
+        case 'created-desc':
+          // For newest first, reverse DOM order (newer products typically appear first)
+          return 0;
+        case 'created-asc':
+          // For oldest first, keep DOM order
+          return 0;
         default:
           return 0;
       }
