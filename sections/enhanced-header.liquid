@@ -521,7 +521,7 @@
                 </li>
                 <li class="account-dropdown-divider"></li>
                 <li>
-                  <a href="{{ routes.account_logout_url }}">
+                  <a href="{{ routes.account_logout_url }}?return_to={{ request.path | url_param_escape }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                       <polyline points="16 17 21 12 16 7"/>
@@ -534,6 +534,14 @@
             </div>
             {% endif %}
           </div>
+
+          {% comment %} BUG-017 FIX: Add wishlist link to header {% endcomment %}
+          <a href="/pages/my-wishlist" class="header-link wishlist-link" title="My Wishlist">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <span class="visually-hidden">Wishlist</span>
+          </a>
 
           <a href="{{ routes.cart_url }}" class="header-link cart-link">
             <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
@@ -600,28 +608,19 @@
       {% if show_member_promo %}
       <div class="nav-member-promo">
         {% if customer %}
-          {% comment %} Check if customer is a member {% endcomment %}
+          {% comment %} Bug Fix #8: All logged-in users see "Member Pricing Active" - no promotional prompts {% endcomment %}
           {% assign is_member = false %}
           {% if customer.tags contains 'plus-member' or customer.tags contains 'wholesale' or customer.tags contains 'member' %}
             {% assign is_member = true %}
           {% endif %}
 
-          {% if is_member %}
-            <span class="member-promo-pill is-member">
-              <svg class="promo-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-              </svg>
-              <span class="promo-text">{{ section.settings.member_promo_member_text | default: 'Member Pricing Active' }}</span>
-            </span>
-          {% else %}
-            <a href="/account" class="member-promo-pill">
-              <svg class="promo-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
-              </svg>
-              <span class="promo-text">{{ section.settings.member_promo_nonmember_text | default: 'Unlock Member Pricing' }}</span>
-              <span class="promo-arrow">→</span>
-            </a>
-          {% endif %}
+          {%- comment -%} Bug Fix #8: Show Member Pricing Active for ALL logged-in users {%- endcomment -%}
+          <span class="member-promo-pill is-member">
+            <svg class="promo-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+            <span class="promo-text">{{ section.settings.member_promo_member_text | default: 'Member Pricing Active' }}</span>
+          </span>
         {% else %}
           <a href="{{ routes.account_login_url }}?return_url={{ request.path | url_param_escape }}" class="member-promo-pill">
             <svg class="promo-icon" viewBox="0 0 24 24" fill="currentColor">

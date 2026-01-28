@@ -1,0 +1,360 @@
+{% comment %}
+  Hero Diagonal Slider Section
+  Version 4: Full Width — Diagonal Image Clip with synchronized text + image slider
+{% endcomment %}
+
+{{ 'hero-diagonal-slider.css' | asset_url | stylesheet_tag }}
+
+<section class="hero-diagonal" id="hero-diagonal-{{ section.id }}">
+  <div class="hero-diagonal__texture"></div>
+
+  <div class="hero-diagonal__content">
+    <div class="hero-diagonal__content-slider swiper" id="heroContentSlider-{{ section.id }}">
+      <div class="swiper-wrapper">
+        {% for block in section.blocks %}
+          {% if block.type == 'slide' %}
+            <div class="swiper-slide" {{ block.shopify_attributes }}>
+              <div class="hero-diagonal__slide-content">
+                {% if block.settings.badge_text != blank %}
+                  <div class="hero-diagonal__badge">
+                    {{ block.settings.badge_text }}
+                  </div>
+                {% endif %}
+
+                <h1 class="hero-diagonal__title">
+                  {{ block.settings.title_line_1 | default: 'From Kitchen Dreams to' }}<br>
+                  <span class="hero-diagonal__title-highlight">{{ block.settings.title_highlight | default: 'Restaurant Reality' }}</span>
+                </h1>
+
+                {% if block.settings.subtitle != blank %}
+                  <p class="hero-diagonal__subtitle">
+                    {{ block.settings.subtitle }}
+                  </p>
+                {% endif %}
+
+                <div class="hero-diagonal__cta">
+                  {% if block.settings.primary_btn_text != blank %}
+                    <a href="{{ block.settings.primary_btn_url | default: '/collections/all' }}" class="hero-diagonal__btn hero-diagonal__btn--primary">
+                      {{ block.settings.primary_btn_text }}
+                      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                      </svg>
+                    </a>
+                  {% endif %}
+                  {% if block.settings.secondary_btn_text != blank %}
+                    <a href="{{ block.settings.secondary_btn_url | default: '/pages/contact-us' }}" class="hero-diagonal__btn hero-diagonal__btn--secondary">
+                      {{ block.settings.secondary_btn_text }}
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-diagonal__image-container">
+    <div class="hero-diagonal__image-slider swiper" id="heroImageSlider-{{ section.id }}">
+      <div class="swiper-wrapper">
+        {% for block in section.blocks %}
+          {% if block.type == 'slide' %}
+            <div class="swiper-slide">
+              {% if block.settings.image != blank %}
+                {% assign cache_bust = 'now' | date: '%s' %}
+                <img
+                  src="{{ block.settings.image | image_url: width: 1200 }}?v={{ cache_bust }}"
+                  srcset="{{ block.settings.image | image_url: width: 600 }}?v={{ cache_bust }} 600w,
+                          {{ block.settings.image | image_url: width: 900 }}?v={{ cache_bust }} 900w,
+                          {{ block.settings.image | image_url: width: 1200 }}?v={{ cache_bust }} 1200w"
+                  sizes="55vw"
+                  alt="{{ block.settings.image_alt | default: block.settings.title_highlight }}"
+                  loading="eager"
+                  class="hero-diagonal__image"
+                >
+              {% else %}
+                <div class="hero-diagonal__image-placeholder">
+                  {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% if section.settings.show_pagination %}
+      <div class="hero-diagonal__pagination swiper-pagination" id="heroPagination-{{ section.id }}"></div>
+    {% endif %}
+  </div>
+
+  {% if section.settings.show_arrows %}
+    <div class="hero-diagonal__nav">
+      <button class="hero-diagonal__nav-btn hero-diagonal__nav-btn--prev" id="heroPrev-{{ section.id }}" aria-label="Previous slide">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <button class="hero-diagonal__nav-btn hero-diagonal__nav-btn--next" id="heroNext-{{ section.id }}" aria-label="Next slide">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+  {% endif %}
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var sectionId = '{{ section.id }}';
+  var contentSliderEl = document.getElementById('heroContentSlider-' + sectionId);
+  var imageSliderEl = document.getElementById('heroImageSlider-' + sectionId);
+
+  if (!contentSliderEl || !imageSliderEl) return;
+
+  var imageSlider = new Swiper(imageSliderEl, {
+    loop: {{ section.settings.loop | default: true }},
+    speed: {{ section.settings.transition_speed | default: 800 }},
+    effect: 'fade',
+    fadeEffect: { crossFade: true },
+    allowTouchMove: false
+  });
+
+  var contentSlider = new Swiper(contentSliderEl, {
+    loop: {{ section.settings.loop | default: true }},
+    speed: {{ section.settings.transition_speed | default: 800 }},
+    effect: 'fade',
+    fadeEffect: { crossFade: true },
+    {% if section.settings.autoplay %}
+    autoplay: {
+      delay: {{ section.settings.autoplay_delay | default: 5000 }},
+      disableOnInteraction: false,
+      pauseOnMouseEnter: true
+    },
+    {% endif %}
+    pagination: {
+      el: '#heroPagination-' + sectionId,
+      clickable: true
+    },
+    navigation: {
+      nextEl: '#heroNext-' + sectionId,
+      prevEl: '#heroPrev-' + sectionId
+    },
+    on: {
+      slideChangeTransitionEnd: function() {
+        // Sync is handled by controller.control - no need to call slideTo
+        // This prevents infinite loop while allowing transition end animations
+      }
+    }
+  });
+
+  // Use Swiper's controller module for synchronization (avoids infinite loop)
+  contentSlider.controller.control = imageSlider;
+  imageSlider.controller.control = contentSlider;
+});
+</script>
+
+{% schema %}
+{
+  "name": "Hero Diagonal Slider",
+  "tag": "section",
+  "class": "hero-diagonal-section",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Slider Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Enable autoplay",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_delay",
+      "label": "Autoplay delay (ms)",
+      "min": 2000,
+      "max": 9000,
+      "step": 500,
+      "default": 5000
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "Loop slides",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "transition_speed",
+      "label": "Transition speed (ms)",
+      "min": 300,
+      "max": 1500,
+      "step": 100,
+      "default": 800
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pagination",
+      "label": "Show pagination dots",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show navigation arrows",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#1c2b48"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#e95b62"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Slide image"
+        },
+        {
+          "type": "text",
+          "id": "image_alt",
+          "label": "Image alt text"
+        },
+        {
+          "type": "header",
+          "content": "Badge"
+        },
+        {
+          "type": "text",
+          "id": "badge_text",
+          "label": "Badge text",
+          "default": "Restaurant Equipment Supplier"
+        },
+        {
+          "type": "header",
+          "content": "Title"
+        },
+        {
+          "type": "text",
+          "id": "title_line_1",
+          "label": "Title line 1",
+          "default": "From Kitchen Dreams to"
+        },
+        {
+          "type": "text",
+          "id": "title_highlight",
+          "label": "Title highlight",
+          "default": "Restaurant Reality"
+        },
+        {
+          "type": "header",
+          "content": "Subtitle"
+        },
+        {
+          "type": "textarea",
+          "id": "subtitle",
+          "label": "Subtitle text",
+          "default": "Complete commercial kitchen solutions trusted by restaurants nationwide."
+        },
+        {
+          "type": "header",
+          "content": "Primary Button"
+        },
+        {
+          "type": "text",
+          "id": "primary_btn_text",
+          "label": "Primary button text",
+          "default": "Shop Equipment"
+        },
+        {
+          "type": "url",
+          "id": "primary_btn_url",
+          "label": "Primary button URL"
+        },
+        {
+          "type": "header",
+          "content": "Secondary Button"
+        },
+        {
+          "type": "text",
+          "id": "secondary_btn_text",
+          "label": "Secondary button text",
+          "default": "Request Quote"
+        },
+        {
+          "type": "url",
+          "id": "secondary_btn_url",
+          "label": "Secondary button URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Diagonal Slider",
+      "blocks": [
+        {
+          "type": "slide",
+          "settings": {
+            "badge_text": "Price Match Guarantee",
+            "title_line_1": "Never Pay More for",
+            "title_highlight": "Restaurant Equipment",
+            "subtitle": "Price Match Guarantee + Expert Support = Your Success Story",
+            "primary_btn_text": "Shop Equipment",
+            "secondary_btn_text": "Request Quote"
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "badge_text": "Free Consultation",
+            "title_line_1": "From Kitchen Dreams to",
+            "title_highlight": "Restaurant Reality",
+            "subtitle": "Complete equipment packages with free consultation and installation support",
+            "primary_btn_text": "Shop Equipment",
+            "secondary_btn_text": "Request Quote"
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "badge_text": "Authentic Equipment",
+            "title_line_1": "Authentic Indian Kitchen",
+            "title_highlight": "Equipment Specialists",
+            "subtitle": "Traditional tandoors, commercial curry stations and specialty Indian cookware",
+            "primary_btn_text": "Shop Equipment",
+            "secondary_btn_text": "Request Quote"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -28,7 +28,7 @@
 
 {% comment %} Collect L3 collection handles with fallback {% endcomment %}
 {% assign l3_collection_handles = '' %}
-{% assign handle_mappings = 'meat-processing-equipment:new-theme-meat-process-equipment,vegetable-slicers-and-cutters-2:new-theme-vegetable-slicers-and-cutters,rice-cooker:new-theme-rice-cooker,commercial-can-openers:new-theme-commercial-can-openers' %}
+{% assign handle_mappings = 'meat-processing-equipment:new-theme-meat-process-equipment,vegetable-slicers-and-cutters-2:new-theme-vegetable-slicers-and-cutters,rice-cooker:new-theme-rice-cooker,commercial-can-openers:new-theme-commercial-can-openers,stainless-steel-work-tables-with-undershelves-1:new-theme-stainless-steel-work-tables-with-undershelves,stainless-steel-enclosed-base-work-tables-1:new-theme-stainless-steel-work-tables-with-undershelves,open-base-work-tables:new-theme-stainless-steel-work-tables-with-undershelves,equipment-stands-mixer-tables:new-theme-equipment-stands,work-table-preparation-stations:new-theme-preparation-stations' %}
 
 {% if l3_children.size > 0 %}
   {% for child_link in l3_children %}
@@ -878,14 +878,7 @@
 }
 
 .cf-plp__plus-badge {
-  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--deep-blue) 100%);
-  color: white;
-  font-size: 9px;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  display: none; /* Hidden on L2 pages per client request */
 }
 
 .cf-plp__stars {
@@ -1173,15 +1166,19 @@
     <nav class="cf-plp__breadcrumb-inline" aria-label="Breadcrumb">
       <a href="/">Home</a>
       <span class="cf-plp__breadcrumb-sep">›</span>
+      {% assign breadcrumb_found = false %}
       {% for link in linklists[menu_handle].links %}
-        {% for l2_link in link.links %}
-          {% assign l2_handle = l2_link.url | split: '/' | last | split: '?' | first %}
-          {% if l2_handle == collection.handle %}
-            <a href="{{ link.url }}">{{ link.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</a>
-            <span class="cf-plp__breadcrumb-sep">›</span>
-            {% break %}
-          {% endif %}
-        {% endfor %}
+        {% unless breadcrumb_found %}
+          {% for l2_link in link.links %}
+            {% assign l2_handle = l2_link.url | split: '/' | last | split: '?' | first %}
+            {% if l2_handle == collection.handle %}
+              <a href="{{ link.url }}">{{ link.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</a>
+              <span class="cf-plp__breadcrumb-sep">›</span>
+              {% assign breadcrumb_found = true %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+        {% endunless %}
       {% endfor %}
       <span class="cf-plp__breadcrumb-current">{{ collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</span>
     </nav>
@@ -1194,17 +1191,18 @@
   {% comment %} L3 Filter Pills (L2 only) {% endcomment %}
   {% if l3_handle_array.size > 0 %}
     <nav class="cf-plp__pills" aria-label="Filter by category">
-      <span class="cf-plp__pills-label">Filter:</span>
+      <span class="cf-plp__pills-label">Subcategory:</span>
 
       <button type="button" class="cf-plp__pill active" data-filter="all">
         All Products
       </button>
 
-      {% for handle in l3_handle_array limit: 10 %}
+      {% for handle in l3_handle_array %}
         {% assign handle_clean = handle | strip %}
         {% if handle_clean != blank %}
           {% assign pill_coll = collections[handle_clean] %}
-          {% assign pill_title = pill_coll.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
+          {% comment %} BUG-020 FIX: Remove common prefixes to match menu labels {% endcomment %}
+          {% assign pill_title = pill_coll.title | remove: 'New Theme - ' | remove: 'New Theme- ' | remove: 'NT - ' | remove: 'Serve-ware Collection: ' | remove: 'Serveware: ' | remove: 'Indian Specialty - ' | remove: 'Restaurant - ' %}
           <button type="button" class="cf-plp__pill" data-filter="{{ handle_clean }}">
             {{ pill_title }}
           </button>
@@ -1220,7 +1218,11 @@
     <aside class="cf-plp__sidebar">
       <h2 class="cf-plp__filters-title">Filters</h2>
 
-      {% comment %} Brand Filter - Collect unique vendors {% endcomment %}
+      {% comment %} ========================================
+         PRIORITY FILTERS: Brand and Product Type
+         ======================================== {% endcomment %}
+
+      {% comment %} 1. Brand Filter - Collect unique vendors {% endcomment %}
       <div class="cf-plp__filter-group">
         <h3 class="cf-plp__filter-title">Brand</h3>
         <ul class="cf-plp__filter-options">
@@ -1255,6 +1257,45 @@
           {% endfor %}
           {% if brands_array.size == 0 %}
             <li><span style="color: var(--text-muted); font-size: 12px;">No brands found</span></li>
+          {% endif %}
+        </ul>
+      </div>
+
+      {% comment %} 2. Product Type Filter - Extract from product tags/types {% endcomment %}
+      <div class="cf-plp__filter-group">
+        <h3 class="cf-plp__filter-title">Product Type</h3>
+        <ul class="cf-plp__filter-options">
+          {% assign type_string = '' %}
+          {% for handle in l3_handle_array limit: 5 %}
+            {% assign handle_clean = handle | strip %}
+            {% if handle_clean != blank %}
+              {% assign coll = collections[handle_clean] %}
+              {% for product in coll.products limit: 15 %}
+                {% if product.type != blank %}
+                  {% unless type_string contains product.type %}
+                    {% if type_string == '' %}
+                      {% assign type_string = product.type %}
+                    {% else %}
+                      {% assign type_string = type_string | append: '|||' | append: product.type %}
+                    {% endif %}
+                  {% endunless %}
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+          {% assign types_array = type_string | split: '|||' %}
+          {% for product_type in types_array limit: 10 %}
+            {% if product_type != blank %}
+              <li>
+                <label class="cf-plp__filter-option">
+                  <input type="checkbox" name="product-type" value="{{ product_type | handleize }}">
+                  {{ product_type }}
+                </label>
+              </li>
+            {% endif %}
+          {% endfor %}
+          {% if types_array.size == 0 %}
+            <li><span style="color: var(--text-muted); font-size: 12px;">No product types found</span></li>
           {% endif %}
         </ul>
       </div>
@@ -1444,7 +1485,7 @@
                 {% for val in values_array limit: 10 %}
                   <li>
                     <label class="cf-plp__filter-option">
-                      <input type="checkbox" name="option_{{ opt_name | handleize }}" value="{{ val | handleize }}" data-option="{{ opt_name }}" data-value="{{ val }}">
+                      <input type="checkbox" name="option_{{ opt_name | handleize }}" value="{{ val | handleize }}" data-option-handle="{{ opt_name | handleize }}" data-value="{{ val }}">
                       {{ val }}
                     </label>
                   </li>
@@ -1503,14 +1544,14 @@
       <div class="cf-plp__grid" id="product-grid">
         {% assign products_shown = 0 %}
         {% assign products_limit = 500 %}
-        {% comment %} Render ALL products from all L3 collections for client-side filtering {% endcomment %}
+        {% comment %} Render products from all L3 collections for client-side filtering (balanced for performance and pagination) {% endcomment %}
 
         {% for handle in l3_handle_array %}
           {% assign handle_clean = handle | strip %}
           {% if handle_clean != blank %}
             {% assign l3_coll = collections[handle_clean] %}
             {% assign l3_category = l3_coll.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
-            {% for product in l3_coll.products limit: 50 %}
+            {% for product in l3_coll.products limit: 100 %}
               {% if products_shown < products_limit %}
                 {% assign products_shown = products_shown | plus: 1 %}
                 {% assign shipment_text = product.metafields.custom.shipment_text %}
@@ -1533,7 +1574,7 @@
                   {% endif %}
                 {% endfor %}
 
-                <div class="cf-plp__card" data-category="{{ handle_clean }}" data-vendor="{{ product.vendor | handleize }}" data-price="{{ product.price }}" data-options="{{ variant_options_data }}">
+                <div class="cf-plp__card" data-category="{{ handle_clean }}" data-vendor="{{ product.vendor | handleize }}" data-type="{{ product.type | handleize }}" data-price="{{ product.price }}" data-options="{{ variant_options_data }}">
                   {% if product.tags contains 'best-seller' or product.tags contains 'featured' %}
                     <span class="cf-plp__card-badge">Best Seller</span>
                   {% elsif product.compare_at_price > product.price %}
@@ -1616,7 +1657,7 @@
                         <div class="cf-plp__price-main">
                           {{ product.price | money }}<span class="cf-plp__price-unit">/Each</span>
                         </div>
-                        <a href="/account/login" class="cf-plp__login-prompt">
+                        <a href="/account/login?return_url={{ request.path | url_param_escape }}" class="cf-plp__login-prompt">
                           🔒 Login for member pricing
                         </a>
                       {% endif %}
@@ -1658,7 +1699,7 @@
               {% assign shipping_class = 'cf-plp__shipping--quick' %}
             {% endif %}
 
-            <div class="cf-plp__card" data-category="all" data-vendor="{{ product.vendor | handleize }}" data-price="{{ product.price }}">
+            <div class="cf-plp__card" data-category="all" data-vendor="{{ product.vendor | handleize }}" data-type="{{ product.type | handleize }}" data-price="{{ product.price }}">
               {% if product.compare_at_price > product.price %}
                 <span class="cf-plp__card-badge">Sale</span>
               {% endif %}
@@ -1727,7 +1768,7 @@
                     <div class="cf-plp__price-main">
                       {{ product.price | money }}<span class="cf-plp__price-unit">/Each</span>
                     </div>
-                    <a href="/account/login" class="cf-plp__login-prompt">
+                    <a href="/account/login?return_url={{ request.path | url_param_escape }}" class="cf-plp__login-prompt">
                       🔒 Login for member pricing
                     </a>
                   {% endif %}
@@ -1788,6 +1829,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const filterState = {
     category: 'all',
     brands: [],
+    productTypes: [],
     priceRanges: [],
     options: {},
     optionRanges: {}
@@ -1801,10 +1843,8 @@ document.addEventListener('DOMContentLoaded', function() {
     filteredCards: []
   };
 
-  // Get cards fresh each time (not cached)
-  function getCards() {
-    return document.querySelectorAll('.cf-plp__card');
-  }
+  // Product Data Cache (Optimization)
+  let productData = [];
 
   const resultsCount = document.querySelector('.cf-plp__results-count strong');
   const paginationContainer = document.getElementById('pagination');
@@ -1815,18 +1855,47 @@ document.addEventListener('DOMContentLoaded', function() {
   const activeFiltersList = document.getElementById('active-filters-list');
   const clearAllBtn = document.getElementById('clear-all-filters');
 
-  console.log('CF-PLP: Filter JS loaded, found', getCards().length, 'cards');
+  // Initialize Data Cache
+  function initProductData() {
+    const cards = document.querySelectorAll('.cf-plp__card');
+    productData = Array.from(cards).map(card => {
+      // Pre-parse price to avoid parsing in loop
+      const priceRaw = card.dataset.price;
+      const price = priceRaw ? (parseInt(priceRaw) / 100) : 0;
+      
+      return {
+        element: card,
+        category: card.dataset.category,
+        vendor: card.dataset.vendor, // handleized
+        productType: card.dataset.type, // handleized
+        price: price,
+        optionsStr: card.dataset.options,
+        // Lazy-loaded options cache
+        _options: null
+      };
+    });
+    console.log('CF-PLP: Data initialized for', productData.length, 'products');
+  }
 
-  // Parse product options from data attribute
-  function parseProductOptions(optionsStr) {
-    if (!optionsStr) return {};
+  // Get parsed options (Lazy Load)
+  function getProductOptions(product) {
+    if (product._options) return product._options;
+    
+    if (!product.optionsStr) {
+      product._options = {};
+      return product._options;
+    }
+
     const result = {};
-    optionsStr.split('|').forEach(optGroup => {
+    // Format: "color:red,blue|size:small,medium"
+    product.optionsStr.split('|').forEach(optGroup => {
       const [name, values] = optGroup.split(':');
       if (name && values) {
+        // Store both handled values for matching
         result[name] = values.split(',').map(v => v.trim());
       }
     });
+    product._options = result;
     return result;
   }
 
@@ -1838,6 +1907,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Update active filters display
   function updateActiveFiltersDisplay() {
+    if (!activeFiltersContainer) return;
+    
     const activeChips = [];
 
     // Category filter (skip if 'all')
@@ -1859,6 +1930,17 @@ document.addEventListener('DOMContentLoaded', function() {
         type: 'brand',
         label: `Brand: ${brandLabel}`,
         value: brand
+      });
+    });
+
+    // Product Type filters
+    filterState.productTypes.forEach(type => {
+      const typeCheckbox = document.querySelector(`input[name="product-type"][value="${type}"]`);
+      const typeLabel = typeCheckbox ? typeCheckbox.parentElement.textContent.trim() : type;
+      activeChips.push({
+        type: 'productType',
+        label: `Type: ${typeLabel}`,
+        value: type
       });
     });
 
@@ -1903,28 +1985,34 @@ document.addEventListener('DOMContentLoaded', function() {
     // Show/hide active filters section
     if (activeChips.length > 0) {
       activeFiltersContainer.style.display = 'block';
-
       // Render chips
-      activeFiltersList.innerHTML = activeChips.map(chip => `
-        <div class="cf-plp__filter-chip" data-type="${chip.type}" data-value="${chip.value}" ${chip.optName ? `data-opt-name="${chip.optName}"` : ''}>
-          <span>${chip.label}</span>
-          <span class="cf-plp__filter-chip-remove" onclick="removeFilter('${chip.type}', '${chip.value}', '${chip.optName || ''}')">×</span>
-        </div>
-      `).join('');
+      if (activeFiltersList) {
+        activeFiltersList.innerHTML = activeChips.map(chip => `
+          <div class="cf-plp__filter-chip" data-type="${chip.type}" data-value="${chip.value}" ${chip.optName ? `data-opt-name="${chip.optName}"` : ''}>
+            <span>${chip.label}</span>
+            <span class="cf-plp__filter-chip-remove" onclick="removeFilter('${chip.type}', '${chip.value}', '${chip.optName || ''}')">×</span>
+          </div>
+        `).join('');
+      }
     } else {
       activeFiltersContainer.style.display = 'none';
     }
   }
 
-  // Remove individual filter
+  // Remove individual filter (Global for onclick access)
   window.removeFilter = function(type, value, optName) {
     if (type === 'category') {
       filterState.category = 'all';
       document.querySelectorAll('.cf-plp__pill').forEach(p => p.classList.remove('active'));
-      document.querySelector('.cf-plp__pill[data-filter="all"]').classList.add('active');
+      const allPill = document.querySelector('.cf-plp__pill[data-filter="all"]');
+      if (allPill) allPill.classList.add('active');
     } else if (type === 'brand') {
       filterState.brands = filterState.brands.filter(b => b !== value);
       const checkbox = document.querySelector(`input[name="brand"][value="${value}"]`);
+      if (checkbox) checkbox.checked = false;
+    } else if (type === 'productType') {
+      filterState.productTypes = filterState.productTypes.filter(t => t !== value);
+      const checkbox = document.querySelector(`input[name="product-type"][value="${value}"]`);
       if (checkbox) checkbox.checked = false;
     } else if (type === 'price') {
       filterState.priceRanges = filterState.priceRanges.filter(p => p !== value);
@@ -1956,127 +2044,133 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   // Clear all filters
-  clearAllBtn.addEventListener('click', function() {
-    // Reset filter state
-    filterState.category = 'all';
-    filterState.brands = [];
-    filterState.priceRanges = [];
-    filterState.options = {};
-    filterState.optionRanges = {};
+  if (clearAllBtn) {
+    clearAllBtn.addEventListener('click', function() {
+      // Reset filter state
+      filterState.category = 'all';
+      filterState.brands = [];
+      filterState.productTypes = [];
+      filterState.priceRanges = [];
+      filterState.options = {};
+      filterState.optionRanges = {};
 
-    // Reset UI
-    document.querySelectorAll('.cf-plp__pill').forEach(p => p.classList.remove('active'));
-    document.querySelector('.cf-plp__pill[data-filter="all"]').classList.add('active');
-    document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-    document.querySelectorAll('.cf-plp__quick-btn').forEach(btn => btn.classList.remove('active'));
+      // Reset UI
+      document.querySelectorAll('.cf-plp__pill').forEach(p => p.classList.remove('active'));
+      const allPill = document.querySelector('.cf-plp__pill[data-filter="all"]');
+      if (allPill) allPill.classList.add('active');
+      
+      document.querySelectorAll('.cf-plp__sidebar input[type="checkbox"]').forEach(cb => cb.checked = false);
+      document.querySelectorAll('.cf-plp__quick-btn').forEach(btn => btn.classList.remove('active'));
 
-    // Reset sliders
-    document.querySelectorAll('.cf-plp__range-filter').forEach(rangeWrap => {
-      const minSlider = rangeWrap.querySelector('.cf-plp__range-min');
-      const maxSlider = rangeWrap.querySelector('.cf-plp__range-max');
-      const minDisplay = rangeWrap.querySelector('.cf-plp__range-min-val');
-      const maxDisplay = rangeWrap.querySelector('.cf-plp__range-max-val');
-      if (minSlider) {
-        minSlider.value = minSlider.min;
-        if (minDisplay) minDisplay.textContent = minSlider.min + '"';
-      }
-      if (maxSlider) {
-        maxSlider.value = maxSlider.max;
-        if (maxDisplay) maxDisplay.textContent = maxSlider.max + '"';
-      }
+      // Reset sliders
+      document.querySelectorAll('.cf-plp__range-filter').forEach(rangeWrap => {
+        const minSlider = rangeWrap.querySelector('.cf-plp__range-min');
+        const maxSlider = rangeWrap.querySelector('.cf-plp__range-max');
+        const minDisplay = rangeWrap.querySelector('.cf-plp__range-min-val');
+        const maxDisplay = rangeWrap.querySelector('.cf-plp__range-max-val');
+        if (minSlider) {
+          minSlider.value = minSlider.min;
+          if (minDisplay) minDisplay.textContent = minSlider.min + '"';
+        }
+        if (maxSlider) {
+          maxSlider.value = maxSlider.max;
+          if (maxDisplay) maxDisplay.textContent = maxSlider.max + '"';
+        }
+      });
+
+      applyFilters();
     });
+  }
 
-    applyFilters();
-  });
-
-  // Apply all filters
+  // Apply all filters (Optimized for Speed)
   function applyFilters(resetPage = true) {
-    const cards = getCards();
     paginationState.filteredCards = [];
-    console.log('CF-PLP: Applying filters, category:', filterState.category, 'to', cards.length, 'cards');
+    
+    // Check if filters are active
+    const hasCategory = filterState.category !== 'all';
+    const hasBrands = filterState.brands.length > 0;
+    const hasProductTypes = filterState.productTypes.length > 0;
+    const hasPrices = filterState.priceRanges.length > 0;
+    const hasOptions = Object.keys(filterState.options).length > 0;
+    const hasRanges = Object.keys(filterState.optionRanges).length > 0;
 
-    cards.forEach(card => {
+    // Use fast iteration over cached data
+    for (let i = 0; i < productData.length; i++) {
+      const p = productData[i];
       let visible = true;
 
-      // Category filter
-      if (filterState.category !== 'all' && card.dataset.category !== filterState.category) {
-        visible = false;
-      }
+      // Category
+      if (hasCategory && p.category !== filterState.category) visible = false;
 
-      // Brand filter
-      if (visible && filterState.brands.length > 0) {
-        if (!filterState.brands.includes(card.dataset.vendor)) {
-          visible = false;
-        }
-      }
+      // Brand
+      if (visible && hasBrands && !filterState.brands.includes(p.vendor)) visible = false;
 
-      // Price range filter
-      if (visible && filterState.priceRanges.length > 0) {
-        const price = parseInt(card.dataset.price) / 100;
+      // Product Type
+      if (visible && hasProductTypes && !filterState.productTypes.includes(p.productType)) visible = false;
+
+      // Price
+      if (visible && hasPrices) {
         let priceMatch = false;
-        filterState.priceRanges.forEach(range => {
-          if (range === '0-500' && price < 500) priceMatch = true;
-          else if (range === '500-1000' && price >= 500 && price < 1000) priceMatch = true;
-          else if (range === '1000-2500' && price >= 1000 && price < 2500) priceMatch = true;
-          else if (range === '2500+' && price >= 2500) priceMatch = true;
-        });
+        for (const range of filterState.priceRanges) {
+          if (range === '0-500' && p.price < 500) { priceMatch = true; break; }
+          if (range === '500-1000' && p.price >= 500 && p.price < 1000) { priceMatch = true; break; }
+          if (range === '1000-2500' && p.price >= 1000 && p.price < 2500) { priceMatch = true; break; }
+          if (range === '2500+' && p.price >= 2500) { priceMatch = true; break; }
+        }
         if (!priceMatch) visible = false;
       }
 
-      // Option filters (checkboxes)
-      if (visible && Object.keys(filterState.options).length > 0) {
-        const productOptions = parseProductOptions(card.dataset.options);
+      // Options
+      if (visible && hasOptions) {
+        const opts = getProductOptions(p);
         for (const [optName, selectedVals] of Object.entries(filterState.options)) {
           if (selectedVals.length > 0) {
-            const productVals = productOptions[optName] || [];
-            const productValsHandled = productVals.map(v => v.toLowerCase().replace(/[^a-z0-9]/g, '-'));
+            const productVals = opts[optName] || [];
+            // Values are strings, need flexible matching (case insensitive, handleized)
+            const pValsHandled = productVals.map(v => v.toLowerCase().replace(/[^a-z0-9]/g, '-'));
             let optMatch = false;
             for (const selVal of selectedVals) {
-              if (productValsHandled.some(pv => pv.includes(selVal) || selVal.includes(pv))) {
+              const selValHandled = selVal.toLowerCase().replace(/[^a-z0-9]/g, '-');
+              if (pValsHandled.some(pv => pv.includes(selValHandled) || selValHandled.includes(pv))) {
                 optMatch = true;
                 break;
               }
             }
-            if (!optMatch) visible = false;
+            if (!optMatch) { visible = false; break; }
           }
         }
       }
 
-      // Option range filters (sliders)
-      if (visible && Object.keys(filterState.optionRanges).length > 0) {
-        const productOptions = parseProductOptions(card.dataset.options);
+      // Ranges
+      if (visible && hasRanges) {
+        const opts = getProductOptions(p);
         for (const [optName, range] of Object.entries(filterState.optionRanges)) {
-          const productVals = productOptions[optName] || [];
-          if (productVals.length > 0) {
-            let rangeMatch = false;
-            for (const val of productVals) {
-              const numVal = extractNumeric(val);
-              if (numVal >= range.min && numVal <= range.max) {
-                rangeMatch = true;
-                break;
-              }
+          const productVals = opts[optName] || [];
+          let rangeMatch = false;
+          for (const val of productVals) {
+            const num = extractNumeric(val);
+            if (num >= range.min && num <= range.max) {
+              rangeMatch = true;
+              break;
             }
-            if (!rangeMatch) visible = false;
           }
+          if (!rangeMatch) { visible = false; break; }
         }
       }
 
-      // Collect filtered cards (don't show yet - pagination will handle display)
-      card.style.display = 'none';
       if (visible) {
-        paginationState.filteredCards.push(card);
+        paginationState.filteredCards.push(p.element);
+      } else {
+        // Hide immediately to be safe, though pagination handles display
+        p.element.style.display = 'none';
       }
-    });
+    }
 
-    // Reset to page 1 when filters change
     if (resetPage) {
       paginationState.currentPage = 1;
     }
 
-    // Update active filters display
     updateActiveFiltersDisplay();
-
-    // Apply pagination
     applyPagination();
   }
 
@@ -2093,68 +2187,75 @@ document.addEventListener('DOMContentLoaded', function() {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 
-    filteredCards.forEach((card, index) => {
-      card.style.display = (index >= startIndex && index < endIndex) ? '' : 'none';
+    // Batch DOM updates using requestAnimationFrame for smoothness
+    requestAnimationFrame(() => {
+      // Hide all first (already done in filter loop, but safety check for previous page)
+      // Actually, filteredCards contains ALL visible items.
+      // We need to show the slice and hide the rest of filteredCards.
+      // Items NOT in filteredCards are already hidden.
+      
+      for (let i = 0; i < filteredCards.length; i++) {
+        if (i >= startIndex && i < endIndex) {
+          filteredCards[i].style.display = '';
+        } else {
+          filteredCards[i].style.display = 'none';
+        }
+      }
     });
 
-    // Render pagination controls
     renderPagination();
   }
 
   // Render pagination buttons
   function renderPagination() {
+    if (!paginationContainer) return;
     const { currentPage, totalPages } = paginationState;
 
-    // Hide pagination if only 1 page
     if (totalPages <= 1) {
       paginationContainer.style.display = 'none';
       return;
     }
     paginationContainer.style.display = 'flex';
 
-    // Update prev/next buttons
-    prevBtn.disabled = currentPage === 1;
-    nextBtn.disabled = currentPage === totalPages;
+    if (prevBtn) prevBtn.disabled = currentPage === 1;
+    if (nextBtn) nextBtn.disabled = currentPage === totalPages;
 
-    // Generate page numbers
-    pageNumbersContainer.innerHTML = '';
-    const maxVisible = 5;
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+    if (pageNumbersContainer) {
+      pageNumbersContainer.innerHTML = '';
+      const maxVisible = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisible - 1);
 
-    if (endPage - startPage < maxVisible - 1) {
-      startPage = Math.max(1, endPage - maxVisible + 1);
-    }
-
-    // First page + ellipsis
-    if (startPage > 1) {
-      pageNumbersContainer.appendChild(createPageButton(1));
-      if (startPage > 2) {
-        const ellipsis = document.createElement('span');
-        ellipsis.className = 'cf-plp__page-ellipsis';
-        ellipsis.textContent = '...';
-        pageNumbersContainer.appendChild(ellipsis);
+      if (endPage - startPage < maxVisible - 1) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
       }
-    }
 
-    // Page numbers
-    for (let i = startPage; i <= endPage; i++) {
-      pageNumbersContainer.appendChild(createPageButton(i));
-    }
-
-    // Last page + ellipsis
-    if (endPage < totalPages) {
-      if (endPage < totalPages - 1) {
-        const ellipsis = document.createElement('span');
-        ellipsis.className = 'cf-plp__page-ellipsis';
-        ellipsis.textContent = '...';
-        pageNumbersContainer.appendChild(ellipsis);
+      if (startPage > 1) {
+        pageNumbersContainer.appendChild(createPageButton(1));
+        if (startPage > 2) {
+          const ellipsis = document.createElement('span');
+          ellipsis.className = 'cf-plp__page-ellipsis';
+          ellipsis.textContent = '...';
+          pageNumbersContainer.appendChild(ellipsis);
+        }
       }
-      pageNumbersContainer.appendChild(createPageButton(totalPages));
+
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbersContainer.appendChild(createPageButton(i));
+      }
+
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          const ellipsis = document.createElement('span');
+          ellipsis.className = 'cf-plp__page-ellipsis';
+          ellipsis.textContent = '...';
+          pageNumbersContainer.appendChild(ellipsis);
+        }
+        pageNumbersContainer.appendChild(createPageButton(totalPages));
+      }
     }
   }
 
-  // Create page button
   function createPageButton(pageNum) {
     const btn = document.createElement('button');
     btn.type = 'button';
@@ -2164,26 +2265,26 @@ document.addEventListener('DOMContentLoaded', function() {
     return btn;
   }
 
-  // Go to specific page
   function goToPage(pageNum) {
     paginationState.currentPage = pageNum;
     applyPagination();
-    // Scroll to top of product grid
-    document.querySelector('.cf-plp__products').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const productsContainer = document.querySelector('.cf-plp__products');
+    if (productsContainer) {
+      productsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
-  // Pagination event listeners
-  prevBtn.addEventListener('click', () => {
-    if (paginationState.currentPage > 1) {
-      goToPage(paginationState.currentPage - 1);
-    }
-  });
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (paginationState.currentPage > 1) goToPage(paginationState.currentPage - 1);
+    });
+  }
 
-  nextBtn.addEventListener('click', () => {
-    if (paginationState.currentPage < paginationState.totalPages) {
-      goToPage(paginationState.currentPage + 1);
-    }
-  });
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (paginationState.currentPage < paginationState.totalPages) goToPage(paginationState.currentPage + 1);
+    });
+  }
 
   // View Toggle (Grid/List)
   const productGrid = document.getElementById('product-grid');
@@ -2193,9 +2294,9 @@ document.addEventListener('DOMContentLoaded', function() {
       this.classList.add('active');
 
       const viewType = this.dataset.view;
-      if (viewType === 'list') {
+      if (viewType === 'list' && productGrid) {
         productGrid.classList.add('list-view');
-      } else {
+      } else if (productGrid) {
         productGrid.classList.remove('list-view');
       }
     });
@@ -2223,6 +2324,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
+  // Product Type Checkboxes
+  document.querySelectorAll('input[name="product-type"]').forEach(cb => {
+    cb.addEventListener('change', function() {
+      if (this.checked) {
+        filterState.productTypes.push(this.value);
+      } else {
+        filterState.productTypes = filterState.productTypes.filter(t => t !== this.value);
+      }
+      applyFilters();
+    });
+  });
+
   // Price Range Checkboxes
   document.querySelectorAll('input[name="price"]').forEach(cb => {
     cb.addEventListener('change', function() {
@@ -2236,9 +2349,9 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // Option Checkboxes (variation filters)
-  document.querySelectorAll('.cf-plp__filter-options input[type="checkbox"][data-option]').forEach(cb => {
+  document.querySelectorAll('.cf-plp__filter-options input[type="checkbox"][data-option-handle]').forEach(cb => {
     cb.addEventListener('change', function() {
-      const optName = this.dataset.option.toLowerCase().replace(/[^a-z0-9]/g, '-');
+      const optName = this.dataset.optionHandle;
       if (!filterState.options[optName]) filterState.options[optName] = [];
 
       if (this.checked) {
@@ -2272,7 +2385,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (maxDisplay) maxDisplay.textContent = maxVal + '"';
 
         filterState.optionRanges[optName] = { min: minVal, max: maxVal };
-        applyFilters();
+        applyFilters(); // Note: for smoother sliders, might want to debounce this
       };
 
       minSlider.addEventListener('input', updateRange);
@@ -2284,9 +2397,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.cf-plp__quick-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       const optName = this.dataset.option;
-      const value = this.dataset.value;
-      const numVal = extractNumeric(value);
-
+      
       // Toggle active state
       this.classList.toggle('active');
 
@@ -2351,27 +2462,17 @@ document.addEventListener('DOMContentLoaded', function() {
         button.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
 
         // Update cart count in header
-        fetch('/cart.js').then(r => r.json()).then(cart => {
-          const countEls = document.querySelectorAll('.cart-count-bubble span, .cart-count, [data-cart-count]');
-          countEls.forEach(el => el.textContent = cart.item_count);
-        });
+        if (window.updateCartCount) window.updateCartCount();
+        else {
+           fetch('/cart.js').then(r => r.json()).then(cart => {
+            const countEls = document.querySelectorAll('.cart-count-bubble span, .cart-count, [data-cart-count]');
+            countEls.forEach(el => el.textContent = cart.item_count);
+          });
+        }
 
-        // Open cart drawer (using custom quick-cart implementation)
-        if (typeof window.openCartDrawer === 'function') {
-          window.openCartDrawer();
-        } else {
-          // Fallback
-          const customCartDrawer = document.getElementById('cartDrawer');
-          if (customCartDrawer) {
-            customCartDrawer.classList.add('active');
-            document.body.style.overflow = 'hidden';
-          } else {
-            // Final fallback: trigger cart notification
-            const cartNotification = document.querySelector('cart-notification');
-            if (cartNotification) {
-              cartNotification.renderContents(data);
-            }
-          }
+        // Show toast notification instead of cart drawer
+        if (typeof window.cfShowCartToast === 'function') {
+          window.cfShowCartToast(data, quantity);
         }
 
         setTimeout(() => {
@@ -2400,10 +2501,11 @@ document.addEventListener('DOMContentLoaded', function() {
     window.location = url;
   };
 
-  // Initialize - apply filters and pagination on page load
+  // Initialize
+  initProductData();
   applyFilters();
 
-  console.log('CF-PLP: All event listeners attached, pagination initialized');
+  console.log('CF-PLP: Optimized JS loaded, data cached for', productData.length, 'products');
 });
 </script>
 

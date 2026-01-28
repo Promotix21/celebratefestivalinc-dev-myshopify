@@ -887,17 +887,17 @@
             {%- if is_logged_in and is_member -%}
               {%- comment %} Logged in member - Show both price cards side by side {% endcomment -%}
               <div class="price-cards-row">
-                <!-- Regular Price Card (Left) -->
+                <!-- Regular Price Card (Left) - Bug Fix #9: Added strikethrough -->
                 <div class="price-card price-card-regular">
                   <div class="price-card-label">Regularly</div>
-                  <div class="price-card-amount">{{ product.price | money }}<span class="price-unit">/{{ section.settings.price_unit | default: "Each" }}</span></div>
+                  <div class="price-card-amount"><s>{{ product.price | money }}</s><span class="price-unit">/{{ section.settings.price_unit | default: "Each" }}</span></div>
                 </div>
 
-                <!-- Member Price Card (Right) -->
+                <!-- Member Price Card (Right) - Bug Fix #8: Removed signup link for members -->
                 <div class="price-card price-card-member">
                   <div class="price-card-badge">Member Price</div>
                   <div class="price-card-amount">{{ member_price | money }}<span class="price-unit">/{{ section.settings.price_unit | default: "Each" }}</span></div>
-                  <a href="/pages/membership" class="signup-plus-link">Sign up for Membership</a>
+                  {%- comment %} Bug Fix #8: Don't show signup link to already logged-in members {% endcomment -%}
                 </div>
               </div>
 
@@ -925,21 +925,7 @@
                     <div class="price-card-amount">$X,XXX.XX<span class="price-unit">/Each</span></div>
                   </div>
                   <div class="price-card-blur-overlay">
-                    <div class="blur-lock-icon">&#128274;</div>
-                    <div class="blur-prompt-text">
-                      {%- if is_logged_in -%}
-                        Become a Member
-                      {%- else -%}
-                        Login to see price
-                      {%- endif -%}
-                    </div>
-                    <a href="{%- if is_logged_in -%}/pages/membership{%- else -%}/account/login?return_url={{ request.path | url_param_escape }}{%- endif -%}" class="blur-login-btn">
-                      {%- if is_logged_in -%}
-                        Learn More
-                      {%- else -%}
-                        Login Now
-                      {%- endif -%}
-                    </a>
+                    <div class="blur-overlay-label">Member Price</div>
                   </div>
                 </div>
               </div>
@@ -1111,42 +1097,37 @@
 
           <!-- Quantity and Add to Cart - Inside Price Section -->
           <div class="quantity-section quantity-section-in-price">
-            <form action="/cart/add" method="post" enctype="multipart/form-data" id="product-form-{{ section.id }}">
+            <form action="/cart/add" method="post" enctype="multipart/form-data" id="product-form-{{ section.id }}" class="add-to-cart-row">
               <input type="hidden" name="id" id="product-variant-id-{{ section.id }}" value="{{ product.selected_or_first_available_variant.id }}">
-
-              <label class="quantity-label">Quantity:</label>
-              <div class="quantity-input-group">
+              <div class="qty-wrapper">
                 <input type="number" name="quantity" value="1" min="1" id="quantity-input">
-                <span>{{ section.settings.price_unit | default: "Each" }}</span>
+                <span class="qty-unit">{{ section.settings.price_unit | default: "Each" }}</span>
               </div>
-
-              <div class="action-buttons">
-                <button type="submit" class="btn btn-add-cart" id="add-to-cart-btn-{{ section.id }}" {% unless product.available %}disabled{% endunless %}>
-                  <i class="fas fa-shopping-cart"></i>
-                  {%- if product.available -%}
-                    {{ section.settings.add_to_cart_text | default: "Add to Cart" }}
-                  {%- else -%}
-                    Sold Out
-                  {%- endif -%}
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-add-list"
-                  data-wishlist-btn
-                  data-product-id="{{ product.id }}"
-                  data-product-title="{{ product.title | escape }}"
-                  data-product-handle="{{ product.handle }}"
-                  data-product-image="{{ product.featured_media | image_url: width: 400 }}"
-                  data-product-price="{{ product.price }}"
-                  data-product-compare-price="{{ product.compare_at_price }}"
-                  data-product-url="{{ product.url }}"
-                  aria-label="Add to wishlist"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                  </svg>
-                </button>
-              </div>
+              <button type="submit" class="btn btn-add-cart" id="add-to-cart-btn-{{ section.id }}" {% unless product.available %}disabled{% endunless %}>
+                <i class="fas fa-shopping-cart"></i>
+                {%- if product.available -%}
+                  {{ section.settings.add_to_cart_text | default: "Add to Cart" }}
+                {%- else -%}
+                  Sold Out
+                {%- endif -%}
+              </button>
+              <button
+                type="button"
+                class="btn btn-add-list"
+                data-wishlist-btn
+                data-product-id="{{ product.id }}"
+                data-product-title="{{ product.title | escape }}"
+                data-product-handle="{{ product.handle }}"
+                data-product-image="{{ product.featured_media | image_url: width: 400 }}"
+                data-product-price="{{ product.price }}"
+                data-product-compare-price="{{ product.compare_at_price }}"
+                data-product-url="{{ product.url }}"
+                aria-label="Add to wishlist"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+              </button>
             </form>
           </div>
         </div>
@@ -1460,12 +1441,7 @@
             {%- if section.settings.help_chat_enabled -%}
               <li>💬 Live Chat Available</li>
             {%- endif -%}
-            {%- comment -%} Resource Page Links {%- endcomment -%}
-            {%- if section.settings.show_resource_links -%}
-              <li><a href="/pages/product-videos">🎬 Product Videos</a></li>
-              <li><a href="/pages/faq">❓ FAQ</a></li>
-              <li><a href="/pages/installation-service">🔧 Installation Service</a></li>
-            {%- endif -%}
+            {%- comment -%} BUG-015 FIX: Removed hardcoded links - use dynamic help_additional_links setting instead {%- endcomment -%}
             {%- if section.settings.help_additional_links != blank -%}
               {%- assign help_links = section.settings.help_additional_links | split: '|' -%}
               {%- for link in help_links -%}
@@ -1884,7 +1860,16 @@
     const addToCartBtn = document.getElementById('add-to-cart-btn-' + sectionId);
     const mainImage = document.getElementById('main-product-image');
     const skuElement = document.querySelector('.product-meta strong');
-    const priceElement = document.querySelector('.price-main');
+
+    // BUG-014 FIX: Target correct price elements
+    const regularPriceElement = document.querySelector('.price-card-regular .price-card-amount');
+    const memberPriceElement = document.querySelector('.price-card-member .price-card-amount');
+    const stickyPriceElement = document.getElementById('sticky-price');
+
+    // Member pricing settings from Liquid
+    const memberDiscount = {{ member_discount | default: 2 }};
+    const isMember = {{ is_member | json }};
+    const enableMemberPricing = {{ enable_member_pricing | json }};
 
     // Update hidden variant ID input
     if (variantIdInput) {
@@ -1907,13 +1892,54 @@
       skuElement.textContent = selectedVariant.sku;
     }
 
-    // Update price display
-    if (priceElement) {
-      const formattedPrice = Shopify.formatMoney ?
-        Shopify.formatMoney(selectedVariant.price) :
-        '$' + (selectedVariant.price / 100).toFixed(2);
-      priceElement.innerHTML = formattedPrice + '<span class="price-unit">/{{ section.settings.price_unit | default: "Each" }}</span>';
+    // BUG-014 FIX: Update price displays with correct selectors
+    const formatMoney = function(cents) {
+      if (Shopify && Shopify.formatMoney) {
+        return Shopify.formatMoney(cents);
+      }
+      return '$' + (cents / 100).toFixed(2);
+    };
+
+    const priceUnit = '{{ section.settings.price_unit | default: "Each" }}';
+    const formattedRegularPrice = formatMoney(selectedVariant.price);
+
+    // Calculate member price (variant price with discount)
+    const memberPriceValue = Math.round(selectedVariant.price * (100 - memberDiscount) / 100);
+    const formattedMemberPrice = formatMoney(memberPriceValue);
+
+    // Update regular price card
+    if (regularPriceElement) {
+      if (enableMemberPricing && isMember) {
+        // Show strikethrough for members
+        regularPriceElement.innerHTML = '<s>' + formattedRegularPrice + '</s><span class="price-unit">/' + priceUnit + '</span>';
+      } else {
+        regularPriceElement.innerHTML = formattedRegularPrice + '<span class="price-unit">/' + priceUnit + '</span>';
+      }
     }
+
+    // Update member price card
+    if (memberPriceElement) {
+      memberPriceElement.innerHTML = formattedMemberPrice + '<span class="price-unit">/' + priceUnit + '</span>';
+    }
+
+    // Update sticky bar price
+    if (stickyPriceElement) {
+      // Show member price if member, otherwise regular price
+      if (enableMemberPricing && isMember) {
+        stickyPriceElement.textContent = formattedMemberPrice;
+      } else {
+        stickyPriceElement.textContent = formattedRegularPrice;
+      }
+    }
+
+    // Update financing row if present (4 installments)
+    const financingText = document.querySelector('.financing-text');
+    if (financingText && enableMemberPricing) {
+      const installmentPrice = formatMoney(Math.round(memberPriceValue / 4));
+      financingText.innerHTML = '4 interest-free payments of ' + installmentPrice + ' with';
+    }
+
+    console.log('💰 Prices updated - Regular:', formattedRegularPrice, 'Member:', formattedMemberPrice);
 
     // Update main image if variant has a featured image
     if (selectedVariant.featured_image && mainImage) {
@@ -2282,16 +2308,10 @@
         document.querySelectorAll('.cart-count-bubble span, [data-cart-count]').forEach(el => el.textContent = cart.item_count);
       });
 
-      // Open cart drawer (using custom quick-cart implementation)
-      if (typeof window.openCartDrawer === 'function') {
-        window.openCartDrawer();
-      } else {
-        // Fallback
-        const customCartDrawer = document.getElementById('cartDrawer');
-        if (customCartDrawer) {
-          customCartDrawer.classList.add('active');
-          document.body.style.overflow = 'hidden';
-        }
+      // Show toast notification instead of cart drawer
+      if (typeof window.cfShowCartToast === 'function') {
+        const qty = parseInt(document.querySelector('[name="quantity"]')?.value) || 1;
+        window.cfShowCartToast(data, qty);
       }
 
       setTimeout(() => {
