@@ -1,31 +1,33 @@
 {
   "sections": {
-    "breadcrumb": {
-      "type": "collection-breadcrumb",
-      "settings": {
-        "background_color": "#f8f9fa",
-        "text_color": "#666666",
-        "link_color": "#333333",
-        "link_hover_color": "#ff6b6b",
-        "padding_top": 16,
-        "padding_bottom": 16
-      }
-    },
     "level1_hub": {
       "type": "collection-level1-hub",
       "settings": {
-        "show_thumbnails": true
-      }
-    },
-    "rich_text": {
-      "type": "rich-text",
-      "disabled": true,
-      "settings": {}
+        "menu": "cf-menu-31-12-2026",
+        "hero_tagline": "Professional Grade",
+        "main_categories_title": "Shop By Category",
+        "show_icon_row": true,
+        "show_secondary_categories": true,
+        "secondary_categories_title": "More Categories",
+        "show_brands_row": true,
+        "brands_title": "Trusted Brands We Carry",
+        "show_products": true,
+        "products_title": "Top Products",
+        "products_limit": 6
+      },
+      "blocks": {
+        "brand_1": { "type": "brand_logo", "settings": { "brand_name": "Avantco", "brand_subtitle": "Refrigeration" } },
+        "brand_2": { "type": "brand_logo", "settings": { "brand_name": "CPG", "brand_subtitle": "Cooking Performance" } },
+        "brand_3": { "type": "brand_logo", "settings": { "brand_name": "REGENCY" } },
+        "brand_4": { "type": "brand_logo", "settings": { "brand_name": "NOBLE", "brand_subtitle": "Warewashing" } },
+        "brand_5": { "type": "brand_logo", "settings": { "brand_name": "VULCAN" } },
+        "brand_6": { "type": "brand_logo", "settings": { "brand_name": "Scotsman", "brand_subtitle": "Ice Systems" } },
+        "brand_7": { "type": "brand_logo", "settings": { "brand_name": "VOLLRATH" } }
+      },
+      "block_order": ["brand_1", "brand_2", "brand_3", "brand_4", "brand_5", "brand_6", "brand_7"]
     }
   },
   "order": [
-    "breadcrumb",
-    "level1_hub",
-    "rich_text"
+    "level1_hub"
   ]
 }

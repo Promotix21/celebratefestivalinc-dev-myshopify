@@ -1,26 +1,62 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
-    "main": {
+    "main_collection": {
       "type": "main-collection",
       "settings": {
-        "products_per_page": 12,
-        "products_per_row_desktop": 3,
+        "products_per_page": 24,
+        "products_per_row_desktop": 4,
+        "products_per_row_tablet": 2,
+        "products_per_row_mobile": 2,
+        "image_ratio": "square",
         "enable_filtering": true,
         "filter_type": "vertical",
+        "show_filter_counts": true,
         "enable_sorting": true,
+        "enable_view_toggle": true,
+        "enable_compare": false,
+        "default_sort": "manual",
         "show_vendor": true,
-        "show_breadcrumbs": true
+        "show_product_type": false,
+        "show_rating": false,
+        "show_quick_add": false,
+        "show_second_image": true,
+        "show_wishlist": true,
+        "show_sale_badge": true,
+        "show_sale_percentage": true,
+        "show_shipping_badge": true,
+        "free_shipping_tag": "free-shipping",
+        "show_low_stock_badge": true,
+        "low_stock_threshold": 10,
+        "show_new_badge": true,
+        "new_badge_tag": "new",
+        "new_badge_duration": 30,
+        "show_compare_at_price": true,
+        "show_savings_amount": true,
+        "enable_call_for_price": true,
+        "call_for_price_text": "Call for Best Price",
+        "call_for_price_phone": "(408) 673-9999",
+        "show_product_features": true,
+        "max_features_display": 3,
+        "features_metafield": "custom.key_features",
+        "show_collection_description": false,
+        "show_breadcrumbs": false,
+        "show_product_count": true,
+        "card_border_radius": 12,
+        "card_shadow": "light",
+        "enable_lazy_loading": true,
+        "enable_infinite_scroll": false,
+        "mobile_sticky_filters": true,
+        "mobile_filter_position": "left"
       }
+    },
+    "rich_text": {
+      "type": "rich-text",
+      "disabled": true,
+      "settings": {}
     }
   },
-  "order": ["main"]
+  "order": [
+    "main_collection",
+    "rich_text"
+  ]
 }

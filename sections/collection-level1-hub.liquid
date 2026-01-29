@@ -1,390 +1,2196 @@
 {% comment %}
-  Level 1 Collection Hub - WebstaurantStore Style
-  Shows Level 2 categories with their Level 3 subcategory links
+  Level 1 Collection Hub - Celebrate Festival Theme
+  EXACT MATCH to webstaurant-red-blue-mockup (1).html
+
+  6 Sections:
+  1. Hero Banner (220px)
+  2. Main Categories (4 columns)
+  3. Icon Categories Row (9 items)
+  4. Secondary Categories (4 columns)
+  5. Brands Row
+  6. Top Products Carousel
 {% endcomment %}
 
 {%- style -%}
-  .level1-hub {
-    padding: 0 0 40px;
-    background: #ffffff;
+  /* ========================================
+     COLOR PALETTE - Red/Blue Theme (EXACT from mockup)
+     ======================================== */
+  :root {
+    /* Blue Spectrum */
+    --deep-blue: #1a3a5c;
+    --primary-blue: #2563eb;
+    --medium-blue: #3b82f6;
+    --light-blue: #60a5fa;
+    --pale-blue: #dbeafe;
+    --sky-blue: #e0f2fe;
+
+    /* Red Spectrum */
+    --deep-red: #991b1b;
+    --primary-red: #dc2626;
+    --bright-red: #ef4444;
+    --light-red: #fca5a5;
+    --pale-red: #fee2e2;
+
+    /* Neutrals */
+    --text-dark: #0f172a;
+    --text-medium: #475569;
+    --text-light: #64748b;
+    --text-muted: #94a3b8;
+    --border-color: #e2e8f0;
+    --bg-light: #f8fafc;
+    --bg-white: #ffffff;
+
+    /* Accents */
+    --rating-gold: #f59e0b;
+    --success-green: #10b981;
   }
 
-  /* Container */
-  .level1-hub__container {
-    max-width: 1400px;
+  /* ========================================
+     PAGE LAYOUT
+     ======================================== */
+  .cf-level1-hub {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    background: var(--bg-white);
+    color: var(--text-dark);
+  }
+
+  .cf-level1-hub * {
+    box-sizing: border-box;
+  }
+
+  .cf-level1-container {
+    max-width: 1280px;
     margin: 0 auto;
-    padding: 30px 20px;
+    background: var(--bg-white);
   }
 
-  /* Hero Banner */
-  .level1-hub__hero {
+  /* ========================================
+     HERO BANNER - 220px Height, FULL WIDTH
+     ======================================== */
+  .hero-banner {
+    position: relative;
+    height: 220px;
+    background: linear-gradient(135deg, var(--deep-blue) 0%, #0f172a 100%);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+  }
+
+  .hero-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 350px;
+    height: 100%;
     background-size: cover;
     background-position: center;
-    background-color: #f0f0f0;
-    margin-bottom: 30px;
+    opacity: 0.25;
   }
 
-  .level1-hub__hero img {
-    width: 100%;
+  /* Animated gradient sweep */
+  .hero-banner::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
     height: 100%;
-    object-fit: cover;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(37, 99, 235, 0.1) 25%,
+      rgba(59, 130, 246, 0.15) 50%,
+      rgba(37, 99, 235, 0.1) 75%,
+      transparent 100%
+    );
+    animation: gradientSweep 8s ease-in-out infinite;
   }
 
-  .level1-hub__hero-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8f 100%);
-    color: rgba(255,255,255,0.3);
+  @keyframes gradientSweep {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(50%); }
   }
 
-  @media (max-width: 768px) {
-    .level1-hub__hero {
-      height: 200px;
-    }
-  }
-
-  /* Category Cards Grid - 2 columns, vertical cards */
-  .level1-hub__grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
-    margin-bottom: 40px;
-  }
-
-  @media (max-width: 768px) {
-    .level1-hub__grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  /* Individual Category Card - Vertical layout */
-  .level1-hub__card {
-    display: flex;
-    flex-direction: column;
-    background: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    overflow: hidden;
-    transition: box-shadow 0.3s ease;
-  }
-
-  .level1-hub__card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-
-  /* Card Image Section (Top) */
-  .level1-hub__card-image {
-    width: 100%;
-    height: 220px;
+  .hero-content {
     position: relative;
-    background: #f5f5f5;
+    z-index: 2;
+    padding: 0 40px;
+    max-width: 700px;
   }
 
-  .level1-hub__card-image a {
+  .hero-tagline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(220, 38, 38, 0.2);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--light-red);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .hero-tagline::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--primary-red);
+    border-radius: 50%;
+  }
+
+  .hero-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 38px;
+    font-weight: 800;
+    color: white;
+    margin: 0 0 12px;
+    line-height: 1.1;
+  }
+
+  .hero-title span {
+    background: linear-gradient(135deg, var(--light-blue) 0%, var(--medium-blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-subtitle {
+    font-size: 15px;
+    color: #cbd5e1;
+    max-width: 500px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Decorative shapes */
+  .hero-shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+  }
+
+  .hero-shape-1 {
+    width: 300px;
+    height: 300px;
+    background: var(--primary-red);
+    top: -100px;
+    right: 100px;
+  }
+
+  .hero-shape-2 {
+    width: 200px;
+    height: 200px;
+    background: var(--medium-blue);
+    bottom: -80px;
+    right: 300px;
+  }
+
+  /* ========================================
+     SECTION LAYOUT
+     ======================================== */
+  .main-categories-section,
+  .secondary-categories-section,
+  .top-products-section {
+    padding: 40px;
+    background: var(--bg-white);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+
+  .section-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--deep-blue);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+  }
+
+  .section-title::before {
+    content: '';
+    width: 4px;
+    height: 28px;
+    background: linear-gradient(180deg, var(--primary-red) 0%, var(--primary-blue) 100%);
+    border-radius: 2px;
+  }
+
+  .view-all-link {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary-blue);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+  }
+
+  .view-all-link:hover {
+    color: var(--primary-red);
+    gap: 10px;
+  }
+
+  /* ========================================
+     MAIN CATEGORIES - 4 Column Grid
+     ======================================== */
+  .main-categories-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+
+  .main-category-card {
+    background: var(--bg-white);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .main-category-card:hover {
+    border-color: var(--primary-blue);
+    box-shadow: 0 12px 40px rgba(37, 99, 235, 0.12);
+    transform: translateY(-4px);
+  }
+
+  /* Main Category Image Link - Clickable with Hover */
+  .main-category-image-link {
     display: block;
-    height: 100%;
+    position: relative;
+    overflow: hidden;
+    height: 160px;
   }
 
-  .level1-hub__card-image img {
+  .main-category-image {
     width: 100%;
-    height: 100%;
+    height: 160px;
     object-fit: cover;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    display: block;
+    transition: transform 0.5s ease;
   }
 
-  .level1-hub__card-placeholder {
+  .main-category-image-link:hover .main-category-image {
+    transform: scale(1.08);
+  }
+
+  .main-category-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
+    background: linear-gradient(135deg, rgba(26, 58, 92, 0.85) 0%, rgba(37, 99, 235, 0.75) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f5 100%);
-    color: #999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
   }
 
-  /* Card Content Section (Bottom) */
-  .level1-hub__card-content {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
+  .main-category-image-link:hover .main-category-image-overlay {
+    opacity: 1;
   }
 
-  .level1-hub__card-header {
-    margin-bottom: 12px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
-  }
-
-  .level1-hub__card-title {
+  .main-category-image-overlay .overlay-text {
+    color: white;
+    font-family: 'Montserrat', sans-serif;
     font-size: 16px;
     font-weight: 700;
-    color: #333;
-    margin: 0 0 4px;
+    text-align: center;
+    padding: 0 15px;
+    transform: translateY(10px);
+    transition: transform 0.3s ease;
   }
 
-  .level1-hub__card-title a {
-    color: #1e3a5f;
+  .main-category-image-link:hover .overlay-text {
+    transform: translateY(0);
+  }
+
+  .main-category-image-placeholder {
+    width: 100%;
+    height: 160px;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    color: var(--text-muted);
+  }
+
+  .main-category-content {
+    padding: 20px;
+  }
+
+  .main-category-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--deep-blue);
+    margin: 0 0 6px;
+  }
+
+  .main-category-title a {
+    color: inherit;
     text-decoration: none;
   }
 
-  .level1-hub__card-title a:hover {
-    text-decoration: underline;
+  .main-category-title a:hover {
+    color: var(--primary-blue);
   }
 
-  .level1-hub__view-all {
+  .main-category-count {
     font-size: 12px;
-    color: #1e3a5f;
+    font-weight: 600;
+    color: var(--primary-red);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
     text-decoration: none;
   }
 
-  .level1-hub__view-all:hover {
+  .main-category-count:hover {
     text-decoration: underline;
   }
 
-  /* Subcategory Links */
-  .level1-hub__subcategories {
+  .main-category-count::after {
+    content: '→';
+    transition: transform 0.3s ease;
+  }
+
+  .main-category-card:hover .main-category-count::after {
+    transform: translateX(4px);
+  }
+
+  .main-category-desc {
+    font-size: 13px;
+    color: var(--text-light);
+    line-height: 1.6;
+    margin: 0 0 14px;
+  }
+
+  .main-category-links {
+    list-style: none;
+    border-top: 1px solid var(--border-color);
+    padding: 14px 0 0;
+    margin: 0;
+  }
+
+  .main-category-links li {
+    margin-bottom: 8px;
+  }
+
+  .main-category-links li:last-child {
+    margin-bottom: 0;
+  }
+
+  .main-category-links a {
+    font-size: 13px;
+    color: var(--primary-blue);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+
+  .main-category-links a::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    background: var(--primary-blue);
+    border-radius: 50%;
+    transition: all 0.2s ease;
+  }
+
+  .main-category-links a:hover {
+    color: var(--primary-red);
+    padding-left: 4px;
+  }
+
+  .main-category-links a:hover::before {
+    background: var(--primary-red);
+  }
+
+  /* ========================================
+     ICON CATEGORIES ROW
+     ======================================== */
+  .icon-categories-section {
+    padding: 30px 40px;
+    background: linear-gradient(180deg, var(--sky-blue) 0%, var(--bg-white) 100%);
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .icon-categories-grid {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .icon-category-item {
+    text-align: center;
+    flex: 1;
+    max-width: 120px;
+    text-decoration: none;
+  }
+
+  .icon-category-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    margin: 0 auto 10px;
+    background: var(--bg-white);
+    border: 2px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    overflow: hidden;
+  }
+
+  .icon-category-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .icon-category-item:hover .icon-category-image {
+    border-color: var(--primary-blue);
+    background: var(--pale-blue);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.15);
+  }
+
+  .icon-category-item:hover .icon-category-image img {
+    transform: scale(1.1);
+  }
+
+  /* Icon Slideshow for auto-cycling product images */
+  .icon-slideshow {
+    position: relative;
+  }
+
+  .icon-slideshow .icon-main-image {
+    position: relative;
+    z-index: 1;
+  }
+
+  .icon-slideshow .slide-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: 2;
+  }
+
+  .icon-slideshow .slide-image.active {
+    opacity: 1;
+  }
+
+  .icon-placeholder {
+    font-size: 28px;
+  }
+
+  .icon-category-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--deep-blue);
+    text-decoration: none;
+    line-height: 1.4;
+    display: block;
+  }
+
+  .icon-category-label:hover {
+    color: var(--primary-red);
+  }
+
+  /* ========================================
+     SECONDARY CATEGORIES GRID
+     ======================================== */
+  .secondary-categories-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+
+  .secondary-category-card {
+    background: var(--bg-white);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+  }
+
+  .secondary-category-card:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+    transform: translateY(-4px);
+  }
+
+  /* Secondary Category Image Link - Clickable with Hover */
+  .secondary-category-image-link {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    height: 180px;
+  }
+
+  .secondary-category-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .secondary-category-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: linear-gradient(135deg, var(--pale-blue) 0%, #f1f5f9 100%);
+    display: block;
+    transition: transform 0.5s ease;
+  }
+
+  .secondary-category-image-link:hover .secondary-category-image {
+    transform: scale(1.08);
+  }
+
+  .secondary-category-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(26, 58, 92, 0.85) 0%, rgba(37, 99, 235, 0.75) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .secondary-category-image-link:hover .secondary-category-image-overlay {
+    opacity: 1;
+  }
+
+  .secondary-category-image-overlay .overlay-text {
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    padding: 0 15px;
+    transform: translateY(10px);
+    transition: transform 0.3s ease;
+  }
+
+  .secondary-category-image-link:hover .overlay-text {
+    transform: translateY(0);
+  }
+
+  .secondary-category-image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--pale-blue) 0%, #f1f5f9 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 50px;
+    color: var(--text-muted);
+  }
+
+  .secondary-category-content {
+    padding: 20px;
+  }
+
+  .secondary-category-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--deep-blue);
+    margin: 0 0 6px;
+  }
+
+  .secondary-category-title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .secondary-category-title a:hover {
+    color: var(--primary-blue);
+  }
+
+  .secondary-category-count {
+    font-size: 12px;
+    color: var(--primary-red);
+    font-weight: 600;
+    margin-bottom: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .secondary-category-count:hover {
+    text-decoration: underline;
+  }
+
+  .secondary-category-desc {
+    font-size: 13px;
+    color: var(--text-light);
+    line-height: 1.6;
+    margin: 0 0 12px;
+  }
+
+  .secondary-category-links {
     list-style: none;
     margin: 0;
     padding: 0;
-    columns: 2;
-    column-gap: 15px;
   }
 
-  .level1-hub__subcategory-item {
-    break-inside: avoid;
+  .secondary-category-links li {
     margin-bottom: 6px;
-    font-size: 13px;
-    line-height: 1.4;
   }
 
-  .level1-hub__subcategory-link {
-    color: #555;
+  .secondary-category-links li:last-child {
+    margin-bottom: 0;
+  }
+
+  .secondary-category-links a {
+    font-size: 12px;
+    color: var(--primary-blue);
     text-decoration: none;
-    display: block;
-    padding: 2px 0;
+    transition: color 0.2s ease;
   }
 
-  .level1-hub__subcategory-link:hover {
-    color: #1e3a5f;
+  .secondary-category-links a:hover {
+    color: var(--primary-red);
     text-decoration: underline;
   }
 
-  /* Thumbnail Navigation Row */
-  .level1-hub__thumbnails {
-    margin-bottom: 40px;
-    padding-top: 30px;
-    border-top: 1px solid #e0e0e0;
+  /* ========================================
+     BRAND LOGOS ROW - 12 Items with View More
+     ======================================== */
+  .brands-section {
+    padding: 30px 40px;
+    background: var(--bg-light);
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
   }
 
-  .level1-hub__thumbnails-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0 0 15px;
-    color: #333;
-  }
-
-  .level1-hub__thumbnails-grid {
+  .brands-header {
     display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 24px;
   }
 
-  .level1-hub__thumbnail {
-    width: 100px;
+  .brands-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--deep-blue);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0;
+    position: relative;
+    padding: 0 20px;
+  }
+
+  .brands-title::before,
+  .brands-title::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 60px;
+    height: 1px;
+    background: var(--border-color);
+  }
+
+  .brands-title::before {
+    right: 100%;
+    margin-right: 5px;
+  }
+
+  .brands-title::after {
+    left: 100%;
+    margin-left: 5px;
+  }
+
+  .brands-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+    align-items: center;
+  }
+
+  .brand-logo {
     text-align: center;
+    padding: 15px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    cursor: pointer;
     text-decoration: none;
+    background: var(--bg-white);
+    border: 1px solid var(--border-color);
   }
 
-  .level1-hub__thumbnail-image {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    overflow: hidden;
-    background: white;
+  .brand-logo:hover {
+    border-color: var(--primary-blue);
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.15);
+    transform: translateY(-4px);
   }
 
-  .level1-hub__thumbnail-image img {
+  .brand-logo img {
+    max-height: 50px;
+    max-width: 100px;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+  }
+
+  .brand-logo:hover img {
+    transform: scale(1.1);
+  }
+
+  .brand-logo-text {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--deep-blue);
+  }
+
+  .brand-logo-subtitle {
+    font-size: 9px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+
+  /* View More Button */
+  .brands-view-more-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+  }
+
+  .brands-view-more-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--deep-blue) 100%);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 25px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+  }
+
+  .brands-view-more-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+  }
+
+  .brands-view-more-btn svg {
+    transition: transform 0.3s ease;
+  }
+
+  .brands-view-more-btn:hover svg {
+    transform: translateX(4px);
+  }
+
+  /* ========================================
+     TOP PRODUCTS CAROUSEL
+     ======================================== */
+  .products-carousel {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 15px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-blue) var(--border-color);
+  }
+
+  .products-carousel::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .products-carousel::-webkit-scrollbar-track {
+    background: var(--border-color);
+    border-radius: 3px;
+  }
+
+  .products-carousel::-webkit-scrollbar-thumb {
+    background: var(--primary-blue);
+    border-radius: 3px;
+  }
+
+  .product-card {
+    flex: 0 0 200px;
+    background: var(--bg-white);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .product-card:hover {
+    border-color: var(--primary-blue);
+    box-shadow: 0 8px 30px rgba(37, 99, 235, 0.12);
+    transform: translateY(-4px);
+  }
+
+  .product-image {
     width: 100%;
-    height: 100%;
+    height: 140px;
+    object-fit: contain;
+    margin-bottom: 12px;
+    background: var(--bg-light);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .product-image img {
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
   }
 
-  .level1-hub__thumbnail-title {
-    font-size: 11px;
-    color: #333;
-    line-height: 1.3;
+  .product-image-placeholder {
+    font-size: 40px;
+    color: var(--text-muted);
   }
 
-  .level1-hub__thumbnail:hover .level1-hub__thumbnail-title {
-    color: #1e3a5f;
+  .product-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--deep-blue);
+    text-decoration: none;
+    line-height: 1.4;
+    display: block;
+    margin-bottom: 10px;
+    min-height: 54px;
+    transition: color 0.2s ease;
   }
 
-  /* Empty State */
-  .level1-hub__empty {
+  .product-title:hover {
+    color: var(--primary-blue);
+  }
+
+  .product-rating {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .plus-badge {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--deep-blue) 100%);
+    color: white;
+    font-size: 9px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .stars {
+    color: var(--rating-gold);
+    font-size: 12px;
+  }
+
+  .product-price {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-red);
+    margin-bottom: 12px;
+  }
+
+  .product-price-unit {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-light);
+  }
+
+  .add-to-cart-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .qty-input {
+    width: 50px;
+    height: 38px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .add-to-cart-btn {
+    flex: 1;
+    height: 38px;
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--deep-red) 100%);
+    color: white;
+    border: none;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+  }
+
+  .add-to-cart-btn:hover {
+    background: linear-gradient(135deg, var(--bright-red) 0%, var(--primary-red) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+  }
+
+  /* ========================================
+     EMPTY STATE
+     ======================================== */
+  .empty-state {
     text-align: center;
     padding: 60px 20px;
-    color: #666;
+    color: var(--text-medium);
   }
 
-  /* Debug info - remove in production */
-  .level1-hub__debug {
-    background: #fffbe6;
-    border: 1px solid #ffe58f;
-    padding: 15px;
-    margin-bottom: 20px;
-    font-size: 12px;
-    font-family: monospace;
+  /* ========================================
+     L2/L3 PRODUCT CARD - WHOLESALE PRICING (PLP)
+     ======================================== */
+  .product-card-plp {
+    background: var(--bg-white);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    transition: all 0.3s ease;
+    text-align: center;
   }
+
+  .product-card-plp:hover {
+    border-color: var(--primary-blue);
+    box-shadow: 0 12px 40px rgba(37, 99, 235, 0.12);
+    transform: translateY(-4px);
+  }
+
+  .product-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: var(--deep-blue);
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .product-card-plp .product-image {
+    width: 100%;
+    height: 160px;
+    object-fit: contain;
+    margin-bottom: 16px;
+    background: var(--bg-light);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .product-card-plp .product-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .product-sku {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .price-box {
+    background: linear-gradient(135deg, var(--pale-blue) 0%, #eff6ff 100%);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+    padding: 14px;
+    margin-bottom: 12px;
+    text-align: center;
+    border-radius: 10px;
+  }
+
+  .price-label {
+    font-size: 10px;
+    color: var(--primary-blue);
+    font-weight: 700;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .price-main {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--primary-red);
+  }
+
+  .price-unit {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-light);
+  }
+
+  .price-regular {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-decoration: line-through;
+    margin-top: 4px;
+  }
+
+  .free-shipping-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+    color: #166534;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+
+  .free-shipping-badge::before {
+    content: '🚚';
+  }
+
+  .product-card-plp .product-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--deep-blue);
+    min-height: 54px;
+    display: block;
+    margin-bottom: 10px;
+    text-decoration: none;
+    line-height: 1.4;
+  }
+
+  .product-card-plp .product-title:hover {
+    color: var(--primary-blue);
+  }
+
+  .product-card-plp .add-to-cart-btn {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--deep-blue) 100%);
+  }
+
+  .product-card-plp .add-to-cart-btn:hover {
+    background: linear-gradient(135deg, var(--medium-blue) 0%, var(--primary-blue) 100%);
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+  }
+
+  /* ========================================
+     RESPONSIVE
+     ======================================== */
+  @media (max-width: 1200px) {
+    .main-categories-grid,
+    .secondary-categories-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 992px) {
+    .main-categories-grid,
+    .secondary-categories-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .hero-title {
+      font-size: 30px;
+    }
+
+    .main-categories-section,
+    .secondary-categories-section,
+    .top-products-section {
+      padding: 30px 20px;
+    }
+
+    .hero-content {
+      padding: 0 20px;
+    }
+
+    .icon-categories-section,
+    .brands-section {
+      padding: 30px 20px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .icon-categories-grid {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .icon-category-item {
+      flex: 0 0 calc(25% - 10px);
+      max-width: calc(25% - 10px);
+      margin-bottom: 15px;
+    }
+
+    .brands-grid {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .brand-logo {
+      flex: 0 0 calc(33.333% - 15px);
+      max-width: calc(33.333% - 15px);
+    }
+  }
+
+  @media (max-width: 576px) {
+    .main-categories-grid,
+    .secondary-categories-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-banner {
+      height: 180px;
+    }
+
+    .hero-title {
+      font-size: 24px;
+    }
+
+    .hero-subtitle {
+      font-size: 13px;
+    }
+
+    .icon-category-item {
+      flex: 0 0 calc(33.333% - 10px);
+      max-width: calc(33.333% - 10px);
+    }
+
+    .brand-logo {
+      flex: 0 0 calc(50% - 10px);
+      max-width: calc(50% - 10px);
+    }
+
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .brands-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .brands-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* ========================================
+     PAGE ANIMATIONS - Fade In On Scroll
+     ======================================== */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Initial state for animated elements */
+  [data-animate] {
+    opacity: 0;
+  }
+
+  [data-animate].animated {
+    animation-duration: 0.6s;
+    animation-fill-mode: both;
+    animation-timing-function: ease-out;
+  }
+
+  [data-animate="fade-up"].animated {
+    animation-name: fadeInUp;
+  }
+
+  [data-animate="fade-in"].animated {
+    animation-name: fadeIn;
+  }
+
+  [data-animate="slide-left"].animated {
+    animation-name: slideInLeft;
+  }
+
+  /* Staggered animation delays */
+  [data-delay="100"] { animation-delay: 0.1s; }
+  [data-delay="200"] { animation-delay: 0.2s; }
+  [data-delay="300"] { animation-delay: 0.3s; }
+  [data-delay="400"] { animation-delay: 0.4s; }
+  [data-delay="500"] { animation-delay: 0.5s; }
+  [data-delay="600"] { animation-delay: 0.6s; }
+  [data-delay="700"] { animation-delay: 0.7s; }
+  [data-delay="800"] { animation-delay: 0.8s; }
 {%- endstyle -%}
 
-{% assign current_handle = collection.handle %}
+{% comment %} Get menu handle from settings {% endcomment %}
+{% assign menu_handle = section.settings.menu | default: 'main-menu' %}
+{% assign menu = linklists[menu_handle] %}
+
+{% comment %} Collection display title {% endcomment %}
 {% assign display_title = collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
 
-{% comment %} Count children first {% endcomment %}
-{% assign child_count = 0 %}
-{% for coll in collections %}
-  {% assign parent_val = coll.metafields.custom.parent_handle.value %}
-  {% if parent_val == current_handle %}
-    {% assign child_count = child_count | plus: 1 %}
+{% comment %}
+  HIERARCHICAL SEARCH: Find the current collection, prioritizing higher levels.
+  Search ALL L1 items first, then L2, then L3.
+  This ensures collections appearing at multiple levels get the highest match.
+{% endcomment %}
+{% assign current_menu_item = nil %}
+{% assign child_categories = nil %}
+{% assign collection_level = 0 %}
+{% assign parent_menu_item = nil %}
+
+{% comment %} PASS 1: Search ALL L1 items first (case-insensitive) {% endcomment %}
+{% assign collection_handle_lower = collection.handle | downcase %}
+{% for l1_link in menu.links %}
+  {% assign l1_handle = l1_link.url | split: '/' | last | split: '?' | first | downcase %}
+  {% assign l1_object_handle = l1_link.object.handle | downcase %}
+  {% if l1_handle == collection_handle_lower or l1_object_handle == collection_handle_lower %}
+    {% assign current_menu_item = l1_link %}
+    {% assign child_categories = l1_link.links %}
+    {% assign collection_level = 1 %}
+    {% break %}
   {% endif %}
 {% endfor %}
 
-<section class="level1-hub">
-  <div class="level1-hub__container">
-    <!-- Hero Banner -->
-    <div class="level1-hub__hero">
-      {% if collection.image %}
-        <img src="{{ collection.image | image_url: width: 1400 }}" alt="{{ display_title | escape }}" loading="eager">
-      {% else %}
-        <div class="level1-hub__hero-placeholder">
-          <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-            <rect x="3" y="3" width="18" height="18" rx="2"/>
-            <circle cx="8.5" cy="8.5" r="1.5"/>
-            <path d="M21 15l-5-5L5 21"/>
-          </svg>
-        </div>
+{% comment %} PASS 2: If not found at L1, search ALL L2 items (case-insensitive) {% endcomment %}
+{% if collection_level == 0 %}
+  {% for l1_link in menu.links %}
+    {% for l2_link in l1_link.links %}
+      {% assign l2_handle = l2_link.url | split: '/' | last | split: '?' | first | downcase %}
+      {% assign l2_object_handle = l2_link.object.handle | downcase %}
+      {% if l2_handle == collection_handle_lower or l2_object_handle == collection_handle_lower %}
+        {% assign current_menu_item = l2_link %}
+        {% assign child_categories = l2_link.links %}
+        {% assign collection_level = 2 %}
+        {% assign parent_menu_item = l1_link %}
+        {% break %}
       {% endif %}
+    {% endfor %}
+    {% if collection_level == 2 %}{% break %}{% endif %}
+  {% endfor %}
+{% endif %}
+
+{% comment %} PASS 3: If not found at L1 or L2, search ALL L3 items (case-insensitive) {% endcomment %}
+{% if collection_level == 0 %}
+  {% for l1_link in menu.links %}
+    {% for l2_link in l1_link.links %}
+      {% for l3_link in l2_link.links %}
+        {% assign l3_handle = l3_link.url | split: '/' | last | split: '?' | first | downcase %}
+        {% assign l3_object_handle = l3_link.object.handle | downcase %}
+        {% if l3_handle == collection_handle_lower or l3_object_handle == collection_handle_lower %}
+          {% assign current_menu_item = l3_link %}
+          {% assign child_categories = l3_link.links %}
+          {% assign collection_level = 3 %}
+          {% assign parent_menu_item = l2_link %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
+      {% if collection_level == 3 %}{% break %}{% endif %}
+    {% endfor %}
+    {% if collection_level == 3 %}{% break %}{% endif %}
+  {% endfor %}
+{% endif %}
+
+{% comment %} For backwards compatibility {% endcomment %}
+{% assign l2_categories = child_categories %}
+
+<!-- DEBUG: Menu Handle: {{ menu_handle }} | Menu Links: {{ menu.links.size }} | Collection Handle: {{ collection.handle }} | Level Found: {{ collection_level }} | Child Categories: {{ child_categories.size }} -->
+
+<section class="cf-level1-hub" data-section-id="{{ section.id }}" data-collection-level="{{ collection_level }}">
+
+{% comment %} =====================================================
+   LEVEL 2 & 3: PRODUCT GRID LAYOUT
+   ===================================================== {% endcomment %}
+{% if collection_level >= 2 %}
+
+  {% comment %} Get hero image: Priority order - Metafield > Collection Image > Section Setting {% endcomment %}
+  {% assign hero_image = collection.metafields.custom.hero_banner | default: collection.image %}
+
+  <!-- Hero Banner for L2/L3 -->
+  <div class="hero-banner" {% if hero_image %}style="background-image: url('{{ hero_image | image_url: width: 1400 }}'); background-size: cover;"{% endif %}>
+    <div class="hero-shape hero-shape-1"></div>
+    <div class="hero-shape hero-shape-2"></div>
+    <div class="hero-content">
+      <div class="hero-tagline">{% if collection_level == 2 %}Category{% else %}Products{% endif %}</div>
+      <h1 class="hero-title">{{ display_title }}</h1>
+      <p class="hero-subtitle">{{ collection.description | strip_html | truncate: 150 | default: 'Browse our selection of quality products for your business.' }}</p>
     </div>
+  </div>
 
-    <!-- Debug info -->
-    {% if request.design_mode %}
-    <div class="level1-hub__debug">
-      <strong>Debug:</strong> current_handle = "{{ current_handle }}" | child_count = {{ child_count }}
-    </div>
-    {% endif %}
+  <div class="cf-level1-container">
 
-    {% if child_count > 0 %}
-      <div class="level1-hub__grid">
-        {% for coll in collections %}
-          {% assign parent_val = coll.metafields.custom.parent_handle.value %}
-          {% if parent_val == current_handle %}
-            {% assign coll_display_title = coll.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
-            {% assign coll_handle = coll.handle %}
+    {% comment %} If L2 has children (L3), show them as quick links {% endcomment %}
+    {% if collection_level == 2 and child_categories.size > 0 %}
+      <section class="icon-categories-section">
+        <div class="icon-categories-grid">
+          {% for l3_link in child_categories limit: 9 %}
+            {% assign l3_title = l3_link.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
+            {% assign l3_handle = l3_link.url | split: '/' | last | split: '?' | first %}
+            {% assign l3_collection = collections[l3_handle] %}
+            {% assign l3_image = l3_link.object.image | default: l3_collection.image | default: l3_collection.products.first.featured_image %}
 
-            <div class="level1-hub__card">
-              <!-- Image Section -->
-              <div class="level1-hub__card-image">
-                <a href="{{ coll.url }}">
-                  {% if coll.image %}
-                    <img src="{{ coll.image | image_url: width: 400 }}" alt="{{ coll_display_title | escape }}" loading="lazy">
-                  {% elsif coll.products.first.featured_image %}
-                    <img src="{{ coll.products.first.featured_image | image_url: width: 400 }}" alt="{{ coll_display_title | escape }}" loading="lazy">
-                  {% else %}
-                    <div class="level1-hub__card-placeholder">
-                      <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                        <rect x="3" y="3" width="18" height="18" rx="2"/>
-                        <circle cx="8.5" cy="8.5" r="1.5"/>
-                        <path d="M21 15l-5-5L5 21"/>
-                      </svg>
-                    </div>
-                  {% endif %}
-                </a>
+            <a href="{{ l3_link.url }}" class="icon-category-item">
+              <div class="icon-category-image">
+                {% if l3_image %}
+                  <img src="{{ l3_image | image_url: width: 160, height: 160, crop: 'center' }}" alt="{{ l3_title | escape }}" loading="lazy">
+                {% else %}
+                  📦
+                {% endif %}
               </div>
-
-              <!-- Content Section -->
-              <div class="level1-hub__card-content">
-                <div class="level1-hub__card-header">
-                  <h3 class="level1-hub__card-title">
-                    <a href="{{ coll.url }}">{{ coll_display_title }}</a>
-                  </h3>
-                  <a href="{{ coll.url }}" class="level1-hub__view-all">View All Categories &rsaquo;</a>
-                </div>
-
-                <!-- Level 3 Subcategory Links -->
-                <ul class="level1-hub__subcategories">
-                  {% assign subcategory_count = 0 %}
-                  {% for subcoll in collections %}
-                    {% assign sub_parent = subcoll.metafields.custom.parent_handle.value %}
-                    {% if sub_parent == coll_handle and subcategory_count < 12 %}
-                      {% assign sub_title = subcoll.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
-                      <li class="level1-hub__subcategory-item">
-                        <a href="{{ subcoll.url }}" class="level1-hub__subcategory-link">{{ sub_title }}</a>
-                      </li>
-                      {% assign subcategory_count = subcategory_count | plus: 1 %}
-                    {% endif %}
-                  {% endfor %}
-                </ul>
-              </div>
-            </div>
-          {% endif %}
-        {% endfor %}
-      </div>
-
-      <!-- Thumbnail Navigation Row -->
-      <div class="level1-hub__thumbnails">
-        <h2 class="level1-hub__thumbnails-title">Browse All Categories</h2>
-        <div class="level1-hub__thumbnails-grid">
-          {% for coll in collections %}
-            {% assign parent_val = coll.metafields.custom.parent_handle.value %}
-            {% if parent_val == current_handle %}
-              {% assign thumb_title = coll.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
-              <a href="{{ coll.url }}" class="level1-hub__thumbnail">
-                <div class="level1-hub__thumbnail-image">
-                  {% if coll.image %}
-                    <img src="{{ coll.image | image_url: width: 160 }}" alt="{{ thumb_title | escape }}" loading="lazy">
-                  {% elsif coll.products.first.featured_image %}
-                    <img src="{{ coll.products.first.featured_image | image_url: width: 160 }}" alt="{{ thumb_title | escape }}" loading="lazy">
-                  {% endif %}
-                </div>
-                <span class="level1-hub__thumbnail-title">{{ thumb_title }}</span>
-              </a>
-            {% endif %}
+              <span class="icon-category-label">{{ l3_title | truncate: 20 }}</span>
+            </a>
           {% endfor %}
         </div>
+      </section>
+    {% endif %}
+
+    <!-- Product Grid -->
+    <section class="products-grid-section" style="padding: 20px 40px 40px 40px;">
+      <h1 style="font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: 700; color: var(--deep-blue); margin: 0 0 20px 0;">{{ display_title }}</h1>
+      <div class="section-header" style="margin-bottom: 20px;">
+        <h2 class="section-title">{{ collection.products_count }} Products</h2>
+        {% if collection.products_count > 24 %}
+          <span class="view-all-link">Page {{ current_page | default: 1 }} of {{ collection.products_count | divided_by: 24 | plus: 1 }}</span>
+        {% endif %}
       </div>
 
-    {% else %}
-      <div class="level1-hub__empty">
-        <p>No subcategories found for this collection.</p>
-        <p><small>Current handle: {{ current_handle }}</small></p>
+      <div class="products-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+        {% paginate collection.products by 24 %}
+          {% for product in collection.products %}
+            <div class="product-card-plp">
+              {% if product.available == false %}
+                <div class="product-badge">Sold Out</div>
+              {% elsif product.compare_at_price > product.price %}
+                <div class="product-badge" style="background: var(--primary-red);">Sale</div>
+              {% endif %}
+
+              <div class="product-image">
+                {% if product.featured_image %}
+                  <a href="{{ product.url }}">
+                    <img src="{{ product.featured_image | image_url: width: 320, height: 320, crop: 'center' }}" alt="{{ product.title | escape }}" loading="lazy">
+                  </a>
+                {% else %}
+                  <span class="product-image-placeholder">📦</span>
+                {% endif %}
+              </div>
+
+              <a href="{{ product.url }}" class="product-title">{{ product.title | truncate: 60 }}</a>
+
+              <div class="product-rating">
+                <span class="plus-badge">Plus</span>
+                <span class="stars">★★★★☆</span>
+              </div>
+
+              <div class="product-sku">#{{ product.variants.first.sku | default: product.id }}</div>
+
+              <div class="price-box">
+                <div class="price-label">Plus Member Price</div>
+                <div class="price-main">{{ product.price | money }}<span class="price-unit">/Each</span></div>
+                {% if product.compare_at_price > product.price %}
+                  <div class="price-regular">Regularly {{ product.compare_at_price | money }}</div>
+                {% endif %}
+              </div>
+
+              {% if product.price >= 9900 %}
+                <div class="free-shipping-badge">Free Shipping</div>
+              {% endif %}
+
+              <div class="add-to-cart-row">
+                <input type="number" value="1" min="1" class="qty-input" aria-label="Quantity">
+                <button type="button" class="add-to-cart-btn" data-variant-id="{{ product.variants.first.id }}"{% unless product.available %} disabled{% endunless %}>
+                  {% if product.available %}Add to Cart{% else %}Sold Out{% endif %}
+                </button>
+              </div>
+            </div>
+          {% endfor %}
+        {% endpaginate %}
       </div>
-    {% endif %}
+
+      {% comment %} Pagination {% endcomment %}
+      {% paginate collection.products by 24 %}
+        {% if paginate.pages > 1 %}
+          <nav class="pagination" style="margin-top: 40px; text-align: center;">
+            {% if paginate.previous %}
+              <a href="{{ paginate.previous.url }}" style="padding: 10px 20px; background: var(--primary-blue); color: white; border-radius: 6px; text-decoration: none; margin: 0 5px;">← Previous</a>
+            {% endif %}
+
+            {% for part in paginate.parts %}
+              {% if part.is_link %}
+                <a href="{{ part.url }}" style="padding: 10px 15px; border: 1px solid var(--border-color); border-radius: 6px; text-decoration: none; margin: 0 3px; color: var(--deep-blue);">{{ part.title }}</a>
+              {% else %}
+                {% if part.title == paginate.current_page %}
+                  <span style="padding: 10px 15px; background: var(--primary-blue); color: white; border-radius: 6px; margin: 0 3px;">{{ part.title }}</span>
+                {% else %}
+                  <span style="padding: 10px 15px; margin: 0 3px; color: var(--text-muted);">{{ part.title }}</span>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+
+            {% if paginate.next %}
+              <a href="{{ paginate.next.url }}" style="padding: 10px 20px; background: var(--primary-blue); color: white; border-radius: 6px; text-decoration: none; margin: 0 5px;">Next →</a>
+            {% endif %}
+          </nav>
+        {% endif %}
+      {% endpaginate %}
+    </section>
+
   </div>
+
+{% else %}
+{% comment %} =====================================================
+   LEVEL 1: HUB LAYOUT (Original 6 sections)
+   ===================================================== {% endcomment %}
+
+  {% comment %} Get hero image: Priority order - Metafield > Collection Image {% endcomment %}
+  {% assign hero_image = collection.metafields.custom.hero_banner | default: collection.image %}
+
+  <!-- ==========================================
+       SECTION 1: HERO BANNER (220px)
+       ========================================== -->
+  <div class="hero-banner" {% if hero_image %}style="background-image: url('{{ hero_image | image_url: width: 1400 }}'); background-size: cover;"{% endif %}>
+    <div class="hero-shape hero-shape-1"></div>
+    <div class="hero-shape hero-shape-2"></div>
+    <div class="hero-content">
+      <div class="hero-tagline">{{ section.settings.hero_tagline | default: 'Professional Grade' }}</div>
+      <h1 class="hero-title">
+        {% assign title_words = display_title | split: ' ' %}
+        {% assign half = title_words.size | divided_by: 2 %}
+        {% assign half_plus_one = half | plus: 1 %}
+        {% for word in title_words %}
+          {% if forloop.index <= half %}{{ word }} {% else %}{% if forloop.index == half_plus_one %}<span>{% endif %}{{ word }}{% unless forloop.last %} {% endunless %}{% if forloop.last %}</span>{% endif %}{% endif %}
+        {% endfor %}
+      </h1>
+      <p class="hero-subtitle">{{ collection.description | strip_html | truncate: 150 | default: 'Reliable Commercial Equipment For Every Application. Trusted by thousands of businesses nationwide.' }}</p>
+    </div>
+  </div>
+
+  <div class="cf-level1-container">
+
+    <!-- ==========================================
+         SECTION 2: MAIN CATEGORIES (4 columns)
+         ========================================== -->
+    <section class="main-categories-section">
+      <div class="section-header">
+        <h2 class="section-title">{{ section.settings.main_categories_title | default: 'Shop By Category' }}</h2>
+      </div>
+
+      {% if l2_categories and l2_categories.size > 0 %}
+        <div class="main-categories-grid">
+          {% for l2_link in l2_categories limit: 4 %}
+            {% assign link_title = l2_link.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
+
+            {% comment %} Get collection image {% endcomment %}
+            {% assign l2_handle = l2_link.url | split: '/' | last | split: '?' | first %}
+            {% assign l2_collection = collections[l2_handle] %}
+            {% assign l2_image = l2_link.object.image | default: l2_collection.image | default: l2_collection.products.first.featured_image %}
+
+            <div class="main-category-card" data-animate="fade-up">
+              <a href="{{ l2_link.url }}" class="main-category-image-link">
+                {% if l2_image %}
+                  <img src="{{ l2_image | image_url: width: 400, height: 320, crop: 'center' }}" alt="{{ link_title | escape }}" class="main-category-image" loading="lazy">
+                  <div class="main-category-image-overlay">
+                    <span class="overlay-text">{{ link_title }}</span>
+                  </div>
+                {% else %}
+                  <div class="main-category-image-placeholder">📦</div>
+                {% endif %}
+              </a>
+
+              <div class="main-category-content">
+                <h3 class="main-category-title"><a href="{{ l2_link.url }}">{{ link_title }}</a></h3>
+
+                {% if l2_link.links.size > 0 %}
+                  <a href="{{ l2_link.url }}" class="main-category-count">Shop {{ l2_link.links.size }} Categories</a>
+                {% elsif l2_collection.products_count %}
+                  <a href="{{ l2_link.url }}" class="main-category-count">{{ l2_collection.products_count }} Products</a>
+                {% endif %}
+
+                <p class="main-category-desc">
+                  {% if l2_collection.description != blank %}
+                    {{ l2_collection.description | strip_html | truncate: 100 }}
+                  {% else %}
+                    Browse our selection of quality {{ link_title | downcase }} for your business.
+                  {% endif %}
+                </p>
+
+                {% if l2_link.links.size > 0 %}
+                  <ul class="main-category-links">
+                    {% for l3_link in l2_link.links limit: 4 %}
+                      {% assign l3_title = l3_link.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
+                      <li><a href="{{ l3_link.url }}">{{ l3_title }}</a></li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <p>No subcategories found. Please configure the menu in section settings.</p>
+        </div>
+      {% endif %}
+    </section>
+
+    <!-- ==========================================
+         SECTION 3: ICON CATEGORIES ROW (9 items)
+         ========================================== -->
+    {% if section.settings.show_icon_row %}
+      <section class="icon-categories-section">
+        <div class="icon-categories-grid">
+          {% assign icon_blocks = section.blocks | where: 'type', 'icon_category' %}
+
+          {% if icon_blocks.size > 0 %}
+            {% for block in icon_blocks limit: 9 %}
+              <a href="{{ block.settings.icon_url | default: '#' }}" class="icon-category-item" {{ block.shopify_attributes }}>
+                <div class="icon-category-image">
+                  {% if block.settings.icon_image %}
+                    <img src="{{ block.settings.icon_image | image_url: width: 160, height: 160, crop: 'center' }}" alt="{{ block.settings.icon_label | escape }}" loading="lazy">
+                  {% else %}
+                    📦
+                  {% endif %}
+                </div>
+                <span class="icon-category-label">{{ block.settings.icon_label | default: 'Category' }}</span>
+              </a>
+            {% endfor %}
+          {% else %}
+            {% comment %} Fallback: Use L3 categories from first few L2s with product image slideshow {% endcomment %}
+            {% assign icon_count = 0 %}
+            {% if l2_categories %}
+              {% for l2_link in l2_categories %}
+                {% for l3_link in l2_link.links %}
+                  {% if icon_count < 9 %}
+                    {% assign l3_title = l3_link.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
+                    {% assign l3_handle = l3_link.url | split: '/' | last | split: '?' | first %}
+
+                    {% comment %} Handle corrections - same mapping as mega-menu.liquid {% endcomment %}
+                    {% assign corrected_l3_handle = l3_handle %}
+                    {% case l3_handle %}
+                      {% when 'new-theme-griddles', 'griddles' %}{% assign corrected_l3_handle = 'new-theme-gas-griddles' %}
+                      {% when 'new-theme-gas-fryer', 'gas-fryer' %}{% assign corrected_l3_handle = 'new-theme-electric-fryer-copy' %}
+                      {% when 'new-theme-deep-fryer', 'deep-fryer' %}{% assign corrected_l3_handle = 'new-theme-gas-fryer-copy' %}
+                      {% when 'new-theme-combination-ovens', 'combination-ovens' %}{% assign corrected_l3_handle = 'new-theme-convection-ovens-copy' %}
+                      {% when 'new-theme-hold-ovens-cabinets', 'hold-ovens-cabinets' %}{% assign corrected_l3_handle = 'new-theme-oven-cabinets' %}
+                      {% when 'new-theme-commercial-sealers', 'commercial-sealers' %}{% assign corrected_l3_handle = 'new-theme-vacuum-sealers' %}
+                      {% when 'new-theme-work-tables', 'work-tables' %}{% assign corrected_l3_handle = 'new-theme-stainless-steel-work-tables-with-undershelves' %}
+                      {% when 'compartment-sinks', 'one-compartment-sinks' %}{% assign corrected_l3_handle = 'new-them-one-compartment-sinks' %}
+                      {% when 'new-theme-back-bar-coolers', 'back-bar-coolers' %}{% assign corrected_l3_handle = 'new-theme-bar-coolers' %}
+                      {% when 'new-theme-commercial-wine-coolers', 'commercial-wine-coolers' %}{% assign corrected_l3_handle = 'new-theme-wine-coolers' %}
+                      {% when 'new-theme-meat-and-deli-display', 'meat-and-deli-display' %}{% assign corrected_l3_handle = 'new-theme-meat-cases' %}
+                      {% when 'new-theme-undercounter-ice-machines', 'undercounter-ice-machines' %}{% assign corrected_l3_handle = 'new-them-undercounter-ice-machines' %}
+                      {% when 'new-theme-worktop-refrigerators' %}{% assign corrected_l3_handle = 'worktop-refrigerators' %}
+                      {% when 'new-theme-milk-coolers', 'milk-coolers' %}{% assign corrected_l3_handle = 'new-theme-milk-cooler' %}
+                      {% when 'new-theme-dish-tray-carts-and-dollies' %}{% assign corrected_l3_handle = 'new-theme-platform-trucks' %}
+                      {% when 'new-theme-pizza-pan-racks', 'pizza-pan-racks' %}{% assign corrected_l3_handle = 'new-theme-steam-table-pan-racks' %}
+                      {% when 'new-theme-storage-racks', 'storage-racks' %}{% assign corrected_l3_handle = 'chrome' %}
+                      {% when 'new-theme-wire-shelving', 'wire-shelving' %}{% assign corrected_l3_handle = 'new-theme-restaurant-shelving' %}
+                      {% when 'new-theme-china-mugs', 'china-mugs' %}{% assign corrected_l3_handle = 'test' %}
+                      {% when 'new-theme-china-plates', 'china-plates' %}{% assign corrected_l3_handle = 'new-theme-china-dinnerware' %}
+                      {% when 'new-theme-melamine-mugs', 'melamine-mugs' %}{% assign corrected_l3_handle = 'mugs' %}
+                      {% when 'new-theme-melamine-platters', 'melamine-platters' %}{% assign corrected_l3_handle = 'new-theme-melamine-trays' %}
+                      {% when 'new-theme-plastic-barware' %}{% assign corrected_l3_handle = 'new-theme-stoneware-bowls' %}
+                      {% when 'new-theme-plastic-tumblers' %}{% assign corrected_l3_handle = 'test-1' %}
+                      {% when 'new-theme-china-cups', 'china-cups' %}{% assign corrected_l3_handle = 'new-theme-china-cups-mugs-and-saucers' %}
+                      {% when 'new-theme-porcelain-cups-mugs' %}{% assign corrected_l3_handle = 'new-theme-porcelain-cups' %}
+                      {% when 'patila-all', 'patila' %}{% assign corrected_l3_handle = 'aluminium-patila' %}
+                      {% when 'rotoquip-tandoor' %}{% assign corrected_l3_handle = 'rotoquip' %}
+                      {% when 'cookware-tava-all', 'tava' %}{% assign corrected_l3_handle = 'taav-all' %}
+                      {% when 'jhara-biryani-sev-namkeen-and-boondi-tools' %}{% assign corrected_l3_handle = 'sev-namkeen-and-boondi-tools' %}
+                    {% endcase %}
+
+                    {% assign l3_collection = collections[corrected_l3_handle] %}
+
+                    {% comment %} Fallback: Try with original handle or new-theme- prefix {% endcomment %}
+                    {% unless l3_collection.products_count > 0 %}
+                      {% assign l3_collection = collections[l3_handle] %}
+                    {% endunless %}
+                    {% unless l3_collection.products_count > 0 %}
+                      {% assign l3_new_handle = 'new-theme-' | append: l3_handle %}
+                      {% assign l3_new_coll = collections[l3_new_handle] %}
+                      {% if l3_new_coll.products_count > 0 %}
+                        {% assign l3_collection = l3_new_coll %}
+                      {% endif %}
+                    {% endunless %}
+
+                    {% assign l3_image = l3_link.object.image | default: l3_collection.image %}
+
+                    {% comment %} Collect product images for slideshow {% endcomment %}
+                    {% assign product_images = '' %}
+                    {% for product in l3_collection.products limit: 4 %}
+                      {% if product.featured_image %}
+                        {% assign img_url = product.featured_image | image_url: width: 160, height: 160, crop: 'center' %}
+                        {% if product_images == '' %}
+                          {% assign product_images = img_url %}
+                        {% else %}
+                          {% assign product_images = product_images | append: '|||' | append: img_url %}
+                        {% endif %}
+                      {% endif %}
+                    {% endfor %}
+
+                    <a href="{{ l3_link.url }}" class="icon-category-item" data-animate="fade-up" data-delay="{{ icon_count | times: 100 }}">
+                      <div class="icon-category-image icon-slideshow" data-images="{{ product_images }}">
+                        {% if l3_image != blank and l3_image != nil %}
+                          <img src="{{ l3_image | image_url: width: 160, height: 160, crop: 'center' }}" alt="{{ l3_title | escape }}" loading="lazy" class="icon-main-image">
+                        {% elsif l3_collection.products.first.featured_image != blank %}
+                          <img src="{{ l3_collection.products.first.featured_image | image_url: width: 160, height: 160, crop: 'center' }}" alt="{{ l3_title | escape }}" loading="lazy" class="icon-main-image">
+                        {% else %}
+                          <span class="icon-placeholder">📦</span>
+                        {% endif %}
+                      </div>
+                      <span class="icon-category-label">{{ l3_title | truncate: 20 }}</span>
+                    </a>
+                    {% assign icon_count = icon_count | plus: 1 %}
+                  {% endif %}
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
+          {% endif %}
+        </div>
+      </section>
+    {% endif %}
+
+    <!-- ==========================================
+         SECTION 4: SECONDARY CATEGORIES (4 columns)
+         ========================================== -->
+    {% if section.settings.show_secondary_categories %}
+      {% assign secondary_start = 4 %}
+      {% if l2_categories and l2_categories.size > secondary_start %}
+        <section class="secondary-categories-section">
+          <div class="section-header">
+            <h2 class="section-title">{{ section.settings.secondary_categories_title | default: 'More Categories' }}</h2>
+          </div>
+
+          <div class="secondary-categories-grid">
+            {% for l2_link in l2_categories offset: secondary_start limit: 4 %}
+              {% assign link_title = l2_link.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
+              {% assign sec_handle = l2_link.url | split: '/' | last | split: '?' | first %}
+              {% assign sec_collection = collections[sec_handle] %}
+              {% assign sec_image = l2_link.object.image | default: sec_collection.image | default: sec_collection.products.first.featured_image %}
+
+              <div class="secondary-category-card">
+                <a href="{{ l2_link.url }}" class="secondary-category-image-link">
+                  <div class="secondary-category-image-wrapper">
+                    {% if sec_image %}
+                      <img src="{{ sec_image | image_url: width: 400, height: 360, crop: 'center' }}" alt="{{ link_title | escape }}" class="secondary-category-image" loading="lazy">
+                      <div class="secondary-category-image-overlay">
+                        <span class="overlay-text">{{ link_title }}</span>
+                      </div>
+                    {% else %}
+                      <div class="secondary-category-image-placeholder">📦</div>
+                    {% endif %}
+                  </div>
+                </a>
+
+                <div class="secondary-category-content">
+                  <h3 class="secondary-category-title"><a href="{{ l2_link.url }}">{{ link_title }}</a></h3>
+
+                  {% if l2_link.links.size > 0 %}
+                    <a href="{{ l2_link.url }}" class="secondary-category-count">Shop {{ l2_link.links.size }} Categories ›</a>
+                  {% elsif sec_collection.products_count %}
+                    <a href="{{ l2_link.url }}" class="secondary-category-count">{{ sec_collection.products_count }} Products ›</a>
+                  {% endif %}
+
+                  {% if sec_collection.description != blank %}
+                    <p class="secondary-category-desc">{{ sec_collection.description | strip_html | truncate: 80 }}</p>
+                  {% endif %}
+
+                  {% if l2_link.links.size > 0 %}
+                    <ul class="secondary-category-links">
+                      {% for l3_link in l2_link.links limit: 3 %}
+                        {% assign l3_title = l3_link.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
+                        <li><a href="{{ l3_link.url }}">{{ l3_title }}</a></li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </section>
+      {% endif %}
+    {% endif %}
+
+    <!-- ==========================================
+         SECTION 5: BRANDS ROW
+         ========================================== -->
+    {% if section.settings.show_brands_row %}
+      {% comment %} Priority Brands - Limited to 12 with View More {% endcomment %}
+      {% assign priority_brands = 'atosa,gsw,thunder-group,rational,robot-coupe,cac,turbo-air,waring,eurodib,winco,sammic,globe' | split: ',' %}
+
+      <section class="brands-section" data-animate="fade-up">
+        <div class="brands-header">
+          <p class="brands-title">{{ section.settings.brands_title | default: 'Trusted Brands We Carry' }}</p>
+        </div>
+        <div class="brands-grid">
+          {% for brand_handle in priority_brands limit: 12 %}
+            {% assign brand_name = brand_handle | replace: '-', ' ' | capitalize %}
+            {% assign brand_link = '/collections/vendors?q=' | append: brand_name | url_encode %}
+            {% case brand_handle %}
+              {% when 'gsw' %}{% assign brand_name = 'GSW' %}{% assign brand_link = '/collections/gsw' %}
+              {% when 'cac' %}{% assign brand_name = 'CAC' %}{% assign brand_link = '/pages/cf-cac' %}
+              {% when 'thunder-group' %}{% assign brand_name = 'Thunder Group' %}{% assign brand_link = '/collections/thunder-group' %}
+              {% when 'robot-coupe' %}{% assign brand_name = 'Robot Coupe' %}{% assign brand_link = '/pages/cf-robot-coupe' %}
+              {% when 'turbo-air' %}{% assign brand_name = 'Turbo Air' %}{% assign brand_link = '/pages/turboair-page' %}
+              {% when 'global-solutions' %}{% assign brand_name = 'Global Solutions' %}{% assign brand_link = '/pages/global-solutions' %}
+              {% when 'atosa' %}{% assign brand_link = '/collections/atosa-all' %}
+              {% when 'rational' %}{% assign brand_link = '/collections/combi-oven-rational' %}
+              {% when 'waring' %}{% assign brand_link = '/pages/waring' %}
+              {% when 'eurodib' %}{% assign brand_link = '/pages/cf-eurodib' %}
+              {% when 'winco' %}{% assign brand_link = '/collections/winco' %}
+              {% when 'sammic' %}{% assign brand_link = '/collections/sammic' %}
+              {% when 'globe' %}{% assign brand_link = '/pages/globe' %}
+            {% endcase %}
+
+            <a href="{{ brand_link }}" class="brand-logo" title="Shop {{ brand_name }} products" data-animate="fade-up" data-delay="{{ forloop.index | times: 50 }}">
+              <img src="{{ 'brand-logo-' | append: brand_handle | append: '.png' | asset_url }}"
+                   alt="{{ brand_name }} logo"
+                   loading="lazy"
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <div class="brand-logo-text" style="display: none;">{{ brand_name }}</div>
+            </a>
+          {% endfor %}
+        </div>
+        <div class="brands-view-more-wrapper">
+          <a href="/pages/brands" class="brands-view-more-btn">
+            View All Brands
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+      </section>
+    {% endif %}
+
+    <!-- ==========================================
+         SECTION 6: TOP PRODUCTS CAROUSEL
+         ========================================== -->
+    {% if section.settings.show_products %}
+      {% assign products_source = collection.products %}
+      {% if section.settings.featured_collection != blank %}
+        {% assign products_source = section.settings.featured_collection.products %}
+      {% endif %}
+
+      {% if products_source.size > 0 %}
+        <section class="top-products-section">
+          <div class="section-header">
+            <h2 class="section-title">{{ section.settings.products_title | default: 'Top Products' }}</h2>
+            <a href="{{ collection.url }}" class="view-all-link">Shop All →</a>
+          </div>
+
+          <div class="products-carousel">
+            {% assign products_limit = section.settings.products_limit | default: 6 %}
+            {% for product in products_source limit: products_limit %}
+              <div class="product-card">
+                <div class="product-image">
+                  {% if product.featured_image %}
+                    <img src="{{ product.featured_image | image_url: width: 280, height: 280, crop: 'center' }}" alt="{{ product.title | escape }}" loading="lazy">
+                  {% else %}
+                    <span class="product-image-placeholder">📦</span>
+                  {% endif %}
+                </div>
+
+                <a href="{{ product.url }}" class="product-title">{{ product.title | truncate: 50 }}</a>
+
+                <div class="product-rating">
+                  <span class="plus-badge">Plus</span>
+                  <span class="stars">★★★★☆</span>
+                </div>
+
+                <div class="product-price">
+                  {{ product.price | money }}<span class="product-price-unit">/Each</span>
+                </div>
+
+                <div class="add-to-cart-row">
+                  <input type="number" value="1" min="1" class="qty-input" aria-label="Quantity">
+                  <button type="button" class="add-to-cart-btn" data-variant-id="{{ product.variants.first.id }}">Add to Cart</button>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </section>
+      {% endif %}
+    {% endif %}
+
+  </div><!-- .cf-level1-container -->
+
+{% endif %}
+{% comment %} End of L1 vs L2/L3 conditional {% endcomment %}
+
 </section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const section = document.querySelector('[data-section-id="{{ section.id }}"]');
+    if (!section) return;
+
+    // ========================================
+    // SCROLL ANIMATIONS
+    // ========================================
+    const animatedElements = section.querySelectorAll('[data-animate]');
+
+    const animationObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animated');
+          animationObserver.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+
+    animatedElements.forEach(el => {
+      animationObserver.observe(el);
+    });
+
+    // ========================================
+    // ICON SLIDESHOW - Auto-cycle product images
+    // ========================================
+    const slideshows = section.querySelectorAll('.icon-slideshow');
+
+    slideshows.forEach(slideshow => {
+      const imagesData = slideshow.dataset.images;
+      if (!imagesData) return;
+
+      const images = imagesData.split('|||').filter(img => img.trim());
+      if (images.length < 2) return;
+
+      let currentIndex = 0;
+      let interval = null;
+
+      // Pre-create image elements
+      images.forEach((src, index) => {
+        if (index === 0) return; // Skip first, it's already shown
+        const img = document.createElement('img');
+        img.src = src;
+        img.className = 'slide-image';
+        img.alt = 'Product image';
+        slideshow.appendChild(img);
+      });
+
+      const slideImages = slideshow.querySelectorAll('.slide-image');
+      const mainImage = slideshow.querySelector('.icon-main-image');
+
+      function showNextImage() {
+        // Hide all slides
+        slideImages.forEach(img => img.classList.remove('active'));
+
+        currentIndex = (currentIndex + 1) % (images.length);
+
+        if (currentIndex === 0) {
+          // Show main image
+          if (mainImage) mainImage.style.opacity = '1';
+        } else {
+          // Hide main, show slide
+          if (mainImage) mainImage.style.opacity = '0';
+          const activeSlide = slideImages[currentIndex - 1];
+          if (activeSlide) activeSlide.classList.add('active');
+        }
+      }
+
+      // Start auto-cycling (always on)
+      interval = setInterval(showNextImage, 2000);
+    });
+
+    // ========================================
+    // ADD TO CART
+    // ========================================
+    section.querySelectorAll('.add-to-cart-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const variantId = this.dataset.variantId;
+        const qtyInput = this.closest('.add-to-cart-row').querySelector('.qty-input');
+        const quantity = parseInt(qtyInput.value) || 1;
+
+        this.disabled = true;
+        const originalText = this.textContent;
+        this.textContent = 'Adding...';
+
+        const button = this;
+        fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: variantId, quantity: quantity })
+        })
+        .then(response => response.json())
+        .then(data => {
+          button.textContent = 'Added!';
+          button.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+
+          // Update cart count in header
+          fetch('/cart.js').then(r => r.json()).then(cart => {
+            const countEls = document.querySelectorAll('.cart-count-bubble span, .cart-count, [data-cart-count]');
+            countEls.forEach(el => el.textContent = cart.item_count);
+          });
+
+          // Show toast notification instead of cart drawer
+          if (typeof window.cfShowCartToast === 'function') {
+            window.cfShowCartToast(data, 1);
+          }
+
+          setTimeout(() => {
+            button.textContent = originalText;
+            button.style.background = '';
+            button.disabled = false;
+          }, 2000);
+          document.dispatchEvent(new CustomEvent('cart:updated'));
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          button.textContent = 'Error';
+          setTimeout(() => {
+            button.textContent = originalText;
+            button.disabled = false;
+          }, 1500);
+        });
+      });
+    });
+  });
+</script>
 
 {% schema %}
 {
-  "name": "Level 1 Category Hub",
+  "name": "Level 1 Collection Hub",
   "tag": "section",
   "class": "section-level1-hub",
   "settings": [
     {
+      "type": "header",
+      "content": "Menu Settings"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Navigation Menu",
+      "info": "Select the menu with L1 > L2 > L3 hierarchy"
+    },
+    {
+      "type": "header",
+      "content": "Hero Banner"
+    },
+    {
+      "type": "text",
+      "id": "hero_tagline",
+      "label": "Tagline",
+      "default": "Professional Grade"
+    },
+    {
+      "type": "header",
+      "content": "Main Categories"
+    },
+    {
+      "type": "text",
+      "id": "main_categories_title",
+      "label": "Section Title",
+      "default": "Shop By Category"
+    },
+    {
+      "type": "header",
+      "content": "Icon Row"
+    },
+    {
       "type": "checkbox",
-      "id": "show_thumbnails",
-      "label": "Show thumbnail navigation",
+      "id": "show_icon_row",
+      "label": "Show Icon Row",
       "default": true
+    },
+    {
+      "type": "header",
+      "content": "Secondary Categories"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_categories",
+      "label": "Show Secondary Categories",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "secondary_categories_title",
+      "label": "Section Title",
+      "default": "More Categories"
+    },
+    {
+      "type": "header",
+      "content": "Brands Row"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_brands_row",
+      "label": "Show Brands Row",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "brands_title",
+      "label": "Brands Title",
+      "default": "Trusted Brands We Carry"
+    },
+    {
+      "type": "header",
+      "content": "Top Products"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_products",
+      "label": "Show Top Products",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "products_title",
+      "label": "Section Title",
+      "default": "Top Products"
+    },
+    {
+      "type": "collection",
+      "id": "featured_collection",
+      "label": "Featured Collection",
+      "info": "Leave blank to use current collection"
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "label": "Number of Products",
+      "min": 4,
+      "max": 12,
+      "step": 1,
+      "default": 6
+    }
+  ],
+  "blocks": [
+    {
+      "type": "icon_category",
+      "name": "Icon Category",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "Icon Image",
+          "info": "80x80px recommended"
+        },
+        {
+          "type": "text",
+          "id": "icon_label",
+          "label": "Label",
+          "default": "Category"
+        },
+        {
+          "type": "url",
+          "id": "icon_url",
+          "label": "Link URL"
+        }
+      ]
+    },
+    {
+      "type": "brand_logo",
+      "name": "Brand Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "logo_image",
+          "label": "Logo Image"
+        },
+        {
+          "type": "text",
+          "id": "brand_name",
+          "label": "Brand Name",
+          "default": "Brand"
+        },
+        {
+          "type": "text",
+          "id": "brand_subtitle",
+          "label": "Subtitle"
+        },
+        {
+          "type": "url",
+          "id": "brand_url",
+          "label": "Brand URL"
+        }
+      ]
     }
   ],
   "presets": [
     {
-      "name": "Level 1 Category Hub"
+      "name": "Level 1 Collection Hub",
+      "blocks": [
+        { "type": "brand_logo", "settings": { "brand_name": "Avantco", "brand_subtitle": "Refrigeration" } },
+        { "type": "brand_logo", "settings": { "brand_name": "CPG", "brand_subtitle": "Cooking Performance" } },
+        { "type": "brand_logo", "settings": { "brand_name": "REGENCY" } },
+        { "type": "brand_logo", "settings": { "brand_name": "NOBLE", "brand_subtitle": "Warewashing" } },
+        { "type": "brand_logo", "settings": { "brand_name": "VULCAN" } },
+        { "type": "brand_logo", "settings": { "brand_name": "Scotsman", "brand_subtitle": "Ice Systems" } },
+        { "type": "brand_logo", "settings": { "brand_name": "VOLLRATH" } }
+      ]
     }
   ]
 }

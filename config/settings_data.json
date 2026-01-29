@@ -122,7 +122,7 @@
     "predictive_search_show_vendor": false,
     "predictive_search_show_price": false,
     "currency_code_enabled": true,
-    "cart_type": "notification",
+    "cart_type": "drawer",
     "show_vendor": false,
     "show_cart_note": false,
     "cart_drawer_collection": "",
@@ -345,8 +345,112 @@
           "show_expert_help": true,
           "expert_help_label": "Get In Touch",
           "expert_help_phone": "(408) 673-9999",
-          "main_menu": "cf-mega-menu",
+          "main_menu": "cf-menu-31-12-2026",
           "nav_icon_size": 28
+        }
+      },
+      "header-compact": {
+        "type": "header-compact",
+        "blocks": {
+          "mega_menu_restaurant": {
+            "type": "mega_menu_thumbnails",
+            "settings": {
+              "menu_item_title": "Restaurant Equipment",
+              "more_items_menu": "restaurant-equipment-more"
+            }
+          },
+          "mega_menu_refrigeration": {
+            "type": "mega_menu_thumbnails",
+            "settings": {
+              "menu_item_title": "Refrigeration",
+              "more_items_menu": "refrigeration-more"
+            }
+          },
+          "mega_menu_smallwares": {
+            "type": "mega_menu_thumbnails",
+            "settings": {
+              "menu_item_title": "Smallwares",
+              "more_items_menu": "smallwares-more"
+            }
+          },
+          "mega_menu_tabletop": {
+            "type": "mega_menu_thumbnails",
+            "settings": {
+              "menu_item_title": "Tabletop",
+              "more_items_menu": "tabletop-more"
+            }
+          },
+          "mega_menu_indian": {
+            "type": "mega_menu_thumbnails",
+            "settings": {
+              "menu_item_title": "Indian Specialty",
+              "more_items_menu": "indian-specialty-more"
+            }
+          },
+          "mega_menu_storage": {
+            "type": "mega_menu_thumbnails",
+            "settings": {
+              "menu_item_title": "Storage and Transport",
+              "more_items_menu": "storage-and-transport-more"
+            }
+          },
+          "logo_grid_brands": {
+            "type": "logo_grid",
+            "settings": {
+              "menu_item_title": "Shop by Brands",
+              "logos_per_row": 8,
+              "show_view_all": true,
+              "view_all_url": "/collections/vendors",
+              "view_all_text": "View All Brands"
+            }
+          },
+          "brand_atosa": {
+            "type": "logo_grid_item",
+            "settings": {
+              "parent_menu_title": "Shop by Brands",
+              "brand_name": "ATOSA",
+              "brand_url": "/collections/atosa-reach-ins"
+            }
+          },
+          "brand_turbo_air": {
+            "type": "logo_grid_item",
+            "settings": {
+              "parent_menu_title": "Shop by Brands",
+              "brand_name": "Turbo Air",
+              "brand_url": "/collections/turbo-air"
+            }
+          },
+          "brand_waring": {
+            "type": "logo_grid_item",
+            "settings": {
+              "parent_menu_title": "Shop by Brands",
+              "brand_name": "Waring",
+              "brand_url": "/collections/waring-all"
+            }
+          }
+        },
+        "block_order": [
+          "mega_menu_restaurant",
+          "mega_menu_refrigeration",
+          "mega_menu_smallwares",
+          "mega_menu_tabletop",
+          "mega_menu_indian",
+          "mega_menu_storage",
+          "logo_grid_brands",
+          "brand_atosa",
+          "brand_turbo_air",
+          "brand_waring"
+        ],
+        "settings": {
+          "logo": "shopify://shop_images/celebrate-logo.png",
+          "sidebar_logo_height": 55,
+          "sidebar_logo_max_width": 180,
+          "search_placeholder": "Search 10,000+ products...",
+          "show_expert_help": true,
+          "expert_help_label": "Get In Touch",
+          "expert_help_phone": "(408) 673-9999",
+          "main_menu": "cf-menu-31-12-2026",
+          "nav_icon_size": 20
         }
       },
       "custom-footer": {
@@ -774,7 +878,7 @@
       "predictive_search_show_vendor": false,
       "predictive_search_show_price": false,
       "currency_code_enabled": true,
-      "cart_type": "notification",
+      "cart_type": "drawer",
       "show_vendor": false,
       "show_cart_note": false,
       "cart_drawer_collection": "",

@@ -736,13 +736,9 @@
   font-size: 13px;
   font-weight: 600;
   color: var(--cf-deep-blue);
-  min-height: 54px;
   margin-bottom: 8px;
   line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  display: block;
   text-decoration: none;
   transition: color 0.2s ease;
 }
@@ -782,7 +778,152 @@
   margin-bottom: 12px;
 }
 
-/* Price Box - Gradient Background */
+/* ========== PRICING SECTIONS - THREE MODES ========== */
+
+/* PUBLIC VIEW - Single Price (Restricted Products) - Gray box */
+.l3-price-single {
+  text-align: center;
+  padding: 8px 10px;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.l3-price-single .l3-price-label {
+  font-size: 10px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.l3-price-single .l3-price-main {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: #1a365d;
+  letter-spacing: -0.5px;
+}
+
+.l3-price-single .l3-price-unit {
+  font-size: 12px;
+  font-weight: 400;
+  color: #64748b;
+}
+
+/* PUBLIC VIEW - Dual Price (Own Brand Products) - Dark blue gradient */
+.l3-price-dual {
+  padding: 8px 10px;
+  background: linear-gradient(135deg, #1a365d 0%, #2d5a87 100%);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.l3-price-dual::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #d4af37, #1a365d, #d4af37);
+}
+
+.l3-price-dual .l3-member-price-label {
+  font-size: 9px;
+  color: rgba(255,255,255,0.8);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.l3-price-dual .l3-member-price-amount {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+
+.l3-price-dual .l3-regular-price-strike {
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+}
+
+.l3-price-dual .l3-regular-price-strike s {
+  text-decoration: line-through;
+}
+
+.l3-price-dual .l3-savings-tag {
+  text-align: center;
+  font-size: 10px;
+  color: #d4af37;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+/* MEMBER VIEW - Subtle styling */
+.l3-price-member-view {
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  position: relative;
+  border: 1px solid #e2e8f0;
+}
+
+.l3-price-member-view::before {
+  content: 'Member Price';
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  color: #64748b;
+  text-align: center;
+  margin-bottom: 2px;
+  letter-spacing: 0.3px;
+}
+
+.l3-price-member-view .l3-member-view-price {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #ff6b6b;
+  text-align: center;
+  letter-spacing: -0.3px;
+  margin-bottom: 2px;
+}
+
+.l3-price-member-view .l3-member-view-regular {
+  text-align: center;
+  font-size: 11px;
+  color: #94a3b8;
+  margin-bottom: 2px;
+}
+
+.l3-price-member-view .l3-member-view-regular s {
+  text-decoration: line-through;
+}
+
+.l3-price-member-view .l3-member-view-savings {
+  text-align: center;
+  font-size: 10px;
+  color: #10b981;
+  font-weight: 600;
+}
+
+.l3-price-member-view .l3-price-unit {
+  font-size: 11px;
+  font-weight: 400;
+  color: #94a3b8;
+}
+
+/* Legacy Price Box Support (for transition) */
 .l3-price-box {
   background: linear-gradient(135deg, var(--cf-pale-blue) 0%, #eff6ff 100%);
   border: 1px solid rgba(45, 90, 135, 0.2);
@@ -830,6 +971,44 @@
   background: rgba(16, 185, 129, 0.1);
   border-radius: 4px;
   display: inline-block;
+}
+
+/* Member badge on image */
+.l3-member-badge {
+  position: absolute;
+  top: 50px;
+  left: 16px;
+  background: #1a365d;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 2;
+}
+
+/* Voltage badge */
+.l3-voltage-badge {
+  position: absolute;
+  top: 50px;
+  left: 16px;
+  background: #2d5a87;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  z-index: 2;
+}
+
+.l3-member-badge + .l3-voltage-badge,
+.l3-voltage-badge + .l3-member-badge {
+  top: 80px;
 }
 
 /* Login for Member Price Link */
@@ -1914,41 +2093,120 @@
                   assign product_sku = product.selected_or_first_available_variant.sku
                   assign fuel_type = product.metafields.custom.fuel_type.value
                   assign product_badge = product.metafields.custom.badge.value
-                  assign member_price = nil
-                  assign price_source = 'none'
-                  assign has_member_pricing = false
-                  if product.metafields.wsh.wholesale_price
-                    assign member_price = product.metafields.wsh.wholesale_price
-                    assign price_source = 'wsh-plugin'
-                    assign has_member_pricing = true
-                  elsif product.compare_at_price > product.price
-                    assign member_price = product.price
-                    assign price_source = 'sale-price'
-                    assign has_member_pricing = true
-                  endif
-                  assign savings_amount = nil
-                  if has_member_pricing and member_price
-                    assign savings_amount = product.compare_at_price | minus: product.price
+
+                  comment
+                    Check if customer is a member (logged in with wholesale tags)
+                  endcomment
+                  assign is_member = false
+                  if customer
+                    for tag in customer.tags
+                      assign tag_lower = tag | downcase
+                      if tag_lower contains 'wholesale' or tag_lower contains 'plus' or tag_lower contains 'member' or tag_lower contains 'cph' or tag_lower contains 'rou' or tag_lower contains 'margin'
+                        assign is_member = true
+                        break
+                      endif
+                    endfor
                   endif
 
-                  {% comment %} Build images array properly for hover effect {% endcomment %}
-                  {% assign images_array = '' %}
-                  {% for media in product.media limit: 5 %}
-                    {% if media.media_type == 'image' %}
-                      {% assign img_url = media.preview_image | image_url: width: 400 %}
-                      {% if images_array == '' %}
-                        {% assign images_array = img_url %}
-                      {% else %}
-                        {% assign images_array = images_array | append: '|||' | append: img_url %}
-                      {% endif %}
-                    {% endif %}
-                  {% endfor %}
-                  {% assign images_split = images_array | split: '|||' %}
-                  {% assign images_json = images_split | json %}
+                  comment
+                    Check if product is own-brand (Celebrate Festival Inc)
+                  endcomment
+                  assign is_own_brand = false
+                  assign vendor_lower = product.vendor | downcase
+                  if vendor_lower contains 'celebrate festival' or vendor_lower contains 'celebratefest'
+                    assign is_own_brand = true
+                  endif
 
-                  {% assign product_tags_joined = product.tags | join: ',' %}
+                  comment
+                    Get voltage/power info from tags
+                  endcomment
+                  assign voltage_badge = blank
+                  for tag in product.tags
+                    assign tag_lower = tag | downcase
+                    if tag_lower contains 'volt' or tag_lower contains '115v' or tag_lower contains '208v' or tag_lower contains '220v' or tag_lower contains '240v'
+                      assign voltage_badge = tag
+                      break
+                    endif
+                  endfor
+
+                  comment
+                    WSH Pricing - capture output to get variables
+                  endcomment
                 -%}
-                <div class="l3-product-card" data-product-id="{{ product.id }}" data-images="{{ images_json | escape }}" data-category="{{ sub_handle }}" data-vendor="{{ product.vendor | handleize }}" data-tags="{{ product_tags_joined | handleize }}">
+                {%- capture wcp_output -%}
+                  {%- render 'wcp_discount', wcp_discount: product, wpd_is_render: 'yes' -%}
+                {%- endcapture -%}
+                {%- liquid
+                  comment
+                    Parse WSH price output (pipe-delimited)
+                  endcomment
+                  assign wcp_output_clean = wcp_output | strip
+                  assign wcp_values = wcp_output_clean | split: '|'
+                  assign wcp_price = wcp_values[0] | plus: 0
+
+                  comment
+                    WSH Pricing Logic:
+                    Case 1: Individual variant pricing - wcp_price < product.price
+                    Case 2: Bulk discount - compare_at_price > product.price
+                  endcomment
+                  assign retail_price = product.price
+                  assign member_price = product.price
+                  assign has_wholesale_price = false
+
+                  if wcp_price != blank and wcp_price > 0 and wcp_price < product.price
+                    assign has_wholesale_price = true
+                    assign retail_price = product.price
+                    assign member_price = wcp_price
+                  elsif product.compare_at_price != blank and product.compare_at_price > product.price
+                    assign has_wholesale_price = true
+                    assign retail_price = product.compare_at_price
+                    assign member_price = product.price
+                  endif
+
+                  comment
+                    Calculate savings for display
+                  endcomment
+                  assign savings_amount = 0
+                  assign savings_percent = 0
+                  if has_wholesale_price and retail_price > member_price
+                    assign savings_amount = retail_price | minus: member_price
+                    assign savings_percent = savings_amount | times: 100.0 | divided_by: retail_price | round
+                  endif
+
+                  comment
+                    Determine pricing display mode:
+                    - price-single: Non-member viewing restricted product (retail only)
+                    - price-dual: Non-member viewing own-brand product (both prices)
+                    - price-member-view: Member viewing any product (member pricing)
+                  endcomment
+                  assign pricing_mode = 'price-single'
+                  if is_member and has_wholesale_price
+                    assign pricing_mode = 'price-member-view'
+                  elsif is_member
+                    assign pricing_mode = 'price-member-view'
+                  elsif is_own_brand and has_wholesale_price
+                    assign pricing_mode = 'price-dual'
+                  endif
+
+                  comment
+                    Build images array properly for hover effect
+                  endcomment
+                  assign images_array = ''
+                  for media in product.media limit: 5
+                    if media.media_type == 'image'
+                      assign img_url = media.preview_image | image_url: width: 400
+                      if images_array == ''
+                        assign images_array = img_url
+                      else
+                        assign images_array = images_array | append: '|||' | append: img_url
+                      endif
+                    endif
+                  endfor
+                  assign images_split = images_array | split: '|||'
+                  assign images_json = images_split | json
+                -%}
+
+                <div class="l3-product-card" data-product-id="{{ product.id }}" data-images="{{ images_json | escape }}">
                   {%- if product_badge != blank -%}
                     <span class="l3-product-badge">{{ product_badge }}</span>
                   {%- elsif on_sale -%}
@@ -1956,6 +2214,17 @@
                   {%- elsif product.tags contains 'new' -%}
                     <span class="l3-product-badge">New</span>
                   {%- endif -%}
+
+                  {%- comment -%} Member badge for own-brand products shown to non-members {%- endcomment -%}
+                  {%- if is_own_brand and has_wholesale_price and is_member == false -%}
+                    <span class="l3-member-badge">Member Pricing</span>
+                  {%- endif -%}
+
+                  {%- comment -%} Voltage badge {%- endcomment -%}
+                  {%- if voltage_badge != blank -%}
+                    <span class="l3-voltage-badge">{{ voltage_badge }}</span>
+                  {%- endif -%}
+
                   <a href="{{ product.url }}" class="l3-product-image">
                     {%- if product.featured_media -%}
                       <img src="{{ product.featured_media | image_url: width: 320 }}" alt="{{ product.featured_media.alt | escape }}" loading="lazy" class="l3-image-primary" width="160" height="160">
@@ -1979,9 +2248,42 @@
                   {%- if product_sku != blank -%}
                     <div class="l3-product-sku">#{{ product_sku }}</div>
                   {%- endif -%}
-                  <div class="l3-price-box">
-                    <div class="l3-price-main">{{ product.price | money }}<span class="l3-price-unit">/Each</span></div>
-                  </div>
+
+                  {%- comment -%} THREE-MODE PRICING DISPLAY {%- endcomment -%}
+                  {%- case pricing_mode -%}
+                    {%- when 'price-member-view' -%}
+                      {%- comment -%} MEMBER VIEW - Always shows member pricing with coral border {%- endcomment -%}
+                      <div class="l3-price-member-view">
+                        <div class="l3-member-view-price">
+                          {%- if has_wholesale_price -%}
+                            {{ member_price | money }}<span class="l3-price-unit">/Each</span>
+                          {%- else -%}
+                            {{ product.price | money }}<span class="l3-price-unit">/Each</span>
+                          {%- endif -%}
+                        </div>
+                        {%- if has_wholesale_price -%}
+                          <div class="l3-member-view-regular">Retail: <s>{{ retail_price | money }}</s></div>
+                          <div class="l3-member-view-savings">You Save {{ savings_amount | money }}</div>
+                        {%- endif -%}
+                      </div>
+
+                    {%- when 'price-dual' -%}
+                      {%- comment -%} PUBLIC VIEW - Own Brand Products: Show both prices {%- endcomment -%}
+                      <div class="l3-price-dual">
+                        <div class="l3-member-price-label">Member Price</div>
+                        <div class="l3-member-price-amount">{{ member_price | money }}</div>
+                        <div class="l3-regular-price-strike">Retail: <s>{{ retail_price | money }}</s></div>
+                        <div class="l3-savings-tag">Save {{ savings_amount | money }} ({{ savings_percent }}%)</div>
+                      </div>
+
+                    {%- else -%}
+                      {%- comment -%} PUBLIC VIEW - Restricted Products: Single retail price only {%- endcomment -%}
+                      <div class="l3-price-single">
+                        <div class="l3-price-label">Retail Price</div>
+                        <div class="l3-price-main">{{ product.price | money }}<span class="l3-price-unit">/Each</span></div>
+                      </div>
+                  {%- endcase -%}
+
                   {%- if shipment_text != blank -%}
                     <span class="l3-shipping {{ shipping_class }}">{{ shipment_text }}</span>
                   {%- endif -%}
@@ -2033,51 +2335,97 @@
               assign product_badge = product.metafields.custom.badge.value
 
               comment
-                Comprehensive Member Pricing Logic (WSH Wholesale Plugin Integration)
-                Priority: WSH Plugin > Wholesale Plugin > Custom Metafield > Compare Price > Calculated
+                Check if customer is a member (logged in with wholesale tags)
               endcomment
-              assign member_price = nil
-              assign price_source = 'none'
-              assign has_member_pricing = false
-
-              comment
-                Try WSH Wholesale Plugin metafield paths
-              endcomment
-              if product.metafields.wsh.wholesale_price
-                assign member_price = product.metafields.wsh.wholesale_price
-                assign price_source = 'wsh-plugin'
-                assign has_member_pricing = true
-              elsif product.metafields.wholesale.price
-                assign member_price = product.metafields.wholesale.price
-                assign price_source = 'wholesale-plugin'
-                assign has_member_pricing = true
-              elsif product.metafields.custom.wholesale_price
-                assign member_price = product.metafields.custom.wholesale_price
-                assign price_source = 'custom-wholesale'
-                assign has_member_pricing = true
-              elsif product.metafields.custom.member_price
-                assign member_price = product.metafields.custom.member_price.value
-                assign price_source = 'custom-member'
-                assign has_member_pricing = true
-              elsif on_sale
-                comment
-                  Use sale price as member price
-                endcomment
-                assign member_price = product.price
-                assign price_source = 'sale-price'
-                assign has_member_pricing = true
+              assign is_member = false
+              if customer
+                for tag in customer.tags
+                  assign tag_lower = tag | downcase
+                  if tag_lower contains 'wholesale' or tag_lower contains 'plus' or tag_lower contains 'member' or tag_lower contains 'cph' or tag_lower contains 'rou' or tag_lower contains 'margin'
+                    assign is_member = true
+                    break
+                  endif
+                endfor
               endif
 
               comment
-                Calculate savings if member pricing exists
+                Check if product is own-brand (Celebrate Festival Inc)
               endcomment
-              assign savings_amount = nil
-              if has_member_pricing and member_price
-                if price_source == 'sale-price'
-                  assign savings_amount = product.compare_at_price | minus: product.price
-                else
-                  assign savings_amount = product.price | minus: member_price
+              assign is_own_brand = false
+              assign vendor_lower = product.vendor | downcase
+              if vendor_lower contains 'celebrate festival' or vendor_lower contains 'celebratefest'
+                assign is_own_brand = true
+              endif
+
+              comment
+                Get voltage/power info from tags
+              endcomment
+              assign voltage_badge = blank
+              for tag in product.tags
+                assign tag_lower = tag | downcase
+                if tag_lower contains 'volt' or tag_lower contains '115v' or tag_lower contains '208v' or tag_lower contains '220v' or tag_lower contains '240v'
+                  assign voltage_badge = tag
+                  break
                 endif
+              endfor
+
+              comment
+                WSH Pricing - capture output to get variables
+              endcomment
+            -%}
+            {%- capture wcp_output -%}
+              {%- render 'wcp_discount', wcp_discount: product, wpd_is_render: 'yes' -%}
+            {%- endcapture -%}
+            {%- liquid
+              comment
+                Parse WSH price output (pipe-delimited)
+              endcomment
+              assign wcp_output_clean = wcp_output | strip
+              assign wcp_values = wcp_output_clean | split: '|'
+              assign wcp_price = wcp_values[0] | plus: 0
+
+              comment
+                WSH Pricing Logic:
+                Case 1: Individual variant pricing - wcp_price < product.price
+                Case 2: Bulk discount - compare_at_price > product.price
+              endcomment
+              assign retail_price = product.price
+              assign member_price = product.price
+              assign has_wholesale_price = false
+
+              if wcp_price != blank and wcp_price > 0 and wcp_price < product.price
+                assign has_wholesale_price = true
+                assign retail_price = product.price
+                assign member_price = wcp_price
+              elsif product.compare_at_price != blank and product.compare_at_price > product.price
+                assign has_wholesale_price = true
+                assign retail_price = product.compare_at_price
+                assign member_price = product.price
+              endif
+
+              comment
+                Calculate savings for display
+              endcomment
+              assign savings_amount = 0
+              assign savings_percent = 0
+              if has_wholesale_price and retail_price > member_price
+                assign savings_amount = retail_price | minus: member_price
+                assign savings_percent = savings_amount | times: 100.0 | divided_by: retail_price | round
+              endif
+
+              comment
+                Determine pricing display mode:
+                - price-single: Non-member viewing restricted product (retail only)
+                - price-dual: Non-member viewing own-brand product (both prices)
+                - price-member-view: Member viewing any product (member pricing)
+              endcomment
+              assign pricing_mode = 'price-single'
+              if is_member and has_wholesale_price
+                assign pricing_mode = 'price-member-view'
+              elsif is_member
+                assign pricing_mode = 'price-member-view'
+              elsif is_own_brand and has_wholesale_price
+                assign pricing_mode = 'price-dual'
               endif
 
               comment
@@ -2107,6 +2455,16 @@
                 <span class="l3-product-badge">Sale</span>
               {%- elsif product.tags contains 'new' -%}
                 <span class="l3-product-badge">New</span>
+              {%- endif -%}
+
+              {%- comment -%} Member badge for own-brand products shown to non-members {%- endcomment -%}
+              {%- if is_own_brand and has_wholesale_price and is_member == false -%}
+                <span class="l3-member-badge">Member Pricing</span>
+              {%- endif -%}
+
+              {%- comment -%} Voltage badge {%- endcomment -%}
+              {%- if voltage_badge != blank -%}
+                <span class="l3-voltage-badge">{{ voltage_badge }}</span>
               {%- endif -%}
 
               <!-- Product Image -->
@@ -2173,46 +2531,40 @@
                 <div class="l3-product-sku">#{{ product_sku }}</div>
               {%- endif -%}
 
-              <!-- Price Box -->
-              <div class="l3-price-box" data-price-source="{{ price_source }}">
-                {%- if has_member_pricing and price_source == 'sale-price' -%}
-                  {%- comment -%} Sale price - show to everyone (it's a public sale) {%- endcomment -%}
-                  <div class="l3-price-label">Sale Price</div>
-                  <div class="l3-price-main">{{ product.price | money }}<span class="l3-price-unit">/Each</span></div>
-                  <div class="l3-price-regular">Regularly {{ product.compare_at_price | money }}</div>
-                  {%- if savings_amount and savings_amount > 0 -%}
-                    <div class="l3-savings">Save {{ savings_amount | money }}</div>
-                  {%- endif -%}
-                {%- elsif has_member_pricing and member_price -%}
-                  {%- comment -%} Wholesale/Member price - only show if logged in {%- endcomment -%}
-                  {%- if customer -%}
-                    {%- comment -%} Customer is logged in - show member price {%- endcomment -%}
-                    <div class="l3-price-label">Member Price</div>
-                    {%- comment -%} Handle different price formats - if already in cents use money directly, else multiply {%- endcomment -%}
-                    {%- if member_price > 1000 -%}
-                      {%- comment -%} Likely already in cents {%- endcomment -%}
-                      <div class="l3-price-main">{{ member_price | money }}<span class="l3-price-unit">/Each</span></div>
-                    {%- else -%}
-                      {%- comment -%} Likely in dollars, convert to cents {%- endcomment -%}
-                      <div class="l3-price-main">{{ member_price | times: 100 | money }}<span class="l3-price-unit">/Each</span></div>
+              {%- comment -%} THREE-MODE PRICING DISPLAY {%- endcomment -%}
+              {%- case pricing_mode -%}
+                {%- when 'price-member-view' -%}
+                  {%- comment -%} MEMBER VIEW - Always shows member pricing with coral border {%- endcomment -%}
+                  <div class="l3-price-member-view">
+                    <div class="l3-member-view-price">
+                      {%- if has_wholesale_price -%}
+                        {{ member_price | money }}<span class="l3-price-unit">/Each</span>
+                      {%- else -%}
+                        {{ product.price | money }}<span class="l3-price-unit">/Each</span>
+                      {%- endif -%}
+                    </div>
+                    {%- if has_wholesale_price -%}
+                      <div class="l3-member-view-regular">Retail: <s>{{ retail_price | money }}</s></div>
+                      <div class="l3-member-view-savings">You Save {{ savings_amount | money }}</div>
                     {%- endif -%}
-                    <div class="l3-price-regular">Regularly {{ product.price | money }}</div>
-                    {%- if savings_amount and savings_amount > 0 -%}
-                      <div class="l3-savings">Save {{ savings_amount | money }}</div>
-                    {%- endif -%}
-                  {%- else -%}
-                    {%- comment -%} Customer not logged in - show login prompt {%- endcomment -%}
-                    <div class="l3-price-main">{{ product.price | money }}<span class="l3-price-unit">/Each</span></div>
-                    <a href="{{ routes.account_login_url }}" class="l3-login-for-price">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                      Login for Member Price
-                    </a>
-                  {%- endif -%}
+                  </div>
+
+                {%- when 'price-dual' -%}
+                  {%- comment -%} PUBLIC VIEW - Own Brand Products: Show both prices {%- endcomment -%}
+                  <div class="l3-price-dual">
+                    <div class="l3-member-price-label">Member Price</div>
+                    <div class="l3-member-price-amount">{{ member_price | money }}</div>
+                    <div class="l3-regular-price-strike">Retail: <s>{{ retail_price | money }}</s></div>
+                    <div class="l3-savings-tag">Save {{ savings_amount | money }} ({{ savings_percent }}%)</div>
+                  </div>
+
                 {%- else -%}
-                  {%- comment -%} Standard pricing {%- endcomment -%}
-                  <div class="l3-price-main">{{ product.price | money }}<span class="l3-price-unit">/Each</span></div>
-                {%- endif -%}
-              </div>
+                  {%- comment -%} PUBLIC VIEW - Restricted Products: Single retail price only {%- endcomment -%}
+                  <div class="l3-price-single">
+                    <div class="l3-price-label">Retail Price</div>
+                    <div class="l3-price-main">{{ product.price | money }}<span class="l3-price-unit">/Each</span></div>
+                  </div>
+              {%- endcase -%}
 
               <!-- Shipping Badge from Metafield -->
               {%- if shipment_text != blank -%}
@@ -2694,17 +3046,9 @@
                 cartCountBubble.textContent = cart.item_count;
               }
 
-              // Open cart drawer (using custom quick-cart implementation)
-              // Use global openCartDrawer function from cart-integration.js
-              if (typeof window.openCartDrawer === 'function') {
-                window.openCartDrawer();
-              } else {
-                // Fallback: Try to open custom cart drawer directly
-                const customCartDrawer = document.getElementById('cartDrawer');
-                if (customCartDrawer) {
-                  customCartDrawer.classList.add('active');
-                  document.body.style.overflow = 'hidden';
-                }
+              // Show toast notification instead of opening cart drawer
+              if (typeof window.cfShowCartToast === 'function') {
+                window.cfShowCartToast(data, quantity);
               }
             });
 

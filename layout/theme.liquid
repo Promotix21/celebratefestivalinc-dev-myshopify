@@ -15,6 +15,11 @@
       <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
     {%- endunless -%}
 
+    <!-- Celebrate Festival Custom Fonts: Playfair Display & DM Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <title>
       {{ page_title }}
       {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
@@ -31,6 +36,7 @@
     <script src="{{ 'constants.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'pubsub.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'wishlist.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'details-disclosure.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'details-modal.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'search-form.js' | asset_url }}" defer="defer"></script>
@@ -256,6 +262,9 @@
     {% endstyle %}
 
     {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'compact-spacing.css' | asset_url | stylesheet_tag }}
+    {{ 'wishlist.css' | asset_url | stylesheet_tag }}
+    {{ 'cart-toast.css' | asset_url | stylesheet_tag }}
     <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
 
     {%- if settings.cart_type == 'drawer' -%}
@@ -306,9 +315,12 @@
       {{ 'accessibility.skip_to_text' | t }}
     </a>
 
+    {%- comment -%}
+    Shopify native cart-drawer removed - using custom quick-cart instead
     {%- if settings.cart_type == 'drawer' -%}
       {%- render 'cart-drawer' -%}
     {%- endif -%}
+    {%- endcomment -%}
 
     {% section 'enhanced-header' %}
 
@@ -372,12 +384,29 @@
       <script src="{{ 'predictive-search.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
 
+    {%- comment -%}
+    Native cart-drawer.js removed - using cart-integration.js instead
     {%- if settings.cart_type == 'drawer' -%}
       <script src="{{ 'cart-drawer.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
+    {%- endcomment -%}
 
+    {% comment %}
+      Custom Quick Cart Implementation
+      Note: This overrides the native Shopify cart-drawer with custom functionality.
+      Bug fixes applied (Jan 2026):
+      - Fixed overlay click to close cart
+      - Fixed cart sidebar not appearing on add-to-cart
+      - Fixed order notes staying selected when clicking outside
+    {% endcomment %}
     {% render 'quick-cart' %}
-<script src="{{ 'cart-integration.js' | asset_url }}" defer></script>
+    <script src="{{ 'cart-toast.js' | asset_url }}" defer></script>
+    <script src="{{ 'cart-integration.js' | asset_url }}" defer></script>
+
+    {%- comment -%} WSH Wholesale Pricing - Cart Integration {%- endcomment -%}
+    {%- if customer.tags.size > 0 and template == 'cart' -%}
+      {%- render 'wcp_cart' -%}
+    {%- endif -%}
 
   </body>
 </html>

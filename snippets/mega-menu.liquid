@@ -13,10 +13,21 @@ MEGA-MENU.LIQUID - Full Width Mega Menu
   {% endif %}
 {% endfor %}
 
+{% comment %}
+  COLLECTION HANDLE FALLBACK HELPER
+  Try to find collection with or without "new-theme-" prefix
+{% endcomment %}
+{%- capture collection_lookup_helper -%}
+  {%- comment -%}
+    This helper is used inline when looking up collections.
+    If the handle doesn't find a collection, try with new-theme- prefix.
+  {%- endcomment -%}
+{%- endcapture -%}
+
 {% if mega_menu_block and link.links.size > 0 %}
 <div class="mega-menu">
   <div class="mega-menu-container">
-    
+
     {% comment %} Optional: Remove debug info in production {% endcomment %}
     {% if section.settings.show_debug_info %}
     <div class="debug-info">
@@ -25,27 +36,157 @@ MEGA-MENU.LIQUID - Full Width Mega Menu
       Columns: {{ mega_menu_block.settings.columns | default: 3 }} | Promo: {% if mega_menu_block.settings.promo_image %}✅{% else %}❌{% endif %}
     </div>
     {% endif %}
-    
+
     <div class="mega-menu-grid">
       <!-- Left Side: Menu Content Grid -->
       <div class="mega-menu-content-grid" style="grid-template-columns: repeat({{ mega_menu_block.settings.columns | default: 3 }}, 1fr);">
         {% for child_link in link.links %}
+          {% comment %} Get handle from URL and apply correction mapping {% endcomment %}
+          {% assign child_handle = child_link.url | split: '/' | last | split: '?' | first %}
+
+          {% comment %} Apply handle correction mapping - inline for reliability {% endcomment %}
+          {% assign corrected_handle = child_handle %}
+          {% case child_handle %}
+            {% when 'new-theme-griddles' or 'griddles' %}{% assign corrected_handle = 'new-theme-gas-griddles' %}
+            {% when 'new-theme-gas-fryer' or 'gas-fryer' %}{% assign corrected_handle = 'new-theme-electric-fryer-copy' %}
+            {% when 'new-theme-deep-fryer' or 'deep-fryer' %}{% assign corrected_handle = 'new-theme-gas-fryer-copy' %}
+            {% when 'new-theme-combination-ovens' or 'combination-ovens' %}{% assign corrected_handle = 'new-theme-convection-ovens-copy' %}
+            {% when 'new-theme-hold-ovens-cabinets' or 'hold-ovens-cabinets' %}{% assign corrected_handle = 'new-theme-oven-cabinets' %}
+            {% when 'new-theme-commercial-sealers' or 'commercial-sealers' %}{% assign corrected_handle = 'new-theme-vacuum-sealers' %}
+            {% when 'new-theme-work-tables' or 'work-tables' %}{% assign corrected_handle = 'new-theme-stainless-steel-work-tables-with-undershelves' %}
+            {% when 'compartment-sinks' or 'one-compartment-sinks' %}{% assign corrected_handle = 'new-them-one-compartment-sinks' %}
+            {% when 'new-theme-back-bar-coolers' or 'back-bar-coolers' %}{% assign corrected_handle = 'new-theme-bar-coolers' %}
+            {% when 'new-theme-commercial-wine-coolers' or 'commercial-wine-coolers' %}{% assign corrected_handle = 'new-theme-wine-coolers' %}
+            {% when 'new-theme-meat-and-deli-display' or 'meat-and-deli-display' %}{% assign corrected_handle = 'new-theme-meat-cases' %}
+            {% when 'new-theme-undercounter-ice-machines' or 'undercounter-ice-machines' %}{% assign corrected_handle = 'new-them-undercounter-ice-machines' %}
+            {% when 'new-theme-worktop-refrigerators' %}{% assign corrected_handle = 'worktop-refrigerators' %}
+            {% when 'new-theme-milk-coolers' or 'milk-coolers' %}{% assign corrected_handle = 'new-theme-milk-cooler' %}
+            {% when 'new-theme-dish-tray-carts-and-dollies' %}{% assign corrected_handle = 'new-theme-platform-trucks' %}
+            {% when 'new-theme-pizza-pan-racks' or 'pizza-pan-racks' %}{% assign corrected_handle = 'new-theme-steam-table-pan-racks' %}
+            {% when 'new-theme-storage-racks' or 'storage-racks' %}{% assign corrected_handle = 'chrome' %}
+            {% when 'new-theme-wire-shelving' or 'wire-shelving' %}{% assign corrected_handle = 'new-theme-restaurant-shelving' %}
+            {% when 'new-theme-china-mugs' or 'china-mugs' %}{% assign corrected_handle = 'test' %}
+            {% when 'new-theme-china-plates' or 'china-plates' %}{% assign corrected_handle = 'new-theme-china-dinnerware' %}
+            {% when 'new-theme-melamine-mugs' or 'melamine-mugs' %}{% assign corrected_handle = 'mugs' %}
+            {% when 'new-theme-melamine-platters' or 'melamine-platters' %}{% assign corrected_handle = 'new-theme-melamine-trays' %}
+            {% when 'new-theme-plastic-barware' %}{% assign corrected_handle = 'new-theme-stoneware-bowls' %}
+            {% when 'new-theme-plastic-tumblers' %}{% assign corrected_handle = 'test-1' %}
+            {% when 'new-theme-china-cups' or 'china-cups' %}{% assign corrected_handle = 'new-theme-china-cups-mugs-and-saucers' %}
+            {% when 'new-theme-porcelain-cups-mugs' %}{% assign corrected_handle = 'new-theme-porcelain-cups' %}
+            {% when 'patila-all' or 'patila' %}{% assign corrected_handle = 'aluminium-patila' %}
+            {% when 'rotoquip-tandoor' %}{% assign corrected_handle = 'rotoquip' %}
+            {% when 'cookware-tava-all' or 'tava' %}{% assign corrected_handle = 'taav-all' %}
+            {% when 'jhara-biryani-sev-namkeen-and-boondi-tools' %}{% assign corrected_handle = 'sev-namkeen-and-boondi-tools' %}
+          {% endcase %}
+
+          {% comment %} Try original handle first {% endcomment %}
+          {% assign child_collection = collections[child_handle] %}
+
+          {% comment %} If not found, try corrected handle {% endcomment %}
+          {% unless child_collection.products_count > 0 or child_collection.all_products_count > 0 %}
+            {% assign child_collection = collections[corrected_handle] %}
+            {% if child_collection.products_count > 0 or child_collection.all_products_count > 0 %}
+              {% assign child_handle = corrected_handle %}
+            {% endif %}
+          {% endunless %}
+
+          {% comment %} Fallback: Try with "new-theme-" prefix if still not found {% endcomment %}
+          {% unless child_collection.products_count > 0 or child_collection.all_products_count > 0 %}
+            {% assign new_theme_handle = 'new-theme-' | append: child_handle %}
+            {% assign temp_collection = collections[new_theme_handle] %}
+            {% if temp_collection.products_count > 0 or temp_collection.all_products_count > 0 %}
+              {% assign child_collection = temp_collection %}
+              {% assign child_handle = new_theme_handle %}
+            {% endif %}
+          {% endunless %}
+
+          {% assign child_image = child_link.object.image | default: child_collection.image | default: child_collection.products.first.featured_image %}
+          {% assign child_title = child_link.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
+          {% assign child_url = '/collections/' | append: child_handle %}
+
           <div class="mega-menu-column">
-            <h3>{{ child_link.title }}</h3>
-            
+            {% if child_image %}
+              <a href="{{ child_url }}" class="mega-menu-image-link">
+                <img src="{{ child_image | image_url: width: 200, height: 150, crop: 'center' }}"
+                     alt="{{ child_title | escape }}"
+                     class="mega-menu-category-image"
+                     loading="lazy">
+              </a>
+            {% endif %}
+            <h3><a href="{{ child_url }}">{{ child_title }}</a></h3>
+
             {% if child_link.links.size > 0 %}
               <ul>
-                {% for grandchild_link in child_link.links %}
+                {% for grandchild_link in child_link.links limit: 5 %}
+                  {% comment %} Apply handle mapping for grandchild (L3) links {% endcomment %}
+                  {% assign grandchild_handle = grandchild_link.url | split: '/' | last | split: '?' | first %}
+
+                  {% comment %} Inline handle correction for L3 {% endcomment %}
+                  {% assign corrected_grandchild = grandchild_handle %}
+                  {% case grandchild_handle %}
+                    {% when 'new-theme-griddles' or 'griddles' %}{% assign corrected_grandchild = 'new-theme-gas-griddles' %}
+                    {% when 'new-theme-gas-fryer' or 'gas-fryer' %}{% assign corrected_grandchild = 'new-theme-electric-fryer-copy' %}
+                    {% when 'new-theme-deep-fryer' or 'deep-fryer' %}{% assign corrected_grandchild = 'new-theme-gas-fryer-copy' %}
+                    {% when 'new-theme-combination-ovens' or 'combination-ovens' %}{% assign corrected_grandchild = 'new-theme-convection-ovens-copy' %}
+                    {% when 'new-theme-hold-ovens-cabinets' or 'hold-ovens-cabinets' %}{% assign corrected_grandchild = 'new-theme-oven-cabinets' %}
+                    {% when 'new-theme-commercial-sealers' or 'commercial-sealers' %}{% assign corrected_grandchild = 'new-theme-vacuum-sealers' %}
+                    {% when 'new-theme-work-tables' or 'work-tables' %}{% assign corrected_grandchild = 'new-theme-stainless-steel-work-tables-with-undershelves' %}
+                    {% when 'compartment-sinks' or 'one-compartment-sinks' %}{% assign corrected_grandchild = 'new-them-one-compartment-sinks' %}
+                    {% when 'new-theme-back-bar-coolers' or 'back-bar-coolers' %}{% assign corrected_grandchild = 'new-theme-bar-coolers' %}
+                    {% when 'new-theme-commercial-wine-coolers' or 'commercial-wine-coolers' %}{% assign corrected_grandchild = 'new-theme-wine-coolers' %}
+                    {% when 'new-theme-meat-and-deli-display' or 'meat-and-deli-display' %}{% assign corrected_grandchild = 'new-theme-meat-cases' %}
+                    {% when 'new-theme-undercounter-ice-machines' or 'undercounter-ice-machines' %}{% assign corrected_grandchild = 'new-them-undercounter-ice-machines' %}
+                    {% when 'new-theme-worktop-refrigerators' %}{% assign corrected_grandchild = 'worktop-refrigerators' %}
+                    {% when 'new-theme-milk-coolers' or 'milk-coolers' %}{% assign corrected_grandchild = 'new-theme-milk-cooler' %}
+                    {% when 'new-theme-dish-tray-carts-and-dollies' %}{% assign corrected_grandchild = 'new-theme-platform-trucks' %}
+                    {% when 'new-theme-pizza-pan-racks' or 'pizza-pan-racks' %}{% assign corrected_grandchild = 'new-theme-steam-table-pan-racks' %}
+                    {% when 'new-theme-storage-racks' or 'storage-racks' %}{% assign corrected_grandchild = 'chrome' %}
+                    {% when 'new-theme-wire-shelving' or 'wire-shelving' %}{% assign corrected_grandchild = 'new-theme-restaurant-shelving' %}
+                    {% when 'new-theme-china-mugs' or 'china-mugs' %}{% assign corrected_grandchild = 'test' %}
+                    {% when 'new-theme-china-plates' or 'china-plates' %}{% assign corrected_grandchild = 'new-theme-china-dinnerware' %}
+                    {% when 'new-theme-melamine-mugs' or 'melamine-mugs' %}{% assign corrected_grandchild = 'mugs' %}
+                    {% when 'new-theme-melamine-platters' or 'melamine-platters' %}{% assign corrected_grandchild = 'new-theme-melamine-trays' %}
+                    {% when 'new-theme-plastic-barware' %}{% assign corrected_grandchild = 'new-theme-stoneware-bowls' %}
+                    {% when 'new-theme-plastic-tumblers' %}{% assign corrected_grandchild = 'test-1' %}
+                    {% when 'new-theme-china-cups' or 'china-cups' %}{% assign corrected_grandchild = 'new-theme-china-cups-mugs-and-saucers' %}
+                    {% when 'new-theme-porcelain-cups-mugs' %}{% assign corrected_grandchild = 'new-theme-porcelain-cups' %}
+                    {% when 'patila-all' or 'patila' %}{% assign corrected_grandchild = 'aluminium-patila' %}
+                    {% when 'rotoquip-tandoor' %}{% assign corrected_grandchild = 'rotoquip' %}
+                    {% when 'cookware-tava-all' or 'tava' %}{% assign corrected_grandchild = 'taav-all' %}
+                    {% when 'jhara-biryani-sev-namkeen-and-boondi-tools' %}{% assign corrected_grandchild = 'sev-namkeen-and-boondi-tools' %}
+                  {% endcase %}
+
+                  {% assign gc_collection = collections[grandchild_handle] %}
+                  {% unless gc_collection.products_count > 0 or gc_collection.all_products_count > 0 %}
+                    {% assign gc_collection = collections[corrected_grandchild] %}
+                    {% if gc_collection.products_count > 0 or gc_collection.all_products_count > 0 %}
+                      {% assign grandchild_handle = corrected_grandchild %}
+                    {% endif %}
+                  {% endunless %}
+
+                  {% unless gc_collection.products_count > 0 or gc_collection.all_products_count > 0 %}
+                    {% assign new_theme_gc = 'new-theme-' | append: grandchild_handle %}
+                    {% assign temp_gc = collections[new_theme_gc] %}
+                    {% if temp_gc.products_count > 0 or temp_gc.all_products_count > 0 %}
+                      {% assign grandchild_handle = new_theme_gc %}
+                    {% endif %}
+                  {% endunless %}
+
+                  {% assign grandchild_title = grandchild_link.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
+                  {% assign grandchild_url = '/collections/' | append: grandchild_handle %}
                   <li>
-                    <a href="{{ grandchild_link.url }}">
-                      {{ grandchild_link.title }}
+                    <a href="{{ grandchild_url }}">
+                      {{ grandchild_title }}
                     </a>
                   </li>
                 {% endfor %}
+                {% if child_link.links.size > 5 %}
+                  <li><a href="{{ child_url }}" class="view-all-link">View All →</a></li>
+                {% endif %}
               </ul>
             {% else %}
-              <a href="{{ child_link.url }}" style="color: #666; font-size: 13px; font-style: italic;">
-                View {{ child_link.title }} →
+              <a href="{{ child_url }}" class="view-category-link">
+                View {{ child_title }} →
               </a>
             {% endif %}
           </div>

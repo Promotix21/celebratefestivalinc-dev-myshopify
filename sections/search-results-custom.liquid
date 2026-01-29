@@ -353,6 +353,9 @@
             </button>
 
             {% if search.results_count > 0 %}
+              <!-- Active Filters Display -->
+              <div class="active-filters" id="active-filters-container" style="display: none;"></div>
+
               <!-- Products Header -->
               <div class="products-header">
                 <div class="products-count">
@@ -666,6 +669,9 @@ function applyFilters() {
     noResults.style.display = 'none';
     document.getElementById('products-grid').style.display = 'grid';
   }
+
+  // Update active filters display
+  updateActiveFiltersDisplay();
 }
 
   // Price filter
@@ -703,10 +709,18 @@ function clearAllFilters() {
   applyFilters();
 }
 
-  // Sort products
+  // Sort products - Bug Fix #6: Fixed selector to match product-card.liquid class names
   function sortProducts(sortValue) {
     const grid = document.getElementById('products-grid');
+    if (!grid) return;
+
     const products = Array.from(grid.querySelectorAll('.search-product-wrapper'));
+    if (products.length === 0) return;
+
+    // Store original order for relevance
+    if (!window.originalProductOrder) {
+      window.originalProductOrder = products.map(p => p.dataset.productId);
+    }
 
     products.sort((a, b) => {
       switch(sortValue) {
@@ -715,24 +729,29 @@ function clearAllFilters() {
         case 'price-high':
           return parseFloat(b.dataset.productPrice || 0) - parseFloat(a.dataset.productPrice || 0);
         case 'title-asc':
-          const titleA = a.querySelector('.product-title, .card__heading, .product-card-title');
-          const titleB = b.querySelector('.product-title, .card__heading, .product-card-title');
-          return (titleA?.textContent || '').localeCompare(titleB?.textContent || '');
+          // Bug Fix #6: Updated selector to match product-card.liquid (.card-title)
+          const titleA = a.querySelector('.card-title, .product-title, .card__heading');
+          const titleB = b.querySelector('.card-title, .product-title, .card__heading');
+          return (titleA?.textContent?.trim() || '').localeCompare(titleB?.textContent?.trim() || '');
         case 'title-desc':
-          const titleA2 = a.querySelector('.product-title, .card__heading, .product-card-title');
-          const titleB2 = b.querySelector('.product-title, .card__heading, .product-card-title');
-          return (titleB2?.textContent || '').localeCompare(titleA2?.textContent || '');
+          const titleA2 = a.querySelector('.card-title, .product-title, .card__heading');
+          const titleB2 = b.querySelector('.card-title, .product-title, .card__heading');
+          return (titleB2?.textContent?.trim() || '').localeCompare(titleA2?.textContent?.trim() || '');
         case 'created-desc':
-          // For newest first, reverse DOM order (newer products typically appear first)
-          return 0;
+          // Sort by data-created attribute or product ID (higher ID = newer)
+          return parseInt(b.dataset.productId || 0) - parseInt(a.dataset.productId || 0);
         case 'created-asc':
-          // For oldest first, keep DOM order
-          return 0;
+          return parseInt(a.dataset.productId || 0) - parseInt(b.dataset.productId || 0);
+        case 'relevance':
         default:
-          return 0;
+          // Restore original order
+          const indexA = window.originalProductOrder.indexOf(a.dataset.productId);
+          const indexB = window.originalProductOrder.indexOf(b.dataset.productId);
+          return indexA - indexB;
       }
     });
 
+    // Re-append in sorted order
     products.forEach(product => grid.appendChild(product));
   }
 
@@ -812,27 +831,88 @@ function clearAllFilters() {
   // Show More / Show Less for filters
 function toggleShowMore(groupId, button) {
   const group = document.getElementById(groupId);
-  const hiddenItems = group.querySelectorAll('.filter-item-hidden');
+  const allItems = group.querySelectorAll('.filter-item');
   const icon = button.querySelector('i');
   const text = button.querySelector('.show-more-text');
-  
+
   if (button.classList.contains('expanded')) {
-    // Collapse
-    hiddenItems.forEach(item => {
-      item.classList.add('filter-item-hidden');
+    // Collapse - hide items after the first 5
+    allItems.forEach((item, index) => {
+      if (index >= 5) {
+        item.classList.add('filter-item-hidden');
+        item.style.display = 'none';
+      }
     });
     button.classList.remove('expanded');
     text.textContent = 'Show More';
     icon.style.transform = 'rotate(0deg)';
   } else {
-    // Expand
-    hiddenItems.forEach(item => {
+    // Expand - show all items
+    allItems.forEach(item => {
       item.classList.remove('filter-item-hidden');
+      item.style.display = '';
     });
     button.classList.add('expanded');
     text.textContent = 'Show Less';
     icon.style.transform = 'rotate(180deg)';
   }
+}
+
+// Update active filters display
+function updateActiveFiltersDisplay() {
+  const container = document.getElementById('active-filters-container');
+  if (!container) return;
+
+  let hasActiveFilters = false;
+  let html = '';
+
+  // Check each filter type
+  for (const [type, values] of Object.entries(activeFilters)) {
+    if (type === 'priceMin' || type === 'priceMax') {
+      if (values !== null) {
+        hasActiveFilters = true;
+        const label = type === 'priceMin' ? 'Min: $' + values : 'Max: $' + values;
+        html += `<span class="active-filter-tag" onclick="removeFilter('${type}', null)">${label} <i class="fas fa-times"></i></span>`;
+      }
+    } else if (Array.isArray(values) && values.length > 0) {
+      hasActiveFilters = true;
+      values.forEach(val => {
+        const label = val.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        html += `<span class="active-filter-tag" onclick="removeFilter('${type}', '${val}')">${label} <i class="fas fa-times"></i></span>`;
+      });
+    }
+  }
+
+  if (hasActiveFilters) {
+    container.innerHTML = `
+      <div class="active-filters-inner">
+        <span class="active-filters-label">Active Filters:</span>
+        ${html}
+        <a href="#" class="clear-all-filters" onclick="clearAllFilters(); return false;">Clear All</a>
+      </div>
+    `;
+    container.style.display = 'block';
+  } else {
+    container.style.display = 'none';
+  }
+}
+
+// Remove single filter
+function removeFilter(type, value) {
+  if (type === 'priceMin') {
+    activeFilters.priceMin = null;
+    document.getElementById('minPrice').value = '';
+  } else if (type === 'priceMax') {
+    activeFilters.priceMax = null;
+    document.getElementById('maxPrice').value = '';
+  } else {
+    activeFilters[type] = activeFilters[type].filter(v => v !== value);
+    // Uncheck the corresponding checkbox
+    document.querySelectorAll(`.filter-item[data-filter-type="${type}"][data-filter-value="${value}"] .filter-checkbox`).forEach(cb => {
+      cb.classList.remove('checked');
+    });
+  }
+  applyFilters();
 }
 </script>
 

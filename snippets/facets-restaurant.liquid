@@ -1,8 +1,14 @@
 {%- comment -%}
   Hybrid Facets - Restaurant Equipment Theme
-  
+
   Uses Dawn's core filtering logic + Custom restaurant equipment UI
-  
+
+  Supports:
+  - Standard list filters (Vendor, Product Type, Tags)
+  - Variant option filters (Size, Color, Material, etc.)
+  - Price range filters
+  - Swatch presentation for color options
+
   Accepts:
   - results: {Object} Collection or Search object
   - enable_filtering: {Boolean}
@@ -14,34 +20,49 @@
 {%- liquid
   assign sort_options = results.sort_options | default: collection.sort_options
   assign sort_by = results.sort_by | default: collection.sort_by | default: results.default_sort_by
+  assign default_presentation = 'text'
 -%}
 
 <div class="facets-wrapper" id="main-collection-filters" data-id="{{ section.id }}">
-  
+
   {%- unless results.filters == empty -%}
     <form id="FacetFiltersForm" class="facets-form">
       <div id="FacetsWrapperDesktop" class="facets-container">
-        
+
         {%- for filter in results.filters -%}
           {%- liquid
-            case filter.type
-              when 'boolean', 'list'
-                assign is_color = false
-                assign is_swatch = false
-                
-                # Check if this is a color filter
-                if filter.label contains 'Color' or filter.label contains 'Finish' or filter.param_name contains 'color'
-                  assign is_swatch = true
-                endif
-              when 'price_range'
-                assign is_price = true
-            endcase
+            # Get the filter presentation type from Shopify (text, swatch, image)
+            assign presentation = filter.presentation | default: default_presentation
+
+            # Determine if this is a swatch/color filter
+            assign is_swatch = false
+            assign is_size = false
+            assign is_variant_option = false
+
+            # Check if this is a variant option filter (param_name starts with 'filter.v.option')
+            if filter.param_name contains 'filter.v.option'
+              assign is_variant_option = true
+            endif
+
+            # Check for swatch presentation or color-related filters
+            if presentation == 'swatch'
+              assign is_swatch = true
+            elsif filter.label contains 'Color' or filter.label contains 'Colour' or filter.label contains 'Finish' or filter.param_name contains 'color'
+              assign is_swatch = true
+            endif
+
+            # Check for size filters
+            if filter.label contains 'Size' or filter.param_name contains 'size'
+              assign is_size = true
+            endif
           -%}
 
           <details
             id="Details-{{ forloop.index }}-{{ section.id }}"
-            class="filter-section js-filter"
+            class="filter-section js-filter{% if is_variant_option %} filter-section--variant{% endif %}{% if is_swatch %} filter-section--swatch{% endif %}{% if is_size %} filter-section--size{% endif %}"
             data-index="{{ forloop.index }}"
+            data-filter-type="{{ filter.type }}"
+            data-is-variant="{{ is_variant_option }}"
             {% if forloop.index == 1 %}open{% endif %}
           >
             <summary class="filter-title">
@@ -57,37 +78,84 @@
             </summary>
 
             <div id="Facet-{{ forloop.index }}-{{ section.id }}" class="filter-group">
-              
+
               {%- case filter.type -%}
                 {%- when 'boolean' or 'list' -%}
-                  
+
                   {%- if is_swatch -%}
-                    {%- comment -%} Swatch/Color Display {%- endcomment -%}
+                    {%- comment -%} Swatch/Color Display for variant options {%- endcomment -%}
                     <div class="filter-swatches">
                       {%- for filter_value in filter.values -%}
-                        <div class="swatch-item {% if filter_value.active %}active{% endif %} {% if filter_value.count == 0 and filter_value.active == false %}disabled{% endif %}">
+                        {%- liquid
+                          assign is_disabled = false
+                          if filter_value.count == 0 and filter_value.active == false
+                            assign is_disabled = true
+                          endif
+                        -%}
+                        <div class="swatch-item {% if filter_value.active %}active{% endif %} {% if is_disabled %}disabled{% endif %}">
                           <input
                             type="checkbox"
                             name="{{ filter_value.param_name }}"
                             value="{{ filter_value.value }}"
                             id="Filter-{{ filter.param_name | escape }}-{{ forloop.index }}"
                             {% if filter_value.active %}checked{% endif %}
-                            {% if filter_value.count == 0 and filter_value.active == false %}disabled{% endif %}
+                            {% if is_disabled %}disabled{% endif %}
                           >
                           <label for="Filter-{{ filter.param_name | escape }}-{{ forloop.index }}" class="swatch-label" title="{{ filter_value.label | escape }}">
                             {%- liquid
                               assign color_name = filter_value.label | downcase | handleize
-                              assign color_file = color_name | append: '.png'
                             -%}
-                            
+
                             {%- if filter_value.swatch.image -%}
-                              <img src="{{ filter_value.swatch.image | image_url: width: 50 }}" alt="{{ filter_value.label }}" loading="lazy">
+                              <span class="swatch-visual swatch-image">
+                                <img src="{{ filter_value.swatch.image | image_url: width: 50 }}" alt="{{ filter_value.label }}" loading="lazy">
+                              </span>
                             {%- elsif filter_value.swatch.color -%}
-                              <span class="swatch-color" style="background-color: {{ filter_value.swatch.color }};"></span>
+                              <span class="swatch-visual swatch-color" style="background-color: {{ filter_value.swatch.color }};"></span>
                             {%- else -%}
-                              <span class="swatch-text">{{ filter_value.label | slice: 0, 2 | upcase }}</span>
+                              {%- comment -%} Fallback color mapping for common colors {%- endcomment -%}
+                              {%- liquid
+                                assign fallback_color = ''
+                                case color_name
+                                  when 'black'
+                                    assign fallback_color = '#000000'
+                                  when 'white'
+                                    assign fallback_color = '#ffffff'
+                                  when 'red'
+                                    assign fallback_color = '#ff0000'
+                                  when 'blue'
+                                    assign fallback_color = '#0000ff'
+                                  when 'green'
+                                    assign fallback_color = '#00ff00'
+                                  when 'yellow'
+                                    assign fallback_color = '#ffff00'
+                                  when 'orange'
+                                    assign fallback_color = '#ff8000'
+                                  when 'purple'
+                                    assign fallback_color = '#800080'
+                                  when 'pink'
+                                    assign fallback_color = '#ffc0cb'
+                                  when 'brown'
+                                    assign fallback_color = '#8b4513'
+                                  when 'gray', 'grey'
+                                    assign fallback_color = '#808080'
+                                  when 'silver'
+                                    assign fallback_color = '#c0c0c0'
+                                  when 'gold'
+                                    assign fallback_color = '#ffd700'
+                                  when 'navy'
+                                    assign fallback_color = '#000080'
+                                  when 'beige'
+                                    assign fallback_color = '#f5f5dc'
+                                endcase
+                              -%}
+                              {%- if fallback_color != blank -%}
+                                <span class="swatch-visual swatch-color" style="background-color: {{ fallback_color }};"></span>
+                              {%- else -%}
+                                <span class="swatch-visual swatch-text">{{ filter_value.label | slice: 0, 2 | upcase }}</span>
+                              {%- endif -%}
                             {%- endif -%}
-                            
+
                             <span class="swatch-name">{{ filter_value.label | escape }}</span>
                             {%- if filter_value.count > 0 -%}
                               <span class="swatch-count">({{ filter_value.count }})</span>
@@ -96,19 +164,62 @@
                         </div>
                       {%- endfor -%}
                     </div>
-                  
-                  {%- else -%}
-                    {%- comment -%} Standard Checkbox Display {%- endcomment -%}
+
+                  {%- elsif is_size -%}
+                    {%- comment -%} Size Checkbox Display with View More (Plus sign icon) {%- endcomment -%}
                     <ul class="filter-list" role="list">
                       {%- for filter_value in filter.values -%}
-                        <li class="filter-item">
+                        {%- liquid
+                          assign is_disabled = false
+                          if filter_value.count == 0 and filter_value.active == false
+                            assign is_disabled = true
+                          endif
+                        -%}
+                        <li class="filter-item{% if forloop.index > 10 %} filter-item--hidden{% endif %}">
                           <input
                             type="checkbox"
                             name="{{ filter_value.param_name }}"
                             value="{{ filter_value.value }}"
                             id="Filter-{{ filter.param_name | escape }}-{{ forloop.index }}"
                             {% if filter_value.active %}checked{% endif %}
-                            {% if filter_value.count == 0 and filter_value.active == false %}disabled{% endif %}
+                            {% if is_disabled %}disabled{% endif %}
+                          >
+                          <label for="Filter-{{ filter.param_name | escape }}-{{ forloop.index }}" class="filter-label">
+                            <span class="filter-checkbox filter-checkbox--plus {% if filter_value.active %}checked{% endif %}">
+                              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 1V11M1 6H11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                              </svg>
+                            </span>
+                            <span class="filter-text">{{ filter_value.label | escape }}</span>
+                            <span class="filter-count" data-count="{{ filter_value.count }}">({{ filter_value.count }})</span>
+                          </label>
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                    {%- if filter.values.size > 10 -%}
+                      <button type="button" class="filter-view-more" onclick="toggleFilterViewMore(this)">
+                        View More ({{ filter.values.size | minus: 10 }})
+                      </button>
+                    {%- endif -%}
+
+                  {%- else -%}
+                    {%- comment -%} Standard Checkbox Display with View More {%- endcomment -%}
+                    <ul class="filter-list" role="list">
+                      {%- for filter_value in filter.values -%}
+                        {%- liquid
+                          assign is_disabled = false
+                          if filter_value.count == 0 and filter_value.active == false
+                            assign is_disabled = true
+                          endif
+                        -%}
+                        <li class="filter-item{% if is_variant_option %} filter-item--variant{% endif %}{% if forloop.index > 10 %} filter-item--hidden{% endif %}">
+                          <input
+                            type="checkbox"
+                            name="{{ filter_value.param_name }}"
+                            value="{{ filter_value.value }}"
+                            id="Filter-{{ filter.param_name | escape }}-{{ forloop.index }}"
+                            {% if filter_value.active %}checked{% endif %}
+                            {% if is_disabled %}disabled{% endif %}
                           >
                           <label for="Filter-{{ filter.param_name | escape }}-{{ forloop.index }}" class="filter-label">
                             <span class="filter-checkbox {% if filter_value.active %}checked{% endif %}">
@@ -126,6 +237,11 @@
                         </li>
                       {%- endfor -%}
                     </ul>
+                    {%- if filter.values.size > 10 -%}
+                      <button type="button" class="filter-view-more" onclick="toggleFilterViewMore(this)">
+                        View More ({{ filter.values.size | minus: 10 }})
+                      </button>
+                    {%- endif -%}
                   {%- endif -%}
 
                 {%- when 'price_range' -%}
@@ -142,7 +258,7 @@
                     assign filter_range_max = filter.range_max | divided_by: 100.0
                   -%}
 
-                  <div class="price-range">
+                  <div class="price-range" data-range-min="{{ filter_range_min }}" data-range-max="{{ filter_range_max }}">
                     <div class="price-inputs">
                       <div class="price-input-wrapper">
                         <span class="currency-symbol">{{ cart.currency.symbol }}</span>
@@ -150,7 +266,7 @@
                           type="number"
                           name="{{ filter.min_value.param_name }}"
                           id="Filter-{{ filter.label | escape }}-min"
-                          class="price-input"
+                          class="price-input price-input-min"
                           {%- if uses_comma_decimals -%}
                             placeholder="{{ filter_range_min | replace: '.', ',' }}"
                           {%- else -%}
@@ -171,16 +287,16 @@
                           {%- endif -%}
                         >
                       </div>
-                      
+
                       <span class="price-separator">-</span>
-                      
+
                       <div class="price-input-wrapper">
                         <span class="currency-symbol">{{ cart.currency.symbol }}</span>
                         <input
                           type="number"
                           name="{{ filter.max_value.param_name }}"
                           id="Filter-{{ filter.label | escape }}-max"
-                          class="price-input"
+                          class="price-input price-input-max"
                           {%- if uses_comma_decimals -%}
                             placeholder="{{ filter_range_max | replace: '.', ',' }}"
                           {%- else -%}
@@ -203,8 +319,16 @@
                       </div>
                     </div>
 
-                    <div class="price-range-track">
-                      <div class="price-range-fill" data-min="{{ filter_min_value }}" data-max="{{ filter_max_value }}" data-range-min="{{ filter_range_min }}" data-range-max="{{ filter_range_max }}"></div>
+                    <div class="price-range-slider-container">
+                      <div class="price-range-track">
+                        <div class="price-range-fill"></div>
+                        <div class="price-range-handle price-range-handle-min" data-handle="min">
+                          <span class="price-range-tooltip"></span>
+                        </div>
+                        <div class="price-range-handle price-range-handle-max" data-handle="max">
+                          <span class="price-range-tooltip"></span>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -338,6 +462,267 @@
   function clearAllFilters() {
     window.location.href = window.location.pathname;
   }
+
+  // Toggle View More for filter lists
+  function toggleFilterViewMore(btn) {
+    const filterList = btn.previousElementSibling;
+    const hiddenItems = filterList.querySelectorAll('.filter-item--hidden');
+    const isExpanded = filterList.classList.contains('expanded');
+
+    if (isExpanded) {
+      filterList.classList.remove('expanded');
+      btn.textContent = `View More (${hiddenItems.length})`;
+    } else {
+      filterList.classList.add('expanded');
+      btn.textContent = 'View Less';
+    }
+  }
+
+  // Price Range Slider Functionality
+  function initPriceRangeSliders() {
+    const priceRanges = document.querySelectorAll('.price-range');
+    console.log('🔍 Facets: Found', priceRanges.length, 'price range sliders');
+    priceRanges.forEach(priceRange => {
+      // Skip if already initialized
+      if (priceRange.dataset.initialized === 'true') {
+        return;
+      }
+      priceRange.dataset.initialized = 'true';
+      const minInput = priceRange.querySelector('.price-input-min');
+      const maxInput = priceRange.querySelector('.price-input-max');
+      const fill = priceRange.querySelector('.price-range-fill');
+      const minHandle = priceRange.querySelector('.price-range-handle-min');
+      const maxHandle = priceRange.querySelector('.price-range-handle-max');
+      const minTooltip = minHandle?.querySelector('.price-range-tooltip');
+      const maxTooltip = maxHandle?.querySelector('.price-range-tooltip');
+      const track = priceRange.querySelector('.price-range-track');
+
+      if (!minInput || !maxInput || !fill || !minHandle || !maxHandle || !track) return;
+
+      const rangeMin = parseFloat(priceRange.dataset.rangeMin) || 0;
+      const rangeMax = parseFloat(priceRange.dataset.rangeMax) || 10000;
+
+      let isDragging = false;
+      let currentHandle = null;
+
+      function updateSlider() {
+        const min = parseFloat(minInput.value) || rangeMin;
+        const max = parseFloat(maxInput.value) || rangeMax;
+        const range = rangeMax - rangeMin;
+
+        if (range > 0) {
+          const leftPercent = ((min - rangeMin) / range) * 100;
+          const rightPercent = ((max - rangeMin) / range) * 100;
+
+          fill.style.left = leftPercent + '%';
+          fill.style.width = (rightPercent - leftPercent) + '%';
+
+          minHandle.style.left = leftPercent + '%';
+          maxHandle.style.left = rightPercent + '%';
+
+          // Update tooltips
+          if (minTooltip) minTooltip.textContent = '$' + Math.round(min);
+          if (maxTooltip) maxTooltip.textContent = '$' + Math.round(max);
+        }
+      }
+
+      function getValueFromPosition(clientX) {
+        const rect = track.getBoundingClientRect();
+        const percent = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        return rangeMin + (percent * (rangeMax - rangeMin));
+      }
+
+      function handleMove(e) {
+        if (!isDragging || !currentHandle) return;
+
+        e.preventDefault();
+        const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+        const value = getValueFromPosition(clientX);
+
+        if (currentHandle === minHandle) {
+          const maxVal = parseFloat(maxInput.value) || rangeMax;
+          const newMin = Math.min(value, maxVal);
+          minInput.value = Math.round(newMin);
+        } else {
+          const minVal = parseFloat(minInput.value) || rangeMin;
+          const newMax = Math.max(value, minVal);
+          maxInput.value = Math.round(newMax);
+        }
+
+        updateSlider();
+      }
+
+      function handleEnd() {
+        if (isDragging) {
+          isDragging = false;
+          currentHandle = null;
+          document.body.style.userSelect = '';
+
+          // Trigger form submit after drag ends
+          const form = priceRange.closest('form');
+          if (form) {
+            const event = new Event('input', { bubbles: true });
+            minInput.dispatchEvent(event);
+          }
+        }
+      }
+
+      function handleStart(handle) {
+        return function(e) {
+          isDragging = true;
+          currentHandle = handle;
+          document.body.style.userSelect = 'none';
+
+          handle.classList.add('dragging');
+
+          e.preventDefault();
+        };
+      }
+
+      // Mouse events
+      minHandle.addEventListener('mousedown', handleStart(minHandle));
+      maxHandle.addEventListener('mousedown', handleStart(maxHandle));
+
+      // Touch events
+      minHandle.addEventListener('touchstart', handleStart(minHandle), { passive: false });
+      maxHandle.addEventListener('touchstart', handleStart(maxHandle), { passive: false });
+
+      // Global move and end events
+      document.addEventListener('mousemove', handleMove);
+      document.addEventListener('touchmove', handleMove, { passive: false });
+      document.addEventListener('mouseup', handleEnd);
+      document.addEventListener('touchend', handleEnd);
+
+      // Track click to jump
+      track.addEventListener('click', function(e) {
+        if (e.target.classList.contains('price-range-handle')) return;
+
+        const value = getValueFromPosition(e.clientX);
+        const min = parseFloat(minInput.value) || rangeMin;
+        const max = parseFloat(maxInput.value) || rangeMax;
+        const midPoint = (min + max) / 2;
+
+        if (value < midPoint) {
+          minInput.value = Math.round(value);
+        } else {
+          maxInput.value = Math.round(value);
+        }
+
+        updateSlider();
+
+        // Trigger form submit
+        const form = priceRange.closest('form');
+        if (form) {
+          const event = new Event('input', { bubbles: true });
+          minInput.dispatchEvent(event);
+        }
+      });
+
+      // Update slider when inputs change
+      minInput.addEventListener('input', updateSlider);
+      maxInput.addEventListener('input', updateSlider);
+
+      // Validate inputs on change
+      minInput.addEventListener('change', function() {
+        const min = parseFloat(this.value) || rangeMin;
+        const max = parseFloat(maxInput.value) || rangeMax;
+        if (min > max) {
+          this.value = max;
+          updateSlider();
+        }
+      });
+
+      maxInput.addEventListener('change', function() {
+        const min = parseFloat(minInput.value) || rangeMin;
+        const max = parseFloat(this.value) || rangeMax;
+        if (max < min) {
+          this.value = min;
+          updateSlider();
+        }
+      });
+
+      // Cleanup dragging class on mouseup anywhere
+      document.addEventListener('mouseup', function() {
+        minHandle.classList.remove('dragging');
+        maxHandle.classList.remove('dragging');
+      });
+
+      // Initialize
+      updateSlider();
+    });
+  }
+
+  // Handle checkbox state toggling
+  function initCheckboxStateHandlers() {
+    // Handle all filter checkboxes (standard, size, swatch)
+    document.querySelectorAll('.filter-item input[type="checkbox"], .swatch-item input[type="checkbox"]').forEach(checkbox => {
+      // Skip if already has event listener
+      if (checkbox.dataset.listenerAdded === 'true') {
+        return;
+      }
+      checkbox.dataset.listenerAdded = 'true';
+
+      checkbox.addEventListener('change', function() {
+        // Find the visual checkbox element
+        const visualCheckbox = this.parentElement.querySelector('.filter-checkbox, .filter-checkbox--plus');
+
+        if (visualCheckbox) {
+          // Toggle the 'checked' class based on checkbox state
+          if (this.checked) {
+            visualCheckbox.classList.add('checked');
+          } else {
+            visualCheckbox.classList.remove('checked');
+          }
+        }
+
+        // For swatch items, toggle active class on parent
+        const swatchItem = this.closest('.swatch-item');
+        if (swatchItem) {
+          if (this.checked) {
+            swatchItem.classList.add('active');
+          } else {
+            swatchItem.classList.remove('active');
+          }
+        }
+
+        // For size items, toggle active class on parent
+        const sizeItem = this.closest('.size-item');
+        if (sizeItem) {
+          if (this.checked) {
+            sizeItem.classList.add('active');
+          } else {
+            sizeItem.classList.remove('active');
+          }
+        }
+      });
+    });
+  }
+
+  // Initialize on DOM ready
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔍 Facets: Starting initialization');
+    initPriceRangeSliders();
+    console.log('🔍 Facets: Price sliders initialized');
+    initCheckboxStateHandlers();
+    console.log('✅ Facets: ALL initialization complete!');
+  });
+
+  // Re-initialize after AJAX filter updates
+  if (typeof MutationObserver !== 'undefined') {
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.addedNodes.length) {
+          initPriceRangeSliders();
+          initCheckboxStateHandlers();
+        }
+      });
+    });
+
+    const filtersContainer = document.getElementById('FacetsWrapperDesktop');
+    if (filtersContainer) {
+      observer.observe(filtersContainer, { childList: true, subtree: true });
+    }
+  }
 </script>
 
 <style>
@@ -397,6 +782,35 @@ facet-filters-form {
   margin-bottom: 12px;
 }
 
+/* Hidden filter items (View More) */
+.filter-item--hidden {
+  display: none;
+}
+
+.filter-list.expanded .filter-item--hidden {
+  display: block;
+}
+
+/* View More button */
+.filter-view-more {
+  background: none;
+  border: none;
+  color: var(--cf-navy, #2d5a87);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 0;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+
+.filter-view-more:hover {
+  color: var(--cf-coral, #ff6b6b);
+}
+
 .filter-item input[type="checkbox"] {
   position: absolute;
   opacity: 0;
@@ -408,6 +822,242 @@ facet-filters-form {
   outline-offset: 2px;
 }
 
+/* Variant Option Filter Styles */
+.filter-section--variant .filter-title-wrapper span:first-child {
+  font-weight: 600;
+}
+
+.filter-item--variant {
+  padding-left: 4px;
+}
+
+/* Plus sign checkbox for Size filter */
+.filter-checkbox--plus {
+  border-radius: 4px;
+}
+
+.filter-checkbox--plus svg {
+  opacity: 0.4;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.filter-checkbox--plus.checked {
+  background: var(--cf-coral, #ff6b6b);
+  border-color: var(--cf-coral, #ff6b6b);
+}
+
+.filter-checkbox--plus.checked svg {
+  opacity: 1;
+  color: white;
+}
+
+.filter-item:hover .filter-checkbox--plus svg {
+  opacity: 1;
+}
+
+/* ========================================
+   Swatch/Color Filter Styles
+   ======================================== */
+.filter-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 0 0 15px;
+}
+
+.swatch-item {
+  position: relative;
+}
+
+.swatch-item input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  cursor: pointer;
+}
+
+.swatch-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  min-width: 60px;
+  text-align: center;
+}
+
+.swatch-label:hover {
+  background: var(--neutral-light, #f5f5f5);
+}
+
+.swatch-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--neutral-gray, #e0e0e0);
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.swatch-visual.swatch-color {
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
+}
+
+.swatch-visual.swatch-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.swatch-visual.swatch-text {
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--neutral-light, #f5f5f5);
+  color: var(--text-dark, #333);
+}
+
+.swatch-name {
+  font-size: 11px;
+  color: var(--text-dark, #333);
+  line-height: 1.2;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.swatch-count {
+  font-size: 10px;
+  color: var(--text-light, #666);
+}
+
+/* Active swatch state */
+.swatch-item.active .swatch-visual {
+  border-color: var(--primary-coral, #ff6b6b);
+  box-shadow: 0 0 0 2px var(--primary-coral, #ff6b6b);
+}
+
+.swatch-item.active .swatch-name {
+  font-weight: 600;
+  color: var(--primary-coral, #ff6b6b);
+}
+
+/* Disabled swatch state */
+.swatch-item.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.swatch-item.disabled .swatch-visual {
+  position: relative;
+}
+
+.swatch-item.disabled .swatch-visual::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--text-light, #666);
+  transform: rotate(-45deg);
+}
+
+/* Focus state */
+.swatch-item input[type="checkbox"]:focus + .swatch-label .swatch-visual {
+  outline: 2px solid var(--primary-coral, #ff6b6b);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   Size Filter Styles (Pill/Button Style)
+   ======================================== */
+.filter-sizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 0 15px;
+}
+
+.size-item {
+  position: relative;
+}
+
+.size-item input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  cursor: pointer;
+}
+
+.size-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 14px;
+  border: 1px solid var(--neutral-gray, #e0e0e0);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: white;
+  font-size: 13px;
+}
+
+.size-label:hover {
+  border-color: var(--primary-coral, #ff6b6b);
+  background: rgba(255, 107, 107, 0.05);
+}
+
+.size-value {
+  font-weight: 500;
+  color: var(--text-dark, #333);
+}
+
+.size-count {
+  font-size: 11px;
+  color: var(--text-light, #666);
+}
+
+/* Active size state */
+.size-item.active .size-label {
+  border-color: var(--primary-coral, #ff6b6b);
+  background: var(--primary-coral, #ff6b6b);
+  color: white;
+}
+
+.size-item.active .size-value,
+.size-item.active .size-count {
+  color: white;
+}
+
+/* Disabled size state */
+.size-item.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.size-item.disabled .size-label {
+  background: var(--neutral-light, #f5f5f5);
+  text-decoration: line-through;
+}
+
+/* Focus state */
+.size-item input[type="checkbox"]:focus + .size-label {
+  outline: 2px solid var(--primary-coral, #ff6b6b);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   Active Filters Display
+   ======================================== */
 .active-facets {
   display: flex;
   flex-wrap: wrap;
@@ -454,22 +1104,101 @@ facet-filters-form {
   background: var(--neutral-gray);
 }
 
+/* ========================================
+   Price Range Styles
+   ======================================== */
+.price-range-slider-container {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  padding: 0 10px;
+}
+
 .price-range-track {
   position: relative;
   height: 6px;
-  background: var(--neutral-gray);
+  background: var(--neutral-gray, #e0e0e0);
   border-radius: 3px;
-  margin-top: 15px;
+  cursor: pointer;
 }
 
 .price-range-fill {
   position: absolute;
   height: 100%;
-  background: var(--primary-coral);
+  background: var(--cf-coral, #ff6b6b);
   border-radius: 3px;
-  transition: all 0.3s ease;
+  pointer-events: none;
+  transition: left 0.1s ease, width 0.1s ease;
 }
 
+.price-range-handle {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  background: white;
+  border: 3px solid var(--cf-coral, #ff6b6b);
+  border-radius: 50%;
+  cursor: grab;
+  z-index: 2;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.price-range-handle:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+}
+
+.price-range-handle.dragging {
+  cursor: grabbing;
+  transform: translate(-50%, -50%) scale(1.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 3;
+}
+
+.price-range-handle.dragging .price-range-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.price-range-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  background: var(--cf-deep-blue, #1a365d);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.price-range-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: var(--cf-deep-blue, #1a365d);
+}
+
+.price-range-handle:hover .price-range-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ========================================
+   Mobile Filter Actions
+   ======================================== */
 .filter-actions-mobile {
   display: flex;
   flex-direction: column;
@@ -479,7 +1208,9 @@ facet-filters-form {
   margin-top: 20px;
 }
 
-/* Loading state */
+/* ========================================
+   Loading State
+   ======================================== */
 #ProductGridContainer.loading {
   opacity: 0.5;
   pointer-events: none;
@@ -498,5 +1229,38 @@ facet-filters-form {
   border-top-color: var(--primary-coral);
   border-radius: 50%;
   animation: spin 1s linear infinite;
+}
+
+/* ========================================
+   Responsive Adjustments
+   ======================================== */
+@media (max-width: 768px) {
+  .filter-swatches {
+    gap: 8px;
+  }
+
+  .swatch-label {
+    min-width: 50px;
+    padding: 4px;
+  }
+
+  .swatch-visual {
+    width: 28px;
+    height: 28px;
+  }
+
+  .swatch-name {
+    font-size: 10px;
+    max-width: 55px;
+  }
+
+  .filter-sizes {
+    gap: 6px;
+  }
+
+  .size-label {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
 }
 </style>

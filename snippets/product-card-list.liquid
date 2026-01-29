@@ -59,29 +59,45 @@
   endif
 -%}
 
-{%- comment -%} Calculate WSH wholesale pricing {%- endcomment -%}
-{%- render 'wcp_discount', wcp_discount: product -%}
+{%- comment -%} Calculate WSH wholesale pricing - capture output to get variables {%- endcomment -%}
+{%- capture wcp_output -%}
+  {%- render 'wcp_discount', wcp_discount: product, wpd_is_render: 'yes' -%}
+{%- endcapture -%}
 
 {%- liquid
   comment
-    Determine if we have a wholesale price different from regular
+    Parse WSH price output (pipe-delimited)
+    Format: wcp_price|wcp_compare_at_price|wcp_compare_at_price_min|wcp_compare_at_price_max|wcp_price_min|wcp_price_max|v_discount_tag|wcp_discount_value|wcp_customer_tag
   endcomment
-  assign has_wholesale_price = false
-  assign wholesale_price = wcp_price
-  assign regular_price = product.price
-
-  if wcp_price != blank and wcp_price < product.price
-    assign has_wholesale_price = true
-    assign wholesale_price = wcp_price
-  endif
+  assign wcp_output_clean = wcp_output | strip
+  assign wcp_values = wcp_output_clean | split: '|'
+  assign wcp_price = wcp_values[0] | plus: 0
 
   comment
-    Fallback: if no WSH price, check compare_at_price
+    WSH Pricing Logic (matching product page):
+    Case 1: Individual variant pricing - wcp_price < product.price
+            → retail = product.price, member = wcp_price
+    Case 2: Bulk discount - wcp_price == product.price AND compare_at_price > product.price
+            → retail = compare_at_price, member = product.price
   endcomment
-  if has_wholesale_price == false and on_sale
+  assign retail_price = product.price
+  assign member_price = product.price
+  assign has_wholesale_price = false
+
+  comment
+    Case 1: WSH returned a specific wholesale price lower than product.price (individual variant pricing)
+  endcomment
+  if wcp_price != blank and wcp_price > 0 and wcp_price < product.price
     assign has_wholesale_price = true
-    assign wholesale_price = product.price
-    assign regular_price = product.compare_at_price
+    assign retail_price = product.price
+    assign member_price = wcp_price
+  comment
+    Case 2: Bulk discount - product.price is already discounted, compare_at_price is retail
+  endcomment
+  elsif product.compare_at_price != blank and product.compare_at_price > product.price
+    assign has_wholesale_price = true
+    assign retail_price = product.compare_at_price
+    assign member_price = product.price
   endif
 
   comment
@@ -89,9 +105,9 @@
   endcomment
   assign savings_amount = 0
   assign savings_percent = 0
-  if has_wholesale_price and regular_price > wholesale_price
-    assign savings_amount = regular_price | minus: wholesale_price
-    assign savings_percent = savings_amount | times: 100.0 | divided_by: regular_price | round
+  if has_wholesale_price and retail_price > member_price
+    assign savings_amount = retail_price | minus: member_price
+    assign savings_percent = savings_amount | times: 100.0 | divided_by: retail_price | round
   endif
 
   comment
@@ -224,16 +240,22 @@
           <!-- MEMBER VIEW - Always shows member pricing with coral border -->
           <div class="price-box-list price-member-view-list">
             <div class="member-badge-tag">MEMBER PRICING</div>
-            <div class="price-main-list">
+            <div class="price-main-list"
+              data-wpd-product-handle="{{ product.handle }}"
+              data-wpd-variant-id="{{ product.selected_or_first_available_variant.id }}"
+              data-wpd-variant-price="{{ product.selected_or_first_available_variant.price }}"
+              data-wpd-variant-compare-at-price="{{ product.selected_or_first_available_variant.compare_at_price }}"
+              data-wpd-product-collection-ids="{% assign wpdProductCollectionIds = product.collections | map:'id' %}{{ wpdProductCollectionIds | join:',' }}"
+              data-wpd-product-id="{{ product.id }}">
               {%- if has_wholesale_price -%}
-                {{ wholesale_price | money }}
+                {{ member_price | money }}
               {%- else -%}
                 {{ product.price | money }}
               {%- endif -%}
               <span class="price-unit">/Each</span>
             </div>
             {%- if has_wholesale_price -%}
-              <div class="price-regular-list">Retail: <s>{{ regular_price | money }}</s></div>
+              <div class="price-regular-list data-wpd-hide">Retail: <s>{{ retail_price | money }}</s></div>
               <div class="savings-text-list">You Save {{ savings_amount | money }}</div>
             {%- endif -%}
           </div>
@@ -242,8 +264,14 @@
           <!-- PUBLIC VIEW - Own Brand Products: Show both prices -->
           <div class="price-box-list price-dual-list">
             <div class="price-label">Member Price</div>
-            <div class="price-main-list">{{ wholesale_price | money }}<span class="price-unit">/Each</span></div>
-            <div class="price-regular-list">Retail: <s>{{ regular_price | money }}</s></div>
+            <div class="price-main-list"
+              data-wpd-product-handle="{{ product.handle }}"
+              data-wpd-variant-id="{{ product.selected_or_first_available_variant.id }}"
+              data-wpd-variant-price="{{ product.selected_or_first_available_variant.price }}"
+              data-wpd-variant-compare-at-price="{{ product.selected_or_first_available_variant.compare_at_price }}"
+              data-wpd-product-collection-ids="{% assign wpdProductCollectionIds = product.collections | map:'id' %}{{ wpdProductCollectionIds | join:',' }}"
+              data-wpd-product-id="{{ product.id }}">{{ member_price | money }}<span class="price-unit">/Each</span></div>
+            <div class="price-regular-list data-wpd-hide">Retail: <s>{{ retail_price | money }}</s></div>
             <div class="savings-text-list">Save {{ savings_amount | money }} ({{ savings_percent }}%)</div>
           </div>
 
@@ -251,7 +279,13 @@
           <!-- PUBLIC VIEW - Restricted Products: Single retail price only -->
           <div class="price-box-list price-single-list">
             <div class="price-label">Retail Price</div>
-            <div class="price-main-list">{{ product.price | money }}<span class="price-unit">/Each</span></div>
+            <div class="price-main-list"
+              data-wpd-product-handle="{{ product.handle }}"
+              data-wpd-variant-id="{{ product.selected_or_first_available_variant.id }}"
+              data-wpd-variant-price="{{ product.selected_or_first_available_variant.price }}"
+              data-wpd-variant-compare-at-price="{{ product.selected_or_first_available_variant.compare_at_price }}"
+              data-wpd-product-collection-ids="{% assign wpdProductCollectionIds = product.collections | map:'id' %}{{ wpdProductCollectionIds | join:',' }}"
+              data-wpd-product-id="{{ product.id }}">{{ product.price | money }}<span class="price-unit">/Each</span></div>
           </div>
 
       {%- endcase -%}

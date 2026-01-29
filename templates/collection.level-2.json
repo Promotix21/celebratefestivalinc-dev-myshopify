@@ -1,20 +1,19 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
-    "breadcrumb": {
-      "type": "collection-breadcrumb",
-      "settings": {
-        "background_color": "#f8f9fa",
-        "text_color": "#666666",
-        "link_color": "#333333",
-        "link_hover_color": "#ff6b6b",
-        "padding_top": 16,
-        "padding_bottom": 16
-      }
-    },
     "level2_hub": {
       "type": "collection-level2-hub",
       "settings": {
-        "show_all_categories": true
+        "menu": "cf-menu-31-12-2026",
+        "products_per_page": 192
       }
     },
     "rich_text": {
@@ -24,7 +23,6 @@
     }
   },
   "order": [
-    "breadcrumb",
     "level2_hub",
     "rich_text"
   ]

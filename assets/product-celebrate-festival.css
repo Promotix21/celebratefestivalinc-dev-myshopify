@@ -847,6 +847,212 @@
     font-weight: 600;
 }
 
+/* ==============================================
+   TWO-CARD PRICING LAYOUT (PDP)
+   ============================================== */
+
+.price-section-container {
+    margin-bottom: 20px;
+}
+
+.price-cards-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.price-cards-single .price-card-full {
+    flex: 1;
+}
+
+.price-card {
+    flex: 1;
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+/* Regular Price Card (Left) */
+.price-card-regular {
+    background: #fff;
+    border: 2px solid #e2e8f0;
+}
+
+.price-card-regular .price-card-label {
+    font-size: 10px;
+    color: #64748b;
+    font-weight: 600;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.price-card-regular .price-card-amount {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+/* Bug Fix #9: Strikethrough styling for regular price when member price is shown */
+.price-card-regular .price-card-amount s {
+    text-decoration: line-through;
+    color: #94a3b8;
+}
+
+/* Member Price Card (Right) */
+.price-card-member {
+    background: #fafafa;
+    border: 1px dotted #d1d5db;
+    position: relative;
+}
+
+.price-card-badge {
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 4px;
+    letter-spacing: 0.3px;
+}
+
+.price-card-member .price-card-amount {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ff6b6b;
+}
+
+.price-card .price-unit {
+    font-size: 12px;
+    font-weight: 400;
+    color: #94a3b8;
+}
+
+.signup-plus-link {
+    display: block;
+    margin-top: 6px;
+    font-size: 11px;
+    color: #2d5a87;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.signup-plus-link:hover {
+    color: #ff6b6b;
+}
+
+/* Blurred Member Price Card */
+.price-card-blurred {
+    position: relative;
+    overflow: hidden;
+}
+
+.price-card-blur-content {
+    filter: blur(6px);
+    user-select: none;
+    pointer-events: none;
+}
+
+.price-card-blur-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 6px;
+}
+
+.blur-lock-icon {
+    font-size: 24px;
+    margin-bottom: 6px;
+}
+
+.blur-prompt-text {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1a365d;
+    margin-bottom: 8px;
+}
+
+.blur-login-btn {
+    background: #ff6b6b;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.blur-login-btn:hover {
+    background: #e85a5a;
+    transform: translateY(-1px);
+}
+
+.blur-overlay-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a365d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Financing Row */
+.financing-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    flex-wrap: wrap;
+}
+
+.financing-text {
+    font-size: 13px;
+    color: #475569;
+}
+
+.financing-logo {
+    font-weight: 700;
+    color: #1a365d;
+    font-size: 13px;
+}
+
+.financing-apply-link {
+    font-size: 13px;
+    color: #00a8e1;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.financing-apply-link:hover {
+    color: #0080b3;
+}
+
+/* Responsive for Two-Card Layout */
+@media (max-width: 480px) {
+    .price-cards-row {
+        flex-direction: column;
+    }
+
+    .price-card-member .price-card-amount,
+    .price-card-regular .price-card-amount {
+        font-size: 18px;
+    }
+
+    .financing-row {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
 /* Alert Boxes */
 .alert-box {
     padding: 15px;
@@ -878,7 +1084,7 @@
     background-color: var(--neutral-light);
     border: 2px solid var(--neutral-gray);
     border-radius: var(--border-radius);
-    padding: 20px;
+    padding: 16px 20px;
 }
 
 .quantity-label {
@@ -914,6 +1120,65 @@
 .action-buttons {
     display: flex;
     gap: 10px;
+}
+
+/* Single Row Add to Cart Layout */
+.add-to-cart-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.add-to-cart-row .qty-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.add-to-cart-row .qty-wrapper input {
+    width: 60px;
+    padding: 12px 8px;
+    border: 2px solid var(--neutral-gray);
+    font-size: 15px;
+    text-align: center;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+}
+
+.add-to-cart-row .qty-unit {
+    color: var(--text-light);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.add-to-cart-row .btn-add-cart {
+    flex: 1;
+    padding: 12px 20px;
+}
+
+.add-to-cart-row .btn-add-list {
+    flex-shrink: 0;
+    padding: 10px;
+    width: 42px;
+    height: 42px;
+}
+
+@media (max-width: 480px) {
+    .add-to-cart-row {
+        flex-wrap: wrap;
+    }
+    .add-to-cart-row .qty-wrapper {
+        width: 100%;
+        justify-content: flex-start;
+        margin-bottom: 8px;
+    }
+    .add-to-cart-row .btn-add-cart {
+        flex: 1;
+    }
+    .add-to-cart-row .btn-add-list {
+        flex-shrink: 0;
+    }
 }
 
 .btn {

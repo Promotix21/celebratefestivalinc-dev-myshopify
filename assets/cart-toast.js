@@ -169,17 +169,13 @@
   }
 
   /**
-   * Handle View Cart button from toast - opens cart drawer
+   * Handle View Cart button from toast - navigates to cart page
+   * Bug Fix #2: Changed to always navigate to /cart instead of opening drawer
    */
   function viewCartFromToast() {
     hideToast();
-    // Try to open cart drawer if available
-    if (typeof window.openCartDrawer === 'function') {
-      window.openCartDrawer();
-    } else {
-      // Fallback: navigate to cart page
-      window.location.href = '/cart';
-    }
+    // Always navigate to cart page (Bug Fix #2)
+    window.location.href = '/cart';
   }
 
   // Global functions

@@ -15,14 +15,64 @@
   }
 
   function initializeCart() {
+    // Track last browsed page for "Continue Shopping" functionality
+    trackLastBrowsedPage();
+
     // Bind header cart button
     bindCartButtons();
-    
+
     // Initialize add to cart buttons
     initializeAddToCartButtons();
-    
+
     // Update cart count on page load
     updateCartCount();
+
+    // Bind continue shopping buttons
+    bindContinueShoppingButtons();
+  }
+
+  /**
+   * Track the last browsed collection or product page
+   * Used by "Continue Shopping" button to return users to their last browsed location
+   */
+  function trackLastBrowsedPage() {
+    const currentPath = window.location.pathname;
+
+    // Save current page URL if on a collection or product page
+    if (currentPath.includes('/collections/') || currentPath.includes('/products/')) {
+      sessionStorage.setItem('lastBrowsedPage', window.location.href);
+    }
+  }
+
+  /**
+   * Get the last browsed page URL with fallback
+   */
+  function getLastBrowsedPage() {
+    return sessionStorage.getItem('lastBrowsedPage') || '/collections/all';
+  }
+
+  /**
+   * Bind continue shopping buttons to redirect to last browsed page
+   */
+  function bindContinueShoppingButtons() {
+    const continueShoppingBtn = document.getElementById('continueShoppingBtn');
+    const continueShoppingFooterBtn = document.getElementById('continueShoppingFooterBtn');
+
+    if (continueShoppingBtn) {
+      continueShoppingBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        closeCartDrawer();
+        window.location.href = getLastBrowsedPage();
+      });
+    }
+
+    if (continueShoppingFooterBtn) {
+      continueShoppingFooterBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        closeCartDrawer();
+        window.location.href = getLastBrowsedPage();
+      });
+    }
   }
 
   /**
@@ -134,15 +184,17 @@
       // Success - show success state
       button.innerHTML = '<i class="fas fa-check"></i> Added!';
       button.style.background = 'var(--success-green)';
-      
+
       // Update cart count
       updateCartCount();
-      
-      // Open cart drawer after a brief delay
-      setTimeout(() => {
-        openCartDrawer();
-      }, 500);
-      
+
+      // Show toast notification instead of opening cart drawer
+      if (typeof window.cfShowCartToast === 'function') {
+        // data.items contains the added items array
+        const addedItem = data.items ? data.items[0] : data;
+        window.cfShowCartToast(addedItem, quantity);
+      }
+
       // Reset button after 2 seconds
       setTimeout(() => {
         button.innerHTML = originalHTML;
@@ -209,9 +261,20 @@
   function openCartDrawer() {
     const cartDrawer = document.getElementById('cartDrawer');
     if (cartDrawer) {
+      // Ensure overlay is properly set up before showing
+      const overlay = cartDrawer.querySelector('.cart-drawer-overlay');
+      if (overlay && !overlay.dataset.bound) {
+        overlay.dataset.bound = 'true';
+        overlay.addEventListener('click', function(e) {
+          if (e.target === overlay) {
+            closeCartDrawer();
+          }
+        });
+      }
+
       cartDrawer.classList.add('active');
       document.body.style.overflow = 'hidden';
-      
+
       // Refresh cart contents
       refreshCartDrawer();
     }
@@ -225,6 +288,12 @@
     if (cartDrawer) {
       cartDrawer.classList.remove('active');
       document.body.style.overflow = '';
+
+      // Blur any active inputs (fixes order notes staying selected)
+      const activeElement = document.activeElement;
+      if (activeElement && (activeElement.tagName === 'TEXTAREA' || activeElement.tagName === 'INPUT')) {
+        activeElement.blur();
+      }
     }
   };
 
@@ -346,9 +415,11 @@
 
   /**
    * Close cart on overlay click
+   * Note: This is a backup handler. Primary handler is bound in openCartDrawer()
    */
   document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('cart-drawer-overlay')) {
+    // Check if clicked element is the overlay (not a child element)
+    if (e.target.classList.contains('cart-drawer-overlay') && e.target === e.currentTarget) {
       closeCartDrawer();
     }
   });

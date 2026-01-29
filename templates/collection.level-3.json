@@ -1,29 +1,19 @@
 {
   "sections": {
-    "breadcrumb": {
-      "type": "collection-breadcrumb",
-      "settings": {
-        "background_color": "#f8f9fa",
-        "text_color": "#666666",
-        "link_color": "#333333",
-        "link_hover_color": "#ff6b6b",
-        "padding_top": 16,
-        "padding_bottom": 16
-      }
-    },
     "main_collection": {
       "type": "main-collection",
       "settings": {
         "products_per_page": 24,
-        "products_per_row_desktop": 3,
+        "products_per_row_desktop": 4,
         "products_per_row_tablet": 2,
         "products_per_row_mobile": 2,
-        "image_ratio": "adapt",
+        "image_ratio": "square",
         "enable_filtering": true,
         "filter_type": "vertical",
         "show_filter_counts": true,
         "enable_sorting": true,
         "enable_view_toggle": true,
+        "enable_compare": false,
         "default_sort": "manual",
         "show_vendor": true,
         "show_product_type": false,
@@ -66,7 +56,6 @@
     }
   },
   "order": [
-    "breadcrumb",
     "main_collection",
     "rich_text"
   ]

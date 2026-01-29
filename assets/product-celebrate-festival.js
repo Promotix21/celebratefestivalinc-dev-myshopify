@@ -109,67 +109,77 @@
   /**
    * Product Form Handler
    * Handles add to cart functionality
+   * Bug Fix #10: Updated to intercept all product forms and show toast notification
    */
   function initProductForm() {
-    const form = document.querySelector('#product-form');
+    // Bug Fix #10: Get all product forms on the page
+    const forms = document.querySelectorAll('[id^="product-form-"], #product-form, form.add-to-cart-row');
 
-    if (!form) return;
+    if (forms.length === 0) return;
 
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
+    forms.forEach(form => {
+      // Prevent double-binding
+      if (form.dataset.ajaxBound) return;
+      form.dataset.ajaxBound = 'true';
 
-      const formData = new FormData(form);
-      const addButton = form.querySelector('.btn-add-cart');
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
 
-      if (!addButton) return;
+        const formData = new FormData(form);
+        const addButton = form.querySelector('.btn-add-cart, [type="submit"]');
 
-      // Disable button and show loading state
-      addButton.disabled = true;
-      const originalText = addButton.innerHTML;
-      addButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+        if (!addButton) return;
 
-      // Submit to Shopify cart
-      fetch('/cart/add.js', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.json())
-      .then(data => {
-        // Success - show confirmation
-        addButton.innerHTML = '<i class="fas fa-check"></i> Added!';
-        addButton.style.background = 'var(--success-green)';
+        // Disable button and show loading state
+        addButton.disabled = true;
+        const originalText = addButton.innerHTML;
+        addButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
 
-        // Trigger Shopify cart drawer if available
-        if (typeof Shopify !== 'undefined' && Shopify.theme && Shopify.theme.cart) {
-          Shopify.theme.cart.refresh();
-        }
+        // Submit to Shopify cart via AJAX
+        fetch('/cart/add.js', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Success - show confirmation
+          addButton.innerHTML = '<i class="fas fa-check"></i> Added!';
+          addButton.style.background = 'var(--success-green)';
 
-        // Dispatch custom event for theme cart
-        document.dispatchEvent(new CustomEvent('cart:updated'));
+          // Dispatch custom event for theme cart
+          document.dispatchEvent(new CustomEvent('cart:updated'));
 
-        // Reset button after 2 seconds
-        setTimeout(() => {
-          addButton.disabled = false;
-          addButton.innerHTML = originalText;
-          addButton.style.background = '';
-        }, 2000);
+          // Show toast notification - Bug Fix #10
+          if (typeof window.cfShowCartToast === 'function') {
+            const qty = parseInt(form.querySelector('[name="quantity"]')?.value) || 1;
+            window.cfShowCartToast(data, qty);
+          }
 
-        // Update cart count if element exists
-        updateCartCount();
-      })
-      .catch(error => {
-        console.error('Error adding to cart:', error);
+          // Reset button after 2 seconds
+          setTimeout(() => {
+            addButton.disabled = false;
+            addButton.innerHTML = originalText;
+            addButton.style.background = '';
+          }, 2000);
 
-        // Error state
-        addButton.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
-        addButton.style.background = 'var(--primary-coral)';
+          // Update cart count if element exists
+          updateCartCount();
+        })
+        .catch(error => {
+          console.error('Error adding to cart:', error);
 
-        // Reset button after 2 seconds
-        setTimeout(() => {
-          addButton.disabled = false;
-          addButton.innerHTML = originalText;
-          addButton.style.background = '';
-        }, 2000);
+          // Error state
+          addButton.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
+          addButton.style.background = 'var(--primary-coral)';
+
+          // Reset button after 2 seconds
+          setTimeout(() => {
+            addButton.disabled = false;
+            addButton.innerHTML = originalText;
+            addButton.style.background = '';
+          }, 2000);
+        });
       });
     });
   }

@@ -305,6 +305,124 @@ HEADER.LIQUID - Main Header Section
   }
 
   /* ===========================================
+     ACCOUNT DROPDOWN STYLES
+     =========================================== */
+  .account-dropdown-wrapper {
+    position: relative;
+  }
+
+  .header-link-btn {
+    color: var(--header-text);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: {{ section.settings.header_links_font_size }}px;
+    transition: all 0.3s ease;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .header-link-btn:hover {
+    color: var(--menu-hover-text);
+    background: var(--menu-hover-bg);
+  }
+
+  .header-link-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .account-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    min-width: 250px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+  }
+
+  .account-dropdown-wrapper:hover .account-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .account-dropdown-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+    border-radius: 8px 8px 0 0;
+  }
+
+  .account-dropdown-name {
+    font-weight: 700;
+    font-size: 15px;
+    color: #1a365d;
+    margin-bottom: 4px;
+  }
+
+  .account-dropdown-email {
+    font-size: 12px;
+    color: #64748b;
+  }
+
+  .account-dropdown-menu {
+    list-style: none;
+    margin: 0;
+    padding: 8px 0;
+  }
+
+  .account-dropdown-menu li {
+    margin: 0;
+  }
+
+  .account-dropdown-menu a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    color: #475569;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .account-dropdown-menu a:hover {
+    background: #f8fafc;
+    color: #1a365d;
+  }
+
+  .account-dropdown-menu svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  .account-dropdown-divider {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 8px 0;
+  }
+
+  .account-dropdown-menu li:last-child a {
+    color: #dc2626;
+  }
+
+  .account-dropdown-menu li:last-child a:hover {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  /* ===========================================
      NAVIGATION STYLES
      =========================================== */
   .main-navigation {
@@ -405,6 +523,40 @@ HEADER.LIQUID - Main Header Section
 
   .mega-menu-column {
     padding: 20px;
+  }
+
+  .mega-menu-category-image {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .mega-menu-image-link:hover .mega-menu-category-image {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .mega-menu-column h3 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .mega-menu-column h3 a:hover {
+    color: var(--accent-color);
+  }
+
+  .view-category-link {
+    color: #666;
+    font-size: 13px;
+    font-style: italic;
+  }
+
+  .view-all-link {
+    color: var(--accent-color) !important;
+    font-weight: 600;
   }
 
   .mega-menu-column h3 {
@@ -751,12 +903,64 @@ HEADER.LIQUID - Main Header Section
 
       <!-- Header Links -->
       <div class="header-links">
-        <a href="{{ routes.account_url }}" class="header-link">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-          </svg>
-          Login
-        </a>
+        <div class="header-link account-dropdown-wrapper">
+          <a href="{{ routes.account_url }}" class="header-link-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            {% if customer %}My Account{% else %}Login{% endif %}
+          </a>
+
+          {% if customer %}
+          <div class="account-dropdown">
+            <div class="account-dropdown-header">
+              <div class="account-dropdown-name">{{ customer.first_name | default: customer.name }}</div>
+              <div class="account-dropdown-email">{{ customer.email }}</div>
+            </div>
+            <ul class="account-dropdown-menu">
+              <li>
+                <a href="{{ routes.account_url }}">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                  Account Dashboard
+                </a>
+              </li>
+              <li>
+                <a href="{{ routes.account_url }}/orders">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                  </svg>
+                  Orders
+                </a>
+              </li>
+              <li>
+                <a href="{{ routes.account_url }}/addresses">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                  </svg>
+                  Addresses
+                </a>
+              </li>
+              <li class="account-dropdown-divider"></li>
+              <li>
+                <a href="{{ routes.account_logout_url }}" class="logout-link" onclick="sessionStorage.setItem('logout_return', window.location.pathname);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                  </svg>
+                  Logout
+                </a>
+              </li>
+            </ul>
+          </div>
+          {% endif %}
+        </div>
+
         <a href="{{ routes.cart_url }}" class="header-link cart-link">
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
@@ -858,6 +1062,18 @@ HEADER.LIQUID - Main Header Section
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // Logout redirect - redirect back to previous page after logout
+  {% unless customer %}
+    var logoutReturn = sessionStorage.getItem('logout_return');
+    if (logoutReturn) {
+      sessionStorage.removeItem('logout_return');
+      // Don't redirect to account pages (they require login)
+      if (logoutReturn !== '/account' && !logoutReturn.includes('/account/')) {
+        window.location.href = logoutReturn;
+      }
+    }
+  {% endunless %}
+
   // Mobile menu functionality
   const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
   const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');

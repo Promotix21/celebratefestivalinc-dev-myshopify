@@ -4,6 +4,17 @@ class CartDrawer extends HTMLElement {
 
     this.addEventListener('keyup', (evt) => evt.code === 'Escape' && this.close());
     this.querySelector('#CartDrawer-Overlay').addEventListener('click', this.close.bind(this));
+    
+    // Close open details (like cart note) when clicking outside of them within the drawer
+    this.addEventListener('click', (event) => {
+      // Ignore logout link clicks
+      if (event.target.closest('a[href*="logout"]') || event.target.closest('.logout-link')) return;
+      if (event.target.closest('details')) return;
+      this.querySelectorAll('details[open]').forEach(details => {
+        details.removeAttribute('open');
+      });
+    });
+
     this.setHeaderCartIconAccessibility();
   }
 
@@ -14,6 +25,8 @@ class CartDrawer extends HTMLElement {
     cartLink.setAttribute('role', 'button');
     cartLink.setAttribute('aria-haspopup', 'dialog');
     cartLink.addEventListener('click', (event) => {
+      // Don't open cart drawer if clicking logout link
+      if (event.target.closest('a[href*="logout"]') || event.target.closest('.logout-link')) return;
       event.preventDefault();
       this.open(cartLink);
     });

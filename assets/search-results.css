@@ -94,12 +94,12 @@
   min-width: 260px;
   flex-shrink: 0;
   padding: 24px;
-  padding-bottom: 40px; /* BUG-018 FIX: Extra bottom padding for price filter */
+  padding-bottom: 60px; /* Extra bottom padding for price filter visibility */
   border-right: 1px solid var(--border-color);
   background: var(--bg-light);
   position: sticky;
-  top: 0;
-  max-height: calc(100vh - 20px); /* BUG-018 FIX: Allow space for content */
+  top: 120px; /* Account for header height */
+  max-height: calc(100vh - 140px); /* Account for header and spacing */
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -130,7 +130,7 @@
 
 .filter-section:last-child {
   margin-bottom: 0;
-  padding-bottom: 0;
+  padding-bottom: 20px; /* Keep padding for price range visibility */
   border-bottom: none;
 }
 
@@ -283,10 +283,10 @@
 }
 
 /* Price Range - Matching L2 */
-/* BUG-018 FIX: Ensure price filter is fully visible */
+/* FIX: Ensure price filter is fully visible */
 .price-range {
   margin-top: 10px;
-  padding-bottom: 20px;
+  padding-bottom: 10px;
 }
 
 .price-inputs {

@@ -205,7 +205,10 @@
     {% if section.settings.title != blank %}
       <h2 class="hexagon-title">{{ section.settings.title }}</h2>
     {% endif %}
-    
+
+    {%- comment %} Default brand links mapping for 18 priority brands {% endcomment -%}
+    {%- assign brand_links = '/collections/atosa-all,/collections/gsw,/collections/thunder-group,/collections/combi-oven-rational,/pages/cf-robot-coupe,/pages/cf-cac,/pages/turboair-page,/pages/waring,/pages/cf-eurodib,/collections/winco,/collections/sammic,/pages/globe,/collections/shaan,/collections/somerset,/pages/global-solutions,/collections/rotoquip,/collections/kwitex,/collections/yanco-product-collection' | split: ',' -%}
+
    <div class="hexagon-grid">
   <!-- Row 1: 8 hexagons -->
   <div class="hex-row">
@@ -214,35 +217,34 @@
       {% assign link_key = 'link_row1_' | append: i %}
       {% assign logo = section.settings[logo_key] %}
       {% assign link_url = section.settings[link_key] %}
-      
-      {% if link_url != blank %}
-        <a href="{{ link_url }}" class="hexagon-link">
-      {% endif %}
-      <div class="hexagon-item">
-        <svg class="hexagon-svg" viewBox="0 0 80 70">
-          <defs>
-            <linearGradient id="hexBorderGradient-row1-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
-              <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
-            </linearGradient>
-          </defs>
-          <polygon class="hex-shape" 
-            points="40,2 70,18 70,52 40,68 10,52 10,18"
-            fill="{{ section.settings.hex_background }}"
-            stroke="url(#hexBorderGradient-row1-{{ i }})"
-            stroke-width="{{ section.settings.hex_border_width }}" />
-          <foreignObject x="15" y="25" width="50" height="40">
-            {% if logo != blank %}
-              <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ i }}" loading="lazy">
-            {% else %}
-              <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
-            {% endif %}
-          </foreignObject>
-        </svg>
-      </div>
-      {% if link_url != blank %}
-        </a>
-      {% endif %}
+
+      {%- assign brand_idx = forloop.index0 -%}
+      {%- assign default_brand_link = brand_links[brand_idx] | default: '/pages/brands' -%}
+      {% assign hex_link = link_url | default: default_brand_link %}
+      <a href="{{ hex_link }}" class="hexagon-link">
+        <div class="hexagon-item">
+          <svg class="hexagon-svg" viewBox="0 0 80 70">
+            <defs>
+              <linearGradient id="hexBorderGradient-row1-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
+                <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
+              </linearGradient>
+            </defs>
+            <polygon class="hex-shape"
+              points="40,2 70,18 70,52 40,68 10,52 10,18"
+              fill="{{ section.settings.hex_background }}"
+              stroke="url(#hexBorderGradient-row1-{{ i }})"
+              stroke-width="{{ section.settings.hex_border_width }}" />
+            <foreignObject x="15" y="25" width="50" height="40">
+              {% if logo != blank %}
+                <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ i }}" loading="lazy">
+              {% else %}
+                <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
+              {% endif %}
+            </foreignObject>
+          </svg>
+        </div>
+      </a>
     {% endfor %}
   </div>
 
@@ -253,35 +255,34 @@
       {% assign link_key = 'link_row2_' | append: i %}
       {% assign logo = section.settings[logo_key] %}
       {% assign link_url = section.settings[link_key] %}
-      
-      {% if link_url != blank %}
-        <a href="{{ link_url }}" class="hexagon-link">
-      {% endif %}
-      <div class="hexagon-item">
-        <svg class="hexagon-svg" viewBox="0 0 80 70">
-          <defs>
-            <linearGradient id="hexBorderGradient-row2-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
-              <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
-            </linearGradient>
-          </defs>
-          <polygon class="hex-shape" 
-            points="40,2 70,18 70,52 40,68 10,52 10,18"
-            fill="{{ section.settings.hex_background }}"
-            stroke="url(#hexBorderGradient-row2-{{ i }})"
-            stroke-width="{{ section.settings.hex_border_width }}" />
-          <foreignObject x="17" y="25" width="46" height="36">
-            {% if logo != blank %}
-              <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ i }}" loading="lazy">
-            {% else %}
-              <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
-            {% endif %}
-          </foreignObject>
-        </svg>
-      </div>
-      {% if link_url != blank %}
-        </a>
-      {% endif %}
+
+      {%- assign brand_idx = forloop.index0 | plus: 8 -%}
+      {%- assign default_brand_link = brand_links[brand_idx] | default: '/pages/brands' -%}
+      {% assign hex_link = link_url | default: default_brand_link %}
+      <a href="{{ hex_link }}" class="hexagon-link">
+        <div class="hexagon-item">
+          <svg class="hexagon-svg" viewBox="0 0 80 70">
+            <defs>
+              <linearGradient id="hexBorderGradient-row2-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
+                <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
+              </linearGradient>
+            </defs>
+            <polygon class="hex-shape"
+              points="40,2 70,18 70,52 40,68 10,52 10,18"
+              fill="{{ section.settings.hex_background }}"
+              stroke="url(#hexBorderGradient-row2-{{ i }})"
+              stroke-width="{{ section.settings.hex_border_width }}" />
+            <foreignObject x="17" y="25" width="46" height="36">
+              {% if logo != blank %}
+                <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ i }}" loading="lazy">
+              {% else %}
+                <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
+              {% endif %}
+            </foreignObject>
+          </svg>
+        </div>
+      </a>
     {% endfor %}
   </div>
 
@@ -292,35 +293,34 @@
       {% assign link_key = 'link_row3_' | append: i %}
       {% assign logo = section.settings[logo_key] %}
       {% assign link_url = section.settings[link_key] %}
-      
-      {% if link_url != blank %}
-        <a href="{{ link_url }}" class="hexagon-link">
-      {% endif %}
-      <div class="hexagon-item">
-        <svg class="hexagon-svg" viewBox="0 0 80 70">
-          <defs>
-            <linearGradient id="hexBorderGradient-row3-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
-              <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
-            </linearGradient>
-          </defs>
-          <polygon class="hex-shape" 
-            points="40,2 70,18 70,52 40,68 10,52 10,18"
-            fill="{{ section.settings.hex_background }}"
-            stroke="url(#hexBorderGradient-row3-{{ i }})"
-            stroke-width="{{ section.settings.hex_border_width }}" />
-          <foreignObject x="17" y="25" width="46" height="36">
-            {% if logo != blank %}
-              <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ i }}" loading="lazy">
-            {% else %}
-              <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
-            {% endif %}
-          </foreignObject>
-        </svg>
-      </div>
-      {% if link_url != blank %}
-        </a>
-      {% endif %}
+
+      {%- assign brand_idx = forloop.index0 | plus: 17 -%}
+      {%- assign default_brand_link = brand_links[brand_idx] | default: '/pages/brands' -%}
+      {% assign hex_link = link_url | default: default_brand_link %}
+      <a href="{{ hex_link }}" class="hexagon-link">
+        <div class="hexagon-item">
+          <svg class="hexagon-svg" viewBox="0 0 80 70">
+            <defs>
+              <linearGradient id="hexBorderGradient-row3-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
+                <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
+              </linearGradient>
+            </defs>
+            <polygon class="hex-shape"
+              points="40,2 70,18 70,52 40,68 10,52 10,18"
+              fill="{{ section.settings.hex_background }}"
+              stroke="url(#hexBorderGradient-row3-{{ i }})"
+              stroke-width="{{ section.settings.hex_border_width }}" />
+            <foreignObject x="17" y="25" width="46" height="36">
+              {% if logo != blank %}
+                <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ i }}" loading="lazy">
+              {% else %}
+                <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
+              {% endif %}
+            </foreignObject>
+          </svg>
+        </div>
+      </a>
     {% endfor %}
   </div>
 
@@ -331,35 +331,34 @@
       {% assign link_key = 'link_row4_' | append: i %}
       {% assign logo = section.settings[logo_key] %}
       {% assign link_url = section.settings[link_key] %}
-      
-      {% if link_url != blank %}
-        <a href="{{ link_url }}" class="hexagon-link">
-      {% endif %}
-      <div class="hexagon-item">
-        <svg class="hexagon-svg" viewBox="0 0 80 70">
-          <defs>
-            <linearGradient id="hexBorderGradient-row4-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
-              <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
-            </linearGradient>
-          </defs>
-          <polygon class="hex-shape" 
-            points="40,2 70,18 70,52 40,68 10,52 10,18"
-            fill="{{ section.settings.hex_background }}"
-            stroke="url(#hexBorderGradient-row4-{{ i }})"
-            stroke-width="{{ section.settings.hex_border_width }}" />
-          <foreignObject x="17" y="25" width="46" height="36">
-            {% if logo != blank %}
-              <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ i }}" loading="lazy">
-            {% else %}
-              <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
-            {% endif %}
-          </foreignObject>
-        </svg>
-      </div>
-      {% if link_url != blank %}
-        </a>
-      {% endif %}
+
+      {%- assign brand_idx = forloop.index0 | plus: 25 -%}
+      {%- assign default_brand_link = brand_links[brand_idx] | default: '/pages/brands' -%}
+      {% assign hex_link = link_url | default: default_brand_link %}
+      <a href="{{ hex_link }}" class="hexagon-link">
+        <div class="hexagon-item">
+          <svg class="hexagon-svg" viewBox="0 0 80 70">
+            <defs>
+              <linearGradient id="hexBorderGradient-row4-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
+                <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
+              </linearGradient>
+            </defs>
+            <polygon class="hex-shape"
+              points="40,2 70,18 70,52 40,68 10,52 10,18"
+              fill="{{ section.settings.hex_background }}"
+              stroke="url(#hexBorderGradient-row4-{{ i }})"
+              stroke-width="{{ section.settings.hex_border_width }}" />
+            <foreignObject x="17" y="25" width="46" height="36">
+              {% if logo != blank %}
+                <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ i }}" loading="lazy">
+              {% else %}
+                <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
+              {% endif %}
+            </foreignObject>
+          </svg>
+        </div>
+      </a>
     {% endfor %}
   </div>
 </div>
