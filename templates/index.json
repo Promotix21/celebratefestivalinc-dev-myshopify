@@ -249,75 +249,81 @@
       "blocks": {
         "category_Vc4BTc": {
           "type": "category",
+          "name": "Commercial Ovens",
           "settings": {
             "category_name": "Commercial Ovens",
             "category_image": "shopify://shop_images/Combi_Oven.jpg",
-            "category_link": "",
+            "category_link": "/collections/commercial-ovens",
             "visible_by_default": true,
             "show_brand_overlay": false,
-            "show_badge": false,
-            "badge_text": "SALE",
-            "badge_type": "sale"
+            "show_badge": true,
+            "badge_text": "hot",
+            "badge_type": "hot"
           }
         },
         "category_73H3M7": {
           "type": "category",
+          "name": "Refrigeration",
           "settings": {
             "category_name": "Refrigeration",
             "category_image": "shopify://shop_images/Refrigeration___Ice_Makers.jpg",
-            "category_link": "",
-            "visible_by_default": true,
-            "show_brand_overlay": false,
-            "show_badge": false,
-            "badge_text": "SALE",
-            "badge_type": "sale"
-          }
-        },
-        "category_8FkQnh": {
-          "type": "category",
-          "settings": {
-            "category_name": "Smallwares",
-            "category_image": "shopify://shop_images/Smallwares_6cb850ca-b73e-4306-ba8f-17b25120446e.png",
-            "category_link": "",
+            "category_link": "/collections/refrigeration",
             "visible_by_default": true,
             "show_brand_overlay": false,
             "show_badge": true,
-            "badge_text": "SALE",
-            "badge_type": "sale"
+            "badge_text": "Hot",
+            "badge_type": "hot"
           }
         },
         "category_giA3Gh": {
           "type": "category",
+          "name": "Food Prep Equipment",
           "settings": {
             "category_name": "Food Prep Equipment",
             "category_image": "shopify://shop_images/Food_Prepartion_Equipment.jpg",
-            "category_link": "",
+            "category_link": "/collections/food-preparation",
             "visible_by_default": true,
             "show_brand_overlay": false,
             "show_badge": true,
-            "badge_text": "NEW",
-            "badge_type": "new"
+            "badge_text": "Sale",
+            "badge_type": "sale"
           }
         },
-        "category_fKw8LT": {
+        "category_Kjnh7e": {
           "type": "category",
+          "name": "Food Display and Merchandising",
           "settings": {
-            "category_name": "Dishwashers",
-            "category_image": "shopify://shop_images/Dishwasher_feae2d4f-344d-4c23-a14b-2fb161f32fb2.jpg",
-            "category_link": "",
+            "category_name": "Food Display and Merchandising",
+            "category_image": "shopify://shop_images/Food_Display_and_Merchandising_d633a006-3e88-482f-b6ce-bf78d6fc0d9a.png",
+            "category_link": "/collections/food-display-and-merchandising",
             "visible_by_default": false,
             "show_brand_overlay": false,
             "show_badge": false,
+            "badge_text": "New",
+            "badge_type": "new"
+          }
+        },
+        "category_8FkQnh": {
+          "type": "category",
+          "name": "Smallwares",
+          "settings": {
+            "category_name": "Smallwares",
+            "category_image": "shopify://shop_images/Smallwares_6cb850ca-b73e-4306-ba8f-17b25120446e.png",
+            "category_link": "/collections/smallwares",
+            "visible_by_default": true,
+            "show_brand_overlay": false,
+            "show_badge": true,
             "badge_text": "SALE",
             "badge_type": "sale"
           }
         },
         "category_AE4BTa": {
           "type": "category",
+          "name": "Grills & Fryers",
           "settings": {
             "category_name": "Grills & Fryers",
             "category_image": "shopify://shop_images/Cooking_Equipments.jpg",
-            "category_link": "",
+            "category_link": "/collections/new-theme-gas-griddles",
             "visible_by_default": false,
             "show_brand_overlay": false,
             "show_badge": false,
@@ -331,7 +337,7 @@
           "settings": {
             "category_name": "Work Tables",
             "category_image": "shopify://shop_images/Work_table.png",
-            "category_link": "",
+            "category_link": "/collections/new-theme-stainless-steel-work-tables-with-undershelves",
             "visible_by_default": false,
             "show_brand_overlay": false,
             "show_badge": false,
@@ -345,7 +351,21 @@
           "settings": {
             "category_name": "Commercial Mixers",
             "category_image": "shopify://shop_images/Grinder.jpg",
-            "category_link": "",
+            "category_link": "/collections/new-theme-planetary-spiral-mixers",
+            "visible_by_default": false,
+            "show_brand_overlay": false,
+            "show_badge": false,
+            "badge_text": "SALE",
+            "badge_type": "sale"
+          }
+        },
+        "category_84axfr": {
+          "type": "category",
+          "name": "Tabletop & Serving",
+          "settings": {
+            "category_name": "Tabletop & Serving",
+            "category_image": "shopify://shop_images/Serveware_5727e24c-69fe-4842-bf2c-bc190420df3c.jpg",
+            "category_link": "/collections/tabletop",
             "visible_by_default": false,
             "show_brand_overlay": false,
             "show_badge": false,
@@ -355,28 +375,16 @@
         },
         "category_CqyCHH": {
           "type": "category",
+          "name": "Indian Specialty Equipment",
           "settings": {
             "category_name": "Indian Specialty Equipment",
             "category_image": "shopify://shop_images/Indian_cookware.jpg",
-            "category_link": "",
+            "category_link": "/collections/idli-momo-steamer-all",
             "visible_by_default": false,
             "show_brand_overlay": false,
             "show_badge": true,
             "badge_text": "HOT",
             "badge_type": "hot"
-          }
-        },
-        "category_84axfr": {
-          "type": "category",
-          "settings": {
-            "category_name": "Tabletop & Serving",
-            "category_image": "shopify://shop_images/Serveware_5727e24c-69fe-4842-bf2c-bc190420df3c.jpg",
-            "category_link": "",
-            "visible_by_default": false,
-            "show_brand_overlay": false,
-            "show_badge": false,
-            "badge_text": "SALE",
-            "badge_type": "sale"
           }
         },
         "category_bptedy": {
@@ -385,7 +393,7 @@
           "settings": {
             "category_name": "Tandoor Equipment",
             "category_image": "shopify://shop_images/Indian_gas___catering_tandoor.jpg",
-            "category_link": "",
+            "category_link": "/collections/new-theme-tandoor-and-parts",
             "visible_by_default": false,
             "show_brand_overlay": true,
             "brand_logo_1": "shopify://shop_images/1_0003_Shaan-logo-1.png",
@@ -397,11 +405,11 @@
         },
         "category_GD8kU9": {
           "type": "category",
-          "name": "Indian Gas & Catering Tandoor",
+          "name": "Indian Serveware",
           "settings": {
-            "category_name": "Indian Gas & Catering Tandoor",
-            "category_image": "shopify://shop_images/Cooking_Equipments.jpg",
-            "category_link": "",
+            "category_name": "Indian Serveware",
+            "category_image": "shopify://shop_images/Indian_Specialty_-_Serveware.png",
+            "category_link": "shopify://collections/indian-specialty-serveware",
             "visible_by_default": false,
             "show_brand_overlay": false,
             "show_badge": false,
@@ -409,11 +417,13 @@
             "badge_type": "sale"
           }
         },
-        "category_Kjnh7e": {
+        "category_fKw8LT": {
           "type": "category",
+          "name": "Dishwashers",
+          "disabled": true,
           "settings": {
-            "category_name": "Serveware",
-            "category_image": "shopify://shop_images/Serveware_5727e24c-69fe-4842-bf2c-bc190420df3c.jpg",
+            "category_name": "Dishwashers",
+            "category_image": "shopify://shop_images/Dishwasher_feae2d4f-344d-4c23-a14b-2fb161f32fb2.jpg",
             "category_link": "",
             "visible_by_default": false,
             "show_brand_overlay": false,
@@ -426,17 +436,17 @@
       "block_order": [
         "category_Vc4BTc",
         "category_73H3M7",
-        "category_8FkQnh",
         "category_giA3Gh",
-        "category_fKw8LT",
+        "category_Kjnh7e",
+        "category_8FkQnh",
         "category_AE4BTa",
         "category_acBy7d",
         "category_r664Fq",
-        "category_CqyCHH",
         "category_84axfr",
+        "category_CqyCHH",
         "category_bptedy",
         "category_GD8kU9",
-        "category_Kjnh7e"
+        "category_fKw8LT"
       ],
       "name": "Featured Categories",
       "settings": {
@@ -553,18 +563,6 @@
         "button_icon_transition": 0.3,
         "animation_duration": 0.5,
         "stagger_animation_delay": 100
-      }
-    },
-    "staff_picks_pzngJ6": {
-      "type": "staff-picks",
-      "name": "Staff Picks",
-      "settings": {
-        "section_title": "Staff Picks",
-        "section_subtitle": "Handpicked by our equipment experts",
-        "product_source": "collection",
-        "featured_collection": "best-selling-collection",
-        "featured_products": [],
-        "products_limit": 8
       }
     },
     "partner_section_7FDna9": {
@@ -718,7 +716,19 @@
         "cta_title": "Don't See Your Restaurant Type?",
         "cta_subtitle": "Our equipment experts work with all types of food businesses. Get personalized recommendations for your specific needs.",
         "cta_button_text": "Get Free Consultation",
-        "cta_button_url": "#"
+        "cta_button_url": "shopify://pages/contact-us"
+      }
+    },
+    "staff_picks_pzngJ6": {
+      "type": "staff-picks",
+      "name": "Staff Picks",
+      "settings": {
+        "section_title": "Staff Picks",
+        "section_subtitle": "Handpicked by our equipment experts",
+        "product_source": "collection",
+        "featured_collection": "new-theme-staff-picks",
+        "featured_products": [],
+        "products_limit": 8
       }
     },
     "testimonials_kqDg6M": {
@@ -761,9 +771,9 @@
     "trust_badges_section_Rc3dXV",
     "hexagon_grid_PCtXnB",
     "featured_categories_e6Ar6U",
-    "staff_picks_pzngJ6",
     "partner_section_7FDna9",
     "industry_use_cases_RGU3Yd",
+    "staff_picks_pzngJ6",
     "testimonials_kqDg6M"
   ]
 }

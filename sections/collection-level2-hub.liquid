@@ -134,21 +134,27 @@
   background: var(--bg-white);
 }
 
-/* Combined Breadcrumb + Header Bar */
-.cf-plp__header-combined {
-  padding: 16px 40px;
+/* ========================================
+   COMPACT HEADER ROW 1 - Breadcrumb (left) | Title (right)
+   ======================================== */
+.cf-plp__header-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 40px;
   background: var(--bg-white);
   border-bottom: 1px solid var(--border-color);
+  gap: 20px;
 }
 
-/* Inline Breadcrumb (compact) */
+/* Inline Breadcrumb (left side) */
 .cf-plp__breadcrumb-inline {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
   font-size: 12px;
-  margin-bottom: 8px;
+  margin: 0;
 }
 
 .cf-plp__breadcrumb-inline a {
@@ -171,7 +177,84 @@
   font-size: 12px;
 }
 
-/* Inline Title */
+/* Compact Title (right side) */
+.cf-plp__title-compact {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--deep-blue);
+  margin: 0;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* ========================================
+   COMPACT TOOLBAR ROW 2 - Filters (left) | View+Sort (right)
+   ======================================== */
+.cf-plp__toolbar-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 40px;
+  background: var(--bg-light);
+  border-bottom: 1px solid var(--border-color);
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.cf-plp__toolbar-compact__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cf-plp__toolbar-compact__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cf-plp__active-filters-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cf-plp__active-filters-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-medium);
+}
+
+.cf-plp__active-filters-list {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cf-plp__clear-all {
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary-blue);
+  cursor: pointer;
+  padding: 0;
+  margin-left: 8px;
+}
+
+.cf-plp__clear-all:hover {
+  color: var(--primary-red);
+}
+
+.cf-plp__results-count {
+  font-size: 13px;
+  color: var(--text-medium);
+}
+
+/* Legacy classes for backwards compatibility */
 .cf-plp__title-inline {
   font-family: 'Montserrat', sans-serif;
   font-size: 24px;
@@ -188,10 +271,18 @@
   line-height: 1.4;
 }
 
-/* Mobile: Show home icon + title only */
+/* Mobile Responsive */
 @media (max-width: 768px) {
-  .cf-plp__header-combined {
-    padding: 16px 20px;
+  .cf-plp__header-compact {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 20px;
+  }
+
+  .cf-plp__title-compact {
+    font-size: 18px;
+    white-space: normal;
   }
 
   .cf-plp__breadcrumb-inline a:not(:first-child),
@@ -200,21 +291,25 @@
     display: none;
   }
 
-  .cf-plp__breadcrumb-inline {
-    margin-bottom: 6px;
-  }
-
   .cf-plp__breadcrumb-inline a:first-child::before {
     content: '🏠';
     margin-right: 4px;
   }
 
-  .cf-plp__title-inline {
-    font-size: 22px;
+  .cf-plp__toolbar-compact {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px 20px;
   }
 
-  .cf-plp__subtitle-inline {
-    font-size: 12px;
+  .cf-plp__toolbar-compact__left {
+    justify-content: flex-start;
+  }
+
+  .cf-plp__toolbar-compact__right {
+    justify-content: space-between;
+    width: 100%;
   }
 }
 
@@ -1152,6 +1247,66 @@
   color: white;
 }
 
+/* ========================================
+   ABOUT THIS CATEGORY - Collapsible Section
+   ======================================== */
+.cf-plp__about-category {
+  margin-top: 40px;
+  padding: 0 0 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.cf-plp__about-category-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 16px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.cf-plp__about-category-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--deep-blue);
+}
+
+.cf-plp__about-category-icon {
+  transition: transform 0.3s ease;
+  color: var(--text-medium);
+}
+
+.cf-plp__about-category-toggle.expanded .cf-plp__about-category-icon {
+  transform: rotate(180deg);
+}
+
+.cf-plp__about-category-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-medium);
+}
+
+.cf-plp__about-category-content[aria-hidden="false"] {
+  padding-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+  .cf-plp__about-category {
+    margin-top: 30px;
+    padding: 0 0 15px;
+  }
+
+  .cf-plp__about-category-title {
+    font-size: 14px;
+  }
+}
+
 .cf-plp__page-ellipsis {
   width: 36px;
   height: 36px;
@@ -1164,8 +1319,8 @@
 
 <div class="cf-plp" data-section-id="{{ section.id }}">
 
-  {% comment %} Combined Breadcrumb + Header Bar {% endcomment %}
-  <header class="cf-plp__header-combined">
+  {% comment %} Compact Header Row 1: Breadcrumb (left) | Title (right) {% endcomment %}
+  <header class="cf-plp__header-compact">
     <nav class="cf-plp__breadcrumb-inline" aria-label="Breadcrumb">
       <a href="/">Home</a>
       <span class="cf-plp__breadcrumb-sep">›</span>
@@ -1185,10 +1340,7 @@
       {% endfor %}
       <span class="cf-plp__breadcrumb-current">{{ collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</span>
     </nav>
-    <h1 class="cf-plp__title-inline">{{ collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</h1>
-    {% if collection.description != blank %}
-      <p class="cf-plp__subtitle-inline">{{ collection.description | strip_html | truncate: 150 }}</p>
-    {% endif %}
+    <h1 class="cf-plp__title-compact">{{ collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</h1>
   </header>
 
   {% comment %} L3 Filter Pills (L2 only) {% endcomment %}
@@ -1510,36 +1662,53 @@
     {% comment %} Products Area {% endcomment %}
     <main class="cf-plp__products">
 
-      {% comment %} Toolbar {% endcomment %}
-      <div class="cf-plp__toolbar">
-        <div class="cf-plp__view-toggle">
-          <button class="cf-plp__view-btn active" data-view="grid">⊞ Grid</button>
-          <button class="cf-plp__view-btn" data-view="list">☰ List</button>
+      {% comment %} Compact Toolbar Row 2: Filters/Count (left) | View Toggle + Sort (right) {% endcomment %}
+      <div class="cf-plp__toolbar-compact">
+        <!-- Left Side: Active Filters or Product Count -->
+        <div class="cf-plp__toolbar-compact__left">
+          <div class="cf-plp__active-filters-inline" id="active-filters" style="display: none;">
+            <span class="cf-plp__active-filters-label">Active Filters:</span>
+            <div class="cf-plp__active-filters-list" id="active-filters-list">
+              <!-- Dynamically populated by JavaScript -->
+            </div>
+            <button type="button" class="cf-plp__clear-all" id="clear-all-filters">Clear All</button>
+          </div>
+          <div class="cf-plp__results-count" id="results-count-display">
+            <strong id="filtered-count">{{ grand_total_products }}</strong> products
+          </div>
         </div>
 
-        <div class="cf-plp__sort">
-          <label for="plp-sort">Sort by</label>
-          <select id="plp-sort" onchange="handleSort(this.value)">
-            <option value="best-selling">Most Popular</option>
-            <option value="price-ascending">Price: Low to High</option>
-            <option value="price-descending">Price: High to Low</option>
-            <option value="title-ascending">Name: A-Z</option>
-          </select>
-        </div>
+        <!-- Right Side: View Toggle + Sort -->
+        <div class="cf-plp__toolbar-compact__right">
+          <div class="cf-plp__view-toggle">
+            <button class="cf-plp__view-btn active" data-view="grid">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                <rect x="0" y="0" width="7" height="7" rx="1"/>
+                <rect x="9" y="0" width="7" height="7" rx="1"/>
+                <rect x="0" y="9" width="7" height="7" rx="1"/>
+                <rect x="9" y="9" width="7" height="7" rx="1"/>
+              </svg>
+              Grid
+            </button>
+            <button class="cf-plp__view-btn" data-view="list">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                <rect x="0" y="1" width="16" height="3" rx="1"/>
+                <rect x="0" y="6" width="16" height="3" rx="1"/>
+                <rect x="0" y="11" width="16" height="3" rx="1"/>
+              </svg>
+              List
+            </button>
+          </div>
 
-        <div class="cf-plp__results-count">
-          <strong id="filtered-count">{{ grand_total_products }}</strong> products
-        </div>
-      </div>
-
-      {% comment %} Active Filters Display {% endcomment %}
-      <div class="cf-plp__active-filters" id="active-filters" style="display: none;">
-        <div class="cf-plp__active-filters-header">
-          <span class="cf-plp__active-filters-label">Active Filters:</span>
-          <button type="button" class="cf-plp__clear-all" id="clear-all-filters">Clear All</button>
-        </div>
-        <div class="cf-plp__active-filters-list" id="active-filters-list">
-          <!-- Dynamically populated by JavaScript -->
+          <div class="cf-plp__sort">
+            <label for="plp-sort">Sort by</label>
+            <select id="plp-sort" onchange="handleSort(this.value)">
+              <option value="best-selling">Most Popular</option>
+              <option value="price-ascending">Price: Low to High</option>
+              <option value="price-descending">Price: High to Low</option>
+              <option value="title-ascending">Name: A-Z</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -1836,11 +2005,42 @@
         </button>
       </div>
 
+      {% comment %} About This Category (SEO Description - Collapsible) {% endcomment %}
+      {% if collection.description != blank %}
+        <div class="cf-plp__about-category">
+          <button class="cf-plp__about-category-toggle" onclick="toggleAboutCategory(this)" aria-expanded="false">
+            <span class="cf-plp__about-category-title">About {{ collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</span>
+            <svg class="cf-plp__about-category-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="cf-plp__about-category-content" aria-hidden="true">
+            {{ collection.description }}
+          </div>
+        </div>
+      {% endif %}
+
     </main>
   </div>
 </div>
 
 <script>
+// Toggle About Category section (global function for onclick)
+function toggleAboutCategory(btn) {
+  const content = btn.nextElementSibling;
+  const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+
+  btn.setAttribute('aria-expanded', !isExpanded);
+  content.setAttribute('aria-hidden', isExpanded);
+  btn.classList.toggle('expanded', !isExpanded);
+
+  if (!isExpanded) {
+    content.style.maxHeight = content.scrollHeight + 'px';
+  } else {
+    content.style.maxHeight = '0';
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   'use strict';
 

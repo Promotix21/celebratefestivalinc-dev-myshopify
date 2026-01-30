@@ -143,14 +143,17 @@
 
         {%- form 'customer_login', novalidate: 'novalidate' -%}
           {%- comment %} Capture return_url from query string to redirect back after login {% endcomment -%}
-          {%- assign return_url = request.path -%}
+          {%- assign return_url = '' -%}
           {%- if request.query_string contains 'return_url=' -%}
             {%- assign return_url_parts = request.query_string | split: 'return_url=' -%}
             {%- if return_url_parts.size > 1 -%}
               {%- assign return_url = return_url_parts[1] | split: '&' | first | url_decode -%}
             {%- endif -%}
           {%- endif -%}
-          <input type="hidden" name="checkout_url" value="{{ return_url }}">
+          {%- comment %} Only set checkout_url if we have a valid return URL (not the login page) {% endcomment -%}
+          {%- if return_url != blank and return_url != '/account/login' -%}
+            <input type="hidden" name="checkout_url" value="{{ return_url }}">
+          {%- endif -%}
 
           {%- if form.errors -%}
             <div class="cf-alert cf-alert-error">
@@ -223,6 +226,49 @@
     </div>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Fix for login button requiring double-click
+  // Ensure form submits on first click by handling the button click explicitly
+  var loginForm = document.querySelector('form[action*="login"]');
+  var loginButton = loginForm ? loginForm.querySelector('button[type="submit"]') : null;
+
+  if (loginButton && loginForm) {
+    loginButton.addEventListener('click', function(e) {
+      // Prevent default only if we're going to handle it
+      var email = loginForm.querySelector('input[type="email"]');
+      var password = loginForm.querySelector('input[type="password"]');
+
+      // Check if both fields have values before submitting
+      if (email && email.value && password && password.value) {
+        // Let the form submit naturally
+        return true;
+      } else if (email && !email.value) {
+        // Focus on empty email field
+        email.focus();
+        e.preventDefault();
+        return false;
+      } else if (password && !password.value) {
+        // Focus on empty password field
+        password.focus();
+        e.preventDefault();
+        return false;
+      }
+    });
+
+    // Also handle Enter key in password field
+    var passwordField = loginForm.querySelector('input[type="password"]');
+    if (passwordField) {
+      passwordField.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          loginForm.submit();
+        }
+      });
+    }
+  }
+});
+</script>
 
 {% schema %}
 {

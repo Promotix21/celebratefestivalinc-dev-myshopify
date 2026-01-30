@@ -1,23 +1,39 @@
-<style type="text/css">
-  .template-404 .title + * {
-    margin-top: 1rem;
-  }
+{{ 'cf-pages.css' | asset_url | stylesheet_tag }}
 
-  @media screen and (min-width: 750px) {
-    .template-404 .title + * {
-      margin-top: 2rem;
-    }
-  }
-</style>
+<div class="cf-404">
+  <div class="cf-404__icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"></circle>
+      <path d="M21 21l-4.35-4.35"></path>
+      <path d="M8 8l6 6"></path>
+      <path d="M14 8l-6 6"></path>
+    </svg>
+  </div>
 
-<div class="template-404 page-width page-margin center">
-  <p>
-    {{ 'templates.404.subtext' | t }}
+  <div class="cf-404__code">404</div>
+  <h1 class="cf-404__title">Page Not Found</h1>
+  <p class="cf-404__text">
+    Sorry, we couldn't find the page you're looking for. It might have been moved or doesn't exist.
   </p>
-  <h1 class="title">
-    {{ 'templates.404.title' | t }}
-  </h1>
-  <a href="{{ routes.all_products_collection_url }}" class="button">
-    {{ 'general.continue_shopping' | t }}
+
+  <a href="{{ routes.root_url }}" class="cf-404__btn">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+      <polyline points="9 22 9 12 15 12 15 22"></polyline>
+    </svg>
+    Back to Home
   </a>
+
+  <div class="cf-404__links">
+    <a href="{{ routes.all_products_collection_url }}" class="cf-404__link">Browse Products</a>
+    <a href="{{ routes.collections_url }}" class="cf-404__link">View Collections</a>
+    <a href="/pages/contact" class="cf-404__link">Contact Us</a>
+  </div>
 </div>
+
+{% schema %}
+{
+  "name": "t:sections.404.name",
+  "settings": []
+}
+{% endschema %}

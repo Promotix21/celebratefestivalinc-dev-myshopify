@@ -1,151 +1,170 @@
 {{ 'customer.css' | asset_url | stylesheet_tag }}
+{{ 'customer-accounts.css' | asset_url | stylesheet_tag }}
 
-{%- style -%}
-  .section-{{ section.id }}-padding {
-    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
-    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
-  }
-
-  @media screen and (min-width: 750px) {
-    .section-{{ section.id }}-padding {
-      padding-top: {{ section.settings.padding_top }}px;
-      padding-bottom: {{ section.settings.padding_bottom }}px;
-    }
-  }
-{%- endstyle -%}
-
-<div class="customer account section-{{ section.id }}-padding">
-  <div>
-    <h1 class="customer__title">{{ 'customer.account.title' | t }}</h1>
-    <a href="{{ routes.account_logout_url }}">
-      <span class="svg-wrapper">
-        {{- 'icon-account.svg' | inline_asset_content -}}
-      </span>
-      {{ 'customer.log_out' | t }}
-    </a>
+<div class="cf-account-page">
+  <!-- Account Header -->
+  <div class="cf-account-header">
+    <div class="cf-account-header-content">
+      <div class="cf-account-welcome">
+        <div class="cf-account-avatar">
+          {{ customer.first_name | slice: 0 }}{{ customer.last_name | slice: 0 }}
+        </div>
+        <div class="cf-account-welcome-text">
+          <h1>Welcome back, {{ customer.first_name }}!</h1>
+          <p>{{ customer.email }} &bull; Member since {{ customer.created_at | date: '%B %Y' }}</p>
+        </div>
+      </div>
+      <div class="cf-account-actions">
+        <a href="{{ routes.all_products_collection_url }}" class="cf-btn cf-btn-coral cf-btn-sm">Continue Shopping</a>
+      </div>
+    </div>
   </div>
 
-  <div>
-    <div>
-      <h2>{{ 'customer.orders.title' | t }}</h2>
+  <div class="cf-account-container">
+    <div class="cf-account-layout">
+      <!-- Sidebar -->
+      <aside class="cf-account-sidebar">
+        <ul class="cf-sidebar-nav">
+          <li><a href="{{ routes.account_url }}" class="active"><span class="icon">📊</span> Dashboard</a></li>
+          <li>
+            <a href="{{ routes.account_url }}#orders">
+              <span class="icon">📦</span> Orders
+              {% if customer.orders.size > 0 %}<span class="badge">{{ customer.orders.size }}</span>{% endif %}
+            </a>
+          </li>
+          <li><a href="{{ routes.account_addresses_url }}"><span class="icon">📍</span> Addresses</a></li>
+        </ul>
+        <div class="cf-sidebar-logout">
+          <ul class="cf-sidebar-nav">
+            <li>
+              <a href="{{ routes.account_logout_url }}" class="logout-link" onclick="sessionStorage.setItem('logout_return', window.location.pathname);"><span class="icon">🚪</span> Logout</a>
+            </li>
+          </ul>
+        </div>
+      </aside>
 
-      {% paginate customer.orders by 20 %}
-        {%- if customer.orders.size > 0 -%}
-          <table role="table" class="order-history">
-            <caption class="visually-hidden">
+      <!-- Main Content -->
+      <div class="cf-account-content">
+        <div class="cf-content-header">
+          <h2 class="cf-content-title">Account Overview</h2>
+        </div>
+        <div class="cf-content-body">
+          <!-- Quick Stats -->
+          <div class="cf-dashboard-grid">
+            <div class="cf-dashboard-card">
+              <div class="cf-dashboard-card-icon">📦</div>
+              <h3>Total Orders</h3>
+              <p>{{ customer.orders.size }} orders placed</p>
+              <a href="#orders">View All Orders →</a>
+            </div>
+            <div class="cf-dashboard-card">
+              <div class="cf-dashboard-card-icon">📍</div>
+              <h3>Saved Addresses</h3>
+              <p>{{ customer.addresses_count }} addresses saved</p>
+              <a href="{{ routes.account_addresses_url }}">Manage Addresses →</a>
+            </div>
+            <div class="cf-dashboard-card">
+              <div class="cf-dashboard-card-icon">👤</div>
+              <h3>Account Details</h3>
+              <p>{{ customer.email }}</p>
+              <a href="{{ routes.account_addresses_url }}">Edit Profile →</a>
+            </div>
+          </div>
+
+          <!-- Recent Orders -->
+          <div class="cf-recent-orders" id="orders">
+            <div class="cf-section-title">
               {{ 'customer.orders.title' | t }}
-            </caption>
-            <thead role="rowgroup">
-              <tr role="row">
-                <th id="ColumnOrder" scope="col" role="columnheader">{{ 'customer.orders.order_number' | t }}</th>
-                <th id="ColumnDate" scope="col" role="columnheader">{{ 'customer.orders.date' | t }}</th>
-                <th id="ColumnPayment" scope="col" role="columnheader">{{ 'customer.orders.payment_status' | t }}</th>
-                <th id="ColumnFulfillment" scope="col" role="columnheader">
-                  {{ 'customer.orders.fulfillment_status' | t }}
-                </th>
-                <th id="ColumnTotal" scope="col" role="columnheader">{{ 'customer.orders.total' | t }}</th>
-              </tr>
-            </thead>
-            <tbody role="rowgroup">
-              {%- for order in customer.orders -%}
-                <tr role="row">
-                  <td
-                    id="RowOrder"
-                    role="cell"
-                    headers="ColumnOrder"
-                    data-label="{{ 'customer.orders.order_number' | t }}"
-                  >
-                    <a
-                      href="{{ order.customer_url }}"
-                      aria-label="{{ 'customer.orders.order_number_link' | t: number: order.name }}"
-                    >
-                      {{ order.name }}
-                    </a>
-                  </td>
-                  <td headers="RowOrder ColumnDate" role="cell" data-label="{{ 'customer.orders.date' | t }}">
-                    {{ order.created_at | time_tag: format: 'date' }}
-                  </td>
-                  <td
-                    headers="RowOrder ColumnPayment"
-                    role="cell"
-                    data-label="{{ 'customer.orders.payment_status' | t }}"
-                  >
-                    {{ order.financial_status_label }}
-                  </td>
-                  <td
-                    headers="RowOrder ColumnFulfillment"
-                    role="cell"
-                    data-label="{{ 'customer.orders.fulfillment_status' | t }}"
-                  >
-                    {{ order.fulfillment_status_label }}
-                  </td>
-                  <td headers="RowOrder ColumnTotal" role="cell" data-label="{{ 'customer.orders.total' | t }}">
-                    {{ order.total_net_amount | money_with_currency }}
-                  </td>
-                </tr>
-              {%- endfor -%}
-            </tbody>
-          </table>
-        {%- else -%}
-          <p>{{ 'customer.orders.none' | t }}</p>
-        {%- endif -%}
+              {% if customer.orders.size > 5 %}
+                <a href="#">View All</a>
+              {% endif %}
+            </div>
 
-        {%- if paginate.pages > 1 -%}
-          {%- if paginate.parts.size > 0 -%}
-            <nav class="pagination" role="navigation" aria-label="{{ 'general.pagination.label' | t }}">
-              <ul role="list">
-                {%- if paginate.previous -%}
-                  <li>
-                    <a href="{{ paginate.previous.url }}" aria-label="{{ 'general.pagination.previous' | t }}">
-                      <span class="svg-wrapper">
-                        {{- 'icon-caret.svg' | inline_asset_content -}}
-                      </span>
-                    </a>
-                  </li>
-                {%- endif -%}
+            {% paginate customer.orders by 20 %}
+              {%- if customer.orders.size > 0 -%}
+                <table class="cf-orders-table">
+                  <thead>
+                    <tr>
+                      <th>{{ 'customer.orders.order_number' | t }}</th>
+                      <th>{{ 'customer.orders.date' | t }}</th>
+                      <th>{{ 'customer.orders.payment_status' | t }}</th>
+                      <th>{{ 'customer.orders.fulfillment_status' | t }}</th>
+                      <th>{{ 'customer.orders.total' | t }}</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {%- for order in customer.orders -%}
+                      <tr>
+                        <td data-label="{{ 'customer.orders.order_number' | t }}">
+                          <a href="{{ order.customer_url }}" class="cf-order-number">{{ order.name }}</a>
+                        </td>
+                        <td data-label="{{ 'customer.orders.date' | t }}">
+                          {{ order.created_at | date: '%b %d, %Y' }}
+                        </td>
+                        <td data-label="{{ 'customer.orders.payment_status' | t }}">
+                          <span class="cf-order-status cf-status-{% if order.financial_status == 'paid' %}fulfilled{% elsif order.financial_status == 'pending' %}processing{% else %}processing{% endif %}">
+                            {{ order.financial_status_label }}
+                          </span>
+                        </td>
+                        <td data-label="{{ 'customer.orders.fulfillment_status' | t }}">
+                          <span class="cf-order-status cf-status-{% if order.fulfillment_status == 'fulfilled' %}fulfilled{% elsif order.fulfillment_status == 'partial' %}shipped{% else %}processing{% endif %}">
+                            {{ order.fulfillment_status_label }}
+                          </span>
+                        </td>
+                        <td data-label="{{ 'customer.orders.total' | t }}" class="cf-order-total">
+                          {{ order.total_net_amount | money_with_currency }}
+                        </td>
+                        <td>
+                          <a href="{{ order.customer_url }}" style="color: var(--cf-navy); font-weight: 600;">View</a>
+                        </td>
+                      </tr>
+                    {%- endfor -%}
+                  </tbody>
+                </table>
 
-                {%- for part in paginate.parts -%}
-                  <li>
-                    {%- if part.is_link -%}
-                      <a href="{{ part.url }}" aria-label="{{ 'general.pagination.page' | t: number: part.title }}">
-                        {{- part.title -}}
-                      </a>
-                    {%- else -%}
-                      {%- if part.title == paginate.current_page -%}
-                        <span aria-current="page" aria-label="{{ 'general.pagination.page' | t: number: part.title }}">
-                          {{- part.title -}}
-                        </span>
-                      {%- else -%}
-                        <span>{{ part.title }}</span>
-                      {%- endif -%}
+                {%- if paginate.pages > 1 -%}
+                  <nav class="cf-pagination" role="navigation" aria-label="{{ 'general.pagination.label' | t }}">
+                    {%- if paginate.previous -%}
+                      <a href="{{ paginate.previous.url }}" class="cf-btn cf-btn-outline cf-btn-sm">Previous</a>
                     {%- endif -%}
-                  </li>
-                {%- endfor -%}
-
-                {%- if paginate.next -%}
-                  <li>
-                    <a href="{{ paginate.next.url }}" aria-label="{{ 'general.pagination.next' | t }}">
-                      <span class="svg-wrapper">
-                        {{- 'icon-caret.svg' | inline_asset_content -}}
-                      </span>
-                    </a>
-                  </li>
+                    {%- if paginate.next -%}
+                      <a href="{{ paginate.next.url }}" class="cf-btn cf-btn-outline cf-btn-sm">Next</a>
+                    {%- endif -%}
+                  </nav>
                 {%- endif -%}
-              </ul>
-            </nav>
-          {%- endif -%}
-        {%- endif -%}
-      {% endpaginate %}
-    </div>
+              {%- else -%}
+                <div class="cf-empty-state">
+                  <div class="cf-empty-state-icon">📦</div>
+                  <h3>No Orders Yet</h3>
+                  <p>You haven't placed any orders yet. Start shopping to see your orders here.</p>
+                  <a href="{{ routes.all_products_collection_url }}" class="cf-btn cf-btn-primary" style="width: auto;">Start Shopping</a>
+                </div>
+              {%- endif -%}
+            {% endpaginate %}
+          </div>
 
-    <div>
-      <h2>{{ 'customer.account.details' | t }}</h2>
-
-      {{ customer.default_address | format_address }}
-
-      <a href="{{ routes.account_addresses_url }}">
-        {{ 'customer.account.view_addresses' | t }} ({{ customer.addresses_count }})
-      </a>
+          <!-- Default Address -->
+          {% if customer.default_address %}
+            <div style="margin-top: 30px;">
+              <div class="cf-section-title">
+                {{ 'customer.account.details' | t }}
+                <a href="{{ routes.account_addresses_url }}">{{ 'customer.account.view_addresses' | t }} ({{ customer.addresses_count }})</a>
+              </div>
+              <div class="cf-address-card default" style="max-width: 400px;">
+                <span class="cf-address-badge">Default</span>
+                <div class="cf-address-name">{{ customer.default_address.name }}</div>
+                <div class="cf-address-details">
+                  {{ customer.default_address | format_address }}
+                </div>
+                <div class="cf-address-actions">
+                  <a href="{{ routes.account_addresses_url }}">Edit</a>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -166,7 +185,7 @@
       "step": 4,
       "unit": "px",
       "label": "t:sections.all.padding.padding_top",
-      "default": 36
+      "default": 0
     },
     {
       "type": "range",
@@ -176,7 +195,7 @@
       "step": 4,
       "unit": "px",
       "label": "t:sections.all.padding.padding_bottom",
-      "default": 36
+      "default": 0
     }
   ]
 }

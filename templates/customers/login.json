@@ -8,13 +8,13 @@
  * ------------------------------------------------------------
  */
 {
+  "layout": "theme.auth",
   "sections": {
     "main": {
       "type": "main-login",
       "settings": {
-        "enable_shop_login_button": "true",
-        "padding_top": 36,
-        "padding_bottom": 36
+        "padding_top": 0,
+        "padding_bottom": 0
       }
     }
   },

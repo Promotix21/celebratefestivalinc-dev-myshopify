@@ -12,7 +12,7 @@
 
 @media screen and (max-width: 749px) {
   .multicolumn .title-wrapper-with-link {
-    margin-bottom: 3rem;
+    margin-bottom: 1.5rem;
   }
 }
 
@@ -50,7 +50,7 @@
 
 @media screen and (min-width: 750px) {
   .multicolumn .button {
-    margin-top: 4rem;
+    margin-top: 2rem;
   }
 }
 
@@ -88,9 +88,9 @@
 }
 
 .multicolumn-card-spacing {
-  padding-top: 2.5rem;
-  margin-left: 2.5rem;
-  margin-right: 2.5rem;
+  padding-top: 1.5rem;
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
 }
 
 .multicolumn-card__info > :nth-child(2) {
@@ -137,7 +137,7 @@
   }
 
   .background-none .grid--2-col-tablet .multicolumn-list__item {
-    margin-top: 4rem;
+    margin-top: 2rem;
   }
 }
 
@@ -147,7 +147,7 @@
 }
 
 .multicolumn-card__info {
-  padding: 2.5rem;
+  padding: 1.5rem;
 }
 
 .background-none .multicolumn-card__info {
@@ -161,7 +161,7 @@
 }
 
 .background-none .multicolumn-card__image-wrapper + .multicolumn-card__info {
-  padding-top: 2.5rem;
+  padding-top: 1.5rem;
 }
 
 .background-none .slider .multicolumn-card__info {
@@ -173,8 +173,8 @@
 }
 
 .background-none .multicolumn-list:not(.slider) .center .multicolumn-card__info {
-  padding-left: 2.5rem;
-  padding-right: 2.5rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
 
 @media screen and (max-width: 749px) {

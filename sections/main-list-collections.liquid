@@ -1,168 +1,443 @@
-{{ 'collection-list.css' | asset_url | stylesheet_tag }}
-
 {%- liquid
-  assign sort_by = section.settings.sort
-  assign columns_desktop = section.settings.columns_desktop
-  assign columns_mobile = section.settings.columns_mobile
-  assign image_ratio = section.settings.image_ratio
-  assign show_description = section.settings.show_description
-  assign show_product_count = section.settings.show_product_count
-  assign header_bg_color = section.settings.header_bg_color
-  assign header_overlay_color = section.settings.header_overlay_color
+  assign main_menu = section.settings.main_menu | default: 'main-menu'
+  assign menu = linklists[main_menu]
+  assign header_bg_color = section.settings.header_bg_color | default: '#1a365d'
+  assign header_overlay_color = section.settings.header_overlay_color | default: 'rgba(26, 54, 93, 0.85)'
 -%}
+
+<style>
+  .collections-hub {
+    --cf-deep-blue: #1a365d;
+    --cf-navy: #2d5a87;
+    --cf-coral: #ff6b6b;
+    --cf-text-dark: #0f172a;
+    --cf-text-medium: #475569;
+    --cf-border: #e2e8f0;
+    --cf-bg-light: #f8fafc;
+  }
+
+  /* Breadcrumb */
+  .collections-breadcrumb {
+    padding: 16px 40px;
+    background: var(--cf-bg-light);
+    border-bottom: 1px solid var(--cf-border);
+  }
+  .collections-breadcrumb nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--cf-text-medium);
+  }
+  .collections-breadcrumb a {
+    color: var(--cf-navy);
+    text-decoration: none;
+  }
+  .collections-breadcrumb a:hover {
+    color: var(--cf-coral);
+  }
+
+  /* Hero Header */
+  .collections-hero {
+    background: linear-gradient(135deg, {{ header_bg_color }} 0%, #0f172a 100%);
+    padding: 50px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .collections-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+  }
+  .collections-hero-content {
+    position: relative;
+    z-index: 1;
+  }
+  .collections-hero h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    color: white;
+    margin: 0 0 12px;
+  }
+  .collections-hero p {
+    font-size: 16px;
+    color: rgba(255,255,255,0.8);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Main Categories Section */
+  .collections-section {
+    padding: 40px;
+  }
+
+  /* L1 Category Grid - 3 columns */
+  .l1-categories-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+  @media (max-width: 992px) {
+    .l1-categories-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 576px) {
+    .l1-categories-grid { grid-template-columns: 1fr; }
+    .collections-section { padding: 24px 16px; }
+    .collections-hero { padding: 30px 16px; }
+    .collections-hero h1 { font-size: 26px; }
+  }
+
+  /* L1 Category Card */
+  .l1-category-card {
+    background: white;
+    border: 1px solid var(--cf-border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  .l1-category-card:hover {
+    border-color: var(--cf-navy);
+    box-shadow: 0 8px 24px rgba(26, 54, 93, 0.12);
+    transform: translateY(-4px);
+  }
+
+  .l1-card-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    position: relative;
+    overflow: hidden;
+    background: var(--cf-bg-light);
+  }
+  .l1-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+  .l1-category-card:hover .l1-card-image img {
+    transform: scale(1.05);
+  }
+  .l1-card-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(26, 54, 93, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .l1-category-card:hover .l1-card-image-overlay {
+    opacity: 1;
+  }
+  .l1-card-image-overlay span {
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+    text-align: center;
+    padding: 0 16px;
+  }
+  .l1-card-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    color: #94a3b8;
+    font-size: 48px;
+  }
+
+  .l1-card-content {
+    padding: 20px;
+  }
+  .l1-card-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--cf-deep-blue);
+    margin: 0 0 8px;
+  }
+  .l1-card-title a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .l1-card-title a:hover {
+    color: var(--cf-coral);
+  }
+
+  .l1-card-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--cf-coral);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .l1-card-count::after {
+    content: '→';
+    transition: transform 0.3s ease;
+  }
+  .l1-category-card:hover .l1-card-count::after {
+    transform: translateX(4px);
+  }
+
+  /* Subcategories List */
+  .l1-subcategories {
+    list-style: none;
+    padding: 14px 0 0;
+    margin: 0;
+    border-top: 1px solid var(--cf-border);
+  }
+  .l1-subcategories li {
+    margin-bottom: 8px;
+  }
+  .l1-subcategories li:last-child {
+    margin-bottom: 0;
+  }
+  .l1-subcategories a {
+    font-size: 13px;
+    color: var(--cf-navy);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  .l1-subcategories a::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    background: var(--cf-navy);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .l1-subcategories a:hover {
+    color: var(--cf-coral);
+    padding-left: 4px;
+  }
+  .l1-subcategories a:hover::before {
+    background: var(--cf-coral);
+  }
+
+  /* Brands Section */
+  .brands-section {
+    background: var(--cf-bg-light);
+    padding: 40px;
+    border-top: 1px solid var(--cf-border);
+  }
+  .brands-section-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--cf-deep-blue);
+    margin: 0 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brands-section-title::before {
+    content: '';
+    width: 4px;
+    height: 24px;
+    background: linear-gradient(180deg, var(--cf-coral) 0%, var(--cf-navy) 100%);
+    border-radius: 2px;
+  }
+  .brands-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 1200px) {
+    .brands-grid { grid-template-columns: repeat(5, 1fr); }
+  }
+  @media (max-width: 992px) {
+    .brands-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+  @media (max-width: 576px) {
+    .brands-grid { grid-template-columns: repeat(3, 1fr); }
+    .brands-section { padding: 24px 16px; }
+  }
+  .brand-item {
+    background: white;
+    border: 1px solid var(--cf-border);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1 / 1;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  .brand-item:hover {
+    border-color: var(--cf-navy);
+    box-shadow: 0 4px 12px rgba(26, 54, 93, 0.1);
+    transform: translateY(-2px);
+  }
+  .brand-item img {
+    max-width: 80%;
+    max-height: 80%;
+    object-fit: contain;
+  }
+  .brand-item span {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--cf-text-medium);
+    text-align: center;
+    line-height: 1.3;
+  }
+</style>
 
 <!-- Breadcrumb -->
 {%- if section.settings.show_breadcrumbs -%}
-<section class="breadcrumb">
-  <div class="container">
-    <nav class="breadcrumb-nav" role="navigation" aria-label="breadcrumbs">
-      <a href="{{ routes.root_url }}">
-        <i class="fas fa-home"></i> Home
-      </a>
-      <span> > </span>
-      <span>Collections</span>
-    </nav>
-  </div>
+<section class="collections-breadcrumb">
+  <nav aria-label="breadcrumbs">
+    <a href="{{ routes.root_url }}">Home</a>
+    <span>›</span>
+    <span>All Categories</span>
+  </nav>
 </section>
 {%- endif -%}
 
-<!-- Page Header -->
-<div class="collection-list-header" 
-     style="background-color: {{ header_bg_color }}; 
-            {% if section.settings.header_bg_image %}
-              background-image: url('{{ section.settings.header_bg_image | image_url: width: 1920 }}');
-              background-size: cover;
-              background-position: center;
-            {% endif %}">
-  
-  {%- if section.settings.header_bg_image or header_overlay_color != 'rgba(0,0,0,0)' -%}
-  <div class="header-overlay" style="background-color: {{ header_overlay_color }};"></div>
-  {%- endif -%}
-  
-  <div class="container header-content-wrapper">
-    {%- if section.settings.title != blank -%}
-      <h1 class="collection-list-title">{{ section.settings.title }}</h1>
-    {%- endif -%}
-    
-    {%- if section.settings.description != blank -%}
-      <div class="collection-list-description">
-        {{ section.settings.description }}
-      </div>
-    {%- endif -%}
+<!-- Hero Header -->
+<section class="collections-hero">
+  <div class="collections-hero-content">
+    <h1>{{ section.settings.title | default: 'Shop by Category' }}</h1>
+    <p>{{ section.settings.description | default: 'Browse our complete selection of professional restaurant equipment, kitchen supplies, and commercial-grade products.' }}</p>
   </div>
-</div>
+</section>
 
-<!-- Collections Grid -->
-<div class="collection-list-content">
-  <div class="container">
-    {%- liquid
-      case sort_by
-        when 'products_high', 'products_low'
-          assign collections = collections | sort: 'all_products_count'
-        when 'date', 'date_reversed'
-          assign collections = collections | sort: 'published_at'
-        else
-          assign collections = collections | sort: 'title'
-      endcase
+<!-- Main Categories Grid -->
+<section class="collections-section collections-hub">
+  <div class="l1-categories-grid">
+    {%- for link in menu.links -%}
+      {%- comment %} Show menu items that have subcategories {% endcomment -%}
+      {%- if link.links.size > 0 -%}
+        {%- assign link_handle = link.url | split: '/' | last | split: '?' | first -%}
+        {%- assign link_collection = collections[link_handle] -%}
 
-      if sort_by == 'products_high' or sort_by == 'date_reversed' or sort_by == 'alphabetical_reversed'
-        assign collections = collections | reverse
-      endif
-    -%}
-
-    <div 
-      class="collections-grid" 
-      data-columns="{{ columns_desktop }}"
-      data-columns-mobile="{{ columns_mobile }}"
-    >
-      {%- for collection in collections -%}
-        {%- unless collection.handle == 'frontpage' -%}
-          <div class="collection-card">
-            <a href="{{ collection.url }}" class="collection-card-link">
-              
-              <!-- Collection Image -->
-              <div class="collection-image {% if image_ratio != 'adapt' %}collection-image-{{ image_ratio }}{% endif %}">
-                {%- if collection.featured_image -%}
-                  <img
-                    src="{{ collection.featured_image | image_url: width: 800 }}"
-                    srcset="
-                      {{ collection.featured_image | image_url: width: 400 }} 400w,
-                      {{ collection.featured_image | image_url: width: 600 }} 600w,
-                      {{ collection.featured_image | image_url: width: 800 }} 800w,
-                      {{ collection.featured_image | image_url: width: 1000 }} 1000w
-                    "
-                    alt="{{ collection.featured_image.alt | default: collection.title | escape }}"
-                    loading="lazy"
-                    width="{{ collection.featured_image.width }}"
-                    height="{{ collection.featured_image.height }}"
-                  >
-                {%- else -%}
-                  <div class="collection-placeholder">
-                    {{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}
-                  </div>
-                {%- endif -%}
-                
-                <!-- Hover Overlay -->
-                <div class="collection-overlay" style="background-color: {{ section.settings.card_overlay_color }};">
-                  <span class="collection-cta">
-                    View Collection
-                    <i class="fas fa-arrow-right"></i>
-                  </span>
-                </div>
-
-                <!-- Product Count Badge -->
-                {%- if show_product_count -%}
-                  <div class="collection-count-badge">
-                    {{ collection.all_products_count }} 
-                    {%- if collection.all_products_count == 1 -%}
-                      Product
-                    {%- else -%}
-                      Products
-                    {%- endif -%}
-                  </div>
-                {%- endif -%}
-              </div>
-
-              <!-- Collection Info -->
-              <div class="collection-info">
-                <h2 class="collection-title">{{ collection.title }}</h2>
-                
-                {%- if show_description and collection.description != blank -%}
-                  <div class="collection-description">
-                    {{ collection.description | strip_html | truncatewords: 20 }}
-                  </div>
-                {%- endif -%}
-
-                <div class="collection-footer">
-                  <span class="collection-link-text">
-                    Shop Now <i class="fas fa-arrow-right"></i>
-                  </span>
-                </div>
-              </div>
-            </a>
-          </div>
+        {%- comment %} Fallback: Try with "new-theme-" prefix {% endcomment -%}
+        {%- unless link_collection.products_count > 0 or link_collection.all_products_count > 0 -%}
+          {%- assign new_theme_handle = 'new-theme-' | append: link_handle -%}
+          {%- assign temp_collection = collections[new_theme_handle] -%}
+          {%- if temp_collection.products_count > 0 or temp_collection.all_products_count > 0 -%}
+            {%- assign link_collection = temp_collection -%}
+          {%- endif -%}
         {%- endunless -%}
-      {%- endfor -%}
-    </div>
 
-    {%- if collections.size == 0 -%}
-      <div class="collection-list-empty">
-        <div class="empty-icon">
-          <i class="fas fa-folder-open"></i>
+        {%- assign card_image = link_collection.image | default: link_collection.products.first.featured_image -%}
+        {%- assign clean_title = link.title | remove: 'New Theme - ' | remove: 'New Theme- ' -%}
+
+        <div class="l1-category-card">
+          <a href="{{ link.url }}" class="l1-card-image">
+            {%- if card_image -%}
+              <img
+                src="{{ card_image | image_url: width: 800, height: 450, crop: 'center' }}"
+                alt="{{ clean_title | escape }}"
+                loading="lazy"
+                width="800"
+                height="450"
+              >
+            {%- else -%}
+              <div class="l1-card-placeholder">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5-7l-3 3.72L9 13l-3 4h12l-4-5z"/>
+                </svg>
+              </div>
+            {%- endif -%}
+            <div class="l1-card-image-overlay">
+              <span>{{ clean_title }}</span>
+            </div>
+          </a>
+
+          <div class="l1-card-content">
+            <h3 class="l1-card-title">
+              <a href="{{ link.url }}">{{ clean_title }}</a>
+            </h3>
+
+            {%- if link.links.size > 0 -%}
+              <a href="{{ link.url }}" class="l1-card-count">
+                Shop {{ link.links.size }} Categories
+              </a>
+
+              <ul class="l1-subcategories">
+                {%- for child_link in link.links limit: 5 -%}
+                  {%- assign child_title = child_link.title | remove: 'New Theme - ' | remove: 'New Theme- ' -%}
+                  <li><a href="{{ child_link.url }}">{{ child_title }}</a></li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </div>
         </div>
-        <h3>No collections found</h3>
-        <p>Start creating collections to organize your products.</p>
-      </div>
-    {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
   </div>
-</div>
+</section>
+
+<!-- Top Brands Section (from Excel sheet) -->
+{%- comment %}
+  Top Brands from: Suggested Navigation Structure to Rajesh.xlsx > Shop By Brands
+  Links use vendor filter: /collections/vendors?q={brand_name}
+{% endcomment -%}
+<section class="brands-section collections-hub">
+  <h2 class="brands-section-title">Top Brands</h2>
+  <div class="brands-grid">
+    {%- assign top_brands = 'ATOSA,GSW,THUNDER GROUP,RATIONAL,ROBOT COUPE,CAC,TURBO AIR,WARING,EURODIB,WINCO,SAMMIC,GLOBE,SHAAN,SOMERSET,GLOBAL SOLUTIONS,ROTOQUIP,KWITEX,YANCO' | split: ',' -%}
+
+    {%- for brand in top_brands -%}
+      {%- assign brand_slug = brand | downcase | replace: ' ', '+' -%}
+      {%- assign brand_url = '/collections/vendors?q=' | append: brand_slug -%}
+
+      <a href="{{ brand_url }}" class="brand-item">
+        {%- comment %} Try to render brand logo if asset exists {% endcomment -%}
+        {%- assign logo_file = 'brand-logo-' | append: brand | downcase | replace: ' ', '-' | append: '.png' -%}
+        {%- assign logo_url = logo_file | asset_url -%}
+        {%- if logo_url contains 'cdn.shopify' -%}
+          <img
+            src="{{ logo_url }}"
+            alt="{{ brand }}"
+            loading="lazy"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+          >
+          <span style="display:none;">{{ brand }}</span>
+        {%- else -%}
+          <span>{{ brand }}</span>
+        {%- endif -%}
+      </a>
+    {%- endfor -%}
+  </div>
+</section>
 
 {% schema %}
 {
-  "name": "Collection List",
+  "name": "Collections Hub",
   "tag": "section",
-  "class": "section-collection-list",
+  "class": "section-collections-hub",
   "settings": [
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "link_list",
+      "id": "main_menu",
+      "label": "Main menu",
+      "default": "main-menu",
+      "info": "Select the menu that contains your L1 categories"
+    },
     {
       "type": "header",
       "content": "Breadcrumbs"
@@ -175,154 +450,41 @@
     },
     {
       "type": "header",
-      "content": "Page Header"
+      "content": "Hero Header"
     },
     {
       "type": "text",
       "id": "title",
-      "default": "Collections",
+      "default": "Shop by Category",
       "label": "Heading"
     },
     {
-      "type": "richtext",
+      "type": "textarea",
       "id": "description",
       "label": "Description",
-      "info": "Optional description below the heading"
+      "default": "Browse our complete selection of professional restaurant equipment, kitchen supplies, and commercial-grade products."
     },
     {
       "type": "color",
       "id": "header_bg_color",
-      "default": "#1e3a8a",
+      "default": "#1a365d",
       "label": "Header background color"
     },
     {
       "type": "image_picker",
       "id": "header_bg_image",
-      "label": "Header background image",
-      "info": "Displays over background color"
+      "label": "Header background image"
     },
     {
       "type": "color",
       "id": "header_overlay_color",
-      "default": "rgba(30, 58, 138, 0.85)",
-      "label": "Header overlay color",
-      "info": "Overlay color over background image"
-    },
-    {
-      "type": "header",
-      "content": "Layout"
-    },
-    {
-      "type": "range",
-      "id": "columns_desktop",
-      "min": 2,
-      "max": 5,
-      "step": 1,
-      "default": 3,
-      "label": "Collections per row (desktop)"
-    },
-    {
-      "type": "select",
-      "id": "columns_mobile",
-      "options": [
-        {
-          "value": "1",
-          "label": "1 column"
-        },
-        {
-          "value": "2",
-          "label": "2 columns"
-        }
-      ],
-      "default": "2",
-      "label": "Collections per row (mobile)"
-    },
-    {
-      "type": "select",
-      "id": "image_ratio",
-      "options": [
-        {
-          "value": "adapt",
-          "label": "Adapt to image"
-        },
-        {
-          "value": "portrait",
-          "label": "Portrait"
-        },
-        {
-          "value": "square",
-          "label": "Square"
-        },
-        {
-          "value": "landscape",
-          "label": "Landscape"
-        }
-      ],
-      "default": "portrait",
-      "label": "Image ratio"
-    },
-    {
-      "type": "header",
-      "content": "Collection Card"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_description",
-      "default": true,
-      "label": "Show collection description"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_product_count",
-      "default": true,
-      "label": "Show product count"
-    },
-    {
-      "type": "color",
-      "id": "card_overlay_color",
-      "default": "rgba(30, 58, 138, 0.85)",
-      "label": "Card hover overlay color"
-    },
-    {
-      "type": "header",
-      "content": "Sorting"
-    },
-    {
-      "type": "select",
-      "id": "sort",
-      "options": [
-        {
-          "value": "alphabetical",
-          "label": "Alphabetically, A-Z"
-        },
-        {
-          "value": "alphabetical_reversed",
-          "label": "Alphabetically, Z-A"
-        },
-        {
-          "value": "date_reversed",
-          "label": "Date, new to old"
-        },
-        {
-          "value": "date",
-          "label": "Date, old to new"
-        },
-        {
-          "value": "products_high",
-          "label": "Product count, high to low"
-        },
-        {
-          "value": "products_low",
-          "label": "Product count, low to high"
-        }
-      ],
-      "default": "alphabetical",
-      "label": "Sort collections by"
+      "default": "rgba(26, 54, 93, 0.85)",
+      "label": "Header overlay color"
     }
   ],
   "presets": [
     {
-      "name": "Collection List"
+      "name": "Collections Hub"
     }
   ]
 }

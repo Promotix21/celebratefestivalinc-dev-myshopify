@@ -147,3 +147,36 @@
 143. New Theme - Cup Dispensers and Lid Organizers (new-theme-cup-dispensers-and-lid-organizers)
 144. New Theme - Straw Organizers and Dispensers (new-theme-straw-organizers-and-dispensers)
 145. New Theme - Flatware (new-theme-flatware)
+
+
+
+ Shopify API Integration Scripts
+
+  | Script                          | Purpose                                                        
+                                                                            |
+  |---------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+  | bulk_update_collections.py      | Bulk update collection templates & tags based on Excel hierarchy (4 levels)                                                                |
+  | create_navigation.py            | Create main navigation menu from Excel structure (REST API)                                                                                |
+  | create_navigation_graphql.py    | Create navigation menu using GraphQL API                       
+                                                                            |
+  | create_remaining_collections.py | Create 9 missing collections (Steam Kettles, Vacuum Sealers, etc.)                                                                         |
+  | cleanup_menu.py                 | Delete accidental "main-menu-1" that was created               
+                                                                            |
+  | recreate_mega_menu.py           | Recreate CF Mega Menu with proper 3-level nesting (L1→L2→L3)                                                                               |
+  | build_complete_menu.py          | Build complete menu from ALL Excel sheets (Restaurant Equipment, Refrigeration, Smallwares, Tabletop, Indian Specialty, Storage Transport) |
+  | create_more_menus_and_config.py | Create "More" sub-menus for each Level 1 category + generate JSON config for enhanced-header section                                       |
+  | add_collection_tags.py          | Add level-X and parent-{handle} tags to collections for auto-population                                                                    |
+  | assign_templates.py             | Bulk assign template suffixes (level-1, level-2, level-3, level-4) to collections                                                          |
+  | add_collection_metafields.py    | Add custom.parent_handle and custom.hierarchy_level metafields to collections                                                              |
+
+  Utility/Reporting Scripts
+
+  | Script                          | Purpose                                                        
+                         |
+  |---------------------------------|-----------------------------------------------------------------------------------------|
+  | check_excel_tabs.py             | Inspect all tabs/sheets in the Excel navigation file           
+                         |
+  | check_collections_in_shopify.py | Compare Excel collections against Shopify, check product counts, generate status report |
+  | generate_progress_report.py     | Generate comprehensive Excel progress report for the client                             |
+
+  All scripts connect to celebratefestivalinc.myshopify.com using the Shopify Admin API and work with the Excel file Suggested Navigation Structure to Rajesh.xlsx to manage the hierarchical navigation structure.

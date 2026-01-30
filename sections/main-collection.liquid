@@ -100,22 +100,30 @@
 }
 
 /* ========================================
-   COMBINED BREADCRUMB + HEADER - Level 3 Style
+   COMPACT HEADER ROW 1 - Breadcrumb (left) | Title (right)
    ======================================== */
-.l3-header-combined {
-  padding: 16px 40px;
+.l3-header-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 40px;
   background: var(--cf-bg-white);
   border-bottom: 1px solid var(--cf-border);
+  gap: 20px;
 }
 
-/* Inline Breadcrumb (compact) */
+/* Inline Breadcrumb (left side) */
 .l3-breadcrumb-inline {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
   font-size: 12px;
-  margin-bottom: 8px;
+  margin: 0;
+}
+
+.l3-breadcrumb-placeholder {
+  flex: 1;
 }
 
 .l3-breadcrumb-inline a {
@@ -138,7 +146,140 @@
   font-size: 12px;
 }
 
-/* Inline Title */
+/* Compact Title (right side) */
+.l3-title-compact {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+  margin: 0;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* ========================================
+   COMPACT TOOLBAR ROW 2 - Filters (left) | View+Sort (right)
+   ======================================== */
+.l3-toolbar-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 40px;
+  background: var(--cf-bg-light);
+  border-bottom: 1px solid var(--cf-border);
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.l3-toolbar-compact__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.l3-toolbar-compact__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.l3-products-count {
+  font-size: 13px;
+  color: var(--cf-text-medium);
+}
+
+.l3-active-filters-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cf-text-medium);
+}
+
+.l3-active-filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--cf-coral-bg);
+  border: 1px solid var(--cf-coral-border);
+  border-radius: 20px;
+  font-size: 11px;
+  color: var(--cf-coral);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.l3-active-filter-tag:hover {
+  background: var(--cf-coral);
+  color: white;
+}
+
+.l3-active-filter-tag i {
+  font-size: 10px;
+}
+
+.l3-clear-all-filters {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cf-navy);
+  text-decoration: none;
+  margin-left: 8px;
+}
+
+.l3-clear-all-filters:hover {
+  color: var(--cf-coral);
+}
+
+/* ========================================
+   ABOUT THIS CATEGORY - Collapsible Section
+   ======================================== */
+.l3-about-category {
+  margin-top: 40px;
+  padding: 0 0 20px;
+  border-top: 1px solid var(--cf-border);
+}
+
+.l3-about-category__toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 16px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.l3-about-category__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--cf-deep-blue);
+}
+
+.l3-about-category__icon {
+  transition: transform 0.3s ease;
+  color: var(--cf-text-medium);
+}
+
+.l3-about-category__toggle.expanded .l3-about-category__icon {
+  transform: rotate(180deg);
+}
+
+.l3-about-category__content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--cf-text-medium);
+}
+
+.l3-about-category__content[aria-hidden="false"] {
+  padding-bottom: 16px;
+}
+
+/* Legacy classes for backwards compatibility */
 .l3-title-inline {
   font-family: 'Montserrat', sans-serif;
   font-size: 24px;
@@ -1515,20 +1656,33 @@
     padding: 20px;
   }
 
-  .l3-header-combined {
-    padding: 16px 20px;
+  .l3-header-compact {
+    padding: 10px 20px;
   }
 
+  .l3-toolbar-compact {
+    padding: 8px 20px;
+  }
+
+  .l3-title-compact,
   .l3-title-inline,
   .l3-title {
-    font-size: 24px;
+    font-size: 18px;
   }
 }
 
 /* Mobile (max-width: 767px) */
 @media (max-width: 767px) {
-  .l3-header-combined {
-    padding: 16px 15px;
+  .l3-header-compact {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 15px;
+  }
+
+  .l3-title-compact {
+    font-size: 18px;
+    white-space: normal;
   }
 
   /* Mobile: Show home icon + title only */
@@ -1538,50 +1692,33 @@
     display: none;
   }
 
-  .l3-breadcrumb-inline {
-    margin-bottom: 6px;
-  }
-
   .l3-breadcrumb-inline a:first-child::before {
     content: '🏠';
     margin-right: 4px;
   }
 
-  .l3-breadcrumb-inline a:first-child i {
-    display: none;
+  .l3-toolbar-compact {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px 15px;
   }
 
-  .l3-title-inline,
-  .l3-title {
-    font-size: 20px;
+  .l3-toolbar-compact__left {
+    justify-content: flex-start;
   }
 
-  .l3-subtitle {
-    font-size: 13px;
+  .l3-toolbar-compact__right {
+    justify-content: space-between;
+    width: 100%;
   }
 
   .l3-products-area {
     padding: 15px;
   }
 
-  .l3-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-
-  .l3-toolbar-right {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-
   .l3-sort-dropdown select {
     width: 100%;
-  }
-
-  .l3-compare-toggle {
-    justify-content: space-between;
   }
 
   .l3-products-grid {
@@ -1606,21 +1743,35 @@
   .l3-price-main {
     font-size: 18px;
   }
+
+  .l3-about-category {
+    margin-top: 30px;
+    padding: 0 0 15px;
+  }
+
+  .l3-about-category__title {
+    font-size: 14px;
+  }
 }
 
 /* Mobile Small (max-width: 575px) */
 @media (max-width: 575px) {
-  .l3-header-combined {
-    padding: 14px 12px;
+  .l3-header-compact {
+    padding: 10px 12px;
+  }
+
+  .l3-toolbar-compact {
+    padding: 8px 12px;
   }
 
   .l3-breadcrumb-inline {
     font-size: 11px;
   }
 
+  .l3-title-compact,
   .l3-title-inline,
   .l3-title {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .l3-products-area {
@@ -1688,8 +1839,8 @@
 }
 </style>
 
-<!-- Combined Breadcrumb + Header -->
-<header class="l3-header-combined">
+<!-- Compact Header Row 1: Breadcrumb (left) | Title (right) -->
+<header class="l3-header-compact">
   {%- if section.settings.show_breadcrumbs -%}
   <nav class="l3-breadcrumb-inline" aria-label="Breadcrumb">
     <a href="{{ routes.root_url }}">Home</a>
@@ -1704,13 +1855,11 @@
 
     <span class="l3-breadcrumb-current">{{ collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</span>
   </nav>
+  {%- else -%}
+  <div class="l3-breadcrumb-placeholder"></div>
   {%- endif -%}
 
-  <h1 class="l3-title-inline">{{ collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</h1>
-
-  {%- if collection.description != blank -%}
-    <p class="l3-subtitle-inline">{{ collection.description | strip_html | truncate: 200 }}</p>
-  {%- endif -%}
+  <h1 class="l3-title-compact">{{ collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</h1>
 </header>
 
 {% comment %}
@@ -1972,31 +2121,58 @@
       </button>
     {%- endif -%}
 
-    <!-- Toolbar -->
-    <div class="l3-toolbar">
-      {%- if section.settings.enable_view_toggle -%}
-        <div class="l3-view-toggle">
-          <button class="l3-view-btn active" onclick="switchL3View('grid')" aria-label="Grid view">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-              <rect x="0" y="0" width="7" height="7" rx="1"/>
-              <rect x="9" y="0" width="7" height="7" rx="1"/>
-              <rect x="0" y="9" width="7" height="7" rx="1"/>
-              <rect x="9" y="9" width="7" height="7" rx="1"/>
-            </svg>
-            Grid
-          </button>
-          <button class="l3-view-btn" onclick="switchL3View('list')" aria-label="List view">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-              <rect x="0" y="1" width="16" height="3" rx="1"/>
-              <rect x="0" y="6" width="16" height="3" rx="1"/>
-              <rect x="0" y="11" width="16" height="3" rx="1"/>
-            </svg>
-            List
-          </button>
-        </div>
-      {%- endif -%}
+    <!-- Compact Toolbar Row 2: Active Filters (left) | View Toggle + Sort (right) -->
+    <div class="l3-toolbar-compact">
+      <!-- Left Side: Active Filters -->
+      <div class="l3-toolbar-compact__left">
+        {%- assign has_active_filters = false -%}
+        {%- for filter in collection.filters -%}
+          {%- if filter.active_values.size > 0 -%}
+            {%- assign has_active_filters = true -%}
+            {%- break -%}
+          {%- endif -%}
+        {%- endfor -%}
 
-      <div class="l3-toolbar-right">
+        {%- if has_active_filters -%}
+          <span class="l3-active-filters-label">Active Filters:</span>
+          {%- for filter in collection.filters -%}
+            {%- for filter_value in filter.active_values -%}
+              <a href="{{ filter_value.url_to_remove }}" class="l3-active-filter-tag">
+                {{ filter.label }}: {{ filter_value.label }}
+                <i class="fas fa-times"></i>
+              </a>
+            {%- endfor -%}
+          {%- endfor -%}
+          <a href="{{ collection.url }}" class="l3-clear-all-filters">Clear All</a>
+        {%- else -%}
+          <span class="l3-products-count">{{ collection.products_count }} products</span>
+        {%- endif -%}
+      </div>
+
+      <!-- Right Side: View Toggle + Sort -->
+      <div class="l3-toolbar-compact__right">
+        {%- if section.settings.enable_view_toggle -%}
+          <div class="l3-view-toggle">
+            <button class="l3-view-btn active" onclick="switchL3View('grid')" aria-label="Grid view">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                <rect x="0" y="0" width="7" height="7" rx="1"/>
+                <rect x="9" y="0" width="7" height="7" rx="1"/>
+                <rect x="0" y="9" width="7" height="7" rx="1"/>
+                <rect x="9" y="9" width="7" height="7" rx="1"/>
+              </svg>
+              Grid
+            </button>
+            <button class="l3-view-btn" onclick="switchL3View('list')" aria-label="List view">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                <rect x="0" y="1" width="16" height="3" rx="1"/>
+                <rect x="0" y="6" width="16" height="3" rx="1"/>
+                <rect x="0" y="11" width="16" height="3" rx="1"/>
+              </svg>
+              List
+            </button>
+          </div>
+        {%- endif -%}
+
         {%- if enable_sorting -%}
           <div class="l3-sort-dropdown">
             <label for="l3-sort-select">Sort by</label>
@@ -2012,34 +2188,8 @@
             </select>
           </div>
         {%- endif -%}
-
-        {%- if section.settings.enable_compare -%}
-          <div class="l3-compare-toggle">
-            Compare Products
-            <div class="l3-toggle-switch" onclick="toggleL3Compare(this)"></div>
-            <span class="l3-compare-status">Off</span>
-          </div>
-        {%- endif -%}
       </div>
     </div>
-
-    <!-- Active Filters Display -->
-    {%- if collection.filters.size > 0 -%}
-      <div class="l3-active-filters">
-        <div class="l3-active-filters-inner">
-          <span class="l3-active-filters-label">Active Filters:</span>
-          {%- for filter in collection.filters -%}
-            {%- for filter_value in filter.active_values -%}
-              <a href="{{ filter_value.url_to_remove }}" class="l3-active-filter-tag">
-                {{ filter.label }}: {{ filter_value.label }}
-                <i class="fas fa-times"></i>
-              </a>
-            {%- endfor -%}
-          {%- endfor -%}
-          <a href="{{ collection.url }}" class="l3-clear-all-filters">Clear All</a>
-        </div>
-      </div>
-    {%- endif -%}
 
     <!-- Loading State -->
     <div class="l3-loading" id="l3-loading">
@@ -2679,6 +2829,21 @@
       {%- endif -%}
     {%- endpaginate -%}
     {%- endif -%}
+
+    <!-- About This Category (SEO Description - Collapsible) -->
+    {%- if collection.description != blank -%}
+      <div class="l3-about-category">
+        <button class="l3-about-category__toggle" onclick="toggleAboutCategory(this)" aria-expanded="false">
+          <span class="l3-about-category__title">About {{ collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</span>
+          <svg class="l3-about-category__icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="l3-about-category__content" aria-hidden="true">
+          {{ collection.description }}
+        </div>
+      </div>
+    {%- endif -%}
   </main>
 </div>
 
@@ -2759,14 +2924,19 @@
     document.body.style.overflow = '';
   }
 
-  // Compare toggle
-  function toggleL3Compare(toggle) {
-    toggle.classList.toggle('active');
-    const status = toggle.nextElementSibling;
-    if (toggle.classList.contains('active')) {
-      status.textContent = 'On';
+  // Toggle About Category section
+  function toggleAboutCategory(btn) {
+    const content = btn.nextElementSibling;
+    const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+
+    btn.setAttribute('aria-expanded', !isExpanded);
+    content.setAttribute('aria-hidden', isExpanded);
+    btn.classList.toggle('expanded', !isExpanded);
+
+    if (!isExpanded) {
+      content.style.maxHeight = content.scrollHeight + 'px';
     } else {
-      status.textContent = 'Off';
+      content.style.maxHeight = '0';
     }
   }
 
@@ -3243,12 +3413,6 @@
       "id": "enable_view_toggle",
       "default": true,
       "label": "Enable grid/list view toggle"
-    },
-    {
-      "type": "checkbox",
-      "id": "enable_compare",
-      "default": true,
-      "label": "Enable compare products toggle"
     },
     {
       "type": "select",

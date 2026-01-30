@@ -103,6 +103,76 @@
     {%- endunless -%}
 
     {{ 'template-giftcard.css' | asset_url | stylesheet_tag }}
+
+    <style>
+      /* Celebrate Festival Brand Overrides */
+      :root {
+        --cf-deep-blue: #1a365d;
+        --cf-navy: #2d5a87;
+        --cf-coral: #ff6b6b;
+      }
+
+      body.gift-card {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      }
+
+      .gift-card__price h1 {
+        font-family: 'Montserrat', sans-serif;
+        color: var(--cf-coral);
+        font-weight: 800;
+      }
+
+      .gift-card__text {
+        color: #475569;
+      }
+
+      .gift-card__number {
+        background: var(--cf-deep-blue);
+        color: #fff;
+        padding: 16px 24px;
+        border-radius: 8px;
+        font-family: monospace;
+        font-size: 20px;
+        letter-spacing: 2px;
+      }
+
+      .gift-card__buttons .button {
+        background: var(--cf-coral);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 14px 28px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+      }
+
+      .gift-card__buttons .button:hover {
+        background: #ff5252;
+        transform: translateY(-2px);
+      }
+
+      .gift-card__buttons .button--secondary {
+        background: var(--cf-navy);
+      }
+
+      .gift-card__buttons .button--secondary:hover {
+        background: #3d6a9f;
+      }
+
+      main h2 {
+        font-family: 'Montserrat', sans-serif;
+        color: var(--cf-deep-blue);
+        font-weight: 700;
+      }
+
+      .badge--expired {
+        background: var(--cf-coral);
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-weight: 600;
+      }
+    </style>
   </head>
 
   <body class="gradient gift-card">
