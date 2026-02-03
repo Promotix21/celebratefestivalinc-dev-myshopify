@@ -247,7 +247,7 @@
             </div>
             <div class="directions-card__content">
               <p>{{ section.settings.directions_text | default: '2-3 min from Fwy 880 exits (Mission or Dixon Landing), 1-2 min from Scott exit on 680. Less than 5 min from intersection of 237 & 880.' }}</p>
-              <a href="{{ section.settings.map_url | default: 'https://maps.google.com/?q=235+Whitney+Pl,+Fremont,+CA+94539' }}" target="_blank" class="btn btn--outline">
+              <a href="{{ section.settings.map_url | default: 'https://www.google.com/maps/place/Celebrate+Festival+Inc+-+Restaurant+Supply+Store/@37.4701271,-121.9202041,17z/data=!3m1!4b1!4m6!3m5!1s0x808fcb603dcda243:0x94f5a26630de7769!8m2!3d37.4701271!4d-121.9202041!16s%2Fg%2F11h2hhf61n?entry=ttu&g_ep=EgoyMDI2MDEyOC4wIKXMDSoASAFQAw%3D%3D' }}" target="_blank" class="btn btn--outline">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                   <circle cx="12" cy="10" r="3"/>
@@ -1628,7 +1628,8 @@
     {
       "type": "url",
       "id": "map_url",
-      "label": "Google Maps URL"
+      "label": "Google Maps URL",
+      "default": "https://www.google.com/maps/place/Celebrate+Festival+Inc+-+Restaurant+Supply+Store/@37.4701271,-121.9202041,17z/data=!3m1!4b1!4m6!3m5!1s0x808fcb603dcda243:0x94f5a26630de7769!8m2!3d37.4701271!4d-121.9202041!16s%2Fg%2F11h2hhf61n?entry=ttu&g_ep=EgoyMDI2MDEyOC4wIKXMDSoASAFQAw%3D%3D"
     },
     {
       "type": "html",
