@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
@@ -6,91 +15,106 @@
         "category_1": {
           "type": "product_category",
           "settings": {
-            "title": "UK MADE ETL NSF CERTIFIED SHAAN TANDOOR"
+            "title": "UK MADE ETL NSF CERTIFIED SHAAN TANDOOR",
+            "link_url": ""
           }
         },
         "category_2": {
           "type": "product_category",
           "settings": {
-            "title": "UK MADE ROTOQUIP NAAN/BREAD OVEN"
+            "title": "UK MADE ROTOQUIP NAAN/BREAD OVEN",
+            "link_url": ""
           }
         },
         "category_3": {
           "type": "product_category",
           "settings": {
-            "title": "GRANITE STONE WET GRINDER & CHOCOLATE MELANGER"
+            "title": "GRANITE STONE WET GRINDER & CHOCOLATE MELANGER",
+            "link_url": ""
           }
         },
         "category_4": {
           "type": "product_category",
           "settings": {
-            "title": "SOMERSET & DOYON DOUGH PROCESSOR"
+            "title": "SOMERSET & DOYON DOUGH PROCESSOR",
+            "link_url": ""
           }
         },
         "category_5": {
           "type": "product_category",
           "settings": {
-            "title": "ROBOT COUPE, SAMMIC & WARING FOOD PROCESSORS"
+            "title": "ROBOT COUPE, SAMMIC & WARING FOOD PROCESSORS",
+            "link_url": ""
           }
         },
         "category_6": {
           "type": "product_category",
           "settings": {
-            "title": "TABLETOP SERVEWARE"
+            "title": "TABLETOP SERVEWARE",
+            "link_url": ""
           }
         },
         "category_7": {
           "type": "product_category",
           "settings": {
-            "title": "FOOD PROCESSOR, BLENDERS, FOOD PACKING EQUIPMENT"
+            "title": "FOOD PROCESSOR, BLENDERS, FOOD PACKING EQUIPMENT",
+            "link_url": ""
           }
         },
         "category_8": {
           "type": "product_category",
           "settings": {
-            "title": "AUTOMATIC KABAB GRILL & EXTRUDER"
+            "title": "AUTOMATIC KABAB GRILL & EXTRUDER",
+            "link_url": ""
           }
         },
         "category_9": {
           "type": "product_category",
           "settings": {
-            "title": "WALK-IN COOLER, REFRIGERATOR, FREEZER"
+            "title": "WALK-IN COOLER, REFRIGERATOR, FREEZER",
+            "link_url": ""
           }
         },
         "category_10": {
           "type": "product_category",
           "settings": {
-            "title": "GAS EQUIPMENT - BURNER, STOCK POTS, GRIDDLES"
+            "title": "GAS EQUIPMENT - BURNER, STOCK POTS, GRIDDLES",
+            "link_url": ""
           }
         },
         "category_11": {
           "type": "product_category",
           "settings": {
-            "title": "CATERING AND BACKYARD TANDOOR"
+            "title": "CATERING AND BACKYARD TANDOOR",
+            "link_url": ""
           }
         },
         "category_12": {
           "type": "product_category",
           "settings": {
-            "title": "BIRYANI LAGAN, LARGE SAUCE POTS, BRAZIER, FRY PANS"
+            "title": "BIRYANI LAGAN, LARGE SAUCE POTS, BRAZIER, FRY PANS",
+            "link_url": ""
           }
         },
         "category_13": {
           "type": "product_category",
           "settings": {
-            "title": "PREP TABLE, SINKS, SHELVES"
+            "title": "PREP TABLE, SINKS, SHELVES",
+            "link_url": ""
           }
         },
         "category_14": {
           "type": "product_category",
           "settings": {
-            "title": "COPPER & STAINLESS STEEL CHAFERS"
+            "title": "COPPER & STAINLESS STEEL CHAFERS",
+            "link_url": ""
           }
         },
         "category_15": {
           "type": "product_category",
           "settings": {
-            "title": "FESTIVAL & NOVELTIES"
+            "title": "FESTIVAL & NOVELTIES",
+            "link_url": ""
           }
         }
       },
@@ -112,19 +136,23 @@
         "category_15"
       ],
       "settings": {
+        "hero_background_image": "shopify://shop_images/Gemini_Generated_Image_9kl4ry9kl4ry9kl4.png",
         "hero_tagline_pill": "Est. Since Day One",
         "hero_title": "About Celebrate Festival Inc",
         "hero_subtitle": "Your Trusted Partner in Restaurant Equipment Excellence",
         "hero_cta_text": "Explore Our Products",
+        "hero_cta_url": "",
         "hero_secondary_cta": "Contact Us",
         "welcome_label": "Who We Are",
         "welcome_title": "Welcome to Celebrate Festival Inc",
         "welcome_paragraph_1": "Welcome to Celebrate Festival Inc - restaurant equipment company, your trusted partner in the world of restaurant equipment and solutions. With a passion for culinary excellence and a commitment to helping your food establishment thrive, we have been serving the needs of restaurateurs, bakers, deli owners, and culinary enthusiasts nationwide.",
         "welcome_paragraph_2": "At Celebrate Festival Inc, we understand that each restaurant, bakery, and deli is unique, with distinct requirements and aspirations. That's why we offer a comprehensive range of top-quality restaurant products tailored to suit every facet of your culinary venture. Whether you're setting up a cozy cafe, a bustling bakery, or an elegant fine-dining establishment, we've got you covered.",
+        "welcome_image": "shopify://shop_images/Gemini_Generated_Image_wm55b8wm55b8wm55.png",
         "expertise_label": "Our Expertise",
         "expertise_title": "Specialists in Indian Restaurant Equipment",
         "expertise_paragraph_1": "While we take pride in catering to a wide spectrum of culinary businesses, our true expertise shines in a specific niche – the vibrant and diverse world of Indian restaurants. With a deep understanding of the intricacies of Indian cuisine and a commitment to sourcing authentic and innovative products, we have earned the trust of countless Indian restaurant owners and chefs across the country.",
         "expertise_paragraph_2": "Our vast network of satisfied customers stands as a testament to our unwavering dedication to excellence.",
+        "expertise_image": "shopify://shop_images/ChatGPT_Image_Jun_27_2025_05_07_38_PM.png",
         "stat_1_number": "1000+",
         "stat_1_label": "Satisfied Customers",
         "stat_2_number": "500+",
@@ -139,6 +167,7 @@
         "products_title": "Our Product Categories",
         "products_subtitle": "Comprehensive solutions for every culinary need",
         "products_cta_text": "View All Products",
+        "products_cta_url": "",
         "contact_label": "Get In Touch",
         "contact_title": "Contact Us",
         "contact_intro": "Products available online and in-store. Visit our warehouse conveniently located at the border of Milpitas & Fremont in CA.",
@@ -147,14 +176,21 @@
         "phone_2": "408-663-5929",
         "email": "sales@celebratefestivalinc.com",
         "website_1": "www.celebratefestivalinc.com",
+        "website_1_url": "",
         "website_2": "BuyTandoor.Com",
+        "website_2_url": "",
         "directions_text": "2-3 min from Fwy 880 exits (Mission or Dixon Landing), 1-2 min from Scott exit on 680. Less than 5 min from intersection of 237 & 880.",
+        "map_url": "",
+        "map_embed": "",
         "final_cta_title": "Ready to Elevate Your Kitchen?",
         "final_cta_text": "Discover our extensive range of professional restaurant equipment and let us help you achieve culinary excellence.",
         "final_cta_primary_text": "Shop Now",
+        "final_cta_primary_url": "",
         "final_cta_secondary_text": "Call Us Today"
       }
     }
   },
-  "order": ["main"]
+  "order": [
+    "main"
+  ]
 }

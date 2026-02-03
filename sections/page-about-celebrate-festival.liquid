@@ -5,13 +5,29 @@
 
 <div class="about-celebrate-festival-page">
   <!-- Hero Section -->
-  <section class="about-hero">
-    <div class="about-hero__background">
-      <div class="about-hero__shapes">
-        <div class="shape shape--1"></div>
-        <div class="shape shape--2"></div>
-        <div class="shape shape--3"></div>
-      </div>
+  {% assign has_hero_image = section.settings.hero_background_image | default: false %}
+  <section class="about-hero about-hero--has-image">
+    {% if has_hero_image %}
+      <img
+        src="{{ section.settings.hero_background_image | image_url: width: 1920 }}"
+        alt="About Celebrate Festival Inc"
+        class="about-hero__bg-image"
+        loading="eager"
+      >
+    {% else %}
+      <img
+        src="{{ 'about-hero-bg.png' | asset_url }}"
+        alt="About Celebrate Festival Inc"
+        class="about-hero__bg-image"
+        loading="eager"
+      >
+    {% endif %}
+    {% assign overlay_opacity = section.settings.hero_overlay_opacity | default: 90 | divided_by: 100.0 %}
+    <div class="about-hero__overlay" style="opacity: {{ overlay_opacity }};"></div>
+    <div class="about-hero__shapes">
+      <div class="shape shape--1"></div>
+      <div class="shape shape--2"></div>
+      <div class="shape shape--3"></div>
     </div>
     <div class="about-hero__content">
       <div class="about-hero__tagline-pill">
@@ -27,7 +43,6 @@
           {{ section.settings.hero_secondary_cta | default: 'Contact Us' }}
         </a>
       </div>
-    </div>
   </section>
 
   <!-- Welcome Section -->
@@ -64,26 +79,17 @@
   <section class="about-expertise">
     <div class="container">
       <div class="about-expertise__grid">
-        <div class="about-expertise__image">
-          {% if section.settings.expertise_image %}
-            {{ section.settings.expertise_image | image_url: width: 600 | image_tag: class: 'about-expertise__img', loading: 'lazy' }}
-          {% else %}
-            <div class="about-expertise__placeholder">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M12 3v18M3 12h18M5.5 5.5l13 13M18.5 5.5l-13 13"/>
-              </svg>
-            </div>
-          {% endif %}
-        </div>
-        <div class="about-expertise__content">
-          <div class="section-label">
-            <span class="section-label__bar"></span>
-            <span class="section-label__text">{{ section.settings.expertise_label | default: 'Our Expertise' }}</span>
-          </div>
-          <h2 class="about-expertise__title">{{ section.settings.expertise_title | default: 'Specialists in Indian Restaurant Equipment' }}</h2>
-          <div class="about-expertise__text">
-            <p>{{ section.settings.expertise_paragraph_1 | default: "While we take pride in catering to a wide spectrum of culinary businesses, our true expertise shines in a specific niche – the vibrant and diverse world of Indian restaurants. With a deep understanding of the intricacies of Indian cuisine and a commitment to sourcing authentic and innovative products, we have earned the trust of countless Indian restaurant owners and chefs across the country." }}</p>
-            <p>{{ section.settings.expertise_paragraph_2 | default: "Our vast network of satisfied customers stands as a testament to our unwavering dedication to excellence." }}</p>
+        <div class="about-expertise__image-wrapper">
+          <div class="about-expertise__image">
+            {% if section.settings.expertise_image %}
+              {{ section.settings.expertise_image | image_url: width: 600 | image_tag: class: 'about-expertise__img', loading: 'lazy' }}
+            {% else %}
+              <div class="about-expertise__placeholder">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M12 3v18M3 12h18M5.5 5.5l13 13M18.5 5.5l-13 13"/>
+                </svg>
+              </div>
+            {% endif %}
           </div>
           <div class="about-expertise__stats">
             <div class="stat-item">
@@ -98,6 +104,17 @@
               <span class="stat-item__number">{{ section.settings.stat_3_number | default: '15+' }}</span>
               <span class="stat-item__label">{{ section.settings.stat_3_label | default: 'Years Experience' }}</span>
             </div>
+          </div>
+        </div>
+        <div class="about-expertise__content">
+          <div class="section-label">
+            <span class="section-label__bar"></span>
+            <span class="section-label__text">{{ section.settings.expertise_label | default: 'Our Expertise' }}</span>
+          </div>
+          <h2 class="about-expertise__title">{{ section.settings.expertise_title | default: 'Specialists in Indian Restaurant Equipment' }}</h2>
+          <div class="about-expertise__text">
+            <p>{{ section.settings.expertise_paragraph_1 | default: "While we take pride in catering to a wide spectrum of culinary businesses, our true expertise shines in a specific niche – the vibrant and diverse world of Indian restaurants. With a deep understanding of the intricacies of Indian cuisine and a commitment to sourcing authentic and innovative products, we have earned the trust of countless Indian restaurant owners and chefs across the country." }}</p>
+            <p>{{ section.settings.expertise_paragraph_2 | default: "Our vast network of satisfied customers stands as a testament to our unwavering dedication to excellence." }}</p>
           </div>
         </div>
       </div>
@@ -247,7 +264,7 @@
             </div>
             <div class="directions-card__content">
               <p>{{ section.settings.directions_text | default: '2-3 min from Fwy 880 exits (Mission or Dixon Landing), 1-2 min from Scott exit on 680. Less than 5 min from intersection of 237 & 880.' }}</p>
-              <a href="{{ section.settings.map_url | default: 'https://www.google.com/maps/place/Celebrate+Festival+Inc+-+Restaurant+Supply+Store/@37.4701271,-121.9202041,17z/data=!3m1!4b1!4m6!3m5!1s0x808fcb603dcda243:0x94f5a26630de7769!8m2!3d37.4701271!4d-121.9202041!16s%2Fg%2F11h2hhf61n?entry=ttu&g_ep=EgoyMDI2MDEyOC4wIKXMDSoASAFQAw%3D%3D' }}" target="_blank" class="btn btn--outline">
+              <a href="{{ section.settings.map_url | default: 'https://maps.google.com/?q=Celebrate+Festival+Inc,+235+Whitney+Pl,+Fremont,+CA+94539' }}" target="_blank" class="btn btn--outline">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                   <circle cx="12" cy="10" r="3"/>
@@ -255,20 +272,13 @@
                 Get Directions
               </a>
             </div>
-            {% if section.settings.map_embed %}
-              <div class="directions-card__map">
+            <div class="directions-card__map">
+              {% if section.settings.map_embed %}
                 {{ section.settings.map_embed }}
-              </div>
-            {% else %}
-              <div class="directions-card__map-placeholder">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                  <rect x="2" y="2" width="20" height="20" rx="2"/>
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" transform="scale(0.6) translate(8,6)"/>
-                  <circle cx="12" cy="10" r="2"/>
-                </svg>
-                <p>Map placeholder - Add Google Maps embed in settings</p>
-              </div>
-            {% endif %}
+              {% else %}
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3166.6112662998175!2d-121.92273282413066!3d37.46989927206378!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808fc6194990b1d7%3A0x4eea4fec4c260e23!2s235%20Whitney%20Pl%2C%20Fremont%2C%20CA%2094539%2C%20USA!5e0!3m2!1sen!2sin!4v1770135474914!5m2!1sen!2sin" width="100%" height="250" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+              {% endif %}
+            </div>
           </div>
         </div>
       </div>
@@ -390,28 +400,24 @@
   }
 
   /* Section Header */
-  .section-header {
-    text-align: center;
+  .about-celebrate-festival-page .section-header {
+    text-align: center !important;
     margin-bottom: 48px;
   }
 
-  .section-title {
+  .about-celebrate-festival-page .section-title {
     font-size: 32px;
     color: var(--cf-deep-blue);
     margin-bottom: 16px;
+    text-align: center !important;
   }
 
-  .section-subtitle {
+  .about-celebrate-festival-page .section-subtitle {
     font-size: 16px;
     color: var(--cf-text-medium);
     max-width: 600px;
     margin: 0 auto;
-  }
-
-  .about-products .section-subtitle {
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
+    text-align: center !important;
   }
 
   /* Buttons */
@@ -433,7 +439,7 @@
 
   .btn--primary {
     background: linear-gradient(135deg, var(--cf-coral) 0%, #ff5252 100%);
-    color: white;
+    color: #ffffff !important;
     border-color: var(--cf-coral);
   }
 
@@ -441,19 +447,24 @@
     background: linear-gradient(135deg, #ff5252 0%, var(--cf-coral) 100%);
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
-    color: white;
+    color: #ffffff !important;
   }
 
   .btn--secondary {
     background: transparent;
-    color: white;
+    color: #ffffff !important;
     border-color: rgba(255, 255, 255, 0.5);
   }
 
   .btn--secondary:hover {
     background: rgba(255, 255, 255, 0.1);
     border-color: white;
-    color: white;
+    color: #ffffff !important;
+  }
+
+  /* Hero specific button styles */
+  .about-hero .btn {
+    color: #ffffff !important;
   }
 
   .btn--outline {
@@ -507,19 +518,49 @@
     justify-content: center;
     overflow: hidden;
     padding: 80px 24px;
+    background: linear-gradient(135deg, var(--cf-deep-blue) 0%, #0f172a 50%, var(--cf-navy) 100%);
   }
 
-  .about-hero__background {
+  .about-hero__bg-image {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, var(--cf-deep-blue) 0%, #0f172a 50%, var(--cf-navy) 100%);
-    z-index: 0;
+    object-fit: cover;
+    object-position: center;
+    z-index: 1;
   }
 
-  .about-hero__background::before {
+  .about-hero__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg,
+      #1a365d 0%,
+      #0f172a 50%,
+      #2d5a87 100%);
+    z-index: 2;
+    /* opacity controlled via inline style */
+  }
+
+  .about-hero__shapes {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  @keyframes heroSweep {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(50%); }
+  }
+
+  .about-hero__shapes::before {
     content: '';
     position: absolute;
     top: 0;
@@ -535,18 +576,6 @@
       transparent 100%
     );
     animation: heroSweep 8s ease-in-out infinite;
-  }
-
-  @keyframes heroSweep {
-    0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(50%); }
-  }
-
-  .about-hero__shapes {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
   }
 
   .shape {
@@ -597,7 +626,7 @@
 
   .about-hero__content {
     position: relative;
-    z-index: 1;
+    z-index: 10;
     text-align: center;
     max-width: 800px;
   }
@@ -718,7 +747,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 60px;
-    align-items: center;
+    align-items: start;
   }
 
   .about-expertise__title {
@@ -734,6 +763,15 @@
     margin-bottom: 32px;
   }
 
+  .about-expertise__image-wrapper {
+    position: relative;
+    padding-bottom: 60px; /* Space for overlapping stats */
+  }
+
+  .about-expertise__image {
+    position: relative;
+  }
+
   .about-expertise__img {
     width: 100%;
     height: auto;
@@ -744,15 +782,20 @@
   .about-expertise__stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
+    gap: 16px;
+    position: relative;
+    margin-top: -60px; /* Pull up to overlap image by 50% of card height */
+    z-index: 2;
+    padding: 0 16px;
   }
 
   .stat-item {
     text-align: center;
-    padding: 20px;
+    padding: 20px 16px;
     background: white;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 8px 30px rgba(26, 54, 93, 0.12);
+    border: 1px solid rgba(226, 232, 240, 0.5);
   }
 
   .stat-item__number {
@@ -918,6 +961,23 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 60px;
+    align-items: center;
+  }
+
+  .about-contact__info,
+  .about-contact__directions {
+    text-align: center;
+  }
+
+  .about-contact__info .section-label {
+    justify-content: center;
+  }
+
+  .about-contact__info .contact-details {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
   }
 
   .about-contact__title {
@@ -1174,8 +1234,14 @@
       direction: ltr;
     }
 
-    .about-expertise__image {
+    .about-expertise__image-wrapper {
       order: -1;
+      padding-bottom: 50px;
+    }
+
+    .about-expertise__stats {
+      margin-top: -50px;
+      padding: 0 12px;
     }
 
     .about-welcome__title,
@@ -1227,21 +1293,27 @@
       font-size: 26px;
     }
 
+    .about-expertise__image-wrapper {
+      padding-bottom: 45px;
+    }
+
     .about-expertise__stats {
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
+      gap: 10px;
+      margin-top: -45px;
+      padding: 0 8px;
     }
 
     .stat-item {
-      padding: 16px 12px;
+      padding: 14px 10px;
     }
 
     .stat-item__number {
-      font-size: 24px;
+      font-size: 22px;
     }
 
     .stat-item__label {
-      font-size: 11px;
+      font-size: 10px;
     }
 
     .directions-card {
@@ -1303,9 +1375,15 @@
       font-size: 11px;
     }
 
+    .about-expertise__image-wrapper {
+      padding-bottom: 0;
+    }
+
     .about-expertise__stats {
       grid-template-columns: 1fr;
       gap: 12px;
+      margin-top: 20px;
+      padding: 0;
     }
 
     .stat-item {
@@ -1352,6 +1430,23 @@
     {
       "type": "header",
       "content": "Hero Section"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_background_image",
+      "label": "Hero Background Image",
+      "info": "Recommended: 1920x600px. The image will have a dark overlay for text readability."
+    },
+    {
+      "type": "range",
+      "id": "hero_overlay_opacity",
+      "label": "Overlay Opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 90,
+      "unit": "%",
+      "info": "Controls how dark the overlay appears over the background image. Higher = darker."
     },
     {
       "type": "text",
@@ -1628,8 +1723,7 @@
     {
       "type": "url",
       "id": "map_url",
-      "label": "Google Maps URL",
-      "default": "https://www.google.com/maps/place/Celebrate+Festival+Inc+-+Restaurant+Supply+Store/@37.4701271,-121.9202041,17z/data=!3m1!4b1!4m6!3m5!1s0x808fcb603dcda243:0x94f5a26630de7769!8m2!3d37.4701271!4d-121.9202041!16s%2Fg%2F11h2hhf61n?entry=ttu&g_ep=EgoyMDI2MDEyOC4wIKXMDSoASAFQAw%3D%3D"
+      "label": "Google Maps URL"
     },
     {
       "type": "html",

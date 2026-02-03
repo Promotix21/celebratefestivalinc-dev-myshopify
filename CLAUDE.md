@@ -1,6 +1,6 @@
 # Claude Implementation Guide - Celebrate Festival Collection Templates
 
-**Last Updated:** January 2026
+**Last Updated:** February 2026
 **Reference Mockup:** `webstaurant-red-blue-mockup (1).html`
 **Shopify Theme ID:** `148264910893`
 **Theme Push Command:** `shopify theme push --theme 148264910893`
@@ -640,64 +640,65 @@ You CANNOT change:
 
 ---
 
-## WSH WHOLESALE PLUGIN INTEGRATION
+## WSH WHOLESALE PLUGIN & MEMBER PRICING
 
-**Last Updated:** January 2026
-**Investigation Completed:** 2026-01-14
-**Schema Setting:** `enable_member_pricing` - **DEFAULT: FALSE** (Must be manually enabled)
+**Last Updated:** February 2026
 
-### ⚠️ IMPORTANT: Member Pricing is NOT Real WSH Integration
+### VENDOR-BASED PRICING LOGIC (CURRENT IMPLEMENTATION)
 
-The "Member Pricing" feature in the product template is a **FALLBACK/PROMOTIONAL** display only. It does NOT show actual WSH wholesale prices.
+The pricing display is determined by **product vendor**, not just member status:
 
-**To Use Real WSH Wholesale Pricing:**
-- Direct wholesale customers to: `https://celebratefestivalinc.myshopify.com/apps/wpdapp/wholesale`
-- This is where WSH plugin actually works with real individual variant pricing
-- The regular storefront CANNOT access WSH prices (by WSH's architectural design)
+#### For CF Inc Products (Own Brand):
+- **Members:** Show dual pricing (Regular Price + Member Price)
+- **Non-Members:** Show blurred member price + **"Login for Member Pricing"** button
 
-**Member Pricing Toggle:**
-- Schema setting: `enable_member_pricing`
-- **Default: FALSE** (disabled)
-- When enabled, shows calculated discount (default 2%) as promotional preview
-- This is purely visual - NOT connected to WSH database
+#### For Third-Party Vendor Products:
+- **All Users:** Show single price only (no member pricing)
+- **Non-Members:** Show **"Call for More Details - (408) 673-9999"** button
 
-### CRITICAL UNDERSTANDING: How WSH Works
+### Vendor Detection Logic
+```liquid
+{% assign is_own_brand = false %}
+{% assign vendor_lower = product.vendor | downcase %}
+{% if vendor_lower contains 'cf inc' or vendor_lower contains 'celebrate festival' %}
+  {% assign is_own_brand = true %}
+{% endif %}
+```
 
-The WSH Wholesale plugin uses a **proprietary architecture** that is fundamentally different from standard Shopify apps:
+### Files Updated with Vendor-Based Logic
 
-**❌ What WSH Does NOT Do:**
-- Does NOT store prices in Shopify product metafields
-- Does NOT expose Liquid variables (e.g., `product.wsh_wholesale_price`)
-- Does NOT modify `product.price` or `variant.price` in regular theme
-- Does NOT integrate with standard Shopify theme templates
+| File | Component | CF Inc Products | Other Vendors |
+|------|-----------|-----------------|---------------|
+| `snippets/product-card.liquid` | Home page, Search | Login for Member Pricing | Call for More Details |
+| `sections/main-collection.liquid` | L3 Collection pages | Login for Member Pricing | Call for More Details |
+| `sections/collection-level2-hub.liquid` | L2 Collection pages | Login for Member Pricing | Call for More Details |
+| `sections/product-celebrate-festival.liquid` | Single Product Page | Blurred price + Login button | Single price + Call button |
 
-**✅ What WSH Does:**
-- Stores individual variant pricing in its own external database
-- Serves wholesale prices ONLY through dedicated section: `/apps/wpdapp/wholesale`
-- Uses customer tags to determine discount groups (9 groups configured)
-- Provides Professional plan features for B2B pricing management
+---
 
-### Discount Groups Configuration
+### PRICING CALCULATION LOGIC (Single Product Page)
 
-The store has **9 discount groups** configured in WSH:
-- CPH
-- UMRP
-- 5% Margin
-- 10% Margin
-- 15% Margin
-- 20% Margin
-- ROU
-- 30% Margin
-- Premium
+The theme uses WSH plugin output + compare_at_price for pricing:
 
-**Example Pricing:**
-- Product: ATOSA AEC-0511E
-- Regular Price: $5806.00
-- CPH Group Price: $5278.08 (9% discount)
+**Two Pricing Cases:**
 
-### Current Theme Implementation
+```liquid
+# Case 1: Individual variant pricing (WSH)
+# When WSH returns wholesale price lower than product.price
+if wcp_price != blank and wcp_price > 0 and wcp_price < product.price
+  retail_price = product.price
+  member_price = wcp_price (WSH wholesale price)
 
-**Member Detection:**
+# Case 2: Bulk discount
+# When compare_at_price exists and is greater than product.price
+elsif product.compare_at_price != blank and product.compare_at_price > product.price
+  retail_price = product.compare_at_price  ← "Regular Price" shown to user
+  member_price = product.price             ← "Member Price" shown to user
+```
+
+**IMPORTANT:** When member pricing is displayed, the "Regular Price" shown is actually `compare_at_price`, NOT `product.price`. The current `product.price` becomes the member price.
+
+### Member Detection
 ```liquid
 {% assign is_member = false %}
 {% if customer %}
@@ -707,108 +708,11 @@ The store has **9 discount groups** configured in WSH:
 {% endif %}
 ```
 
-**Fallback Pricing Calculation:**
-Since WSH doesn't expose prices to the regular theme, we use a 2% fallback discount:
-```liquid
-{% assign member_discount = 2 %}
-{% assign discount_multiplier = 100 | minus: member_discount | divided_by: 100.0 %}
-{% assign member_price = product.price | times: discount_multiplier %}
-```
+---
 
-**Price Source Detection Attempts (All Fail by Design):**
-```liquid
-{% if product.metafields.wsh.wholesale_price %}
-  {% assign member_price = product.metafields.wsh.wholesale_price %}
-{% elsif product.metafields.wholesale.price %}
-  {% assign member_price = product.metafields.wholesale.price %}
-{% elsif product.metafields.custom.wholesale_price %}
-  {% assign member_price = product.metafields.custom.wholesale_price %}
-{% elsif product.compare_at_price and product.compare_at_price < product.price %}
-  {% assign member_price = product.compare_at_price %}
-{% else %}
-  {% comment %} Use fallback calculation {% endcomment %}
-  {% assign member_price = product.price | times: discount_multiplier %}
-{% endif %}
-```
+### WSH WHOLESALE PLUGIN NOTES
 
-### Why This Works Correctly
-
-**For Regular Storefront:**
-- Shows 2% discount as a "teaser" for membership program
-- Member tag detection works perfectly
-- Non-members see blurred pricing with login prompt
-- Members see calculated 2% discount
-
-**For Wholesale Customers:**
-- Direct them to: `https://celebratefestivalinc.myshopify.com/apps/wpdapp/wholesale`
-- They see actual discount group prices (CPH, ROU, etc.)
-- Individual variant pricing applies based on customer tags
-- Volume discounts are honored
-
-### Debug Tools Created
-
-Two debug snippets available (not rendered in production):
-- `snippets/debug-wsh-detection.liquid` - Shows all metafield detection attempts
-- `snippets/debug-wsh-variables.liquid` - Tests for WSH Liquid variables
-
-These can be rendered temporarily for troubleshooting:
-```liquid
-{% render 'debug-wsh-detection' %}
-{% render 'debug-wsh-variables' %}
-```
-
-### DO NOT Attempt These Solutions
-
-**❌ Don't Try:**
-- Adding more metafield paths (WSH doesn't use any)
-- Looking for WSH Liquid variables (they don't exist in regular theme)
-- Modifying price detection logic (current implementation is correct)
-- Expecting WSH prices in product page (only available in `/apps/wpdapp/wholesale`)
-
-**✅ Current Implementation is Correct:**
-- 2% fallback works as designed for regular storefront
-- WSH dedicated section handles actual wholesale pricing
-- Customer segmentation by tags works properly
-- This is how WSH Professional plan is designed to work
-
-### Member Pricing Display
-
-**For Members (logged in with "wholesale" tag):**
-```liquid
-<div class="price-member-section">
-  <div class="price-type-label">{{ section.settings.member_price_label | default: "Plus Member Price:" }}</div>
-  <div class="member-price">
-    {{ member_price | money }}
-    <span>/{{ section.settings.price_unit | default: "Each" }}</span>
-  </div>
-  <span class="savings-badge">Save {{ savings_amount | money }} ({{ member_discount }}%)</span>
-</div>
-```
-
-**For Non-Members:**
-```liquid
-<div class="member-price-blur-container">
-  <div class="price-member-section" style="filter: blur(5px);">
-    <div class="member-price">$X,XXX.XX</div>
-  </div>
-  <div class="member-price-blur-overlay">
-    <div class="login-prompt-text">🔒 Login to see member pricing</div>
-    <a href="/account/login" class="login-btn">Login to Your Account</a>
-  </div>
-</div>
-```
-
-### Recommendation for Clients
-
-When setting up wholesale customers:
-1. Add appropriate customer tag (CPH, ROU, etc.)
-2. Also add "wholesale" tag for member detection
-3. Direct wholesale customers to `/apps/wpdapp/wholesale`
-4. Regular storefront shows 2% preview pricing
-5. Actual discount group pricing only in WSH section
-
-This architecture ensures:
-- Regular customers see promotional member pricing (2% teaser)
-- Wholesale customers get full B2B experience in dedicated section
-- No confusion between retail and wholesale pricing
-- Clean separation of concerns
+- WSH stores individual variant pricing in its own external database
+- For full wholesale experience, direct customers to: `/apps/wpdapp/wholesale`
+- WSH uses customer tags for discount groups (CPH, ROU, etc.)
+- The `wcp_discount` snippet renders WSH prices when available
