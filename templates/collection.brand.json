@@ -1,0 +1,11 @@
+{
+  "sections": {
+    "main": {
+      "type": "collection-brand-hub",
+      "settings": {
+        "menu_handle": "cf-menu-31-12-2026"
+      }
+    }
+  },
+  "order": ["main"]
+}

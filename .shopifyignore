@@ -1,0 +1,30 @@
+# Ignore temporary files created during edits
+*.tmp.*
+*.tmp
+*~
+*.bak
+*.swp
+
+# Ignore Python scripts and data files
+*.py
+*.xlsx
+*.xls
+
+# Ignore development files
+node_modules/*
+.git/*
+.vscode/*
+*.log
+
+# Ignore documentation and reference files
+*.md
+reference-designs/*
+Logo/*
+Logo.zip
+
+# Ignore settings data to preserve customizer changes
+config/settings_data.json
+
+# Ignore other non-theme files
+nul
+temp_*.html

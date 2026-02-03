@@ -1,0 +1,31 @@
+{% comment %} CF Brand: Turbo Air {% endcomment %}
+
+{%- liquid
+  assign turboair_categories = 'turbo-air-reach-ins,turbo-air-food-prep-tables,turbo-air-undercounters,turbo-air-worktops,turbo-air-chef-bases,turbo-air-ice-cream-merchandisers,turbo-air-glass-door-merchandisers,turbo-air-open-display-merchandisers,turbo-air-display-cases,turbo-air-underbar-equipment,turbo-air-milk-coolers,turbo-air-collection' | split: ','
+
+  assign turboair_titles = 'Reach Ins,Food Prep Tables,Undercounters,Worktops,Chef Bases,Ice Cream Merchandisers,Glass Door Merchandisers,Open Display Merchandisers,Display Cases,Underbar Equipment,Milk Coolers,Turbo Air - All' | split: ','
+
+  assign turboair_images = 'Turboair-reach-ins.jpg,Turboair-food-prep-tables.jpg,Turboair-undercounters.jpg,Turboair-worktops.jpg,Turboair-chef-bases.jpg,Turboair-Group_168.png,Turboair-glass-door-merchandisers.jpg,Turboair-Group_92.png,Turboair-Group_167.png,Turboair-Group_165.png,Turboair-Group_104.png,Turbo-Air.png' | split: ','
+-%}
+
+<div class="cf-brand-hub__grid cf-brand-hub__grid--3col">
+  {%- for handle in turboair_categories -%}
+    {%- assign idx = forloop.index0 -%}
+    {%- assign title = turboair_titles[idx] -%}
+    {%- assign image_file = turboair_images[idx] -%}
+    {%- assign cdn_url = 'https://celebratefestivalinc.com/cdn/shop/files/' | append: image_file | append: '?width=400&height=400&crop=center' -%}
+
+    <a href="/collections/{{ handle }}" class="cf-brand-hub__card">
+      <div class="cf-brand-hub__card-image">
+        <img src="{{ cdn_url }}" alt="{{ title }}" loading="lazy">
+        <div class="cf-brand-hub__card-overlay">
+          <span class="cf-brand-hub__card-overlay-text">{{ title }}</span>
+        </div>
+      </div>
+      <div class="cf-brand-hub__card-content">
+        <h3 class="cf-brand-hub__card-title">{{ title }}</h3>
+        <span class="cf-brand-hub__card-btn">Shop Now</span>
+      </div>
+    </a>
+  {%- endfor -%}
+</div>

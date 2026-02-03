@@ -1,0 +1,335 @@
+{% comment %}
+  Brand Logo Mapping Snippet
+
+  Usage:
+    {% render 'brand-logo', vendor: product.vendor %}
+    {% render 'brand-logo', vendor: product.vendor, size: 'small' %}
+    {% render 'brand-logo', vendor: product.vendor, link: true %}
+
+  Parameters:
+    - vendor: The vendor/brand name (required)
+    - size: 'small' (100x50), 'medium' (150x75), 'large' (200x100) - default 'medium'
+    - link: true/false - wrap in link to brand collection page (default false)
+    - class: Additional CSS classes
+{% endcomment %}
+
+{% assign vendor_handle = vendor | handleize %}
+{% assign brand_logo = nil %}
+
+{% comment %} Priority Brands from Excel (18 brands for mega menu) {% endcomment %}
+{% assign priority_brands = 'atosa,gsw,thunder-group,rational,robot-coupe,cac,turbo-air,waring,eurodib,winco,sammic,globe,shaan,somerset,global-solutions,rotoquip,kwitex,yanco' | split: ',' %}
+
+{% comment %} Brand Logo Mapping - All 157 brands {% endcomment %}
+{% case vendor_handle %}
+  {% when 'atosa' %}
+    {% assign brand_logo = 'brand-logo-atosa.png' %}
+  {% when 'gsw' %}
+    {% assign brand_logo = 'brand-logo-gsw.png' %}
+  {% when 'thunder-group' or 'thundergroup' %}
+    {% assign brand_logo = 'brand-logo-thunder-group.png' %}
+  {% when 'rational' %}
+    {% assign brand_logo = 'brand-logo-rational.png' %}
+  {% when 'robot-coupe' or 'robotcoupe' %}
+    {% assign brand_logo = 'brand-logo-robot-coupe.png' %}
+  {% when 'cac' %}
+    {% assign brand_logo = 'brand-logo-cac.png' %}
+  {% when 'turbo-air' or 'turboair' %}
+    {% assign brand_logo = 'brand-logo-turbo-air.png' %}
+  {% when 'waring' %}
+    {% assign brand_logo = 'brand-logo-waring.png' %}
+  {% when 'eurodib' %}
+    {% assign brand_logo = 'brand-logo-eurodib.png' %}
+  {% when 'winco' or 'winware' %}
+    {% assign brand_logo = 'brand-logo-winco.png' %}
+  {% when 'sammic' %}
+    {% assign brand_logo = 'brand-logo-sammic.png' %}
+  {% when 'globe' %}
+    {% assign brand_logo = 'brand-logo-globe.png' %}
+  {% when 'shaan' %}
+    {% assign brand_logo = 'brand-logo-shaan.png' %}
+  {% when 'somerset' %}
+    {% assign brand_logo = 'brand-logo-somerset.png' %}
+  {% when 'global-solutions' or 'globalsolutions' %}
+    {% assign brand_logo = 'brand-logo-global-solutions.png' %}
+  {% when 'rotoquip' %}
+    {% assign brand_logo = 'brand-logo-rotoquip.png' %}
+  {% when 'kwitex' %}
+    {% assign brand_logo = 'brand-logo-kwitex.png' %}
+  {% when 'yanco' or 'yonco' %}
+    {% assign brand_logo = 'brand-logo-yanco.png' %}
+  {% when 'hawkins' %}
+    {% assign brand_logo = 'brand-logo-hawkins.png' %}
+  {% when 'preethi' %}
+    {% assign brand_logo = 'brand-logo-preethi.png' %}
+  {% when 'prestige' %}
+    {% assign brand_logo = 'brand-logo-prestige.png' %}
+  {% when 'la-coppera' or 'lacoppera' %}
+    {% assign brand_logo = 'brand-logo-la-coppera.png' %}
+  {% when 'dukers' %}
+    {% assign brand_logo = 'brand-logo-dukers.png' %}
+  {% when 'true' or 'true-manufacturing' %}
+    {% assign brand_logo = 'brand-logo-true.png' %}
+  {% when 'hoshizaki' %}
+    {% assign brand_logo = 'brand-logo-hoshizaki.png' %}
+  {% when 'vollrath' %}
+    {% assign brand_logo = 'brand-logo-vollrath.png' %}
+  {% when 'hatco' %}
+    {% assign brand_logo = 'brand-logo-hatco.png' %}
+  {% when 'nemco' %}
+    {% assign brand_logo = 'brand-logo-nemco.png' %}
+  {% when 'bunn' %}
+    {% assign brand_logo = 'brand-logo-bunn.png' %}
+  {% when 'hamilton-beach' or 'hamiltonbeach' %}
+    {% assign brand_logo = 'brand-logo-hamilton-beach.png' %}
+  {% when 'victorinox' %}
+    {% assign brand_logo = 'brand-logo-victorinox.png' %}
+  {% when 'mercer' %}
+    {% assign brand_logo = 'brand-logo-mercer.png' %}
+  {% when 'john-boos' or 'johnboos' %}
+    {% assign brand_logo = 'brand-logo-john-boos.png' %}
+  {% when 'tablecraft' %}
+    {% assign brand_logo = 'brand-logo-tablecraft.png' %}
+  {% when 'san-jamar' or 'sanjamar' %}
+    {% assign brand_logo = 'brand-logo-san-jamar.png' %}
+  {% when 'edlund' %}
+    {% assign brand_logo = 'brand-logo-edlund.png' %}
+  {% when 'star' %}
+    {% assign brand_logo = 'brand-logo-star.png' %}
+  {% when 'apw' %}
+    {% assign brand_logo = 'brand-logo-apw.png' %}
+  {% when 'wells' %}
+    {% assign brand_logo = 'brand-logo-wells.png' %}
+  {% when 'pitco' %}
+    {% assign brand_logo = 'brand-logo-pitco.png' %}
+  {% when 'imperial' %}
+    {% assign brand_logo = 'brand-logo-imperial.png' %}
+  {% when 'southbend' %}
+    {% assign brand_logo = 'brand-logo-southbend.png' %}
+  {% when 'bakers-pride' or 'bakerspride' %}
+    {% assign brand_logo = 'brand-logo-bakers-pride.png' %}
+  {% when 'doyon' %}
+    {% assign brand_logo = 'brand-logo-doyon.png' %}
+  {% when 'univex' %}
+    {% assign brand_logo = 'brand-logo-univex.png' %}
+  {% when 'omcan' %}
+    {% assign brand_logo = 'brand-logo-omcan.png' %}
+  {% when 'arctic-air' or 'arcticair' %}
+    {% assign brand_logo = 'brand-logo-arctic-air.png' %}
+  {% when 'federal' %}
+    {% assign brand_logo = 'brand-logo-federal.png' %}
+  {% when 'nor-lake' or 'norlake' %}
+    {% assign brand_logo = 'brand-logo-nor-lake.png' %}
+  {% when 'continental' %}
+    {% assign brand_logo = 'brand-logo-continental.png' %}
+  {% when 'krowne' %}
+    {% assign brand_logo = 'brand-logo-krowne.png' %}
+  {% when 'advance-tabco' or 'advancetabco' %}
+    {% assign brand_logo = 'brand-logo-advance-tabco.png' %}
+  {% when 'channel-mfg' or 'channelmfg' %}
+    {% assign brand_logo = 'brand-logo-channel-mfg.png' %}
+  {% when 'royal-industries' or 'royalindustries' %}
+    {% assign brand_logo = 'brand-logo-royal-industries.png' %}
+  {% when 'crestware' %}
+    {% assign brand_logo = 'brand-logo-crestware.png' %}
+  {% when 'sharp' %}
+    {% assign brand_logo = 'brand-logo-sharp.png' %}
+  {% when 'cooktek' %}
+    {% assign brand_logo = 'brand-logo-cooktek.png' %}
+  {% when 'dynamic' %}
+    {% assign brand_logo = 'brand-logo-dynamic.png' %}
+  {% when 'jackson' %}
+    {% assign brand_logo = 'brand-logo-jackson.png' %}
+  {% when 'insinger' %}
+    {% assign brand_logo = 'brand-logo-insinger.png' %}
+  {% when 'champion' %}
+    {% assign brand_logo = 'brand-logo-champion.png' %}
+  {% when 'cma-dishmachines' or 'cmadishmachines' %}
+    {% assign brand_logo = 'brand-logo-cma-dishmachines.png' %}
+  {% when 'dormont' %}
+    {% assign brand_logo = 'brand-logo-dormont.png' %}
+  {% when 'captiveaire' %}
+    {% assign brand_logo = 'brand-logo-captiveaire.png' %}
+  {% when 'bally' %}
+    {% assign brand_logo = 'brand-logo-bally.png' %}
+  {% when 'us-cooler' or 'uscooler' %}
+    {% assign brand_logo = 'brand-logo-us-cooler.png' %}
+  {% when 'spaceman' %}
+    {% assign brand_logo = 'brand-logo-spaceman.png' %}
+  {% when 'taylor' %}
+    {% assign brand_logo = 'brand-logo-taylor.png' %}
+  {% when 'sterno' %}
+    {% assign brand_logo = 'brand-logo-sterno.png' %}
+  {% when 'bissell' %}
+    {% assign brand_logo = 'brand-logo-bissell.png' %}
+  {% when 'world-dryer' or 'worlddryer' %}
+    {% assign brand_logo = 'brand-logo-world-dryer.png' %}
+  {% when 'chef-works' or 'chefworks' %}
+    {% assign brand_logo = 'brand-logo-chef-works.png' %}
+  {% when 'chef-master' or 'chefmaster' %}
+    {% assign brand_logo = 'brand-logo-chef-master.png' %}
+  {% when 'anets' %}
+    {% assign brand_logo = 'brand-logo-anets.png' %}
+  {% when 'marsal' %}
+    {% assign brand_logo = 'brand-logo-marsal.png' %}
+  {% when 'pizza-group' or 'pizzagroup' %}
+    {% assign brand_logo = 'brand-logo-pizza-group.png' %}
+  {% when 'middleby' %}
+    {% assign brand_logo = 'brand-logo-middleby.png' %}
+  {% when 'moffat' %}
+    {% assign brand_logo = 'brand-logo-moffat.png' %}
+  {% when 'toastmaster' %}
+    {% assign brand_logo = 'brand-logo-toastmaster.png' %}
+  {% when 'crown-steam' or 'crownsteam' %}
+    {% assign brand_logo = 'brand-logo-crown-steam.png' %}
+  {% when 'piper-products' or 'piperproducts' %}
+    {% assign brand_logo = 'brand-logo-piper-products.png' %}
+  {% when 'la-rosa' or 'larosa' %}
+    {% assign brand_logo = 'brand-logo-la-rosa.png' %}
+  {% when 'mkld' %}
+    {% assign brand_logo = 'brand-logo-mkld.png' %}
+  {% when 'oak-street' or 'oakstreet' %}
+    {% assign brand_logo = 'brand-logo-oak-street.png' %}
+  {% when 'mts-seating' or 'mtsseating' %}
+    {% assign brand_logo = 'brand-logo-mts-seating.png' %}
+  {% when 'grosfillex' %}
+    {% assign brand_logo = 'brand-logo-grosfillex.png' %}
+  {% when 'just-chairs' or 'justchairs' %}
+    {% assign brand_logo = 'brand-logo-just-chairs.png' %}
+  {% when 'cdn' %}
+    {% assign brand_logo = 'brand-logo-cdn.png' %}
+  {% when 'howard-mccray' or 'howardmccray' %}
+    {% assign brand_logo = 'brand-logo-howard-mccray.png' %}
+  {% when 'fogel' %}
+    {% assign brand_logo = 'brand-logo-fogel.png' %}
+  {% when 'hydrakool' %}
+    {% assign brand_logo = 'brand-logo-hydrakool.png' %}
+  {% when 'ice-o-matic' or 'iceomatic' %}
+    {% assign brand_logo = 'brand-logo-ice-o-matic.png' %}
+  {% when 'micromatic' or 'micro-matic' %}
+    {% assign brand_logo = 'brand-logo-micromatic.png' %}
+  {% when 'perfect-fry' or 'perfectfry' %}
+    {% assign brand_logo = 'brand-logo-perfect-fry.png' %}
+  {% when 'rf-hunter' or 'rfhunter' %}
+    {% assign brand_logo = 'brand-logo-rf-hunter.png' %}
+  {% when 'disco' %}
+    {% assign brand_logo = 'brand-logo-disco.png' %}
+  {% when 'louis-tellier' or 'louistellier' %}
+    {% assign brand_logo = 'brand-logo-louis-tellier.png' %}
+  {% when 'mundial' %}
+    {% assign brand_logo = 'brand-logo-mundial.png' %}
+  {% when 'town' %}
+    {% assign brand_logo = 'brand-logo-town.png' %}
+  {% when 'eastern' %}
+    {% assign brand_logo = 'brand-logo-eastern.png' %}
+  {% when 'iti' %}
+    {% assign brand_logo = 'brand-logo-iti.png' %}
+  {% when 'get-enterprises' or 'getenterprises' %}
+    {% assign brand_logo = 'brand-logo-get-enterprises.png' %}
+  {% when 'bizerba' %}
+    {% assign brand_logo = 'brand-logo-bizerba.png' %}
+  {% when 'hubbell' %}
+    {% assign brand_logo = 'brand-logo-hubbell.png' %}
+  {% when 'ammex' %}
+    {% assign brand_logo = 'brand-logo-ammex.png' %}
+  {% when 'hospeco' %}
+    {% assign brand_logo = 'brand-logo-hospeco.png' %}
+  {% when 'impact' %}
+    {% assign brand_logo = 'brand-logo-impact.png' %}
+  {% when 'cellucap' %}
+    {% assign brand_logo = 'brand-logo-cellucap.png' %}
+  {% when 'nextstep' %}
+    {% assign brand_logo = 'brand-logo-nextstep.png' %}
+  {% when 'steril-sil' or 'sterilsil' %}
+    {% assign brand_logo = 'brand-logo-steril-sil.png' %}
+  {% when 'spill-stop' or 'spillstop' %}
+    {% assign brand_logo = 'brand-logo-spill-stop.png' %}
+  {% when 'precision-pour' or 'precisionpour' %}
+    {% assign brand_logo = 'brand-logo-precision-pour.png' %}
+  {% when 'ts-brass' or 'tsbrass' or 't-s-brass' %}
+    {% assign brand_logo = 'brand-logo-ts-brass.png' %}
+  {% when 'chase-doors' or 'chasedoors' %}
+    {% assign brand_logo = 'brand-logo-chase-doors.png' %}
+  {% when 'adcraft' %}
+    {% assign brand_logo = 'brand-logo-adcraft.png' %}
+  {% when 'gmcw' %}
+    {% assign brand_logo = 'brand-logo-gmcw.png' %}
+  {% when 'magikitchen' %}
+    {% assign brand_logo = 'brand-logo-magikitchen.png' %}
+  {% when 'texican' %}
+    {% assign brand_logo = 'brand-logo-texican.png' %}
+  {% when 'unipro' %}
+    {% assign brand_logo = 'brand-logo-unipro.png' %}
+  {% when 'uniworld' %}
+    {% assign brand_logo = 'brand-logo-uniworld.png' %}
+  {% when 'unified' %}
+    {% assign brand_logo = 'brand-logo-unified.png' %}
+  {% when 'vertex' %}
+    {% assign brand_logo = 'brand-logo-vertex.png' %}
+  {% when 'john-ritzenthaler' or 'johnritzenthaler' %}
+    {% assign brand_logo = 'brand-logo-john-ritzenthaler.png' %}
+  {% when 'klingers' %}
+    {% assign brand_logo = 'brand-logo-klingers.png' %}
+  {% when 'larkin' %}
+    {% assign brand_logo = 'brand-logo-larkin.png' %}
+  {% when 'quantum-foodservice' or 'quantumfoodservice' %}
+    {% assign brand_logo = 'brand-logo-quantum-foodservice.png' %}
+  {% when 'radius' %}
+    {% assign brand_logo = 'brand-logo-radius.png' %}
+  {% when 'astra' %}
+    {% assign brand_logo = 'brand-logo-astra.png' %}
+  {% when 'chef-specialties' or 'chefspecialties' %}
+    {% assign brand_logo = 'brand-logo-chef-specialties.png' %}
+  {% when 'chefs-choice' or 'chefschoice' %}
+    {% assign brand_logo = 'brand-logo-chefs-choice.png' %}
+  {% when 'naks' %}
+    {% assign brand_logo = 'brand-logo-naks.png' %}
+  {% when 'newton' %}
+    {% assign brand_logo = 'brand-logo-newton.png' %}
+  {% when 'senneca' %}
+    {% assign brand_logo = 'brand-logo-senneca.png' %}
+{% endcase %}
+
+{% comment %} Set sizes based on parameter {% endcomment %}
+{% assign logo_width = 150 %}
+{% assign logo_height = 75 %}
+{% case size %}
+  {% when 'small' %}
+    {% assign logo_width = 100 %}
+    {% assign logo_height = 50 %}
+  {% when 'large' %}
+    {% assign logo_width = 200 %}
+    {% assign logo_height = 100 %}
+{% endcase %}
+
+{% comment %} Output the logo {% endcomment %}
+{% if brand_logo %}
+  {% assign logo_url = brand_logo | asset_url %}
+  {% if link %}
+    {% assign brand_collection_url = '/collections/vendors?q=' | append: vendor | url_encode %}
+    <a href="{{ brand_collection_url }}" class="brand-logo-link {{ class }}" title="Shop {{ vendor }} products">
+      <img src="{{ logo_url }}"
+           alt="{{ vendor }} logo"
+           width="{{ logo_width }}"
+           height="{{ logo_height }}"
+           loading="lazy"
+           class="brand-logo-img">
+    </a>
+  {% else %}
+    <img src="{{ logo_url }}"
+         alt="{{ vendor }} logo"
+         width="{{ logo_width }}"
+         height="{{ logo_height }}"
+         loading="lazy"
+         class="brand-logo-img {{ class }}">
+  {% endif %}
+{% else %}
+  {% comment %} Fallback: show text-based logo {% endcomment %}
+  {% if link %}
+    {% assign brand_collection_url = '/collections/vendors?q=' | append: vendor | url_encode %}
+    <a href="{{ brand_collection_url }}" class="brand-logo-link brand-logo-text {{ class }}" title="Shop {{ vendor }} products">
+      {{ vendor }}
+    </a>
+  {% else %}
+    <span class="brand-logo-text {{ class }}">{{ vendor }}</span>
+  {% endif %}
+{% endif %}

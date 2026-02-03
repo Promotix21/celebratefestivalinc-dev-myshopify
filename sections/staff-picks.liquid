@@ -80,379 +80,114 @@
   }
 
   /* Products Grid / Slider */
-  .staff-picks-slider {
+  .staff-picks-slider.swiper {
     overflow: hidden;
+    width: 100%;
   }
 
-  .staff-picks-grid {
+  .staff-picks-slider .swiper-wrapper {
     display: flex;
-    gap: 16px;
+    width: max-content;
   }
 
-  /* ========== PRODUCT CARD STYLES ========== */
-  .sp-product-card {
-    width: 220px;
+  /* ========== PRODUCT CARD OVERRIDES FOR SLIDER ========== */
+  .sp-slide-wrapper {
+    width: 220px !important;
     min-width: 220px;
+  }
+
+  .sp-slide-wrapper .product-card {
+    width: 100%;
+    margin: 0;
     background: #ffffff;
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     transition: transform 0.2s, box-shadow 0.2s;
     border: 1px solid #e2e8f0;
-    display: flex;
-    flex-direction: column;
   }
 
-  .sp-product-card:hover {
+  .sp-slide-wrapper .product-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba(26, 54, 93, 0.15);
-  }
-
-  /* Image Section */
-  .sp-card-image {
-    height: 160px;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    padding: 12px;
-    overflow: hidden;
-  }
-
-  .sp-card-image img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    transition: transform 0.3s ease;
-  }
-
-  .sp-product-card:hover .sp-card-image img {
-    transform: scale(1.05);
-  }
-
-  /* Badges */
-  .sp-badge-container {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    z-index: 2;
-  }
-
-  .sp-voltage-badge {
-    background: #2d5a87;
-    color: #ffffff;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 4px 8px;
-    border-radius: 4px;
-  }
-
-  .sp-member-badge {
-    background: #1a365d;
-    color: #ffffff;
-    font-size: 9px;
-    font-weight: 600;
-    padding: 4px 8px;
-    border-radius: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  /* Card Content */
-  .sp-card-content {
-    padding: 14px;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-  }
-
-  .sp-card-title {
-    font-size: 13px;
-    font-weight: 500;
-    color: #1a365d;
-    line-height: 1.4;
-    height: 54px;
-    overflow: hidden;
-    margin: 0 0 8px 0;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-  }
-
-  .sp-card-title a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .sp-card-title a:hover {
-    color: #2d5a87;
-  }
-
-  /* Rating & SKU */
-  .sp-card-meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #e2e8f0;
-  }
-
-  .sp-rating {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .sp-stars {
-    color: #d4af37;
-    font-size: 11px;
-    letter-spacing: -1px;
-  }
-
-  .sp-stars .empty {
-    color: #e2e8f0;
-  }
-
-  .sp-sku {
-    font-size: 10px;
-    color: #94a3b8;
-  }
-
-  /* ========== PRICING SECTIONS ========== */
-
-  /* PUBLIC VIEW - Single Price (Restricted Products) */
-  .sp-price-single {
-    text-align: center;
-    padding: 16px 10px;
-    background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
-    border-radius: 6px;
-    margin-bottom: 12px;
-    border: 1px solid rgba(45, 90, 135, 0.2);
-  }
-
-  .sp-price-label-single {
-    font-size: 10px;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
-  }
-
-  .sp-price-amount-single {
-    font-size: 26px;
-    font-weight: 700;
-    color: #1a365d;
-    letter-spacing: -0.5px;
-  }
-
-  .sp-price-unit {
-    font-size: 12px;
-    font-weight: 400;
-    color: #64748b;
-  }
-
-  /* PUBLIC VIEW - Dual Price (Own Brand Products) */
-  .sp-price-dual {
-    padding: 12px 10px;
-    background: linear-gradient(135deg, #1a365d 0%, #2d5a87 100%);
-    border-radius: 6px;
-    margin-bottom: 12px;
-    position: relative;
-  }
-
-  .sp-price-dual::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #d4af37, #1a365d, #d4af37);
-  }
-
-  .sp-member-price-label {
-    font-size: 9px;
-    color: rgba(255,255,255,0.8);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    text-align: center;
-    margin-bottom: 6px;
-  }
-
-  .sp-member-price-amount {
-    font-size: 28px;
-    font-weight: 700;
-    color: #ffffff;
-    text-align: center;
-    letter-spacing: -0.5px;
-    margin-bottom: 8px;
-  }
-
-  .sp-regular-price-strike {
-    text-align: center;
-    font-size: 12px;
-    color: rgba(255,255,255,0.7);
-  }
-
-  .sp-regular-price-strike s {
-    text-decoration: line-through;
-  }
-
-  .sp-savings-tag {
-    text-align: center;
-    font-size: 10px;
-    color: #d4af37;
-    font-weight: 600;
-    margin-top: 6px;
-  }
-
-  /* MEMBER VIEW - Always Dual Price with coral border */
-  .sp-price-member-view {
-    background: linear-gradient(135deg, #1a365d 0%, #2d5a87 100%);
-    border-radius: 6px;
-    padding: 14px 10px;
-    margin-bottom: 12px;
-    position: relative;
-    border: 2px solid #ff6b6b;
-  }
-
-  .sp-price-member-view::after {
-    content: 'MEMBER PRICING';
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #ff6b6b;
-    color: #ffffff;
-    font-size: 7.5px;
-    font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 10px;
-    letter-spacing: 0.3px;
-    white-space: nowrap;
-  }
-
-  .sp-member-view-price {
-    font-size: 30px;
-    font-weight: 700;
-    color: #ffffff;
-    text-align: center;
-    letter-spacing: -0.5px;
-    margin-bottom: 6px;
-  }
-
-  .sp-member-view-regular {
-    text-align: center;
-    font-size: 13px;
-    color: rgba(255,255,255,0.7);
-    margin-bottom: 4px;
-  }
-
-  .sp-member-view-regular s {
-    text-decoration: line-through;
-  }
-
-  .sp-member-view-savings {
-    text-align: center;
-    font-size: 11px;
-    color: #d4af37;
-    font-weight: 600;
-  }
-
-  /* ========== LOGIN FOR MEMBER PRICING ========== */
-  .sp-login-prompt {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    font-size: 11px;
-    font-weight: 600;
-    color: #ff6b6b;
-    text-decoration: none;
-    margin: 8px 0;
-    padding: 6px 10px;
-    background: rgba(255, 107, 107, 0.08);
-    border-radius: 6px;
-    transition: all 0.2s ease;
-  }
-
-  .sp-login-prompt:hover {
-    background: rgba(255, 107, 107, 0.15);
-    color: #e85555;
-    text-decoration: none;
-  }
-
-  .sp-lock-icon {
-    font-size: 12px;
-  }
-
-  /* ========== ACTION BUTTONS ========== */
-  .sp-card-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: auto;
-  }
-
-  .sp-qty-input {
-    width: 45px;
-    height: 40px;
-    border: 2px solid #e2e8f0;
-    border-radius: 6px;
-    text-align: center;
-    font-size: 14px;
-    font-weight: 600;
-    color: #0f172a;
-  }
-
-  .sp-qty-input:focus {
-    outline: none;
     border-color: #2d5a87;
   }
 
-  .sp-add-to-cart {
-    flex: 1;
-    height: 40px;
-    background: #ff6b6b;
-    color: #ffffff;
-    border: none;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
+  /* Compact card adjustments for slider */
+  .sp-slide-wrapper .product-card .card-image {
+    padding: 0;
+    height: 140px;
   }
 
-  .sp-add-to-cart:hover {
-    background: #ff5252;
+  .sp-slide-wrapper .product-card .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
 
-  .sp-add-to-cart.added {
-    background: #22c55e;
+  .sp-slide-wrapper .product-card .card-content {
+    padding: 12px;
   }
 
-  .sp-add-to-cart:disabled {
-    background: #94a3b8;
-    cursor: not-allowed;
+  .sp-slide-wrapper .product-card .card-title {
+    font-size: 12px;
+    min-height: 36px;
+    -webkit-line-clamp: 2;
+  }
+
+  .sp-slide-wrapper .product-card .sku {
+    font-size: 9px;
+  }
+
+  .sp-slide-wrapper .product-card .price-single,
+  .sp-slide-wrapper .product-card .price-dual,
+  .sp-slide-wrapper .product-card .price-member-view {
+    padding: 10px 8px;
+  }
+
+  .sp-slide-wrapper .product-card .price-amount-single,
+  .sp-slide-wrapper .product-card .member-price-amount,
+  .sp-slide-wrapper .product-card .member-view-price {
+    font-size: 18px;
+  }
+
+  .sp-slide-wrapper .product-card .card-actions {
+    padding: 0 12px 12px;
+  }
+
+  .sp-slide-wrapper .product-card .qty-input {
+    width: 50px;
+    height: 34px;
+    font-size: 12px;
+  }
+
+  .sp-slide-wrapper .product-card .add-to-cart {
+    height: 34px;
+    font-size: 11px;
+  }
+
+  /* Empty state */
+  .sp-empty-card {
+    width: 100%;
+    padding: 40px 20px;
+    text-align: center;
+    color: #64748b;
   }
 
   /* Swiper overrides */
-  .staff-picks-slider .swiper-slide {
-    width: auto !important;
+  .staff-picks-slider.swiper .swiper-slide {
+    width: 220px;
+    flex-shrink: 0;
   }
 
   /* Responsive */
   @media (max-width: 768px) {
     .staff-picks-section {
       padding: 40px 0;
+    }
+
+    .staff-picks-container {
+      padding: 0 16px;
     }
 
     .staff-picks-header {
@@ -465,25 +200,19 @@
       font-size: 22px;
     }
 
-    .sp-product-card {
-      width: 180px;
+    .sp-slide-wrapper {
+      width: 180px !important;
       min-width: 180px;
     }
 
-    .sp-card-image {
-      height: 140px;
+    .sp-slide-wrapper .product-card .card-image {
+      height: 120px;
     }
 
-    .sp-price-amount-single {
-      font-size: 22px;
-    }
-
-    .sp-member-price-amount {
-      font-size: 24px;
-    }
-
-    .sp-member-view-price {
-      font-size: 26px;
+    .sp-slide-wrapper .product-card .price-amount-single,
+    .sp-slide-wrapper .product-card .member-price-amount,
+    .sp-slide-wrapper .product-card .member-view-price {
+      font-size: 16px;
     }
   }
 </style>
@@ -525,192 +254,21 @@
         {% endif %}
 
         {% for product in staff_products limit: section.settings.products_limit %}
-          {% comment %} Member detection {% endcomment %}
-          {% assign is_member = false %}
-          {% if customer %}
-            {% for tag in customer.tags %}
-              {% assign tag_lower = tag | downcase %}
-              {% if tag_lower contains 'wholesale' or tag_lower contains 'plus' or tag_lower contains 'member' or tag_lower contains 'cph' or tag_lower contains 'rou' or tag_lower contains 'margin' %}
-                {% assign is_member = true %}
-                {% break %}
-              {% endif %}
-            {% endfor %}
-          {% endif %}
-
-          {% comment %} Own brand detection {% endcomment %}
-          {% assign is_own_brand = false %}
-          {% assign vendor_lower = product.vendor | downcase %}
-          {% if vendor_lower contains 'celebrate festival' or vendor_lower contains 'celebratefest' %}
-            {% assign is_own_brand = true %}
-          {% endif %}
-
-          {% comment %} Calculate WSH wholesale pricing - capture output to get variables {% endcomment %}
-          {%- capture wcp_output -%}
-            {%- render 'wcp_discount', wcp_discount: product, wpd_is_render: 'yes' -%}
-          {%- endcapture -%}
-
-          {%- liquid
-            # Parse WSH price output (pipe-delimited)
-            assign wcp_output_clean = wcp_output | strip
-            assign wcp_values = wcp_output_clean | split: '|'
-            assign wcp_price = wcp_values[0] | plus: 0
-
-            # WSH Pricing Logic:
-            # Case 1: Individual variant pricing - wcp_price < product.price → retail = product.price, member = wcp_price
-            # Case 2: Bulk discount - compare_at_price > product.price → retail = compare_at_price, member = product.price
-            assign retail_price = product.price
-            assign member_price = product.price
-            assign has_wholesale_price = false
-
-            # Case 1: WSH returned a specific wholesale price lower than product.price
-            if wcp_price != blank and wcp_price > 0 and wcp_price < product.price
-              assign has_wholesale_price = true
-              assign retail_price = product.price
-              assign member_price = wcp_price
-            # Case 2: Bulk discount - product.price is already discounted
-            elsif product.compare_at_price != blank and product.compare_at_price > product.price
-              assign has_wholesale_price = true
-              assign retail_price = product.compare_at_price
-              assign member_price = product.price
-            endif
-
-            # Calculate savings
-            assign savings_amount = 0
-            assign savings_percent = 0
-            if has_wholesale_price and retail_price > member_price
-              assign savings_amount = retail_price | minus: member_price
-              assign savings_percent = savings_amount | times: 100.0 | divided_by: retail_price | round
-            endif
-          -%}
-
-          {% comment %} Determine pricing mode {% endcomment %}
-          {% assign pricing_mode = 'price-single' %}
-          {% if is_member and has_wholesale_price %}
-            {% assign pricing_mode = 'price-member-view' %}
-          {% elsif is_member %}
-            {% assign pricing_mode = 'price-member-view' %}
-          {% elsif is_own_brand and has_wholesale_price %}
-            {% assign pricing_mode = 'price-dual' %}
-          {% endif %}
-
-          {% comment %} Get voltage from tags {% endcomment %}
-          {% assign voltage_badge = blank %}
-          {% for tag in product.tags %}
-            {% assign tag_lower = tag | downcase %}
-            {% if tag_lower contains 'volt' or tag_lower contains '115v' or tag_lower contains '208v' or tag_lower contains '220v' or tag_lower contains '240v' %}
-              {% assign voltage_badge = tag %}
-              {% break %}
-            {% endif %}
-          {% endfor %}
-
-          <div class="swiper-slide">
-            <div class="sp-product-card" data-product-id="{{ product.id }}">
-              <!-- Image -->
-              <a href="{{ product.url }}" class="sp-card-image">
-                {% if product.featured_media %}
-                  <img
-                    src="{{ product.featured_media | image_url: width: 400 }}"
-                    alt="{{ product.featured_media.alt | escape }}"
-                    loading="lazy"
-                  >
-                {% else %}
-                  {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
-                {% endif %}
-
-                <div class="sp-badge-container">
-                  {% if voltage_badge != blank %}
-                    <span class="sp-voltage-badge">{{ voltage_badge }}</span>
-                  {% endif %}
-                  {% if is_own_brand and has_wholesale_price and is_member == false %}
-                    <span class="sp-member-badge">Member Pricing</span>
-                  {% endif %}
-                </div>
-              </a>
-
-              <!-- Content -->
-              <div class="sp-card-content">
-                <h3 class="sp-card-title">
-                  <a href="{{ product.url }}">{{ product.title }}</a>
-                </h3>
-
-                <div class="sp-card-meta">
-                  <div class="sp-rating">
-                    <span class="sp-stars">&#9733;&#9733;&#9733;&#9733;<span class="empty">&#9733;</span></span>
-                  </div>
-                  {% if product.selected_or_first_available_variant.sku != blank %}
-                    <span class="sp-sku">#{{ product.selected_or_first_available_variant.sku }}</span>
-                  {% endif %}
-                </div>
-
-                <!-- Pricing -->
-                {% case pricing_mode %}
-                  {% when 'price-member-view' %}
-                    <div class="sp-price-member-view">
-                      <div class="sp-member-view-price">
-                        {% if has_wholesale_price %}
-                          {{ member_price | money }}
-                        {% else %}
-                          {{ product.price | money }}
-                        {% endif %}
-                      </div>
-                      {% if has_wholesale_price %}
-                        <div class="sp-member-view-regular">Retail: <s>{{ retail_price | money }}</s></div>
-                        <div class="sp-member-view-savings">You Save {{ savings_amount | money }}</div>
-                      {% endif %}
-                    </div>
-
-                  {% when 'price-dual' %}
-                    <div class="sp-price-dual">
-                      <div class="sp-member-price-label">Member Price</div>
-                      <div class="sp-member-price-amount">{{ member_price | money }}</div>
-                      <div class="sp-regular-price-strike">Retail: <s>{{ retail_price | money }}</s></div>
-                      <div class="sp-savings-tag">Save {{ savings_amount | money }} ({{ savings_percent }}%)</div>
-                    </div>
-
-                  {% else %}
-                    <div class="sp-price-single">
-                      <div class="sp-price-label-single">Retail Price</div>
-                      <div class="sp-price-amount-single">{{ product.price | money }}<span class="sp-price-unit">/Each</span></div>
-                    </div>
-                {% endcase %}
-
-                {% comment %} Login for Member Pricing - only for non-logged-in users viewing own-brand products {% endcomment %}
-                {% if is_own_brand and customer == nil %}
-                  <a href="/account/login?return_url={{ product.url | url_encode }}" class="sp-login-prompt">
-                    <span class="sp-lock-icon">&#128274;</span> Login for Member Pricing
-                  </a>
-                {% endif %}
-
-                <!-- Actions -->
-                <div class="sp-card-actions">
-                  {% if product.available %}
-                    {% if product.variants.size == 1 %}
-                      <input type="number" class="sp-qty-input" value="1" min="1" data-product-id="{{ product.id }}">
-                      <button
-                        type="button"
-                        class="sp-add-to-cart"
-                        data-variant-id="{{ product.selected_or_first_available_variant.id }}"
-                      >
-                        Add to Cart
-                      </button>
-                    {% else %}
-                      <a href="{{ product.url }}" class="sp-add-to-cart">
-                        Select Options
-                      </a>
-                    {% endif %}
-                  {% else %}
-                    <button class="sp-add-to-cart" disabled>Sold Out</button>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
+          <div class="swiper-slide sp-slide-wrapper">
+            {%- render 'product-card',
+              product: product,
+              show_vendor: false,
+              show_rating: false,
+              show_sale_badge: true,
+              show_shipping_badge: true,
+              show_sku: true,
+              show_qty_input: true
+            -%}
           </div>
         {% else %}
           <div class="swiper-slide">
-            <div class="sp-product-card">
-              <div class="sp-card-content">
-                <p>No products found. Please select a collection.</p>
-              </div>
+            <div class="sp-empty-card">
+              <p>No products found. Please select a collection.</p>
             </div>
           </div>
         {% endfor %}
@@ -721,7 +279,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Initialize Swiper
+  // Initialize Swiper for Staff Picks slider
   const spSwiper{{ section.id | replace: '-', '_' }} = new Swiper('#sp-swiper-{{ section.id }}', {
     slidesPerView: 'auto',
     spaceBetween: 16,
@@ -731,52 +289,6 @@ document.addEventListener('DOMContentLoaded', function() {
       nextEl: '#sp-next-{{ section.id }}',
       prevEl: '#sp-prev-{{ section.id }}',
     },
-  });
-
-  // Add to cart functionality
-  document.querySelectorAll('#sp-swiper-{{ section.id }} .sp-add-to-cart[data-variant-id]').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-      e.preventDefault();
-      const variantId = this.dataset.variantId;
-      const card = this.closest('.sp-product-card');
-      const qtyInput = card.querySelector('.sp-qty-input');
-      const quantity = qtyInput ? parseInt(qtyInput.value, 10) || 1 : 1;
-
-      this.disabled = true;
-      const originalText = this.textContent;
-      this.textContent = 'Adding...';
-
-      fetch('/cart/add.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: variantId, quantity: quantity })
-      })
-      .then(res => res.json())
-      .then(data => {
-        this.textContent = 'Added!';
-        this.classList.add('added');
-
-        // Update cart count
-        fetch('/cart.js').then(r => r.json()).then(cart => {
-          const cartCount = document.querySelector('.cart-count');
-          if (cartCount) cartCount.textContent = cart.item_count;
-        });
-
-        setTimeout(() => {
-          this.textContent = originalText;
-          this.classList.remove('added');
-          this.disabled = false;
-        }, 2000);
-      })
-      .catch(err => {
-        console.error(err);
-        this.textContent = 'Error';
-        setTimeout(() => {
-          this.textContent = originalText;
-          this.disabled = false;
-        }, 2000);
-      });
-    });
   });
 });
 </script>

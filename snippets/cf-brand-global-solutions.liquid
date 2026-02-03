@@ -1,0 +1,29 @@
+{% comment %} CF Brand: Global Solutions {% endcomment %}
+
+{%- liquid
+  assign gs_categories = 'global-solutions-food-prep,global-solutions-cooking,global-solutions-warming,global-solutions-concessions,global-solution-all' | split: ','
+  assign gs_titles = 'PREP,COOKING,WARMING,CONCESSION,GLOBAL SOLUTIONS ALL' | split: ','
+  assign gs_images = 'Prep_ec71f55f-96bf-4fbc-9918-a00ec7c6652e.png,Induction.png,Warming.png,Concession.png,GS_all_products.png' | split: ','
+-%}
+
+<div class="cf-brand-hub__grid">
+  {%- for handle in gs_categories -%}
+    {%- assign idx = forloop.index0 -%}
+    {%- assign title = gs_titles[idx] -%}
+    {%- assign image_file = gs_images[idx] -%}
+    {%- assign cdn_url = 'https://celebratefestivalinc.com/cdn/shop/files/' | append: image_file | append: '?width=400&height=400&crop=center' -%}
+
+    <a href="/collections/{{ handle }}" class="cf-brand-hub__card">
+      <div class="cf-brand-hub__card-image">
+        <img src="{{ cdn_url }}" alt="{{ title }}" loading="lazy">
+        <div class="cf-brand-hub__card-overlay">
+          <span class="cf-brand-hub__card-overlay-text">{{ title }}</span>
+        </div>
+      </div>
+      <div class="cf-brand-hub__card-content">
+        <h3 class="cf-brand-hub__card-title">{{ title }}</h3>
+        <span class="cf-brand-hub__card-btn">Shop Now</span>
+      </div>
+    </a>
+  {%- endfor -%}
+</div>

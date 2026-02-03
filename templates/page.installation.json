@@ -1,0 +1,197 @@
+{
+  "sections": {
+    "main": {
+      "type": "page-installation",
+      "blocks": {
+        "benefit_warranty": {
+          "type": "benefit",
+          "settings": {
+            "benefit_title": "Warranty Protected",
+            "benefit_text": "Professional installation ensures your manufacturer warranty remains valid and protected.",
+            "benefit_icon": "warranty"
+          }
+        },
+        "benefit_certified": {
+          "type": "benefit",
+          "settings": {
+            "benefit_title": "Certified Technicians",
+            "benefit_text": "Our team is factory-trained and certified to install commercial kitchen equipment.",
+            "benefit_icon": "certified"
+          }
+        },
+        "benefit_time": {
+          "type": "benefit",
+          "settings": {
+            "benefit_title": "Fast Turnaround",
+            "benefit_text": "We work efficiently to minimize downtime and get your kitchen up and running quickly.",
+            "benefit_icon": "time"
+          }
+        },
+        "benefit_support": {
+          "type": "benefit",
+          "settings": {
+            "benefit_title": "Ongoing Support",
+            "benefit_text": "Post-installation support and maintenance services available when you need them.",
+            "benefit_icon": "support"
+          }
+        },
+        "benefit_safety": {
+          "type": "benefit",
+          "settings": {
+            "benefit_title": "Code Compliant",
+            "benefit_text": "All installations meet local building codes, health department, and safety requirements.",
+            "benefit_icon": "safety"
+          }
+        },
+        "benefit_tools": {
+          "type": "benefit",
+          "settings": {
+            "benefit_title": "Proper Tools & Parts",
+            "benefit_text": "We use proper tools and genuine parts for every installation.",
+            "benefit_icon": "tools"
+          }
+        },
+        "step_1": {
+          "type": "process_step",
+          "settings": {
+            "step_title": "Consultation",
+            "step_text": "Contact us to discuss your equipment and installation needs. We'll review your site requirements and provide a detailed quote."
+          }
+        },
+        "step_2": {
+          "type": "process_step",
+          "settings": {
+            "step_title": "Site Assessment",
+            "step_text": "Our technician visits your location to assess electrical, plumbing, ventilation, and space requirements."
+          }
+        },
+        "step_3": {
+          "type": "process_step",
+          "settings": {
+            "step_title": "Scheduling",
+            "step_text": "We schedule the installation at a time that works best for your business operations."
+          }
+        },
+        "step_4": {
+          "type": "process_step",
+          "settings": {
+            "step_title": "Professional Installation",
+            "step_text": "Our certified technicians install your equipment according to manufacturer specifications and safety codes."
+          }
+        },
+        "step_5": {
+          "type": "process_step",
+          "settings": {
+            "step_title": "Testing & Training",
+            "step_text": "We test all equipment thoroughly, provide operational training to your staff, and ensure everything works perfectly."
+          }
+        },
+        "equipment_tandoors": {
+          "type": "equipment_type",
+          "settings": {
+            "equipment_name": "Tandoors",
+            "equipment_icon": "🔥"
+          }
+        },
+        "equipment_walkin": {
+          "type": "equipment_type",
+          "settings": {
+            "equipment_name": "Walk-In Coolers",
+            "equipment_icon": "❄️"
+          }
+        },
+        "equipment_refrigerators": {
+          "type": "equipment_type",
+          "settings": {
+            "equipment_name": "Refrigerators",
+            "equipment_icon": "🧊"
+          }
+        },
+        "equipment_ovens": {
+          "type": "equipment_type",
+          "settings": {
+            "equipment_name": "Commercial Ovens",
+            "equipment_icon": "🍞"
+          }
+        },
+        "equipment_processors": {
+          "type": "equipment_type",
+          "settings": {
+            "equipment_name": "Food Processors",
+            "equipment_icon": "⚙️"
+          }
+        },
+        "equipment_grinders": {
+          "type": "equipment_type",
+          "settings": {
+            "equipment_name": "Wet Grinders",
+            "equipment_icon": "🌀"
+          }
+        },
+        "equipment_gas": {
+          "type": "equipment_type",
+          "settings": {
+            "equipment_name": "Gas Equipment",
+            "equipment_icon": "🔧"
+          }
+        },
+        "equipment_ventilation": {
+          "type": "equipment_type",
+          "settings": {
+            "equipment_name": "Ventilation",
+            "equipment_icon": "💨"
+          }
+        }
+      },
+      "block_order": [
+        "benefit_warranty",
+        "benefit_certified",
+        "benefit_time",
+        "benefit_support",
+        "benefit_safety",
+        "benefit_tools",
+        "step_1",
+        "step_2",
+        "step_3",
+        "step_4",
+        "step_5",
+        "equipment_tandoors",
+        "equipment_walkin",
+        "equipment_refrigerators",
+        "equipment_ovens",
+        "equipment_processors",
+        "equipment_grinders",
+        "equipment_gas",
+        "equipment_ventilation"
+      ],
+      "settings": {
+        "hero_tagline": "Professional Services",
+        "hero_title": "Equipment Installation Services",
+        "hero_subtitle": "Professional installation for commercial kitchen equipment by certified technicians. Serving the Bay Area and beyond.",
+        "hero_cta_primary_text": "Call for Quote",
+        "hero_cta_secondary_text": "Learn More",
+        "description_label": "Our Service",
+        "description_title": "Expert Installation You Can Trust",
+        "description_text_1": "At Celebrate Festival Inc, we understand that proper installation is crucial for your equipment's performance and longevity. Our team of certified technicians has years of experience installing commercial kitchen equipment across the Bay Area and beyond.",
+        "description_text_2": "From UK-made Shaan Tandoors to walk-in coolers, we ensure every piece of equipment is installed to manufacturer specifications, meeting all local codes and safety requirements. Trust your installation to the experts.",
+        "benefits_label": "Why Choose Us",
+        "benefits_title": "Benefits of Professional Installation",
+        "benefits_subtitle": "Ensure your equipment performs at its best from day one.",
+        "process_label": "Our Process",
+        "process_title": "How It Works",
+        "process_subtitle": "Our streamlined installation process ensures a smooth experience from consultation to completion.",
+        "show_equipment_section": true,
+        "equipment_label": "What We Install",
+        "equipment_title": "Equipment We Install",
+        "equipment_subtitle": "Professional installation available for a wide range of commercial restaurant equipment.",
+        "cta_title": "Ready to Schedule Your Installation?",
+        "cta_text": "Contact our team today to discuss your installation needs and get a free quote. We serve the entire Bay Area and beyond.",
+        "cta_phone": "(408) 673-9999",
+        "cta_email": "sales@celebratefestivalinc.com",
+        "cta_address": "235 Whitney Pl, Fremont, CA 94539",
+        "cta_hours": "Mon-Fri: 9AM - 5PM PST"
+      }
+    }
+  },
+  "order": ["main"]
+}

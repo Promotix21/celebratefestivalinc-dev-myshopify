@@ -32,6 +32,13 @@
       endif
     endfor
   endif
+
+  # Check if product is own-brand (Celebrate Festival Inc) for vendor-specific pricing display
+  assign is_own_brand = false
+  assign vendor_lower = product.vendor | downcase
+  if vendor_lower contains 'celebrate festival' or vendor_lower contains 'celebratefest'
+    assign is_own_brand = true
+  endif
 -%}
 
 {%- comment -%} Calculate WSH wholesale pricing - capture output to get variables {%- endcomment -%}
@@ -941,39 +948,70 @@
               </div>
 
             {%- else -%}
-              {%- comment %} Not logged in or not a member - Show retail price, blur member price {% endcomment -%}
+              {%- comment %} Not logged in or not a member - Vendor-specific pricing display {% endcomment -%}
               {%- assign wpdProductCollectionIds = product.collections | map: 'id' | join: ',' -%}
-              <div class="price-cards-row"
-                data-wpd-product-handle="{{ product.handle }}"
-                data-wpd-variant-id="{{ product.selected_or_first_available_variant.id }}"
-                data-wpd-variant-price="{{ product.selected_or_first_available_variant.price }}"
-                data-wpd-variant-compare-at-price="{{ product.selected_or_first_available_variant.compare_at_price }}"
-                data-wpd-product-collection-ids="{{ wpdProductCollectionIds }}"
-                data-wpd-product-id="{{ product.id }}">
-                <!-- Regular Price Card (Left) - Show retail price -->
-                <div class="price-card price-card-regular">
-                  <div class="price-card-label">Price</div>
-                  <div class="price-card-amount">{{ retail_price | money }}<span class="price-unit">/{{ section.settings.price_unit | default: "Each" }}</span></div>
+
+              {%- if is_own_brand -%}
+                {%- comment %} CF Inc products: Show blurred member price + Login for Member Pricing {% endcomment -%}
+                <div class="price-cards-row"
+                  data-wpd-product-handle="{{ product.handle }}"
+                  data-wpd-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                  data-wpd-variant-price="{{ product.selected_or_first_available_variant.price }}"
+                  data-wpd-variant-compare-at-price="{{ product.selected_or_first_available_variant.compare_at_price }}"
+                  data-wpd-product-collection-ids="{{ wpdProductCollectionIds }}"
+                  data-wpd-product-id="{{ product.id }}">
+                  <!-- Regular Price Card (Left) - Show retail price -->
+                  <div class="price-card price-card-regular">
+                    <div class="price-card-label">Price</div>
+                    <div class="price-card-amount">{{ retail_price | money }}<span class="price-unit">/{{ section.settings.price_unit | default: "Each" }}</span></div>
+                  </div>
+
+                  <!-- Member Price Card (Right) - Blurred for non-members -->
+                  <div class="price-card price-card-member price-card-blurred">
+                    <div class="price-card-blur-content">
+                      <div class="price-card-badge">Member Price</div>
+                      <div class="price-card-amount">$X,XXX.XX<span class="price-unit">/Each</span></div>
+                    </div>
+                    <div class="price-card-blur-overlay">
+                      <div class="blur-overlay-label">Member Price</div>
+                    </div>
+                  </div>
                 </div>
 
-                <!-- Member Price Card (Right) - Blurred for non-members -->
-                <div class="price-card price-card-member price-card-blurred">
-                  <div class="price-card-blur-content">
-                    <div class="price-card-badge">Member Price</div>
-                    <div class="price-card-amount">$X,XXX.XX<span class="price-unit">/Each</span></div>
-                  </div>
-                  <div class="price-card-blur-overlay">
-                    <div class="blur-overlay-label">Member Price</div>
+                <!-- Login for Member Pricing CTA - CF Inc products -->
+                <a href="/account/login?return_url={{ product.url | url_encode }}" class="spp-login-member-pricing">
+                  <span class="spp-lock-icon">&#128274;</span> Login for Member Pricing
+                </a>
+
+                <!-- Financing Options (shown but with blurred amount) -->
+                <div class="financing-row">
+                  <span class="financing-text">4 interest-free payments of <span style="filter: blur(4px);">$XXX.XX</span> with</span>
+                  <span class="financing-logo">Credit Key</span>
+                  <a href="#" class="financing-apply-link">Apply Now</a>
+                </div>
+
+              {%- else -%}
+                {%- comment %} Other vendor products: Show "Call Us For Details" (MAP compliance - no blurred price) {% endcomment -%}
+                <div class="price-cards-row price-cards-single"
+                  data-wpd-product-handle="{{ product.handle }}"
+                  data-wpd-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                  data-wpd-variant-price="{{ product.selected_or_first_available_variant.price }}"
+                  data-wpd-variant-compare-at-price="{{ product.selected_or_first_available_variant.compare_at_price }}"
+                  data-wpd-product-collection-ids="{{ wpdProductCollectionIds }}"
+                  data-wpd-product-id="{{ product.id }}">
+                  <!-- Regular Price Card - Show retail price -->
+                  <div class="price-card price-card-regular price-card-full">
+                    <div class="price-card-label">Price</div>
+                    <div class="price-card-amount">{{ retail_price | money }}<span class="price-unit">/{{ section.settings.price_unit | default: "Each" }}</span></div>
                   </div>
                 </div>
-              </div>
 
-              <!-- Financing Options (shown but with blurred amount) -->
-              <div class="financing-row">
-                <span class="financing-text">4 interest-free payments of <span style="filter: blur(4px);">$XXX.XX</span> with</span>
-                <span class="financing-logo">Credit Key</span>
-                <a href="#" class="financing-apply-link">Apply Now</a>
-              </div>
+                <!-- Call Us For Details CTA - Other vendor products (MAP compliance) -->
+                <a href="tel:+14086739999" class="spp-call-for-details">
+                  <span class="spp-phone-icon">&#128222;</span> Call Us For Details - (408) 673-9999
+                </a>
+
+              {%- endif -%}
             {%- endif -%}
           {%- else -%}
             {%- comment %} Member pricing disabled - show single price {% endcomment -%}
@@ -1189,12 +1227,6 @@
         </div>
         {%- endif -%}
 
-        <!-- Plus Member Info -->
-        {%- if enable_member_pricing and section.settings.member_info_text != blank -%}
-        <div class="alert-box alert-dark">
-          🌟 {{ section.settings.member_info_text }}
-        </div>
-        {%- endif -%}
 
         <!-- Instant Access Shipping -->
         {%- if section.settings.show_shipping_info or shipment_text != blank -%}

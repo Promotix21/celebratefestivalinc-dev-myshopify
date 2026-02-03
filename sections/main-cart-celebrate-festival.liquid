@@ -1,0 +1,2140 @@
+{{ 'cart-celebrate-festival.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  /* CF Brand Colors */
+  :root {
+    --cf-deep-blue: #1a365d;
+    --cf-navy: #2d5a87;
+    --cf-coral: #ff6b6b;
+    --cf-gold: #d4af37;
+    --cf-success: #10b981;
+    --cf-text-dark: #0f172a;
+    --cf-text-medium: #475569;
+    --cf-text-light: #64748b;
+    --cf-text-muted: #94a3b8;
+    --cf-border: #e2e8f0;
+    --cf-bg-light: #f8fafc;
+    --cf-bg-white: #ffffff;
+    --cf-navy-hover: #3d6a9f;
+  }
+{%- endstyle -%}
+
+{%- unless settings.cart_type == 'drawer' -%}
+  <script src="{{ 'cart.js' | asset_url }}" defer="defer"></script>
+{%- endunless -%}
+
+{%- comment -%} Member detection for pricing display {%- endcomment -%}
+{%- assign is_member = false -%}
+{%- if customer -%}
+  {%- for tag in customer.tags -%}
+    {%- assign tag_lower = tag | downcase -%}
+    {%- if tag_lower contains 'wholesale' or tag_lower contains 'plus' or tag_lower contains 'member' or tag_lower contains 'cph' or tag_lower contains 'rou' or tag_lower contains 'margin' -%}
+      {%- assign is_member = true -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{%- comment -%} Calculate potential member savings (2% default discount for upsell display) {%- endcomment -%}
+{%- assign member_discount_percent = section.settings.member_discount_percent | default: 2 -%}
+{%- assign potential_savings = cart.total_price | times: member_discount_percent | divided_by: 100 -%}
+
+<cart-items class="cf-cart-page{% if cart == empty %} is-empty{% endif %}">
+  <div class="cf-cart-container">
+    {%- if cart != empty -%}
+      <!-- Cart Header -->
+      <div class="cf-cart-header">
+        <div class="cf-cart-header-left">
+          <h1 class="cf-cart-title">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            Cart
+            <span class="cf-cart-count">({{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }})</span>
+          </h1>
+          <a href="{{ routes.all_products_collection_url }}" class="cf-continue-shopping">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Continue Shopping
+          </a>
+        </div>
+        <a href="{{ routes.cart_url }}/clear" class="cf-empty-cart-btn" onclick="return confirm('Are you sure you want to empty your cart?');">
+          Empty Cart
+        </a>
+      </div>
+
+      <form action="{{ routes.cart_url }}" method="post" id="cart" class="cf-cart-form">
+        <div class="cf-cart-layout">
+          <!-- Cart Items Column -->
+          <div class="cf-cart-items-section" id="main-cart-items" data-id="{{ section.id }}">
+            <div class="cf-cart-items-wrapper js-contents">
+              <table class="cf-cart-table">
+                <thead>
+                  <tr>
+                    <th class="cf-th-product" colspan="2">Product</th>
+                    <th class="cf-th-price">Price</th>
+                    <th class="cf-th-quantity">Quantity</th>
+                    <th class="cf-th-total">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {%- for item in cart.items -%}
+                    <tr class="cf-cart-item" id="CartItem-{{ item.index | plus: 1 }}">
+                      <!-- Product Image -->
+                      <td class="cf-cart-item-image-cell">
+                        <a href="{{ item.url }}" class="cf-cart-item-image-link">
+                          <div class="cf-cart-item-image-wrapper">
+                            {% if item.image %}
+                              <img
+                                src="{{ item.image | image_url: width: 200 }}"
+                                alt="{{ item.image.alt | escape }}"
+                                class="cf-cart-item-image"
+                                loading="lazy"
+                                width="100"
+                                height="100"
+                              >
+                            {% else %}
+                              <div class="cf-cart-item-no-image">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                  <polyline points="21,15 16,10 5,21"></polyline>
+                                </svg>
+                              </div>
+                            {% endif %}
+                          </div>
+                        </a>
+                      </td>
+
+                      <!-- Product Details -->
+                      <td class="cf-cart-item-details-cell">
+                        <div class="cf-cart-item-details">
+                          <div class="cf-cart-item-badges">
+                            {%- if section.settings.show_member_badge -%}
+                              <span class="cf-member-badge">member</span>
+                            {%- endif -%}
+                          </div>
+                          {%- if settings.show_vendor and item.product.vendor -%}
+                            <span class="cf-cart-item-vendor">{{ item.product.vendor }}</span>
+                          {%- endif -%}
+                          <a href="{{ item.url }}" class="cf-cart-item-title">
+                            {{ item.product.title | escape }}
+                          </a>
+
+                          {%- if item.product.has_only_default_variant == false -%}
+                            {%- for option in item.options_with_values -%}
+                              <div class="cf-cart-item-variant">
+                                <span class="cf-cart-item-variant-label">{{ option.name }}:</span>
+                                {{ option.value }}
+                              </div>
+                            {%- endfor -%}
+                          {%- endif -%}
+
+                          {%- for property in item.properties -%}
+                            {%- assign property_first_char = property.first | slice: 0 -%}
+                            {%- if property.last != blank and property_first_char != '_' -%}
+                              <div class="cf-cart-item-property">
+                                <span class="cf-cart-item-property-label">{{ property.first }}:</span>
+                                {%- if property.last contains '/uploads/' -%}
+                                  <a href="{{ property.last }}" target="_blank">{{ property.last | split: '/' | last }}</a>
+                                {%- else -%}
+                                  {{ property.last }}
+                                {%- endif -%}
+                              </div>
+                            {%- endif -%}
+                          {%- endfor -%}
+
+                          {%- if item.selling_plan_allocation != null -%}
+                            <div class="cf-cart-item-selling-plan">
+                              {{ item.selling_plan_allocation.selling_plan.name }}
+                            </div>
+                          {%- endif -%}
+
+                          {%- if item.sku and item.sku != blank -%}
+                            <div class="cf-cart-item-sku">SKU: {{ item.sku }}</div>
+                          {%- endif -%}
+
+                          {%- if item.line_level_discount_allocations.size > 0 -%}
+                            {%- for discount in item.line_level_discount_allocations -%}
+                              <div class="cf-cart-item-discount">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                  <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                                  <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                                </svg>
+                                {{ discount.discount_application.title }}
+                                (-{{ discount.amount | money }})
+                              </div>
+                            {%- endfor -%}
+                          {%- endif -%}
+
+                          <!-- Mobile remove button -->
+                          <cart-remove-button class="cf-mobile-remove" id="Remove-Mobile-{{ item.index | plus: 1 }}" data-index="{{ item.index | plus: 1 }}">
+                            <a href="{{ item.url_to_remove }}" class="cf-remove-link-mobile" aria-label="{{ 'sections.cart.remove_title' | t: title: item.title }}">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                              </svg>
+                              Remove
+                            </a>
+                          </cart-remove-button>
+                        </div>
+                      </td>
+
+                      <!-- Unit Price -->
+                      <td class="cf-cart-item-price-cell" data-label="Price">
+                        <div class="cf-cart-item-price">
+                          {%- if item.original_price != item.final_price -%}
+                            <span class="cf-price-compare">{{ item.original_price | money }}</span>
+                            <span class="cf-price-sale">{{ item.final_price | money }}</span>
+                          {%- else -%}
+                            <span class="cf-price-regular">{{ item.original_price | money }}</span>
+                          {%- endif -%}
+                          {%- if item.variant.available and item.unit_price_measurement -%}
+                            <span class="cf-unit-price">
+                              {{ item.variant.unit_price | money }}/{{ item.variant.unit_price_measurement.reference_unit }}
+                            </span>
+                          {%- endif -%}
+                        </div>
+                      </td>
+
+                      <!-- Quantity -->
+                      <td class="cf-cart-item-quantity-cell" data-label="Quantity">
+                        <div class="cf-quantity-wrapper">
+                          <quantity-input class="cf-quantity-input-wrapper">
+                            <button
+                              class="cf-quantity-btn cf-quantity-minus"
+                              name="minus"
+                              type="button"
+                              aria-label="Decrease quantity"
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                              </svg>
+                            </button>
+                            <input
+                              class="cf-quantity-input"
+                              type="number"
+                              name="updates[]"
+                              value="{{ item.quantity }}"
+                              min="{{ item.variant.quantity_rule.min | default: 1 }}"
+                              data-min="{{ item.variant.quantity_rule.min | default: 1 }}"
+                              step="{{ item.variant.quantity_rule.increment | default: 1 }}"
+                              {% if item.variant.quantity_rule.max != null %}max="{{ item.variant.quantity_rule.max }}"{% endif %}
+                              aria-label="Quantity for {{ item.product.title | escape }}"
+                              id="Quantity-{{ item.index | plus: 1 }}"
+                              data-index="{{ item.index | plus: 1 }}"
+                              data-quantity-variant-id="{{ item.variant.id }}"
+                            >
+                            <button
+                              class="cf-quantity-btn cf-quantity-plus"
+                              name="plus"
+                              type="button"
+                              aria-label="Increase quantity"
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                              </svg>
+                            </button>
+                          </quantity-input>
+
+                          <!-- Desktop remove button -->
+                          <cart-remove-button class="cf-desktop-remove" id="Remove-{{ item.index | plus: 1 }}" data-index="{{ item.index | plus: 1 }}">
+                            <a href="{{ item.url_to_remove }}" class="cf-remove-btn" aria-label="{{ 'sections.cart.remove_title' | t: title: item.title }}">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                              </svg>
+                            </a>
+                          </cart-remove-button>
+                          <!-- Save for later button -->
+                          <button
+                            type="button"
+                            class="cf-save-for-later-btn"
+                            aria-label="Save for later: {{ item.title | escape }}"
+                            data-save-for-later
+                            data-variant-id="{{ item.variant.id }}"
+                            data-product-id="{{ item.product.id }}"
+                            data-product-title="{{ item.product.title | escape }}"
+                            data-product-handle="{{ item.product.handle }}"
+                            data-product-image="{{ item.image | image_url: width: 400 }}"
+                            data-product-price="{{ item.original_price }}"
+                            data-product-compare-price="{{ item.variant.compare_at_price }}"
+                            data-product-url="{{ item.product.url }}"
+                            title="Save for later"
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                          </button>
+                        </div>
+                        <div class="cf-cart-item-error" id="Line-item-error-{{ item.index | plus: 1 }}" role="alert">
+                          <small class="cart-item__error-text"></small>
+                        </div>
+                      </td>
+
+                      <!-- Line Total -->
+                      <td class="cf-cart-item-total-cell" data-label="Total">
+                        <div class="cf-loading-overlay">
+                          {%- render 'loading-spinner' -%}
+                        </div>
+                        <div class="cf-cart-item-total">
+                          {%- if item.original_line_price != item.final_line_price -%}
+                            <span class="cf-total-compare">{{ item.original_line_price | money }}</span>
+                            <span class="cf-total-final cf-total-sale">{{ item.final_line_price | money }}</span>
+                          {%- else -%}
+                            <span class="cf-total-final">{{ item.original_line_price | money }}</span>
+                          {%- endif -%}
+                        </div>
+                      </td>
+                    </tr>
+                  {%- endfor -%}
+                </tbody>
+              </table>
+            </div>
+
+            {%- comment -%} Member Pricing Upsell Banner - Only show to non-members {%- endcomment -%}
+            {%- unless is_member -%}
+              {%- if section.settings.show_membership_upsell -%}
+                <div class="cf-membership-upsell" id="membership-upsell-banner">
+                  <div class="cf-membership-upsell-icon">
+                    <span class="cf-membership-badge-large">member</span>
+                  </div>
+                  <div class="cf-membership-upsell-content">
+                    <div class="cf-membership-upsell-header">
+                      <strong>Member Pricing</strong>
+                      <span class="cf-membership-savings">Save {{ potential_savings | money }} on this order!</span>
+                    </div>
+                    <p class="cf-membership-upsell-text">Members get exclusive discounts on thousands of qualifying items.</p>
+                  </div>
+                  <div class="cf-membership-upsell-actions">
+                    {%- if section.settings.membership_price != blank -%}
+                      <span class="cf-membership-price">{{ section.settings.membership_price }}</span>
+                    {%- endif -%}
+                    <a href="{{ section.settings.membership_signup_url | default: '/pages/membership' }}" class="cf-membership-signup-btn">
+                      {{ section.settings.membership_cta_text | default: 'Sign up for Membership' }}
+                    </a>
+                    <button type="button" class="cf-membership-dismiss" aria-label="Dismiss" onclick="this.closest('.cf-membership-upsell').style.display='none';">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                      No thanks
+                    </button>
+                  </div>
+                  <a href="{{ section.settings.membership_learn_more_url | default: '/pages/membership' }}" class="cf-membership-learn-more">Learn More</a>
+                </div>
+              {%- endif -%}
+            {%- endunless -%}
+
+            <!-- Cart Note -->
+            {%- if settings.show_cart_note -%}
+              <div class="cf-cart-note-section">
+                <label for="Cart-note" class="cf-cart-note-label">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                  Order Notes
+                </label>
+                <textarea
+                  id="Cart-note"
+                  name="note"
+                  class="cf-cart-note-textarea"
+                  placeholder="Add any special instructions for your order..."
+                >{{ cart.note }}</textarea>
+              </div>
+            {%- endif -%}
+          </div>
+
+          <!-- Order Summary Sidebar -->
+          <div class="cf-cart-summary-section" id="main-cart-footer" data-id="{{ section.id }}">
+            <div class="cf-cart-summary js-contents">
+              <h2 class="cf-summary-title">Order Summary</h2>
+
+              <!-- Subtotal -->
+              <div class="cf-summary-row">
+                <span class="cf-summary-label">Subtotal ({{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }})</span>
+                <span class="cf-summary-value">{{ cart.items_subtotal_price | money }}</span>
+              </div>
+
+              <!-- Cart Level Discounts -->
+              {%- if cart.cart_level_discount_applications.size > 0 -%}
+                {%- for discount in cart.cart_level_discount_applications -%}
+                  <div class="cf-summary-discount">
+                    <div class="cf-discount-header">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                        <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                      </svg>
+                      <span>{{ discount.title }}</span>
+                    </div>
+                    <span class="cf-discount-amount">-{{ discount.total_allocated_amount | money }}</span>
+                  </div>
+                {%- endfor -%}
+              {%- endif -%}
+
+              <!-- Shipping Notice -->
+              <div class="cf-shipping-notice">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="1" y="3" width="15" height="13"></rect>
+                  <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                  <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                  <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                </svg>
+                <div class="cf-shipping-notice-text">
+                  <span class="cf-shipping-label">Shipping</span>
+                  <span class="cf-shipping-value">Calculated at checkout</span>
+                </div>
+              </div>
+
+              <!-- Total -->
+              <div class="cf-summary-total">
+                <span class="cf-total-label">Estimated Total</span>
+                <span class="cf-total-amount">{{ cart.total_price | money_with_currency }}</span>
+              </div>
+
+              <!-- Tax Note -->
+              <p class="cf-tax-note">
+                {%- if cart.taxes_included and shop.shipping_policy.body != blank -%}
+                  Taxes included. <a href="{{ shop.shipping_policy.url }}">Shipping</a> calculated at checkout.
+                {%- elsif cart.taxes_included -%}
+                  Taxes included. Shipping calculated at checkout.
+                {%- elsif shop.shipping_policy.body != blank -%}
+                  Taxes and <a href="{{ shop.shipping_policy.url }}">shipping</a> calculated at checkout.
+                {%- else -%}
+                  Taxes and shipping calculated at checkout.
+                {%- endif -%}
+              </p>
+
+              <!-- Checkout Button -->
+              <button type="submit" name="checkout" class="cf-checkout-btn" {% if cart == empty %}disabled{% endif %}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                  <line x1="1" y1="10" x2="23" y2="10"></line>
+                </svg>
+                Proceed to Checkout
+              </button>
+
+              <!-- Dynamic Checkout Buttons -->
+              {%- if additional_checkout_buttons -%}
+                <div class="cf-dynamic-checkout">
+                  <span class="cf-or-divider">or</span>
+                  <div class="cf-dynamic-checkout-buttons">
+                    {{ content_for_additional_checkout_buttons }}
+                  </div>
+                </div>
+              {%- endif -%}
+
+              <!-- Trust Badges -->
+              <div class="cf-trust-section">
+                <div class="cf-trust-badge">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  </svg>
+                  <span>Secure Checkout</span>
+                </div>
+                <div class="cf-trust-badge">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  </svg>
+                  <span>Buyer Protection</span>
+                </div>
+                <div class="cf-trust-badge">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                  <span>Quality Guaranteed</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      {%- comment -%} Recommended Products Section {%- endcomment -%}
+      {%- if section.settings.show_recommended_products -%}
+        {%- assign recommended_collection = section.settings.recommended_collection -%}
+        {%- if recommended_collection != blank -%}
+          <div class="cf-recommended-section">
+            <h2 class="cf-recommended-title">Recommended Products</h2>
+            <div class="cf-recommended-carousel-wrapper">
+              <button class="cf-carousel-nav cf-carousel-prev" aria-label="Previous products" onclick="scrollCarousel(-1)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M15 18l-6-6 6-6"/>
+                </svg>
+              </button>
+              <div class="cf-recommended-carousel" id="recommended-carousel">
+                {%- for product in collections[recommended_collection].products limit: 12 -%}
+                  <div class="cf-recommended-card">
+                    {%- if section.settings.show_member_badge_recommended -%}
+                      <span class="cf-member-badge cf-member-badge-small">member</span>
+                    {%- endif -%}
+                    <a href="{{ product.url }}" class="cf-recommended-image-link">
+                      <div class="cf-recommended-image-wrapper">
+                        {%- if product.featured_image -%}
+                          <img
+                            src="{{ product.featured_image | image_url: width: 200 }}"
+                            alt="{{ product.featured_image.alt | escape | default: product.title }}"
+                            loading="lazy"
+                            width="120"
+                            height="120"
+                          >
+                        {%- else -%}
+                          <div class="cf-recommended-no-image">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                              <polyline points="21,15 16,10 5,21"></polyline>
+                            </svg>
+                          </div>
+                        {%- endif -%}
+                      </div>
+                    </a>
+                    <div class="cf-recommended-details">
+                      <a href="{{ product.url }}" class="cf-recommended-product-title">
+                        {{ product.title | truncate: 50 }}
+                      </a>
+                      <div class="cf-recommended-price">
+                        {{ product.price | money }}<span class="cf-price-unit">/Each</span>
+                      </div>
+                    </div>
+                    <div class="cf-recommended-actions">
+                      <div class="cf-recommended-qty-wrapper">
+                        <input type="number" class="cf-recommended-qty" value="1" min="1" max="99" aria-label="Quantity">
+                      </div>
+                      <button
+                        type="button"
+                        class="cf-recommended-add-btn"
+                        data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                        onclick="addRecommendedToCart(this)"
+                        {% unless product.available %}disabled{% endunless %}
+                      >
+                        {% if product.available %}Add to Cart{% else %}Sold Out{% endif %}
+                      </button>
+                    </div>
+                  </div>
+                {%- endfor -%}
+              </div>
+              <button class="cf-carousel-nav cf-carousel-next" aria-label="Next products" onclick="scrollCarousel(1)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 18l6-6-6-6"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endif -%}
+
+    {%- else -%}
+      <!-- Empty Cart State -->
+      <div class="cf-cart-empty">
+        <div class="cf-cart-empty-icon">
+          <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+        </div>
+        <h1 class="cf-cart-empty-title">Your cart is empty</h1>
+        <p class="cf-cart-empty-text">Looks like you haven't added anything to your cart yet.</p>
+        <a href="{{ routes.all_products_collection_url }}" class="cf-cart-empty-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          Start Shopping
+        </a>
+
+        {%- if shop.customer_accounts_enabled and customer == null -%}
+          <div class="cf-cart-login-prompt">
+            <h2 class="cf-cart-login-title">Have an account?</h2>
+            <p class="cf-cart-login-text">
+              <a href="{{ routes.account_login_url }}">Log in</a> to check out faster and view your order history.
+            </p>
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  <p class="visually-hidden" id="cart-live-region-text" aria-live="polite" role="status"></p>
+  <p class="visually-hidden" id="shopping-cart-line-item-status" aria-live="polite" aria-hidden="true" role="status">
+    {{ 'accessibility.loading' | t }}
+  </p>
+</cart-items>
+
+<style>
+/* ========================================
+   CELEBRATE FESTIVAL - PROFESSIONAL CART
+   ======================================== */
+
+cart-items.cf-cart-page {
+  display: block;
+}
+
+.cf-cart-page {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--cf-bg-light);
+  min-height: 60vh;
+  padding: 40px 0;
+}
+
+/* When cart items are removed dynamically, toggle empty state */
+.cf-cart-page.is-empty .cf-cart-form {
+  display: none;
+}
+
+.cf-cart-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+@media (max-width: 768px) {
+  .cf-cart-page {
+    padding: 24px 0;
+  }
+  .cf-cart-container {
+    padding: 0 16px;
+  }
+}
+
+/* ========================================
+   CART HEADER
+   ======================================== */
+.cf-cart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--cf-border);
+}
+
+.cf-cart-header-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.cf-cart-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+}
+
+.cf-cart-title svg {
+  color: var(--cf-coral);
+}
+
+.cf-cart-count {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--cf-text-medium);
+}
+
+.cf-continue-shopping {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cf-navy);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.cf-continue-shopping:hover {
+  color: var(--cf-coral);
+  gap: 12px;
+}
+
+.cf-continue-shopping svg {
+  transition: transform 0.3s ease;
+}
+
+.cf-continue-shopping:hover svg {
+  transform: translateX(-4px);
+}
+
+/* Empty Cart Button */
+.cf-empty-cart-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 20px;
+  border: 1px solid var(--cf-border);
+  border-radius: 8px;
+  background: var(--cf-bg-white);
+  color: var(--cf-text-medium);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.cf-empty-cart-btn:hover {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+@media (max-width: 576px) {
+  .cf-cart-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .cf-cart-header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .cf-cart-title {
+    font-size: 22px;
+  }
+}
+
+/* ========================================
+   CART LAYOUT - TWO COLUMN
+   ======================================== */
+.cf-cart-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .cf-cart-layout {
+    grid-template-columns: 1fr 340px;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 900px) {
+  .cf-cart-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========================================
+   CART ITEMS TABLE
+   ======================================== */
+.cf-cart-items-wrapper {
+  background: var(--cf-bg-white);
+  border-radius: 12px;
+  border: 1px solid var(--cf-border);
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.cf-cart-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cf-cart-table thead {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+}
+
+.cf-cart-table th {
+  padding: 16px 20px;
+  text-align: left;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--cf-text-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  border-bottom: 1px solid var(--cf-border);
+}
+
+.cf-th-product { width: 45%; }
+.cf-th-price { width: 15%; text-align: center; }
+.cf-th-quantity { width: 20%; text-align: center; }
+.cf-th-total { width: 15%; text-align: right; }
+
+/* ========================================
+   CART ITEM ROW
+   ======================================== */
+.cf-cart-item {
+  border-bottom: 1px solid var(--cf-border);
+  transition: background-color 0.2s ease;
+}
+
+.cf-cart-item:hover {
+  background-color: rgba(45, 90, 135, 0.02);
+}
+
+.cf-cart-item:last-child {
+  border-bottom: none;
+}
+
+.cf-cart-item td {
+  padding: 24px 20px;
+  vertical-align: middle;
+}
+
+/* Product Image */
+.cf-cart-item-image-cell {
+  width: 100px;
+}
+
+.cf-cart-item-image-wrapper {
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--cf-border);
+  background: var(--cf-bg-light);
+}
+
+.cf-cart-item-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cf-cart-item-no-image {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cf-text-muted);
+}
+
+.cf-cart-item-image-link {
+  display: block;
+}
+
+/* Product Details */
+.cf-cart-item-details {
+  padding-left: 4px;
+}
+
+.cf-cart-item-vendor {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cf-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.cf-cart-item-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--cf-deep-blue);
+  text-decoration: none;
+  display: block;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  transition: color 0.2s ease;
+}
+
+.cf-cart-item-title:hover {
+  color: var(--cf-coral);
+}
+
+.cf-cart-item-variant,
+.cf-cart-item-property,
+.cf-cart-item-selling-plan {
+  font-size: 13px;
+  color: var(--cf-text-light);
+  margin-top: 4px;
+}
+
+.cf-cart-item-variant-label,
+.cf-cart-item-property-label {
+  font-weight: 600;
+  color: var(--cf-text-medium);
+}
+
+.cf-cart-item-sku {
+  font-size: 11px;
+  color: var(--cf-text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 8px;
+}
+
+.cf-cart-item-discount {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cf-success);
+  margin-top: 10px;
+}
+
+/* Member Badge */
+.cf-cart-item-badges {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.cf-member-badge {
+  display: inline-block;
+  background: var(--cf-success);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: lowercase;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+}
+
+.cf-member-badge-small {
+  font-size: 9px;
+  padding: 2px 6px;
+}
+
+/* Price Cell */
+.cf-cart-item-price-cell {
+  text-align: center;
+}
+
+.cf-cart-item-price {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.cf-price-regular {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--cf-deep-blue);
+}
+
+.cf-price-compare {
+  font-size: 13px;
+  color: var(--cf-text-muted);
+  text-decoration: line-through;
+}
+
+.cf-price-sale {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--cf-coral);
+}
+
+.cf-unit-price {
+  font-size: 11px;
+  color: var(--cf-text-muted);
+}
+
+/* Quantity Cell */
+.cf-cart-item-quantity-cell {
+  text-align: center;
+}
+
+.cf-quantity-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.cf-quantity-input-wrapper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--cf-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--cf-bg-white);
+}
+
+.cf-quantity-btn {
+  width: 36px;
+  height: 36px;
+  background: var(--cf-bg-light);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cf-navy);
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.cf-quantity-btn:hover {
+  background: var(--cf-navy);
+  color: white;
+}
+
+.cf-quantity-input {
+  width: 50px;
+  height: 36px;
+  border: none;
+  border-left: 1px solid var(--cf-border);
+  border-right: 1px solid var(--cf-border);
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cf-deep-blue);
+  -moz-appearance: textfield;
+}
+
+.cf-quantity-input::-webkit-outer-spin-button,
+.cf-quantity-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.cf-quantity-input:focus {
+  outline: none;
+  background: rgba(45, 90, 135, 0.05);
+}
+
+/* Remove Button */
+.cf-remove-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--cf-border);
+  background: var(--cf-bg-white);
+  color: var(--cf-text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.cf-remove-btn:hover {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+/* Save for Later Button */
+.cf-save-for-later-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--cf-border);
+  background: var(--cf-bg-white);
+  color: var(--cf-text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 6px;
+}
+
+.cf-save-for-later-btn:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #2563eb;
+}
+
+.cf-save-for-later-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.cf-mobile-remove {
+  display: none;
+}
+
+.cf-remove-link-mobile {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--cf-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  margin-top: 12px;
+  transition: color 0.2s ease;
+}
+
+.cf-remove-link-mobile:hover {
+  color: #dc2626;
+}
+
+/* Error State */
+.cf-cart-item-error {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #dc2626;
+}
+
+/* Loading Overlay */
+.cf-loading-overlay {
+  display: none;
+}
+
+.cf-loading-overlay .loading__spinner {
+  position: absolute;
+}
+
+/* Total Cell */
+.cf-cart-item-total-cell {
+  text-align: right;
+  position: relative;
+}
+
+.cf-cart-item-total {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.cf-total-compare {
+  font-size: 13px;
+  color: var(--cf-text-muted);
+  text-decoration: line-through;
+}
+
+.cf-total-final {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+}
+
+.cf-total-sale {
+  color: var(--cf-coral);
+}
+
+/* ========================================
+   CART NOTE
+   ======================================== */
+.cf-cart-note-section {
+  background: var(--cf-bg-white);
+  border: 1px solid var(--cf-border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.cf-cart-note-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cf-deep-blue);
+  margin-bottom: 12px;
+}
+
+.cf-cart-note-label svg {
+  color: var(--cf-navy);
+}
+
+.cf-cart-note-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px;
+  border: 1px solid var(--cf-border);
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--cf-text-dark);
+  resize: vertical;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cf-cart-note-textarea:focus {
+  outline: none;
+  border-color: var(--cf-navy);
+  box-shadow: 0 0 0 3px rgba(45, 90, 135, 0.1);
+}
+
+.cf-cart-note-textarea::placeholder {
+  color: var(--cf-text-muted);
+}
+
+/* ========================================
+   ORDER SUMMARY SIDEBAR
+   ======================================== */
+.cf-cart-summary-section {
+  position: sticky;
+  top: 20px;
+}
+
+.cf-cart-summary {
+  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+  border: 1px solid rgba(45, 90, 135, 0.2);
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.cf-summary-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+  margin: 0 0 24px 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(45, 90, 135, 0.15);
+}
+
+.cf-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.cf-summary-label {
+  font-size: 14px;
+  color: var(--cf-text-medium);
+}
+
+.cf-summary-value {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--cf-deep-blue);
+}
+
+/* Discount */
+.cf-summary-discount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 14px;
+}
+
+.cf-discount-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cf-success);
+}
+
+.cf-discount-amount {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cf-success);
+}
+
+/* Shipping Notice */
+.cf-shipping-notice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(45, 90, 135, 0.08);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 20px;
+}
+
+.cf-shipping-notice svg {
+  color: var(--cf-navy);
+  flex-shrink: 0;
+}
+
+.cf-shipping-notice-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cf-shipping-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cf-text-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cf-shipping-value {
+  font-size: 13px;
+  color: var(--cf-text-light);
+}
+
+/* Total */
+.cf-summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 2px solid rgba(45, 90, 135, 0.2);
+  padding-top: 20px;
+  margin-top: 8px;
+  margin-bottom: 16px;
+}
+
+.cf-total-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+}
+
+.cf-total-amount {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--cf-coral);
+}
+
+/* Tax Note */
+.cf-tax-note {
+  font-size: 11px;
+  color: var(--cf-text-light);
+  text-align: center;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.cf-tax-note a {
+  color: var(--cf-navy);
+  text-decoration: underline;
+}
+
+/* Checkout Button */
+.cf-checkout-btn {
+  width: 100%;
+  background: var(--cf-coral);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 18px 24px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 14px rgba(255, 107, 107, 0.35);
+}
+
+.cf-checkout-btn:hover:not(:disabled) {
+  background: #ff5252;
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.45);
+  transform: translateY(-2px);
+}
+
+.cf-checkout-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Dynamic Checkout */
+.cf-dynamic-checkout {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(45, 90, 135, 0.15);
+}
+
+.cf-or-divider {
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  color: var(--cf-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+
+.cf-dynamic-checkout-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Trust Badges */
+.cf-trust-section {
+  display: flex;
+  justify-content: space-around;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(45, 90, 135, 0.15);
+}
+
+.cf-trust-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  flex: 1;
+}
+
+.cf-trust-badge svg {
+  color: var(--cf-navy);
+  opacity: 0.7;
+}
+
+.cf-trust-badge span {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--cf-text-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* ========================================
+   MEMBERSHIP UPSELL BANNER
+   ======================================== */
+.cf-membership-upsell {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: var(--cf-bg-white);
+  border: 2px solid var(--cf-navy);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-top: 20px;
+  position: relative;
+}
+
+.cf-membership-upsell-icon {
+  flex-shrink: 0;
+}
+
+.cf-membership-badge-large {
+  display: inline-block;
+  background: var(--cf-success);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: lowercase;
+  padding: 8px 14px;
+  border-radius: 6px;
+}
+
+.cf-membership-upsell-content {
+  flex: 1;
+}
+
+.cf-membership-upsell-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.cf-membership-upsell-header strong {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  color: var(--cf-deep-blue);
+}
+
+.cf-membership-savings {
+  color: var(--cf-success);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cf-membership-upsell-text {
+  font-size: 13px;
+  color: var(--cf-text-medium);
+  margin: 0;
+}
+
+.cf-membership-upsell-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.cf-membership-price {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+}
+
+.cf-membership-signup-btn {
+  display: inline-block;
+  background: var(--cf-success);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 12px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.cf-membership-signup-btn:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.cf-membership-dismiss {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--cf-text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 8px;
+  transition: color 0.2s ease;
+}
+
+.cf-membership-dismiss:hover {
+  color: var(--cf-text-dark);
+}
+
+.cf-membership-learn-more {
+  position: absolute;
+  bottom: 12px;
+  right: 24px;
+  font-size: 12px;
+  color: var(--cf-navy);
+  text-decoration: underline;
+}
+
+.cf-membership-learn-more:hover {
+  color: var(--cf-coral);
+}
+
+@media (max-width: 900px) {
+  .cf-membership-upsell {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+  .cf-membership-upsell-header {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .cf-membership-upsell-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .cf-membership-learn-more {
+    position: static;
+    margin-top: 8px;
+  }
+}
+
+/* ========================================
+   RECOMMENDED PRODUCTS CAROUSEL
+   ======================================== */
+.cf-recommended-section {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--cf-border);
+}
+
+.cf-recommended-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+  margin: 0 0 24px 0;
+}
+
+.cf-recommended-carousel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cf-recommended-carousel {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 4px 0;
+  flex: 1;
+}
+
+.cf-recommended-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.cf-carousel-nav {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--cf-border);
+  border-radius: 50%;
+  background: var(--cf-bg-white);
+  color: var(--cf-navy);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.cf-carousel-nav:hover {
+  background: var(--cf-navy);
+  color: white;
+  border-color: var(--cf-navy);
+}
+
+.cf-recommended-card {
+  flex: 0 0 180px;
+  background: var(--cf-bg-white);
+  border: 1px solid var(--cf-border);
+  border-radius: 10px;
+  padding: 16px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.cf-recommended-card:hover {
+  border-color: var(--cf-navy);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.cf-recommended-card .cf-member-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+}
+
+.cf-recommended-image-wrapper {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  background: var(--cf-bg-light);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cf-recommended-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.cf-recommended-no-image {
+  color: var(--cf-text-muted);
+}
+
+.cf-recommended-image-link {
+  display: block;
+  text-decoration: none;
+}
+
+.cf-recommended-details {
+  margin-bottom: 12px;
+}
+
+.cf-recommended-product-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cf-deep-blue);
+  text-decoration: none;
+  display: block;
+  line-height: 1.4;
+  margin-bottom: 6px;
+  min-height: 34px;
+}
+
+.cf-recommended-product-title:hover {
+  color: var(--cf-coral);
+}
+
+.cf-recommended-price {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cf-coral);
+}
+
+.cf-price-unit {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--cf-text-muted);
+}
+
+.cf-recommended-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.cf-recommended-qty-wrapper {
+  flex-shrink: 0;
+}
+
+.cf-recommended-qty {
+  width: 44px;
+  height: 36px;
+  border: 1px solid var(--cf-border);
+  border-radius: 6px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cf-deep-blue);
+}
+
+.cf-recommended-qty:focus {
+  outline: none;
+  border-color: var(--cf-navy);
+}
+
+.cf-recommended-add-btn {
+  flex: 1;
+  background: var(--cf-coral);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cf-recommended-add-btn:hover:not(:disabled) {
+  background: #ff5252;
+}
+
+.cf-recommended-add-btn:disabled {
+  background: var(--cf-text-muted);
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .cf-recommended-card {
+    flex: 0 0 160px;
+  }
+  .cf-carousel-nav {
+    display: none;
+  }
+}
+
+/* ========================================
+   EMPTY CART STATE
+   ======================================== */
+.cf-cart-empty {
+  text-align: center;
+  padding: 80px 40px;
+  background: var(--cf-bg-white);
+  border-radius: 16px;
+  border: 1px solid var(--cf-border);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.cf-cart-empty-icon {
+  margin-bottom: 24px;
+  color: var(--cf-text-muted);
+  opacity: 0.4;
+}
+
+.cf-cart-empty-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+  margin: 0 0 12px 0;
+}
+
+.cf-cart-empty-text {
+  font-size: 15px;
+  color: var(--cf-text-medium);
+  margin-bottom: 32px;
+}
+
+.cf-cart-empty-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--cf-navy);
+  color: white;
+  padding: 16px 32px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(45, 90, 135, 0.25);
+}
+
+.cf-cart-empty-btn:hover {
+  background: var(--cf-navy-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(45, 90, 135, 0.35);
+}
+
+.cf-cart-login-prompt {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--cf-border);
+}
+
+.cf-cart-login-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--cf-deep-blue);
+  margin: 0 0 8px 0;
+}
+
+.cf-cart-login-text {
+  font-size: 14px;
+  color: var(--cf-text-medium);
+  margin: 0;
+}
+
+.cf-cart-login-text a {
+  color: var(--cf-coral);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.cf-cart-login-text a:hover {
+  text-decoration: underline;
+}
+
+/* ========================================
+   MOBILE RESPONSIVE
+   ======================================== */
+@media (max-width: 900px) {
+  .cf-cart-summary-section {
+    position: static;
+    order: -1;
+    margin-bottom: 24px;
+  }
+
+  .cf-cart-layout {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+}
+
+@media (max-width: 768px) {
+  .cf-cart-table thead {
+    display: none;
+  }
+
+  .cf-cart-table,
+  .cf-cart-table tbody,
+  .cf-cart-item {
+    display: block;
+  }
+
+  .cf-cart-item {
+    border: 1px solid var(--cf-border);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    padding: 20px;
+    background: var(--cf-bg-white);
+  }
+
+  .cf-cart-items-wrapper {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  .cf-cart-item td {
+    display: block;
+    padding: 0;
+    text-align: left !important;
+  }
+
+  .cf-cart-item-image-cell {
+    float: left;
+    margin-right: 16px;
+    margin-bottom: 12px;
+  }
+
+  .cf-cart-item-image-wrapper {
+    width: 90px;
+    height: 90px;
+  }
+
+  .cf-cart-item-details-cell {
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .cf-cart-item-price-cell {
+    clear: both;
+    padding-top: 16px !important;
+    border-top: 1px solid var(--cf-border);
+    margin-top: 8px;
+  }
+
+  .cf-cart-item-price-cell::before {
+    content: 'Price: ';
+    font-weight: 600;
+    color: var(--cf-text-medium);
+    margin-right: 8px;
+  }
+
+  .cf-cart-item-price {
+    display: inline-flex;
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .cf-cart-item-quantity-cell {
+    padding-top: 16px !important;
+  }
+
+  .cf-quantity-wrapper {
+    justify-content: flex-start;
+  }
+
+  .cf-desktop-remove {
+    display: none;
+  }
+
+  .cf-mobile-remove {
+    display: block;
+  }
+
+  .cf-cart-item-total-cell {
+    padding-top: 16px !important;
+    border-top: 1px solid var(--cf-border);
+    margin-top: 16px;
+  }
+
+  .cf-cart-item-total-cell::before {
+    content: 'Subtotal: ';
+    font-weight: 600;
+    color: var(--cf-text-medium);
+    margin-right: 8px;
+  }
+
+  .cf-cart-item-total {
+    display: inline-flex;
+    flex-direction: row;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cf-cart-summary {
+    padding: 20px;
+  }
+
+  .cf-total-amount {
+    font-size: 22px;
+  }
+
+  .cf-trust-section {
+    flex-wrap: wrap;
+  }
+
+  .cf-cart-empty {
+    padding: 48px 24px;
+  }
+
+  .cf-cart-empty-title {
+    font-size: 22px;
+  }
+}
+</style>
+
+<script>
+// Carousel scroll functionality
+function scrollCarousel(direction) {
+  const carousel = document.getElementById('recommended-carousel');
+  if (!carousel) return;
+
+  const cardWidth = carousel.querySelector('.cf-recommended-card')?.offsetWidth || 180;
+  const scrollAmount = (cardWidth + 16) * 2; // 2 cards at a time
+
+  carousel.scrollBy({
+    left: direction * scrollAmount,
+    behavior: 'smooth'
+  });
+}
+
+// Add recommended product to cart
+async function addRecommendedToCart(button) {
+  const variantId = button.dataset.variantId;
+  const qtyInput = button.closest('.cf-recommended-card').querySelector('.cf-recommended-qty');
+  const quantity = parseInt(qtyInput?.value) || 1;
+
+  if (!variantId) return;
+
+  // Disable button and show loading state
+  const originalText = button.textContent;
+  button.disabled = true;
+  button.textContent = 'Adding...';
+
+  try {
+    const response = await fetch('/cart/add.js', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: variantId,
+        quantity: quantity
+      })
+    });
+
+    if (response.ok) {
+      button.textContent = 'Added!';
+      button.style.background = 'var(--cf-success)';
+
+      // Refresh cart after a short delay
+      setTimeout(() => {
+        window.location.reload();
+      }, 800);
+    } else {
+      throw new Error('Failed to add to cart');
+    }
+  } catch (error) {
+    console.error('Error adding to cart:', error);
+    button.textContent = 'Error';
+    button.style.background = '#dc2626';
+
+    setTimeout(() => {
+      button.textContent = originalText;
+      button.style.background = '';
+      button.disabled = false;
+    }, 2000);
+  }
+}
+</script>
+
+{% schema %}
+{
+  "name": "Cart - Celebrate Festival",
+  "tag": "section",
+  "class": "cf-cart-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Cart Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show product vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badges",
+      "label": "Show trust badges",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_member_badge",
+      "label": "Show member badge on cart items",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Membership Upsell Banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_membership_upsell",
+      "label": "Show membership upsell for non-members",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "member_discount_percent",
+      "label": "Member discount percentage (for savings calculation)",
+      "min": 1,
+      "max": 30,
+      "step": 1,
+      "default": 2,
+      "unit": "%"
+    },
+    {
+      "type": "text",
+      "id": "membership_price",
+      "label": "Membership price text",
+      "default": "$99/month",
+      "info": "Leave blank to hide"
+    },
+    {
+      "type": "text",
+      "id": "membership_cta_text",
+      "label": "Membership CTA button text",
+      "default": "Sign up for Membership"
+    },
+    {
+      "type": "url",
+      "id": "membership_signup_url",
+      "label": "Membership signup page URL"
+    },
+    {
+      "type": "url",
+      "id": "membership_learn_more_url",
+      "label": "Learn more page URL"
+    },
+    {
+      "type": "header",
+      "content": "Recommended Products"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_recommended_products",
+      "label": "Show recommended products",
+      "default": true
+    },
+    {
+      "type": "collection",
+      "id": "recommended_collection",
+      "label": "Collection for recommended products"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_member_badge_recommended",
+      "label": "Show member badge on recommended products",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,16 @@
+{
+  "sections": {
+    "main": {
+      "type": "page-wishlist",
+      "settings": {
+        "page_title": "My Wishlist",
+        "clear_button_text": "Clear Wishlist",
+        "empty_title": "Your Wishlist is Empty",
+        "empty_text": "Start adding products you love to your wishlist!",
+        "empty_button_text": "Start Shopping",
+        "empty_button_link": "/collections/all"
+      }
+    }
+  },
+  "order": ["main"]
+}

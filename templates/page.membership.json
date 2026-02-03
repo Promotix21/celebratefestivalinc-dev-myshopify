@@ -1,0 +1,137 @@
+{
+  "sections": {
+    "main": {
+      "type": "page-membership",
+      "blocks": {
+        "benefit_1": {
+          "type": "benefit",
+          "settings": {
+            "title": "Exclusive Wholesale Pricing",
+            "description": "Access special member-only prices on thousands of products"
+          }
+        },
+        "benefit_2": {
+          "type": "benefit",
+          "settings": {
+            "title": "Additional Savings",
+            "description": "Save 2% or more on select items with Plus Member pricing"
+          }
+        },
+        "benefit_3": {
+          "type": "benefit",
+          "settings": {
+            "title": "Priority Support",
+            "description": "Get dedicated customer service and faster response times"
+          }
+        },
+        "benefit_4": {
+          "type": "benefit",
+          "settings": {
+            "title": "Early Access",
+            "description": "Be first to know about new products and special promotions"
+          }
+        },
+        "benefit_5": {
+          "type": "benefit",
+          "settings": {
+            "title": "Free Shipping",
+            "description": "Enjoy free shipping on qualifying orders"
+          }
+        },
+        "benefit_6": {
+          "type": "benefit",
+          "settings": {
+            "title": "Exclusive Deals",
+            "description": "Access member-only sales and promotions throughout the year"
+          }
+        },
+        "faq_1": {
+          "type": "faq",
+          "settings": {
+            "question": "Who can become a Plus Member?",
+            "answer": "Any registered business, restaurant, caterer, or professional in the foodservice industry can apply for Plus Membership."
+          }
+        },
+        "faq_2": {
+          "type": "faq",
+          "settings": {
+            "question": "How much can I save?",
+            "answer": "Savings vary by product, but most members save 2-15% on their purchases with wholesale pricing. High-volume buyers can save even more with our Business Membership tier."
+          }
+        },
+        "faq_3": {
+          "type": "faq",
+          "settings": {
+            "question": "Is there a minimum order requirement?",
+            "answer": "No, there are no minimum order requirements. You'll see member pricing on every qualifying item regardless of order size."
+          }
+        },
+        "faq_4": {
+          "type": "faq",
+          "settings": {
+            "question": "Can I cancel my membership?",
+            "answer": "Yes, you can cancel anytime. Memberships are non-refundable but will remain active until the end of your billing period."
+          }
+        },
+        "faq_5": {
+          "type": "faq",
+          "settings": {
+            "question": "How do I see member pricing?",
+            "answer": "Once logged in with an active membership, you'll automatically see member pricing displayed on all product pages and in your cart."
+          }
+        }
+      },
+      "block_order": [
+        "benefit_1",
+        "benefit_2",
+        "benefit_3",
+        "benefit_4",
+        "benefit_5",
+        "benefit_6",
+        "faq_1",
+        "faq_2",
+        "faq_3",
+        "faq_4",
+        "faq_5"
+      ],
+      "settings": {
+        "page_title": "Become a Plus Member",
+        "hero_title": "Unlock Exclusive Wholesale Pricing",
+        "hero_description": "Join our Plus Membership program and save on every purchase with special wholesale pricing available only to members.",
+        "benefits_title": "Member Benefits",
+        "pricing_title": "Membership Options",
+        "annual_title": "Annual Membership",
+        "annual_price": "$99/year",
+        "annual_description": "Best value for regular purchasers",
+        "annual_features": "<ul><li>All member benefits</li><li>Unlimited wholesale pricing access</li><li>Priority customer support</li></ul>",
+        "annual_button_text": "Sign Up Now",
+        "annual_button_url": "/account/register",
+        "featured_badge_text": "Most Popular",
+        "business_title": "Business Membership",
+        "business_price": "$299/year",
+        "business_description": "Perfect for restaurants and businesses",
+        "business_features": "<ul><li>All annual membership benefits</li><li>Additional bulk pricing discounts</li><li>Dedicated account manager</li><li>Net 30 payment terms available</li></ul>",
+        "business_button_text": "Contact Sales",
+        "business_button_url": "/pages/contact",
+        "how_it_works_title": "How It Works",
+        "step1_title": "Sign Up",
+        "step1_description": "Create your account and choose your membership level",
+        "step2_title": "Get Verified",
+        "step2_description": "We'll verify your information (usually within 24 hours)",
+        "step3_title": "Start Saving",
+        "step3_description": "Once approved, you'll immediately see member pricing on all eligible products",
+        "faq_title": "Frequently Asked Questions",
+        "cta_title": "Ready to Start Saving?",
+        "cta_description": "Join thousands of foodservice professionals who trust Celebrate Festival for their equipment needs.",
+        "cta_button_text": "Create Your Account",
+        "cta_button_url": "/account/register",
+        "cta_note": "Already have an account?",
+        "cta_login_text": "Log in",
+        "cta_login_url": "/account/login"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

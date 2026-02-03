@@ -1,0 +1,160 @@
+{
+  "sections": {
+    "main": {
+      "type": "page-about-celebrate-festival",
+      "blocks": {
+        "category_1": {
+          "type": "product_category",
+          "settings": {
+            "title": "UK MADE ETL NSF CERTIFIED SHAAN TANDOOR"
+          }
+        },
+        "category_2": {
+          "type": "product_category",
+          "settings": {
+            "title": "UK MADE ROTOQUIP NAAN/BREAD OVEN"
+          }
+        },
+        "category_3": {
+          "type": "product_category",
+          "settings": {
+            "title": "GRANITE STONE WET GRINDER & CHOCOLATE MELANGER"
+          }
+        },
+        "category_4": {
+          "type": "product_category",
+          "settings": {
+            "title": "SOMERSET & DOYON DOUGH PROCESSOR"
+          }
+        },
+        "category_5": {
+          "type": "product_category",
+          "settings": {
+            "title": "ROBOT COUPE, SAMMIC & WARING FOOD PROCESSORS"
+          }
+        },
+        "category_6": {
+          "type": "product_category",
+          "settings": {
+            "title": "TABLETOP SERVEWARE"
+          }
+        },
+        "category_7": {
+          "type": "product_category",
+          "settings": {
+            "title": "FOOD PROCESSOR, BLENDERS, FOOD PACKING EQUIPMENT"
+          }
+        },
+        "category_8": {
+          "type": "product_category",
+          "settings": {
+            "title": "AUTOMATIC KABAB GRILL & EXTRUDER"
+          }
+        },
+        "category_9": {
+          "type": "product_category",
+          "settings": {
+            "title": "WALK-IN COOLER, REFRIGERATOR, FREEZER"
+          }
+        },
+        "category_10": {
+          "type": "product_category",
+          "settings": {
+            "title": "GAS EQUIPMENT - BURNER, STOCK POTS, GRIDDLES"
+          }
+        },
+        "category_11": {
+          "type": "product_category",
+          "settings": {
+            "title": "CATERING AND BACKYARD TANDOOR"
+          }
+        },
+        "category_12": {
+          "type": "product_category",
+          "settings": {
+            "title": "BIRYANI LAGAN, LARGE SAUCE POTS, BRAZIER, FRY PANS"
+          }
+        },
+        "category_13": {
+          "type": "product_category",
+          "settings": {
+            "title": "PREP TABLE, SINKS, SHELVES"
+          }
+        },
+        "category_14": {
+          "type": "product_category",
+          "settings": {
+            "title": "COPPER & STAINLESS STEEL CHAFERS"
+          }
+        },
+        "category_15": {
+          "type": "product_category",
+          "settings": {
+            "title": "FESTIVAL & NOVELTIES"
+          }
+        }
+      },
+      "block_order": [
+        "category_1",
+        "category_2",
+        "category_3",
+        "category_4",
+        "category_5",
+        "category_6",
+        "category_7",
+        "category_8",
+        "category_9",
+        "category_10",
+        "category_11",
+        "category_12",
+        "category_13",
+        "category_14",
+        "category_15"
+      ],
+      "settings": {
+        "hero_tagline_pill": "Est. Since Day One",
+        "hero_title": "About Celebrate Festival Inc",
+        "hero_subtitle": "Your Trusted Partner in Restaurant Equipment Excellence",
+        "hero_cta_text": "Explore Our Products",
+        "hero_secondary_cta": "Contact Us",
+        "welcome_label": "Who We Are",
+        "welcome_title": "Welcome to Celebrate Festival Inc",
+        "welcome_paragraph_1": "Welcome to Celebrate Festival Inc - restaurant equipment company, your trusted partner in the world of restaurant equipment and solutions. With a passion for culinary excellence and a commitment to helping your food establishment thrive, we have been serving the needs of restaurateurs, bakers, deli owners, and culinary enthusiasts nationwide.",
+        "welcome_paragraph_2": "At Celebrate Festival Inc, we understand that each restaurant, bakery, and deli is unique, with distinct requirements and aspirations. That's why we offer a comprehensive range of top-quality restaurant products tailored to suit every facet of your culinary venture. Whether you're setting up a cozy cafe, a bustling bakery, or an elegant fine-dining establishment, we've got you covered.",
+        "expertise_label": "Our Expertise",
+        "expertise_title": "Specialists in Indian Restaurant Equipment",
+        "expertise_paragraph_1": "While we take pride in catering to a wide spectrum of culinary businesses, our true expertise shines in a specific niche – the vibrant and diverse world of Indian restaurants. With a deep understanding of the intricacies of Indian cuisine and a commitment to sourcing authentic and innovative products, we have earned the trust of countless Indian restaurant owners and chefs across the country.",
+        "expertise_paragraph_2": "Our vast network of satisfied customers stands as a testament to our unwavering dedication to excellence.",
+        "stat_1_number": "1000+",
+        "stat_1_label": "Satisfied Customers",
+        "stat_2_number": "500+",
+        "stat_2_label": "Products Available",
+        "stat_3_number": "15+",
+        "stat_3_label": "Years Experience",
+        "mission_label": "Our Mission",
+        "mission_title": "Empowering Culinary Excellence",
+        "mission_text": "At Celebrate Festival Inc, we believe that the success of your restaurant venture begins with equipping your kitchen with the finest tools and solutions. Our mission is to empower you to create exceptional culinary experiences for your patrons while optimizing your operational efficiency.",
+        "mission_cta_text": "Join the ranks of thousands of satisfied customers who have elevated their culinary endeavors with our products and expertise. Explore our extensive catalog, and let us be your partner in achieving culinary greatness.",
+        "products_label": "What We Offer",
+        "products_title": "Our Product Categories",
+        "products_subtitle": "Comprehensive solutions for every culinary need",
+        "products_cta_text": "View All Products",
+        "contact_label": "Get In Touch",
+        "contact_title": "Contact Us",
+        "contact_intro": "Products available online and in-store. Visit our warehouse conveniently located at the border of Milpitas & Fremont in CA.",
+        "address": "Celebrate Festival Inc, 235 Whitney Pl, Fremont, CA 94539",
+        "phone_1": "408-673-9999",
+        "phone_2": "408-663-5929",
+        "email": "sales@celebratefestivalinc.com",
+        "website_1": "www.celebratefestivalinc.com",
+        "website_2": "BuyTandoor.Com",
+        "directions_text": "2-3 min from Fwy 880 exits (Mission or Dixon Landing), 1-2 min from Scott exit on 680. Less than 5 min from intersection of 237 & 880.",
+        "final_cta_title": "Ready to Elevate Your Kitchen?",
+        "final_cta_text": "Discover our extensive range of professional restaurant equipment and let us help you achieve culinary excellence.",
+        "final_cta_primary_text": "Shop Now",
+        "final_cta_secondary_text": "Call Us Today"
+      }
+    }
+  },
+  "order": ["main"]
+}

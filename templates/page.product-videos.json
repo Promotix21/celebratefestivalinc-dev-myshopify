@@ -1,0 +1,132 @@
+{
+  "sections": {
+    "main": {
+      "type": "page-product-videos",
+      "blocks": {
+        "filter_tandoors": {
+          "type": "category_filter",
+          "settings": {
+            "category_name": "Tandoors",
+            "category_handle": "tandoors"
+          }
+        },
+        "filter_refrigeration": {
+          "type": "category_filter",
+          "settings": {
+            "category_name": "Refrigeration",
+            "category_handle": "refrigeration"
+          }
+        },
+        "filter_food_processors": {
+          "type": "category_filter",
+          "settings": {
+            "category_name": "Food Processors",
+            "category_handle": "food-processors"
+          }
+        },
+        "filter_ovens": {
+          "type": "category_filter",
+          "settings": {
+            "category_name": "Ovens & Cooking",
+            "category_handle": "ovens"
+          }
+        },
+        "video_1": {
+          "type": "video_entry",
+          "settings": {
+            "video_title": "Shaan Tandoor Demo - Commercial Clay Oven",
+            "video_description": "See our UK-made Shaan Tandoor in action. ETL NSF certified for commercial restaurant use.",
+            "video_category": "Tandoors",
+            "video_type": "youtube",
+            "video_url": "",
+            "video_duration": "4:30"
+          }
+        },
+        "video_2": {
+          "type": "video_entry",
+          "settings": {
+            "video_title": "Walk-In Cooler Installation Guide",
+            "video_description": "Complete installation walkthrough for commercial walk-in coolers and freezers.",
+            "video_category": "Refrigeration",
+            "video_type": "youtube",
+            "video_url": "",
+            "video_duration": "8:15"
+          }
+        },
+        "video_3": {
+          "type": "video_entry",
+          "settings": {
+            "video_title": "Robot Coupe Food Processor Overview",
+            "video_description": "Features and capabilities of the Robot Coupe commercial food processor line.",
+            "video_category": "Food Processors",
+            "video_type": "youtube",
+            "video_url": "",
+            "video_duration": "5:45"
+          }
+        },
+        "video_4": {
+          "type": "video_entry",
+          "settings": {
+            "video_title": "RotoquiP Naan Oven Features",
+            "video_description": "Discover the UK-made RotoquiP bread and naan oven for commercial kitchens.",
+            "video_category": "Ovens",
+            "video_type": "youtube",
+            "video_url": "",
+            "video_duration": "3:20"
+          }
+        },
+        "video_5": {
+          "type": "video_entry",
+          "settings": {
+            "video_title": "Wet Grinder Setup & Operation",
+            "video_description": "How to set up and operate granite stone wet grinders for your restaurant.",
+            "video_category": "Food Processors",
+            "video_type": "youtube",
+            "video_url": "",
+            "video_duration": "6:00"
+          }
+        },
+        "video_6": {
+          "type": "video_entry",
+          "settings": {
+            "video_title": "Commercial Refrigerator Maintenance Tips",
+            "video_description": "Keep your commercial refrigeration equipment running efficiently with these maintenance tips.",
+            "video_category": "Refrigeration",
+            "video_type": "youtube",
+            "video_url": "",
+            "video_duration": "4:15"
+          }
+        }
+      },
+      "block_order": [
+        "filter_tandoors",
+        "filter_refrigeration",
+        "filter_food_processors",
+        "filter_ovens",
+        "video_1",
+        "video_2",
+        "video_3",
+        "video_4",
+        "video_5",
+        "video_6"
+      ],
+      "settings": {
+        "hero_tagline": "Video Library",
+        "hero_title": "Product Videos",
+        "hero_subtitle": "Watch product demonstrations, installation guides, tutorials, and equipment reviews from Celebrate Festival Inc.",
+        "show_filters": true,
+        "auto_fetch_videos": false,
+        "max_videos": 12,
+        "empty_title": "Videos Coming Soon",
+        "empty_text": "We're working on adding more product videos. Check back soon for demonstrations, tutorials, and equipment reviews!",
+        "empty_cta_text": "Browse Products",
+        "show_contact_section": true,
+        "contact_title": "Need a Live Demo?",
+        "contact_text": "Contact us to schedule a live product demonstration at our Fremont showroom or request specific product videos.",
+        "contact_phone": "(408) 673-9999",
+        "contact_email": "sales@celebratefestivalinc.com"
+      }
+    }
+  },
+  "order": ["main"]
+}

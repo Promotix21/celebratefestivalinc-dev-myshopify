@@ -1,7 +1,7 @@
 <!-- sections/industry-use-cases.liquid -->
 <style>
   .industry-use-cases {
-    padding: 60px 0;
+    padding: 40px 0;
     background-color: #f8f9fa;
   }
   
@@ -15,19 +15,31 @@
     text-align: center;
     margin-bottom: 50px;
   }
-  
+
   .industry-use-cases__title {
-    font-size: 2.5rem;
+    font-size: 36px;
     font-weight: 700;
-    color: var(--primary-color, #244469);
-    margin-bottom: 10px;
+    color: #2d3748;
+    margin-bottom: 0;
     line-height: 1.2;
   }
-  
+
   .industry-use-cases__subtitle {
-    font-size: 1.1rem;
-    color: var(--accent-color, #f14f56);
-    font-weight: 500;
+    display: block;
+    font-size: 18px;
+    font-weight: 400;
+    color: #718096;
+    margin-top: 10px;
+    opacity: 0.8;
+  }
+
+  @media (max-width: 768px) {
+    .industry-use-cases__title {
+      font-size: 28px;
+    }
+    .industry-use-cases__subtitle {
+      font-size: 16px;
+    }
   }
   
   .industry-use-cases__grid {
@@ -81,11 +93,26 @@
     padding: 25px;
   }
   
+  .use-case-card__image-link {
+    display: block;
+    text-decoration: none;
+  }
+
+  .use-case-card__title-link {
+    text-decoration: none;
+    display: block;
+  }
+
+  .use-case-card__title-link:hover .use-case-card__title {
+    color: var(--accent-color, #f14f56);
+  }
+
   .use-case-card__title {
     font-size: 1.6rem;
     font-weight: 700;
     color: var(--primary-color, #244469);
     margin-bottom: 8px;
+    transition: color 0.2s ease;
   }
   
   .use-case-card__description {
@@ -96,7 +123,7 @@
   }
   
   .use-case-card__tags {
-    display: flex;
+    display: none; /* Hidden for launch - client unable to link all tags */
     flex-wrap: wrap;
     gap: 8px;
     margin-bottom: 25px;
@@ -276,47 +303,55 @@
       {% for block in section.blocks %}
         {% if block.type == 'use_case' %}
           <div class="use-case-card" {{ block.shopify_attributes }}>
-            <div class="use-case-card__image">
-              {% if block.settings.image %}
-                <img src="{{ block.settings.image | image_url: width: 400 }}" 
-                     alt="{{ block.settings.title }}"
-                     loading="lazy">
-              {% else %}
-                <div style="background: #f0f0f0; height: 100%; display: flex; align-items: center; justify-content: center; color: #999;">
-                  Add Image
-                </div>
-              {% endif %}
-              
-              {% if block.settings.icon %}
-                <div class="use-case-card__icon">
-                  {{ block.settings.icon }}
-                </div>
-              {% endif %}
-            </div>
-            
+            {% assign card_url = block.settings.cta_url | default: '#' %}
+            <a href="{{ card_url }}" class="use-case-card__image-link">
+              <div class="use-case-card__image">
+                {% if block.settings.image %}
+                  <img src="{{ block.settings.image | image_url: width: 400 }}"
+                       alt="{{ block.settings.title }}"
+                       loading="lazy">
+                {% else %}
+                  <div style="background: #f0f0f0; height: 100%; display: flex; align-items: center; justify-content: center; color: #999;">
+                    Add Image
+                  </div>
+                {% endif %}
+
+                {% if block.settings.icon %}
+                  <div class="use-case-card__icon">
+                    {{ block.settings.icon }}
+                  </div>
+                {% endif %}
+              </div>
+            </a>
+
             <div class="use-case-card__content">
-              <h3 class="use-case-card__title">{{ block.settings.title }}</h3>
+              <a href="{{ card_url }}" class="use-case-card__title-link">
+                <h3 class="use-case-card__title">{{ block.settings.title }}</h3>
+              </a>
               <p class="use-case-card__description">{{ block.settings.description }}</p>
-              
+
               {% if block.settings.tags != blank %}
                 <div class="use-case-card__tags">
                   {% assign tags_array = block.settings.tags | split: ',' %}
                   {% for tag_item in tags_array %}
                     {% assign tag_parts = tag_item | split: '|' %}
                     {% assign tag_name = tag_parts[0] | strip %}
-                    {% assign tag_value = tag_parts[1] | strip %}
-                    {% if tag_value == blank %}
-                      {% assign tag_value = tag_name | handleize %}
+                    {% assign tag_url = tag_parts[1] | strip %}
+                    {% if tag_url == blank %}
+                      {% assign tag_url = '/collections/' | append: tag_name | handleize %}
+                    {% elsif tag_url contains '/' %}
+                      {% comment %} URL is already a path {% endcomment %}
+                    {% else %}
+                      {% assign tag_url = '/collections/' | append: tag_url %}
                     {% endif %}
-                    
-                    <a href="{{ block.settings.collection_handle | default: 'all' | prepend: '/collections/' }}/{{ tag_value | handleize }}" 
-                       class="use-case-card__tag">
+
+                    <a href="{{ tag_url }}" class="use-case-card__tag">
                       {{ tag_name }}
                     </a>
                   {% endfor %}
                 </div>
               {% endif %}
-              
+
               {% if block.settings.cta_text != blank and block.settings.cta_url != blank %}
                 <a href="{{ block.settings.cta_url }}" class="use-case-card__cta">
                   {{ block.settings.cta_text }}
@@ -452,7 +487,7 @@
           "type": "textarea",
           "id": "tags",
           "label": "Equipment Tags",
-          "info": "Format: 'Display Name|tag-handle, Display Name|tag-handle' (e.g., 'Pizza Ovens|pizza-ovens, Dough Mixers|dough-mixers')"
+          "info": "Format: 'Display Name|/collections/handle' or 'Display Name|handle' (e.g., 'Pizza Ovens|/collections/pizza-ovens, Dough Mixers|dough-mixers')"
         },
         {
           "type": "text",

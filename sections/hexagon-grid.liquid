@@ -166,18 +166,48 @@
     .hexagon-section {
       padding: {{ section.settings.section_padding_mobile }}px 10px;
     }
-    
+
     .hexagon-title {
       font-size: {{ section.settings.title_size_mobile }}px;
       margin-bottom: {{ section.settings.title_margin_mobile }}px;
     }
-    
+
     .hexagon-grid {
-      --hex-size-desktop: {{ section.settings.hex_size_mobile }}px;
-      --hex-height-desktop: {{ section.settings.hex_height_mobile }}px;
-      --vertical-spacing-desktop: {{ section.settings.vertical_spacing_mobile }}px;
-      --horizontal-spacing-desktop: {{ section.settings.horizontal_spacing_mobile }}px;
-      --offset-desktop: {{ section.settings.honeycomb_offset_mobile }}px;
+      --hex-size-desktop: 68px;
+      --hex-height-desktop: 59px;
+      --vertical-spacing-desktop: 0px;
+      --horizontal-spacing-desktop: 0px;
+      --offset-desktop: 0px;
+    }
+
+    /* Center rows - honeycomb effect comes from 6-5-6-5 pattern */
+    .hexagon-section .hexagon-grid .hex-row {
+      justify-content: center !important;
+      margin: 0 !important;
+    }
+
+    /* Row 2 */
+    .hexagon-section .hexagon-grid .hex-row:nth-child(2) {
+      transform: translateY(-18px) !important;
+    }
+
+    /* Row 3 */
+    .hexagon-section .hexagon-grid .hex-row:nth-child(3) {
+      transform: translateY(-36px) !important;
+    }
+
+    /* Row 4 */
+    .hexagon-section .hexagon-grid .hex-row:nth-child(4) {
+      transform: translateY(-54px) !important;
+    }
+
+    .hexagon-section .hexagon-grid .hexagon-item {
+      margin: 0 -8px !important;
+    }
+
+    /* Hide hexagons on mobile - show only 4 per row */
+    .hexagon-link.hide-on-mobile {
+      display: none !important;
     }
 
     .stats-section {
@@ -210,7 +240,7 @@
     {%- assign brand_links = '/collections/atosa-all,/collections/gsw,/collections/thunder-group,/collections/combi-oven-rational,/pages/cf-robot-coupe,/pages/cf-cac,/pages/turboair-page,/pages/waring,/pages/cf-eurodib,/collections/winco,/collections/sammic,/pages/globe,/collections/shaan,/collections/somerset,/pages/global-solutions,/collections/rotoquip,/collections/kwitex,/collections/yanco-product-collection' | split: ',' -%}
 
    <div class="hexagon-grid">
-  <!-- Row 1: 8 hexagons -->
+  <!-- Row 1: 8 hexagons (6 on mobile) -->
   <div class="hex-row">
     {% for i in (1..8) %}
       {% assign logo_key = 'logo_row1_' | append: i %}
@@ -221,7 +251,7 @@
       {%- assign brand_idx = forloop.index0 -%}
       {%- assign default_brand_link = brand_links[brand_idx] | default: '/pages/brands' -%}
       {% assign hex_link = link_url | default: default_brand_link %}
-      <a href="{{ hex_link }}" class="hexagon-link">
+      <a href="{{ hex_link }}" class="hexagon-link{% if i > 6 %} hide-on-mobile{% endif %}">
         <div class="hexagon-item">
           <svg class="hexagon-svg" viewBox="0 0 80 70">
             <defs>
@@ -248,7 +278,7 @@
     {% endfor %}
   </div>
 
-  <!-- Row 2: 9 hexagons -->
+  <!-- Row 2: 9 hexagons (5 on mobile) -->
   <div class="hex-row">
     {% for i in (1..9) %}
       {% assign logo_key = 'logo_row2_' | append: i %}
@@ -259,7 +289,7 @@
       {%- assign brand_idx = forloop.index0 | plus: 8 -%}
       {%- assign default_brand_link = brand_links[brand_idx] | default: '/pages/brands' -%}
       {% assign hex_link = link_url | default: default_brand_link %}
-      <a href="{{ hex_link }}" class="hexagon-link">
+      <a href="{{ hex_link }}" class="hexagon-link{% if i > 5 %} hide-on-mobile{% endif %}">
         <div class="hexagon-item">
           <svg class="hexagon-svg" viewBox="0 0 80 70">
             <defs>
@@ -286,7 +316,7 @@
     {% endfor %}
   </div>
 
-  <!-- Row 3: 8 hexagons -->
+  <!-- Row 3: 8 hexagons (6 on mobile) -->
   <div class="hex-row">
     {% for i in (1..8) %}
       {% assign logo_key = 'logo_row3_' | append: i %}
@@ -297,7 +327,7 @@
       {%- assign brand_idx = forloop.index0 | plus: 17 -%}
       {%- assign default_brand_link = brand_links[brand_idx] | default: '/pages/brands' -%}
       {% assign hex_link = link_url | default: default_brand_link %}
-      <a href="{{ hex_link }}" class="hexagon-link">
+      <a href="{{ hex_link }}" class="hexagon-link{% if i > 6 %} hide-on-mobile{% endif %}">
         <div class="hexagon-item">
           <svg class="hexagon-svg" viewBox="0 0 80 70">
             <defs>
@@ -324,7 +354,7 @@
     {% endfor %}
   </div>
 
-  <!-- Row 4: 9 hexagons -->
+  <!-- Row 4: 9 hexagons (5 on mobile) -->
   <div class="hex-row">
     {% for i in (1..9) %}
       {% assign logo_key = 'logo_row4_' | append: i %}
@@ -335,7 +365,7 @@
       {%- assign brand_idx = forloop.index0 | plus: 25 -%}
       {%- assign default_brand_link = brand_links[brand_idx] | default: '/pages/brands' -%}
       {% assign hex_link = link_url | default: default_brand_link %}
-      <a href="{{ hex_link }}" class="hexagon-link">
+      <a href="{{ hex_link }}" class="hexagon-link{% if i > 5 %} hide-on-mobile{% endif %}">
         <div class="hexagon-item">
           <svg class="hexagon-svg" viewBox="0 0 80 70">
             <defs>

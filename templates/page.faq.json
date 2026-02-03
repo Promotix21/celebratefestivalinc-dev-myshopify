@@ -1,0 +1,136 @@
+{
+  "sections": {
+    "main": {
+      "type": "page-faq",
+      "blocks": {
+        "category_ordering": {
+          "type": "category",
+          "settings": {
+            "category_name": "Ordering & Shipping",
+            "category_icon": "shipping"
+          }
+        },
+        "faq_shipping_time": {
+          "type": "faq_item",
+          "settings": {
+            "question": "How long does shipping take?",
+            "answer": "<p>Standard shipping typically takes 5-7 business days for most items. Large equipment may require freight shipping which can take 1-2 weeks. Expedited shipping options are available at checkout for faster delivery on smaller items.</p>"
+          }
+        },
+        "faq_free_shipping": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Do you offer free shipping?",
+            "answer": "<p>Yes! We offer free shipping on many items. Look for the \"Free Shipping\" badge on product pages. For orders requiring freight shipping, we work with multiple carriers to get you the best rates.</p>"
+          }
+        },
+        "faq_tracking": {
+          "type": "faq_item",
+          "settings": {
+            "question": "How do I track my order?",
+            "answer": "<p>Once your order ships, you'll receive a confirmation email with tracking information. You can also log into your account to view order status and tracking details at any time.</p>"
+          }
+        },
+        "category_products": {
+          "type": "category",
+          "settings": {
+            "category_name": "Products & Equipment",
+            "category_icon": "product"
+          }
+        },
+        "faq_warranty": {
+          "type": "faq_item",
+          "settings": {
+            "question": "What warranty do your products have?",
+            "answer": "<p>Most commercial kitchen equipment comes with a manufacturer's warranty ranging from 1-5 years. Tandoors and specialty equipment from brands like Shaan include comprehensive warranties. Check individual product pages for specific warranty information.</p>"
+          }
+        },
+        "faq_nsf": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Are your products NSF certified?",
+            "answer": "<p>Yes, many of our commercial kitchen equipment products are NSF and ETL certified. Our UK-made Shaan Tandoors are ETL NSF certified, meeting strict public health and safety standards for commercial use.</p>"
+          }
+        },
+        "faq_installation": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Do you offer installation services?",
+            "answer": "<p>Yes! We offer professional installation services for large equipment including tandoors, walk-in coolers, and commercial refrigeration. Contact us at (408) 673-9999 to discuss installation options for your location.</p>"
+          }
+        },
+        "category_returns": {
+          "type": "category",
+          "settings": {
+            "category_name": "Returns & Support",
+            "category_icon": "returns"
+          }
+        },
+        "faq_return_policy": {
+          "type": "faq_item",
+          "settings": {
+            "question": "What is your return policy?",
+            "answer": "<p>We offer returns on most items within 30 days of purchase. Products must be unused and in original packaging. Custom orders, clearance items, and perishables are final sale. Contact our team before returning any item to receive proper return authorization.</p>"
+          }
+        },
+        "faq_damaged": {
+          "type": "faq_item",
+          "settings": {
+            "question": "What if my item arrives damaged?",
+            "answer": "<p>Please inspect all deliveries immediately upon arrival. If you notice any damage, take photos and contact us within 48 hours at (408) 673-9999 or sales@celebratefestivalinc.com. We'll work with you and the carrier to resolve the issue promptly.</p>"
+          }
+        },
+        "category_payment": {
+          "type": "category",
+          "settings": {
+            "category_name": "Payment & Pricing",
+            "category_icon": "payment"
+          }
+        },
+        "faq_payment_methods": {
+          "type": "faq_item",
+          "settings": {
+            "question": "What payment methods do you accept?",
+            "answer": "<p>We accept all major credit cards (Visa, Mastercard, American Express, Discover), PayPal, Shop Pay, and bank transfers for large orders. Business accounts may qualify for net payment terms.</p>"
+          }
+        },
+        "faq_wholesale": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Do you offer wholesale pricing?",
+            "answer": "<p>Yes! We offer competitive wholesale pricing for qualified businesses. Contact our sales team at (408) 673-9999 to discuss volume discounts and set up a wholesale account. Plus Members also receive special pricing on all orders.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "category_ordering",
+        "faq_shipping_time",
+        "faq_free_shipping",
+        "faq_tracking",
+        "category_products",
+        "faq_warranty",
+        "faq_nsf",
+        "faq_installation",
+        "category_returns",
+        "faq_return_policy",
+        "faq_damaged",
+        "category_payment",
+        "faq_payment_methods",
+        "faq_wholesale"
+      ],
+      "settings": {
+        "hero_tagline": "Help Center",
+        "hero_title": "Frequently Asked Questions",
+        "hero_subtitle": "Find answers to common questions about our products, shipping, returns, and services.",
+        "show_search": true,
+        "search_placeholder": "Search for answers...",
+        "show_contact_cta": true,
+        "contact_title": "Still have questions?",
+        "contact_text": "Can't find the answer you're looking for? Our expert team is here to help with all your restaurant equipment needs.",
+        "contact_phone": "(408) 673-9999",
+        "contact_email": "sales@celebratefestivalinc.com"
+      }
+    }
+  },
+  "order": ["main"]
+}

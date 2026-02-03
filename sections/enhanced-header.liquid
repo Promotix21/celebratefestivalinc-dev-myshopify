@@ -255,12 +255,27 @@
 
   /* Mega menu promo pill container */
   .mega-menu-member-promo {
-    padding: 12px 20px;
+    padding: 6px 14px;
     background: linear-gradient(90deg, rgba(26, 54, 93, 0.03) 0%, transparent 100%);
     border-top: 1px solid #e2e8f0;
     display: flex;
     align-items: center;
     justify-content: flex-end;
+  }
+
+  .mega-menu-member-promo .member-promo-pill {
+    padding: 5px 10px;
+    font-size: 11px;
+    gap: 6px;
+  }
+
+  .mega-menu-member-promo .promo-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .mega-menu-member-promo .promo-text {
+    font-size: 11px;
   }
 
   /* Navigation bar member promo (subtle) */
@@ -610,9 +625,13 @@
         {% if customer %}
           {% comment %} Bug Fix #8: All logged-in users see "Member Pricing Active" - no promotional prompts {% endcomment %}
           {% assign is_member = false %}
-          {% if customer.tags contains 'plus-member' or customer.tags contains 'wholesale' or customer.tags contains 'member' %}
-            {% assign is_member = true %}
-          {% endif %}
+          {% for tag in customer.tags %}
+            {% assign tag_lower = tag | downcase %}
+            {% if tag_lower contains 'wholesale' or tag_lower contains 'plus' or tag_lower contains 'member' or tag_lower contains 'cph' or tag_lower contains 'rou' or tag_lower contains 'margin' %}
+              {% assign is_member = true %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
 
           {%- comment -%} Bug Fix #8: Show Member Pricing Active for ALL logged-in users {%- endcomment -%}
           <span class="member-promo-pill is-member">
@@ -1061,8 +1080,8 @@
         // Offline - Show Contact Us
         expertHelpBtn.href = '/pages/contact-us';
         expertHelpBtn.classList.add('offline');
-        expertHelpLabel.textContent = 'WE\'RE OFFLINE';
-        expertHelpPhone.textContent = 'Contact Us';
+        expertHelpLabel.textContent = 'LEAVE US A MESSAGE';
+        expertHelpPhone.textContent = '';
         expertHelpIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>';
       }
     }

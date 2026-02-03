@@ -1,0 +1,1327 @@
+{% comment %}
+  Installation Service Page Section - Celebrate Festival Inc
+  Professional service information page with sections for description, benefits, process, and contact CTA
+{% endcomment %}
+
+<style>
+  /* Installation Service Page Styles */
+  .installation-page {
+    --cf-deep-blue: #1a365d;
+    --cf-navy: #2d5a87;
+    --cf-coral: #ff6b6b;
+    --cf-gold: #d4af37;
+    --cf-success: #10b981;
+    --cf-text-dark: #0f172a;
+    --cf-text-medium: #475569;
+    --cf-text-light: #64748b;
+    --cf-text-muted: #94a3b8;
+    --cf-border: #e2e8f0;
+    --cf-bg-light: #f8fafc;
+    --cf-bg-white: #ffffff;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  /* Hero Section */
+  .installation-hero {
+    background: linear-gradient(135deg, var(--cf-deep-blue) 0%, #0f172a 100%);
+    padding: 80px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .installation-hero__shapes {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .installation-hero .shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    background: white;
+  }
+
+  .installation-hero .shape--1 {
+    width: 400px;
+    height: 400px;
+    top: -150px;
+    right: -100px;
+  }
+
+  .installation-hero .shape--2 {
+    width: 300px;
+    height: 300px;
+    bottom: -100px;
+    left: 5%;
+  }
+
+  .installation-hero .shape--3 {
+    width: 150px;
+    height: 150px;
+    top: 40%;
+    left: 15%;
+  }
+
+  .installation-hero__content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .installation-hero__tagline {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  .installation-hero__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 42px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 20px;
+    line-height: 1.2;
+  }
+
+  .installation-hero__subtitle {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0 0 32px;
+    line-height: 1.6;
+  }
+
+  .installation-hero__cta {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .installation-hero__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 32px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .installation-hero__btn--primary {
+    background: var(--cf-coral);
+    color: white;
+  }
+
+  .installation-hero__btn--primary:hover {
+    background: #ff5252;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+  }
+
+  .installation-hero__btn--secondary {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .installation-hero__btn--secondary:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Service Description Section */
+  .installation-description {
+    padding: 70px 40px;
+    background: white;
+  }
+
+  .installation-description__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .installation-description__content {
+    order: 1;
+  }
+
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .section-label__bar {
+    width: 4px;
+    height: 24px;
+    background: linear-gradient(180deg, var(--cf-coral) 0%, var(--cf-navy) 100%);
+    border-radius: 2px;
+  }
+
+  .section-label__text {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--cf-coral);
+  }
+
+  .installation-description__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--cf-deep-blue);
+    margin: 0 0 20px;
+    line-height: 1.3;
+  }
+
+  .installation-description__text {
+    font-size: 15px;
+    color: var(--cf-text-medium);
+    line-height: 1.8;
+    margin: 0 0 16px;
+  }
+
+  .installation-description__text:last-child {
+    margin-bottom: 0;
+  }
+
+  .installation-description__image {
+    order: 2;
+    position: relative;
+  }
+
+  .installation-description__img {
+    width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+  }
+
+  .installation-description__placeholder {
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: linear-gradient(135deg, var(--cf-bg-light) 0%, var(--cf-border) 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--cf-text-muted);
+  }
+
+  .installation-description__placeholder svg {
+    width: 80px;
+    height: 80px;
+    opacity: 0.5;
+  }
+
+  /* Benefits Section */
+  .installation-benefits {
+    padding: 70px 40px;
+    background: var(--cf-bg-light);
+  }
+
+  .installation-benefits__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .installation-benefits__header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .installation-benefits__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--cf-deep-blue);
+    margin: 0 0 12px;
+  }
+
+  .installation-benefits__subtitle {
+    font-size: 15px;
+    color: var(--cf-text-medium);
+    margin: 0;
+  }
+
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+
+  .benefit-card {
+    background: white;
+    border: 1px solid var(--cf-border);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .benefit-card:hover {
+    border-color: var(--cf-navy);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: translateY(-4px);
+  }
+
+  .benefit-card__icon {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, var(--cf-deep-blue) 0%, var(--cf-navy) 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: white;
+  }
+
+  .benefit-card__icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .benefit-card__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--cf-text-dark);
+    margin: 0 0 10px;
+  }
+
+  .benefit-card__text {
+    font-size: 14px;
+    color: var(--cf-text-medium);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Process Section */
+  .installation-process {
+    padding: 70px 40px;
+    background: white;
+  }
+
+  .installation-process__inner {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .installation-process__header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .installation-process__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--cf-deep-blue);
+    margin: 0 0 12px;
+  }
+
+  .installation-process__subtitle {
+    font-size: 15px;
+    color: var(--cf-text-medium);
+    margin: 0;
+  }
+
+  .process-steps {
+    position: relative;
+  }
+
+  .process-steps::before {
+    content: '';
+    position: absolute;
+    left: 28px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, var(--cf-coral), var(--cf-navy));
+  }
+
+  .process-step {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 40px;
+    position: relative;
+  }
+
+  .process-step:last-child {
+    margin-bottom: 0;
+  }
+
+  .process-step__number {
+    width: 56px;
+    height: 56px;
+    background: white;
+    border: 3px solid var(--cf-navy);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--cf-navy);
+    flex-shrink: 0;
+    z-index: 1;
+  }
+
+  .process-step:hover .process-step__number {
+    background: var(--cf-navy);
+    color: white;
+  }
+
+  .process-step__content {
+    background: var(--cf-bg-light);
+    border-radius: 12px;
+    padding: 24px;
+    flex: 1;
+    transition: all 0.3s ease;
+  }
+
+  .process-step:hover .process-step__content {
+    background: white;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .process-step__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--cf-text-dark);
+    margin: 0 0 8px;
+  }
+
+  .process-step__text {
+    font-size: 14px;
+    color: var(--cf-text-medium);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Equipment Coverage Section */
+  .installation-equipment {
+    padding: 70px 40px;
+    background: var(--cf-bg-light);
+  }
+
+  .installation-equipment__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .installation-equipment__header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .installation-equipment__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--cf-deep-blue);
+    margin: 0 0 12px;
+  }
+
+  .installation-equipment__subtitle {
+    font-size: 15px;
+    color: var(--cf-text-medium);
+    margin: 0;
+  }
+
+  .equipment-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  .equipment-item {
+    background: white;
+    border: 1px solid var(--cf-border);
+    border-radius: 10px;
+    padding: 24px 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .equipment-item:hover {
+    border-color: var(--cf-coral);
+    transform: translateY(-2px);
+  }
+
+  .equipment-item__icon {
+    width: 48px;
+    height: 48px;
+    background: var(--cf-bg-light);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    color: var(--cf-navy);
+    font-size: 22px;
+  }
+
+  .equipment-item__name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--cf-text-dark);
+    margin: 0;
+  }
+
+  /* Contact CTA Section */
+  .installation-cta {
+    padding: 80px 40px;
+    background: linear-gradient(135deg, var(--cf-deep-blue) 0%, #0f172a 100%);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .installation-cta__shapes {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .installation-cta .shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    background: white;
+  }
+
+  .installation-cta .shape--1 {
+    width: 200px;
+    height: 200px;
+    top: -50px;
+    left: 10%;
+  }
+
+  .installation-cta .shape--2 {
+    width: 150px;
+    height: 150px;
+    bottom: -50px;
+    right: 15%;
+  }
+
+  .installation-cta__inner {
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .installation-cta__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 16px;
+  }
+
+  .installation-cta__text {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0 0 32px;
+    line-height: 1.6;
+  }
+
+  .installation-cta__buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+  }
+
+  .installation-cta__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 32px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .installation-cta__btn--primary {
+    background: var(--cf-coral);
+    color: white;
+  }
+
+  .installation-cta__btn--primary:hover {
+    background: #ff5252;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+  }
+
+  .installation-cta__btn--secondary {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .installation-cta__btn--secondary:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+
+  .installation-cta__contact {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .installation-cta__contact-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+  }
+
+  .installation-cta__contact-item svg {
+    width: 20px;
+    height: 20px;
+    color: var(--cf-coral);
+  }
+
+  .installation-cta__contact-item a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .installation-cta__contact-item a:hover {
+    color: white;
+    text-decoration: underline;
+  }
+
+  /* Responsive */
+  @media (max-width: 992px) {
+    .installation-description__inner {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    .installation-description__image {
+      order: 1;
+    }
+
+    .installation-description__content {
+      order: 2;
+    }
+
+    .benefits-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .equipment-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .installation-hero {
+      padding: 50px 20px;
+    }
+
+    .installation-hero__title {
+      font-size: 32px;
+    }
+
+    .installation-hero__subtitle {
+      font-size: 16px;
+    }
+
+    .installation-description,
+    .installation-benefits,
+    .installation-process,
+    .installation-equipment,
+    .installation-cta {
+      padding: 50px 20px;
+    }
+
+    .benefits-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .equipment-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .installation-cta__contact {
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .process-steps::before {
+      left: 24px;
+    }
+
+    .process-step__number {
+      width: 48px;
+      height: 48px;
+      font-size: 18px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .installation-hero__cta {
+      flex-direction: column;
+    }
+
+    .installation-hero__btn {
+      justify-content: center;
+    }
+
+    .installation-cta__buttons {
+      flex-direction: column;
+    }
+
+    .installation-cta__btn {
+      justify-content: center;
+    }
+  }
+</style>
+
+<div class="installation-page">
+  <!-- Hero Section -->
+  <section class="installation-hero">
+    <div class="installation-hero__shapes">
+      <div class="shape shape--1"></div>
+      <div class="shape shape--2"></div>
+      <div class="shape shape--3"></div>
+    </div>
+    <div class="installation-hero__content">
+      <span class="installation-hero__tagline">{{ section.settings.hero_tagline | default: 'Professional Services' }}</span>
+      <h1 class="installation-hero__title">{{ section.settings.hero_title | default: 'Equipment Installation Services' }}</h1>
+      <p class="installation-hero__subtitle">{{ section.settings.hero_subtitle | default: 'Professional installation for commercial kitchen equipment by certified technicians.' }}</p>
+      <div class="installation-hero__cta">
+        {% if section.settings.hero_cta_primary_text != blank %}
+        <a href="{{ section.settings.hero_cta_primary_url | default: '#contact' }}" class="installation-hero__btn installation-hero__btn--primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          {{ section.settings.hero_cta_primary_text }}
+        </a>
+        {% endif %}
+        {% if section.settings.hero_cta_secondary_text != blank %}
+        <a href="{{ section.settings.hero_cta_secondary_url | default: '#process' }}" class="installation-hero__btn installation-hero__btn--secondary">
+          {{ section.settings.hero_cta_secondary_text }}
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Service Description Section -->
+  <section class="installation-description">
+    <div class="installation-description__inner">
+      <div class="installation-description__content">
+        <div class="section-label">
+          <span class="section-label__bar"></span>
+          <span class="section-label__text">{{ section.settings.description_label | default: 'Our Service' }}</span>
+        </div>
+        <h2 class="installation-description__title">{{ section.settings.description_title | default: 'Expert Installation You Can Trust' }}</h2>
+        <p class="installation-description__text">{{ section.settings.description_text_1 | default: "At Celebrate Festival Inc, we understand that proper installation is crucial for your equipment's performance and longevity. Our team of certified technicians has years of experience installing commercial kitchen equipment across the Bay Area and beyond." }}</p>
+        <p class="installation-description__text">{{ section.settings.description_text_2 | default: "From tandoors to walk-in coolers, we ensure every piece of equipment is installed to manufacturer specifications, meeting all local codes and safety requirements." }}</p>
+      </div>
+      <div class="installation-description__image">
+        {% if section.settings.description_image %}
+          {{ section.settings.description_image | image_url: width: 600 | image_tag: class: 'installation-description__img', loading: 'lazy' }}
+        {% else %}
+          <div class="installation-description__placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+            </svg>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section class="installation-benefits">
+    <div class="installation-benefits__inner">
+      <div class="installation-benefits__header">
+        <div class="section-label" style="justify-content: center;">
+          <span class="section-label__bar"></span>
+          <span class="section-label__text">{{ section.settings.benefits_label | default: 'Why Choose Us' }}</span>
+        </div>
+        <h2 class="installation-benefits__title">{{ section.settings.benefits_title | default: 'Benefits of Professional Installation' }}</h2>
+        <p class="installation-benefits__subtitle">{{ section.settings.benefits_subtitle | default: 'Ensure your equipment performs at its best from day one.' }}</p>
+      </div>
+
+      <div class="benefits-grid">
+        {% for block in section.blocks %}
+          {% if block.type == 'benefit' %}
+            <div class="benefit-card" {{ block.shopify_attributes }}>
+              <div class="benefit-card__icon">
+                {% case block.settings.benefit_icon %}
+                  {% when 'warranty' %}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  {% when 'certified' %}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                  {% when 'time' %}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  {% when 'support' %}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                  {% when 'safety' %}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                  {% when 'tools' %}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                  {% else %}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                {% endcase %}
+              </div>
+              <h3 class="benefit-card__title">{{ block.settings.benefit_title }}</h3>
+              <p class="benefit-card__text">{{ block.settings.benefit_text }}</p>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Process Section -->
+  <section class="installation-process" id="process">
+    <div class="installation-process__inner">
+      <div class="installation-process__header">
+        <div class="section-label" style="justify-content: center;">
+          <span class="section-label__bar"></span>
+          <span class="section-label__text">{{ section.settings.process_label | default: 'Our Process' }}</span>
+        </div>
+        <h2 class="installation-process__title">{{ section.settings.process_title | default: 'How It Works' }}</h2>
+        <p class="installation-process__subtitle">{{ section.settings.process_subtitle | default: 'Our streamlined installation process ensures a smooth experience.' }}</p>
+      </div>
+
+      <div class="process-steps">
+        {% assign step_number = 0 %}
+        {% for block in section.blocks %}
+          {% if block.type == 'process_step' %}
+            {% assign step_number = step_number | plus: 1 %}
+            <div class="process-step" {{ block.shopify_attributes }}>
+              <div class="process-step__number">{{ step_number }}</div>
+              <div class="process-step__content">
+                <h3 class="process-step__title">{{ block.settings.step_title }}</h3>
+                <p class="process-step__text">{{ block.settings.step_text }}</p>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Equipment Coverage Section -->
+  {% if section.settings.show_equipment_section %}
+  <section class="installation-equipment">
+    <div class="installation-equipment__inner">
+      <div class="installation-equipment__header">
+        <div class="section-label" style="justify-content: center;">
+          <span class="section-label__bar"></span>
+          <span class="section-label__text">{{ section.settings.equipment_label | default: 'Equipment We Install' }}</span>
+        </div>
+        <h2 class="installation-equipment__title">{{ section.settings.equipment_title | default: 'Equipment We Install' }}</h2>
+        <p class="installation-equipment__subtitle">{{ section.settings.equipment_subtitle | default: 'Professional installation available for a wide range of commercial equipment.' }}</p>
+      </div>
+
+      <div class="equipment-grid">
+        {% for block in section.blocks %}
+          {% if block.type == 'equipment_type' %}
+            <div class="equipment-item" {{ block.shopify_attributes }}>
+              <div class="equipment-item__icon">
+                {{ block.settings.equipment_icon | default: '🔧' }}
+              </div>
+              <p class="equipment-item__name">{{ block.settings.equipment_name }}</p>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Contact CTA Section -->
+  <section class="installation-cta" id="contact">
+    <div class="installation-cta__shapes">
+      <div class="shape shape--1"></div>
+      <div class="shape shape--2"></div>
+    </div>
+    <div class="installation-cta__inner">
+      <h2 class="installation-cta__title">{{ section.settings.cta_title | default: 'Ready to Schedule Your Installation?' }}</h2>
+      <p class="installation-cta__text">{{ section.settings.cta_text | default: 'Contact our team today to discuss your installation needs and get a free quote.' }}</p>
+
+      <div class="installation-cta__buttons">
+        {% if section.settings.cta_phone != blank %}
+        <a href="tel:{{ section.settings.cta_phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' }}" class="installation-cta__btn installation-cta__btn--primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Call {{ section.settings.cta_phone }}
+        </a>
+        {% endif %}
+        {% if section.settings.cta_email != blank %}
+        <a href="mailto:{{ section.settings.cta_email }}" class="installation-cta__btn installation-cta__btn--secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Email Us
+        </a>
+        {% endif %}
+      </div>
+
+      <div class="installation-cta__contact">
+        {% if section.settings.cta_address != blank %}
+        <div class="installation-cta__contact-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>{{ section.settings.cta_address }}</span>
+        </div>
+        {% endif %}
+        {% if section.settings.cta_hours != blank %}
+        <div class="installation-cta__contact-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>{{ section.settings.cta_hours }}</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+</div>
+
+{% schema %}
+{
+  "name": "Installation Service Page",
+  "tag": "section",
+  "class": "section-installation-page",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Hero Section"
+    },
+    {
+      "type": "text",
+      "id": "hero_tagline",
+      "label": "Hero Tagline",
+      "default": "Professional Services"
+    },
+    {
+      "type": "text",
+      "id": "hero_title",
+      "label": "Hero Title",
+      "default": "Equipment Installation Services"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_subtitle",
+      "label": "Hero Subtitle",
+      "default": "Professional installation for commercial kitchen equipment by certified technicians."
+    },
+    {
+      "type": "text",
+      "id": "hero_cta_primary_text",
+      "label": "Primary CTA Text",
+      "default": "Call for Quote"
+    },
+    {
+      "type": "url",
+      "id": "hero_cta_primary_url",
+      "label": "Primary CTA URL"
+    },
+    {
+      "type": "text",
+      "id": "hero_cta_secondary_text",
+      "label": "Secondary CTA Text",
+      "default": "Learn More"
+    },
+    {
+      "type": "url",
+      "id": "hero_cta_secondary_url",
+      "label": "Secondary CTA URL"
+    },
+    {
+      "type": "header",
+      "content": "Service Description"
+    },
+    {
+      "type": "text",
+      "id": "description_label",
+      "label": "Section Label",
+      "default": "Our Service"
+    },
+    {
+      "type": "text",
+      "id": "description_title",
+      "label": "Section Title",
+      "default": "Expert Installation You Can Trust"
+    },
+    {
+      "type": "textarea",
+      "id": "description_text_1",
+      "label": "Description Paragraph 1",
+      "default": "At Celebrate Festival Inc, we understand that proper installation is crucial for your equipment's performance and longevity. Our team of certified technicians has years of experience installing commercial kitchen equipment across the Bay Area and beyond."
+    },
+    {
+      "type": "textarea",
+      "id": "description_text_2",
+      "label": "Description Paragraph 2",
+      "default": "From tandoors to walk-in coolers, we ensure every piece of equipment is installed to manufacturer specifications, meeting all local codes and safety requirements."
+    },
+    {
+      "type": "image_picker",
+      "id": "description_image",
+      "label": "Description Image"
+    },
+    {
+      "type": "header",
+      "content": "Benefits Section"
+    },
+    {
+      "type": "text",
+      "id": "benefits_label",
+      "label": "Section Label",
+      "default": "Why Choose Us"
+    },
+    {
+      "type": "text",
+      "id": "benefits_title",
+      "label": "Section Title",
+      "default": "Benefits of Professional Installation"
+    },
+    {
+      "type": "text",
+      "id": "benefits_subtitle",
+      "label": "Section Subtitle",
+      "default": "Ensure your equipment performs at its best from day one."
+    },
+    {
+      "type": "header",
+      "content": "Process Section"
+    },
+    {
+      "type": "text",
+      "id": "process_label",
+      "label": "Section Label",
+      "default": "Our Process"
+    },
+    {
+      "type": "text",
+      "id": "process_title",
+      "label": "Section Title",
+      "default": "How It Works"
+    },
+    {
+      "type": "text",
+      "id": "process_subtitle",
+      "label": "Section Subtitle",
+      "default": "Our streamlined installation process ensures a smooth experience."
+    },
+    {
+      "type": "header",
+      "content": "Equipment Section"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_equipment_section",
+      "label": "Show Equipment Section",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "equipment_label",
+      "label": "Section Label",
+      "default": "Equipment We Install"
+    },
+    {
+      "type": "text",
+      "id": "equipment_title",
+      "label": "Section Title",
+      "default": "Equipment We Install"
+    },
+    {
+      "type": "text",
+      "id": "equipment_subtitle",
+      "label": "Section Subtitle",
+      "default": "Professional installation available for a wide range of commercial equipment."
+    },
+    {
+      "type": "header",
+      "content": "Contact CTA"
+    },
+    {
+      "type": "text",
+      "id": "cta_title",
+      "label": "CTA Title",
+      "default": "Ready to Schedule Your Installation?"
+    },
+    {
+      "type": "textarea",
+      "id": "cta_text",
+      "label": "CTA Text",
+      "default": "Contact our team today to discuss your installation needs and get a free quote."
+    },
+    {
+      "type": "text",
+      "id": "cta_phone",
+      "label": "Phone Number",
+      "default": "(408) 673-9999"
+    },
+    {
+      "type": "text",
+      "id": "cta_email",
+      "label": "Email Address",
+      "default": "sales@celebratefestivalinc.com"
+    },
+    {
+      "type": "text",
+      "id": "cta_address",
+      "label": "Address",
+      "default": "235 Whitney Pl, Fremont, CA 94539"
+    },
+    {
+      "type": "text",
+      "id": "cta_hours",
+      "label": "Business Hours",
+      "default": "Mon-Fri: 9AM - 5PM PST"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Benefit",
+      "settings": [
+        {
+          "type": "text",
+          "id": "benefit_title",
+          "label": "Benefit Title",
+          "default": "Warranty Protected"
+        },
+        {
+          "type": "textarea",
+          "id": "benefit_text",
+          "label": "Benefit Text",
+          "default": "Professional installation ensures your manufacturer warranty remains valid."
+        },
+        {
+          "type": "select",
+          "id": "benefit_icon",
+          "label": "Benefit Icon",
+          "options": [
+            { "value": "warranty", "label": "Shield (Warranty)" },
+            { "value": "certified", "label": "Badge (Certified)" },
+            { "value": "time", "label": "Clock (Time)" },
+            { "value": "support", "label": "Chat (Support)" },
+            { "value": "safety", "label": "Layers (Safety)" },
+            { "value": "tools", "label": "Wrench (Tools)" },
+            { "value": "check", "label": "Checkmark" }
+          ],
+          "default": "warranty"
+        }
+      ]
+    },
+    {
+      "type": "process_step",
+      "name": "Process Step",
+      "settings": [
+        {
+          "type": "text",
+          "id": "step_title",
+          "label": "Step Title",
+          "default": "Consultation"
+        },
+        {
+          "type": "textarea",
+          "id": "step_text",
+          "label": "Step Description",
+          "default": "We discuss your equipment needs and site requirements to plan the installation."
+        }
+      ]
+    },
+    {
+      "type": "equipment_type",
+      "name": "Equipment Type",
+      "settings": [
+        {
+          "type": "text",
+          "id": "equipment_name",
+          "label": "Equipment Name",
+          "default": "Tandoors"
+        },
+        {
+          "type": "text",
+          "id": "equipment_icon",
+          "label": "Equipment Icon (Emoji)",
+          "default": "🔥",
+          "info": "Use an emoji for the icon"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Installation Service Page",
+      "blocks": [
+        {
+          "type": "benefit",
+          "settings": {
+            "benefit_title": "Warranty Protected",
+            "benefit_text": "Professional installation ensures your manufacturer warranty remains valid and protected.",
+            "benefit_icon": "warranty"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "benefit_title": "Certified Technicians",
+            "benefit_text": "Our team is factory-trained and certified to install commercial kitchen equipment.",
+            "benefit_icon": "certified"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "benefit_title": "Fast Turnaround",
+            "benefit_text": "We work efficiently to minimize downtime and get your kitchen up and running quickly.",
+            "benefit_icon": "time"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "benefit_title": "Ongoing Support",
+            "benefit_text": "Post-installation support and maintenance services available when you need them.",
+            "benefit_icon": "support"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "benefit_title": "Code Compliant",
+            "benefit_text": "All installations meet local building codes, health department, and safety requirements.",
+            "benefit_icon": "safety"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "benefit_title": "Proper Tools & Parts",
+            "benefit_text": "We use proper tools and genuine parts for every installation.",
+            "benefit_icon": "tools"
+          }
+        },
+        {
+          "type": "process_step",
+          "settings": {
+            "step_title": "Consultation",
+            "step_text": "Contact us to discuss your equipment and installation needs. We'll review your site requirements and provide a detailed quote."
+          }
+        },
+        {
+          "type": "process_step",
+          "settings": {
+            "step_title": "Site Assessment",
+            "step_text": "Our technician visits your location to assess electrical, plumbing, ventilation, and space requirements."
+          }
+        },
+        {
+          "type": "process_step",
+          "settings": {
+            "step_title": "Scheduling",
+            "step_text": "We schedule the installation at a time that works best for your business operations."
+          }
+        },
+        {
+          "type": "process_step",
+          "settings": {
+            "step_title": "Professional Installation",
+            "step_text": "Our certified technicians install your equipment according to manufacturer specifications."
+          }
+        },
+        {
+          "type": "process_step",
+          "settings": {
+            "step_title": "Testing & Training",
+            "step_text": "We test all equipment, provide operational training, and ensure everything works perfectly."
+          }
+        },
+        {
+          "type": "equipment_type",
+          "settings": {
+            "equipment_name": "Tandoors",
+            "equipment_icon": "🔥"
+          }
+        },
+        {
+          "type": "equipment_type",
+          "settings": {
+            "equipment_name": "Walk-In Coolers",
+            "equipment_icon": "❄️"
+          }
+        },
+        {
+          "type": "equipment_type",
+          "settings": {
+            "equipment_name": "Refrigerators",
+            "equipment_icon": "🧊"
+          }
+        },
+        {
+          "type": "equipment_type",
+          "settings": {
+            "equipment_name": "Commercial Ovens",
+            "equipment_icon": "🍞"
+          }
+        },
+        {
+          "type": "equipment_type",
+          "settings": {
+            "equipment_name": "Food Processors",
+            "equipment_icon": "⚙️"
+          }
+        },
+        {
+          "type": "equipment_type",
+          "settings": {
+            "equipment_name": "Wet Grinders",
+            "equipment_icon": "🌀"
+          }
+        },
+        {
+          "type": "equipment_type",
+          "settings": {
+            "equipment_name": "Gas Equipment",
+            "equipment_icon": "🔧"
+          }
+        },
+        {
+          "type": "equipment_type",
+          "settings": {
+            "equipment_name": "Ventilation",
+            "equipment_icon": "💨"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

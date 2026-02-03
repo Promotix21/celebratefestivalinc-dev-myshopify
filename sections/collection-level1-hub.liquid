@@ -1452,7 +1452,7 @@
               <div class="product-sku">#{{ product.variants.first.sku | default: product.id }}</div>
 
               <div class="price-box">
-                <div class="price-label">Plus Member Price</div>
+                <div class="price-label">Member Price</div>
                 <div class="price-main">{{ product.price | money }}<span class="price-unit">/Each</span></div>
                 {% if product.compare_at_price > product.price %}
                   <div class="price-regular">Regularly {{ product.compare_at_price | money }}</div>
@@ -1782,45 +1782,64 @@
          SECTION 5: BRANDS ROW
          ========================================== -->
     {% if section.settings.show_brands_row %}
-      {% comment %} Priority Brands - Limited to 12 with View More {% endcomment %}
-      {% assign priority_brands = 'atosa,gsw,thunder-group,rational,robot-coupe,cac,turbo-air,waring,eurodib,winco,sammic,globe' | split: ',' %}
+      {% comment %} Collect brand_logo blocks {% endcomment %}
+      {% assign brand_blocks = section.blocks | where: "type", "brand_logo" %}
 
       <section class="brands-section" data-animate="fade-up">
         <div class="brands-header">
           <p class="brands-title">{{ section.settings.brands_title | default: 'Trusted Brands We Carry' }}</p>
         </div>
         <div class="brands-grid">
-          {% for brand_handle in priority_brands limit: 12 %}
-            {% assign brand_name = brand_handle | replace: '-', ' ' | capitalize %}
-            {% assign brand_link = '/collections/vendors?q=' | append: brand_name | url_encode %}
-            {% case brand_handle %}
-              {% when 'gsw' %}{% assign brand_name = 'GSW' %}{% assign brand_link = '/collections/gsw' %}
-              {% when 'cac' %}{% assign brand_name = 'CAC' %}{% assign brand_link = '/pages/cf-cac' %}
-              {% when 'thunder-group' %}{% assign brand_name = 'Thunder Group' %}{% assign brand_link = '/collections/thunder-group' %}
-              {% when 'robot-coupe' %}{% assign brand_name = 'Robot Coupe' %}{% assign brand_link = '/pages/cf-robot-coupe' %}
-              {% when 'turbo-air' %}{% assign brand_name = 'Turbo Air' %}{% assign brand_link = '/pages/turboair-page' %}
-              {% when 'global-solutions' %}{% assign brand_name = 'Global Solutions' %}{% assign brand_link = '/pages/global-solutions' %}
-              {% when 'atosa' %}{% assign brand_link = '/collections/atosa-all' %}
-              {% when 'rational' %}{% assign brand_link = '/collections/combi-oven-rational' %}
-              {% when 'waring' %}{% assign brand_link = '/pages/waring' %}
-              {% when 'eurodib' %}{% assign brand_link = '/pages/cf-eurodib' %}
-              {% when 'winco' %}{% assign brand_link = '/collections/winco' %}
-              {% when 'sammic' %}{% assign brand_link = '/collections/sammic' %}
-              {% when 'globe' %}{% assign brand_link = '/pages/globe' %}
-            {% endcase %}
+          {% if brand_blocks.size > 0 %}
+            {% comment %} Use customizer blocks {% endcomment %}
+            {% for block in brand_blocks limit: 12 %}
+              {% assign brand_name = block.settings.brand_name | default: 'Brand' %}
+              {% assign brand_link = block.settings.brand_url | default: '#' %}
+              {% assign brand_handle = brand_name | handleize %}
 
-            <a href="{{ brand_link }}" class="brand-logo" title="Shop {{ brand_name }} products" data-animate="fade-up" data-delay="{{ forloop.index | times: 50 }}">
-              <img src="{{ 'brand-logo-' | append: brand_handle | append: '.png' | asset_url }}"
-                   alt="{{ brand_name }} logo"
-                   loading="lazy"
-                   onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-              <div class="brand-logo-text" style="display: none;">{{ brand_name }}</div>
-            </a>
-          {% endfor %}
+              <a href="{{ brand_link }}" class="brand-logo" title="Shop {{ brand_name }} products" data-animate="fade-up" data-delay="{{ forloop.index | times: 50 }}" {{ block.shopify_attributes }}>
+                {% if block.settings.logo_image %}
+                  <img src="{{ block.settings.logo_image | image_url: width: 200 }}"
+                       alt="{{ brand_name }} logo"
+                       loading="lazy"
+                       onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                {% else %}
+                  <img src="{{ 'brand-logo-' | append: brand_handle | append: '.png' | asset_url }}"
+                       alt="{{ brand_name }} logo"
+                       loading="lazy"
+                       onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                {% endif %}
+                <div class="brand-logo-text" style="{% if block.settings.logo_image %}display: none;{% endif %}">{{ brand_name }}</div>
+              </a>
+            {% endfor %}
+          {% else %}
+            {% comment %} Fallback: Default brands if no blocks added {% endcomment %}
+            {% assign default_brands = 'atosa,gsw,thunder-group,rational,robot-coupe,cac,turbo-air,waring,eurodib,winco,sammic,globe' | split: ',' %}
+            {% for brand_handle in default_brands limit: 12 %}
+              {% assign brand_name = brand_handle | replace: '-', ' ' | capitalize %}
+              {% assign brand_link = '/collections/vendors?q=' | append: brand_name | url_encode %}
+              {% case brand_handle %}
+                {% when 'gsw' %}{% assign brand_name = 'GSW' %}
+                {% when 'cac' %}{% assign brand_name = 'CAC' %}
+                {% when 'thunder-group' %}{% assign brand_name = 'Thunder Group' %}
+                {% when 'robot-coupe' %}{% assign brand_name = 'Robot Coupe' %}
+                {% when 'turbo-air' %}{% assign brand_name = 'Turbo Air' %}
+                {% when 'global-solutions' %}{% assign brand_name = 'Global Solutions' %}
+              {% endcase %}
+
+              <a href="{{ brand_link }}" class="brand-logo" title="Shop {{ brand_name }} products" data-animate="fade-up" data-delay="{{ forloop.index | times: 50 }}">
+                <img src="{{ 'brand-logo-' | append: brand_handle | append: '.png' | asset_url }}"
+                     alt="{{ brand_name }} logo"
+                     loading="lazy"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="brand-logo-text" style="display: none;">{{ brand_name }}</div>
+              </a>
+            {% endfor %}
+          {% endif %}
         </div>
         <div class="brands-view-more-wrapper">
-          <a href="/pages/brands" class="brands-view-more-btn">
-            View All Brands
+          <a href="{{ section.settings.brands_view_all_url | default: '/pages/brands' }}" class="brands-view-more-btn">
+            {{ section.settings.brands_view_all_text | default: 'View All Brands' }}
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M5 12h14M12 5l7 7-7 7"/>
             </svg>
@@ -2096,6 +2115,17 @@
       "default": "Trusted Brands We Carry"
     },
     {
+      "type": "text",
+      "id": "brands_view_all_text",
+      "label": "View All Button Text",
+      "default": "View All Brands"
+    },
+    {
+      "type": "url",
+      "id": "brands_view_all_url",
+      "label": "View All Button URL"
+    },
+    {
       "type": "header",
       "content": "Top Products"
     },
@@ -2183,13 +2213,18 @@
     {
       "name": "Level 1 Collection Hub",
       "blocks": [
-        { "type": "brand_logo", "settings": { "brand_name": "Avantco", "brand_subtitle": "Refrigeration" } },
-        { "type": "brand_logo", "settings": { "brand_name": "CPG", "brand_subtitle": "Cooking Performance" } },
-        { "type": "brand_logo", "settings": { "brand_name": "REGENCY" } },
-        { "type": "brand_logo", "settings": { "brand_name": "NOBLE", "brand_subtitle": "Warewashing" } },
-        { "type": "brand_logo", "settings": { "brand_name": "VULCAN" } },
-        { "type": "brand_logo", "settings": { "brand_name": "Scotsman", "brand_subtitle": "Ice Systems" } },
-        { "type": "brand_logo", "settings": { "brand_name": "VOLLRATH" } }
+        { "type": "brand_logo", "settings": { "brand_name": "Atosa", "brand_url": "/collections/atosa-all" } },
+        { "type": "brand_logo", "settings": { "brand_name": "GSW", "brand_url": "/collections/gsw" } },
+        { "type": "brand_logo", "settings": { "brand_name": "Thunder Group", "brand_url": "/collections/thunder-group" } },
+        { "type": "brand_logo", "settings": { "brand_name": "Rational", "brand_url": "/collections/combi-oven-rational" } },
+        { "type": "brand_logo", "settings": { "brand_name": "Robot Coupe", "brand_url": "/pages/cf-robot-coupe" } },
+        { "type": "brand_logo", "settings": { "brand_name": "CAC", "brand_url": "/pages/cf-cac" } },
+        { "type": "brand_logo", "settings": { "brand_name": "Turbo Air", "brand_url": "/pages/turboair-page" } },
+        { "type": "brand_logo", "settings": { "brand_name": "Waring", "brand_url": "/pages/waring" } },
+        { "type": "brand_logo", "settings": { "brand_name": "Eurodib", "brand_url": "/pages/cf-eurodib" } },
+        { "type": "brand_logo", "settings": { "brand_name": "Winco", "brand_url": "/collections/winco" } },
+        { "type": "brand_logo", "settings": { "brand_name": "Sammic", "brand_url": "/collections/sammic" } },
+        { "type": "brand_logo", "settings": { "brand_name": "Globe", "brand_url": "/pages/globe" } }
       ]
     }
   ]

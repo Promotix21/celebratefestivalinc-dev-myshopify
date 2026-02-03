@@ -10,8 +10,11 @@
 {
   "sections": {
     "search_results": {
-      "type": "search-results-custom",
-      "settings": {}
+      "type": "search-results-cf",
+      "settings": {
+        "products_per_page": 24,
+        "compact_mode": true
+      }
     }
   },
   "order": [

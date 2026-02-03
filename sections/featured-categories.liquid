@@ -1,20 +1,14 @@
 <!-- sections/featured-categories.liquid -->
 <style>
   .featured-categories-{{ section.id }} {
-    padding: {{ section.settings.section_padding_top_desktop }}px 0 {{ section.settings.section_padding_bottom_desktop }}px;
+    padding: 40px 0;
     background: {{ section.settings.section_background_color }};
   }
   
-  @media (max-width: 768px) {
-    .featured-categories-{{ section.id }} {
-      padding: {{ section.settings.section_padding_top_mobile }}px 0 {{ section.settings.section_padding_bottom_mobile }}px;
-    }
-  }
-  
   .featured-categories-{{ section.id }} .container {
-    max-width: {{ section.settings.container_max_width }}px;
+    max-width: 100%;
     margin: 0 auto;
-    padding: 0 {{ section.settings.container_padding }}px;
+    padding: 0 50px;
   }
   
   .featured-categories-{{ section.id }} .section-title {
@@ -51,18 +45,25 @@
   
   .featured-categories-{{ section.id }} .categories-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: {{ section.settings.grid_gap_desktop }}px;
     margin-bottom: {{ section.settings.grid_margin_bottom }}px;
   }
-  
-  @media (max-width: 992px) {
+
+  @media (max-width: 1200px) {
     .featured-categories-{{ section.id }} .categories-grid {
       grid-template-columns: repeat(4, 1fr);
       gap: {{ section.settings.grid_gap_tablet }}px;
     }
   }
-  
+
+  @media (max-width: 992px) {
+    .featured-categories-{{ section.id }} .categories-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: {{ section.settings.grid_gap_tablet }}px;
+    }
+  }
+
   @media (max-width: 768px) {
     .featured-categories-{{ section.id }} .categories-grid {
       grid-template-columns: repeat(2, 1fr);
@@ -80,13 +81,6 @@
     transition: all {{ section.settings.card_hover_transition }}s ease;
     border: {{ section.settings.card_border_width }}px solid {{ section.settings.card_border_color }};
     box-shadow: {{ section.settings.card_shadow }};
-    height: {{ section.settings.card_height_desktop }}px;
-  }
-  
-  @media (max-width: 768px) {
-    .featured-categories-{{ section.id }} .category-card {
-      height: {{ section.settings.card_height_mobile }}px;
-    }
   }
   
   .featured-categories-{{ section.id }} .category-card:hover {
@@ -97,7 +91,7 @@
   .featured-categories-{{ section.id }} .category-image {
     position: relative;
     width: 100%;
-    height: 70%;
+    aspect-ratio: 800 / 450;
     overflow: hidden;
   }
   
@@ -203,7 +197,6 @@
   }
   
   .featured-categories-{{ section.id }} .category-info {
-    height: 30%;
     padding: {{ section.settings.card_info_padding }}px;
     display: flex;
     align-items: center;
@@ -212,19 +205,19 @@
   }
   
   .featured-categories-{{ section.id }} .category-info h3 {
-    font-size: {{ section.settings.category_title_font_size_desktop }}px;
+    font-size: 14px;
     line-height: {{ section.settings.category_title_line_height }};
-    font-weight: {{ section.settings.category_title_font_weight }};
+    font-weight: 600;
     color: {{ section.settings.category_title_color }};
     margin: 0;
     font-family: {{ section.settings.category_title_font_family }};
     text-align: {{ section.settings.card_text_alignment }};
     transition: color {{ section.settings.category_title_hover_transition }}s ease;
   }
-  
+
   @media (max-width: 768px) {
     .featured-categories-{{ section.id }} .category-info h3 {
-      font-size: {{ section.settings.category_title_font_size_mobile }}px;
+      font-size: 13px;
     }
   }
   
@@ -319,14 +312,14 @@
         {% case block.type %}
           {% when 'category' %}
             {% assign visible_count = visible_count | plus: 1 %}
-            <a href="{{ block.settings.category_link | default: '#' }}" 
-               class="category-card {% unless block.settings.visible_by_default %}hidden-category{% endunless %}" 
+            <a href="{{ block.settings.category_link | default: '#' }}"
+               class="category-card"
                data-id="{{ block.id }}"
                {{ block.shopify_attributes }}>
               <div class="category-image">
                 {% if block.settings.category_image %}
-                  <img src="{{ block.settings.category_image | img_url: '400x300' }}" 
-                       alt="{{ block.settings.category_name }}" 
+                  <img src="{{ block.settings.category_image | img_url: '800x450', crop: 'center' }}"
+                       alt="{{ block.settings.category_name }}"
                        loading="lazy">
                 {% else %}
                   <div style="background: #f0f0f0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #999;">
@@ -404,14 +397,7 @@
       {% endfor %}
     </div>
     
-    {% if section.settings.show_expand_button %}
-      <div class="view-all">
-        <button class="expand-btn" id="expandCategoriesBtn-{{ section.id }}">
-          <span class="btn-text">{{ section.settings.expand_button_text }}</span>
-          <i class="fas fa-chevron-down btn-icon"></i>
-        </button>
-      </div>
-    {% endif %}
+    {% comment %} View all button removed - all 12 cards display by default {% endcomment %}
   </div>
 </section>
 
@@ -477,7 +463,7 @@ document.addEventListener('DOMContentLoaded', function() {
       "step": 5,
       "unit": "px",
       "label": "Top padding (Desktop)",
-      "default": 80
+      "default": 40
     },
     {
       "type": "range",
@@ -487,7 +473,7 @@ document.addEventListener('DOMContentLoaded', function() {
       "step": 5,
       "unit": "px",
       "label": "Bottom padding (Desktop)",
-      "default": 80
+      "default": 40
     },
     {
       "type": "range",
@@ -497,7 +483,7 @@ document.addEventListener('DOMContentLoaded', function() {
       "step": 5,
       "unit": "px",
       "label": "Top padding (Mobile)",
-      "default": 50
+      "default": 30
     },
     {
       "type": "range",
@@ -507,7 +493,7 @@ document.addEventListener('DOMContentLoaded', function() {
       "step": 5,
       "unit": "px",
       "label": "Bottom padding (Mobile)",
-      "default": 50
+      "default": 30
     },
     {
       "type": "color",
@@ -519,11 +505,11 @@ document.addEventListener('DOMContentLoaded', function() {
       "type": "range",
       "id": "container_max_width",
       "min": 1000,
-      "max": 1600,
+      "max": 1800,
       "step": 50,
       "unit": "px",
       "label": "Container max width",
-      "default": 1200
+      "default": 1500
     },
     {
       "type": "range",
@@ -918,7 +904,7 @@ document.addEventListener('DOMContentLoaded', function() {
       "step": 5,
       "unit": "px",
       "label": "Grid gap (Desktop)",
-      "default": 30
+      "default": 20
     },
     {
       "type": "range",
@@ -974,7 +960,7 @@ document.addEventListener('DOMContentLoaded', function() {
       "step": 10,
       "unit": "px",
       "label": "Card height (Desktop)",
-      "default": 280
+      "default": 240
     },
     {
       "type": "range",

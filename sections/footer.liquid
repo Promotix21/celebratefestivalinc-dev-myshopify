@@ -25,6 +25,88 @@
       padding-bottom: {{ section.settings.padding_bottom }}px;
     }
   }
+
+  {% if section.settings.bottom_bar_bg != blank %}
+    .footer__content-bottom {
+      background-color: {{ section.settings.bottom_bar_bg }};
+    }
+  {% endif %}
+
+  {% if section.settings.bottom_bar_text != blank %}
+    .footer__content-bottom,
+    .footer__content-bottom a,
+    .footer__content-bottom .copyright__content,
+    .footer__content-bottom .policies a {
+      color: {{ section.settings.bottom_bar_text }};
+    }
+  {% endif %}
+
+  .footer-block__contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+
+  .footer-block__contact-item svg {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+  }
+
+  .footer-block__hours-label {
+    font-weight: 600;
+    margin-top: 12px;
+    margin-bottom: 4px;
+  }
+
+  .footer__logo {
+    margin-bottom: 20px;
+  }
+
+  .footer__logo img {
+    max-width: {{ section.settings.footer_logo_width }}px;
+    height: auto;
+  }
+
+  .newsletter-form__description {
+    margin-bottom: 16px;
+    font-size: 14px;
+    opacity: 0.85;
+  }
+
+  /* Mobile footer centering */
+  @media screen and (max-width: 749px) {
+    .footer-block {
+      text-align: center;
+    }
+
+    .footer-block__details-content.list-unstyled {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .footer-block__details-content.list-unstyled li {
+      text-align: center;
+    }
+
+    .footer-block__heading {
+      text-align: center;
+    }
+
+    .footer-block__contact {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .footer-block__contact-item {
+      justify-content: center;
+    }
+  }
 {%- endstyle -%}
 
 <footer class="footer color-{{ section.settings.color_scheme }} gradient section-{{ section.id }}-padding">
@@ -50,6 +132,19 @@
   -%}
     {%- unless only_empty_brand -%}
       <div class="footer__content-top page-width">
+        {%- if section.settings.footer_logo != blank -%}
+          <div class="footer__logo{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+            <a href="{{ routes.root_url }}">
+              <img
+                src="{{ section.settings.footer_logo | image_url: width: section.settings.footer_logo_width | times: 2 }}"
+                alt="{{ shop.name }}"
+                width="{{ section.settings.footer_logo_width }}"
+                height="auto"
+                loading="lazy"
+              >
+            </a>
+          </div>
+        {%- endif -%}
         {%- if section.blocks.size > 0 -%}
           {%- liquid
             if section.blocks.size == 9
@@ -153,6 +248,36 @@
                         {{ 'image' | placeholder_svg_tag: 'placeholder-svg placeholder' }}
                       {%- endif -%}
                     </div>
+                  {%- when 'contact_info' -%}
+                    <div class="footer-block__details-content footer-block__contact">
+                      {%- if block.settings.phone != blank -%}
+                        <div class="footer-block__contact-item">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                          <a href="tel:{{ block.settings.phone | remove: ' ' | remove: '(' | remove: ')' | remove: '-' }}">{{ block.settings.phone }}</a>
+                        </div>
+                      {%- endif -%}
+                      {%- if block.settings.email != blank -%}
+                        <div class="footer-block__contact-item">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                          <a href="mailto:{{ block.settings.email }}">{{ block.settings.email }}</a>
+                        </div>
+                      {%- endif -%}
+                      {%- if block.settings.address != blank -%}
+                        <div class="footer-block__contact-item">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                          <span>{{ block.settings.address | newline_to_br }}</span>
+                        </div>
+                      {%- endif -%}
+                      {%- if block.settings.business_hours != blank -%}
+                        {%- if block.settings.hours_label != blank -%}
+                          <div class="footer-block__hours-label">{{ block.settings.hours_label }}</div>
+                        {%- endif -%}
+                        <div class="footer-block__contact-item">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                          <span>{{ block.settings.business_hours | newline_to_br }}</span>
+                        </div>
+                      {%- endif -%}
+                    </div>
                 {%- endcase -%}
               </div>
             {%- endfor -%}
@@ -169,6 +294,9 @@
             <div class="footer-block__newsletter">
               {%- if section.settings.newsletter_heading != blank -%}
                 <h2 class="footer-block__heading inline-richtext">{{ section.settings.newsletter_heading }}</h2>
+              {%- endif -%}
+              {%- if section.settings.newsletter_description != blank -%}
+                <p class="newsletter-form__description">{{ section.settings.newsletter_description }}</p>
               {%- endif -%}
               {%- form 'customer', id: 'ContactFooter', class: 'footer__newsletter newsletter-form' -%}
                 <input type="hidden" name="contact[tags]" value="newsletter">
@@ -299,10 +427,19 @@
     </div>
     <div class="footer__content-bottom-wrapper page-width{% if section.settings.enable_country_selector == false and section.settings.enable_language_selector == false %} footer__content-bottom-wrapper--center{% endif %}">
       <div class="footer__copyright caption">
-        <small class="copyright__content"
-          >&copy; {{ 'now' | date: '%Y' }}, {{ shop.name | link_to: routes.root_url -}}
+        <small class="copyright__content">
+          {%- assign current_year = 'now' | date: '%Y' -%}
+          {%- assign year_placeholder = '{year}' -%}
+          {%- if section.settings.copyright_text != blank -%}
+            {%- assign copyright_output = section.settings.copyright_text | replace: year_placeholder, current_year -%}
+            &copy; {{ copyright_output }}
+          {%- else -%}
+            &copy; {{ current_year }}, {{ shop.name | link_to: routes.root_url }}
+          {%- endif -%}
         </small>
-        <small class="copyright__content">{{ powered_by_link }}</small>
+        {%- if section.settings.show_powered_by -%}
+          <small class="copyright__content">{{ powered_by_link }}</small>
+        {%- endif -%}
         {%- if section.settings.show_policy -%}
           <ul class="policies list-unstyled">
             {%- for policy in shop.policies -%}
@@ -421,6 +558,46 @@
           "default": "center"
         }
       ]
+    },
+    {
+      "type": "contact_info",
+      "name": "Contact Information",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "default": "Contact Us",
+          "label": "Heading"
+        },
+        {
+          "type": "text",
+          "id": "phone",
+          "label": "Phone Number",
+          "info": "e.g., (555) 123-4567"
+        },
+        {
+          "type": "text",
+          "id": "email",
+          "label": "Email Address"
+        },
+        {
+          "type": "textarea",
+          "id": "address",
+          "label": "Address"
+        },
+        {
+          "type": "text",
+          "id": "hours_label",
+          "label": "Hours Label",
+          "default": "Business Hours"
+        },
+        {
+          "type": "textarea",
+          "id": "business_hours",
+          "label": "Business Hours",
+          "info": "e.g., Mon-Fri: 9AM-5PM"
+        }
+      ]
     }
   ],
   "settings": [
@@ -429,6 +606,25 @@
       "id": "color_scheme",
       "label": "t:sections.all.colors.label",
       "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Footer Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "footer_logo",
+      "label": "Footer Logo"
+    },
+    {
+      "type": "range",
+      "id": "footer_logo_width",
+      "min": 50,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "label": "Logo Width",
+      "default": 150
     },
     {
       "type": "header",
@@ -446,6 +642,12 @@
       "id": "newsletter_heading",
       "default": "t:sections.footer.settings.newsletter_heading.default",
       "label": "t:sections.footer.settings.newsletter_heading.label"
+    },
+    {
+      "type": "textarea",
+      "id": "newsletter_description",
+      "label": "Newsletter Description",
+      "info": "Add a description below the newsletter heading"
     },
     {
       "type": "header",
@@ -491,6 +693,36 @@
       "default": true,
       "label": "t:sections.footer.settings.show_policy.label",
       "info": "t:sections.footer.settings.show_policy.info"
+    },
+    {
+      "type": "header",
+      "content": "Copyright"
+    },
+    {
+      "type": "text",
+      "id": "copyright_text",
+      "label": "Custom Copyright Text",
+      "info": "Leave blank to use default store name. Use {year} for current year."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_powered_by",
+      "default": true,
+      "label": "Show 'Powered by Shopify'"
+    },
+    {
+      "type": "header",
+      "content": "Bottom Bar"
+    },
+    {
+      "type": "color",
+      "id": "bottom_bar_bg",
+      "label": "Bottom Bar Background Color"
+    },
+    {
+      "type": "color",
+      "id": "bottom_bar_text",
+      "label": "Bottom Bar Text Color"
     },
     {
       "type": "header",

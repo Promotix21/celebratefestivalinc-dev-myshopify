@@ -1,0 +1,175 @@
+{
+  "sections": {
+    "main": {
+      "type": "page-level1-category",
+      "blocks": {
+        "category_1": {
+          "type": "category_card",
+          "settings": {
+            "card_title": "Cooking Equipment",
+            "card_count_text": "Shop All Cooking Equipment",
+            "card_description": "Equip your kitchen with top-quality commercial cooking equipment. We carry reputable brands at prices that can't be beat.",
+            "subcategory_1": "Gas Fryers",
+            "subcategory_2": "Commercial Gas Ranges",
+            "subcategory_3": "Griddles",
+            "subcategory_4": "Charbroilers"
+          }
+        },
+        "category_2": {
+          "type": "category_card",
+          "settings": {
+            "card_title": "Refrigeration Equipment",
+            "card_count_text": "Shop All Refrigeration",
+            "card_description": "With hundreds of commercial refrigeration equipment products to choose from, you're sure to find a unit that's suitable for your needs.",
+            "subcategory_1": "Reach-In Refrigerators",
+            "subcategory_2": "Refrigerated Prep Tables",
+            "subcategory_3": "Display Refrigeration",
+            "subcategory_4": "Ice Machines"
+          }
+        },
+        "category_3": {
+          "type": "category_card",
+          "settings": {
+            "card_title": "Work Tables & Stations",
+            "card_count_text": "Shop All Work Tables",
+            "card_description": "Whether you need economy or top of the line, undershelf or open base, we have the perfect work table for you.",
+            "subcategory_1": "Stainless Steel Tables",
+            "subcategory_2": "Equipment Stands",
+            "subcategory_3": "Prep Tables",
+            "subcategory_4": "Work Table Accessories"
+          }
+        },
+        "category_4": {
+          "type": "category_card",
+          "settings": {
+            "card_title": "Food Preparation",
+            "card_count_text": "Shop All Food Prep",
+            "card_description": "Our food preparation section has everything you need to transform basic, raw ingredients into culinary masterpieces.",
+            "subcategory_1": "Meat Grinders",
+            "subcategory_2": "Commercial Blenders",
+            "subcategory_3": "Dough Equipment",
+            "subcategory_4": "Cutters & Slicers"
+          }
+        },
+        "icon_1": {
+          "type": "icon_item",
+          "settings": {
+            "icon_label": "Dish Washing"
+          }
+        },
+        "icon_2": {
+          "type": "icon_item",
+          "settings": {
+            "icon_label": "Restaurant Ranges"
+          }
+        },
+        "icon_3": {
+          "type": "icon_item",
+          "settings": {
+            "icon_label": "Fryers"
+          }
+        },
+        "icon_4": {
+          "type": "icon_item",
+          "settings": {
+            "icon_label": "Grills & Griddles"
+          }
+        },
+        "icon_5": {
+          "type": "icon_item",
+          "settings": {
+            "icon_label": "Food Processors"
+          }
+        },
+        "icon_6": {
+          "type": "icon_item",
+          "settings": {
+            "icon_label": "Meat Slicers"
+          }
+        },
+        "icon_7": {
+          "type": "icon_item",
+          "settings": {
+            "icon_label": "Commercial Mixers"
+          }
+        },
+        "icon_8": {
+          "type": "icon_item",
+          "settings": {
+            "icon_label": "Outdoor Cooking"
+          }
+        },
+        "brand_1": {
+          "type": "brand_logo",
+          "settings": {
+            "brand_name": "Avantco",
+            "brand_subtitle": "Refrigeration"
+          }
+        },
+        "brand_2": {
+          "type": "brand_logo",
+          "settings": {
+            "brand_name": "CPG",
+            "brand_subtitle": "Cooking Performance"
+          }
+        },
+        "brand_3": {
+          "type": "brand_logo",
+          "settings": {
+            "brand_name": "Regency"
+          }
+        },
+        "brand_4": {
+          "type": "brand_logo",
+          "settings": {
+            "brand_name": "Noble",
+            "brand_subtitle": "Warewashing"
+          }
+        },
+        "brand_5": {
+          "type": "brand_logo",
+          "settings": {
+            "brand_name": "Beverage-Air"
+          }
+        },
+        "brand_6": {
+          "type": "brand_logo",
+          "settings": {
+            "brand_name": "Vulcan"
+          }
+        }
+      },
+      "block_order": [
+        "category_1",
+        "category_2",
+        "category_3",
+        "category_4",
+        "icon_1",
+        "icon_2",
+        "icon_3",
+        "icon_4",
+        "icon_5",
+        "icon_6",
+        "icon_7",
+        "icon_8",
+        "brand_1",
+        "brand_2",
+        "brand_3",
+        "brand_4",
+        "brand_5",
+        "brand_6"
+      ],
+      "settings": {
+        "hero_height": 250,
+        "hero_title": "",
+        "hero_subtitle": "Reliable Commercial Restaurant Kitchen Equipment For Every Application",
+        "categories_title": "Shop by Category",
+        "icons_title": "Popular Categories",
+        "brands_title": "Featured Brands"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

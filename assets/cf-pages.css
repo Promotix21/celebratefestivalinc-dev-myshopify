@@ -1,0 +1,470 @@
+/* ========================================
+   CELEBRATE FESTIVAL - PAGE STYLES
+   Cart, 404, Blog, Article, Password
+   ======================================== */
+
+/* CF Brand Colors */
+:root {
+  --cf-deep-blue: #1a365d;
+  --cf-navy: #2d5a87;
+  --cf-coral: #ff6b6b;
+  --cf-success: #10b981;
+  --cf-text-dark: #0f172a;
+  --cf-text-medium: #475569;
+  --cf-text-light: #64748b;
+  --cf-border: #e2e8f0;
+  --cf-bg-light: #f8fafc;
+}
+
+/* ========================================
+   CART PAGE
+   ======================================== */
+.cart__empty-text {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+  margin-bottom: 16px;
+}
+
+.cart__warnings .button,
+.cart__ctas .button {
+  background: var(--cf-coral);
+  color: #fff;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+
+.cart__ctas .button:hover,
+.cart__warnings .button:hover {
+  background: #ff5252;
+  transform: translateY(-2px);
+}
+
+.cart__ctas .button--secondary {
+  background: var(--cf-navy);
+}
+
+.cart__ctas .button--secondary:hover {
+  background: #3d6a9f;
+}
+
+.title-wrapper-with-link .title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+}
+
+.title-wrapper-with-link a {
+  color: var(--cf-navy);
+  font-weight: 600;
+}
+
+.title-wrapper-with-link a:hover {
+  color: var(--cf-coral);
+}
+
+.cart-items thead th {
+  color: var(--cf-text-medium);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.cart-item__name {
+  font-weight: 600;
+  color: var(--cf-deep-blue);
+}
+
+.cart-item__name:hover {
+  color: var(--cf-coral);
+}
+
+.cart-item .price {
+  color: var(--cf-coral);
+  font-weight: 700;
+}
+
+.cart-item__quantity .quantity__button {
+  background: var(--cf-bg-light);
+  border-color: var(--cf-border);
+}
+
+.cart-item__quantity .quantity__button:hover {
+  background: var(--cf-navy);
+  color: #fff;
+}
+
+.cart-item__quantity .quantity__input {
+  border-color: var(--cf-border);
+}
+
+.cart__footer .totals__total {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+}
+
+.cart__footer .totals__total-value {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--cf-coral);
+}
+
+.cart__note label {
+  color: var(--cf-text-medium);
+  font-weight: 600;
+}
+
+.cart__note .text-area {
+  border-color: var(--cf-border);
+  border-radius: 8px;
+}
+
+.cart__note .text-area:focus {
+  border-color: var(--cf-navy);
+  box-shadow: 0 0 0 3px rgba(45, 90, 135, 0.1);
+}
+
+/* ========================================
+   404 PAGE
+   ======================================== */
+.cf-404 {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.cf-404__icon {
+  width: 120px;
+  height: 120px;
+  background: var(--cf-bg-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.cf-404__icon svg {
+  width: 60px;
+  height: 60px;
+  color: var(--cf-navy);
+}
+
+.cf-404__code {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 100px;
+  font-weight: 800;
+  color: var(--cf-deep-blue);
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+.cf-404__title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+  margin-bottom: 12px;
+}
+
+.cf-404__text {
+  font-size: 16px;
+  color: var(--cf-text-medium);
+  max-width: 400px;
+  margin-bottom: 30px;
+}
+
+.cf-404__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--cf-coral);
+  color: #fff;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.cf-404__btn:hover {
+  background: #ff5252;
+  transform: translateY(-2px);
+  color: #fff;
+}
+
+.cf-404__links {
+  margin-top: 40px;
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.cf-404__link {
+  color: var(--cf-navy);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.cf-404__link:hover {
+  color: var(--cf-coral);
+  text-decoration: underline;
+}
+
+/* ========================================
+   BLOG LISTING PAGE
+   ======================================== */
+.main-blog .title--primary {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+  margin-bottom: 40px;
+}
+
+.article-card {
+  border: 1px solid var(--cf-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  transition: all 0.3s ease;
+}
+
+.article-card:hover {
+  border-color: var(--cf-navy);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px);
+}
+
+.article-card__title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+}
+
+.article-card__title a:hover {
+  color: var(--cf-coral);
+}
+
+.article-card__info {
+  color: var(--cf-text-light);
+  font-size: 13px;
+}
+
+.article-card__excerpt {
+  color: var(--cf-text-medium);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.article-card .link {
+  color: var(--cf-navy);
+  font-weight: 600;
+}
+
+.article-card .link:hover {
+  color: var(--cf-coral);
+}
+
+/* ========================================
+   BLOG ARTICLE PAGE
+   ======================================== */
+.article-template__title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+  font-size: 36px;
+  line-height: 1.3;
+}
+
+.article-template__content {
+  color: var(--cf-text-dark);
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.article-template__content h2,
+.article-template__content h3,
+.article-template__content h4 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+  margin-top: 32px;
+  margin-bottom: 16px;
+}
+
+.article-template__content a {
+  color: var(--cf-navy);
+}
+
+.article-template__content a:hover {
+  color: var(--cf-coral);
+}
+
+.article-template__content blockquote {
+  border-left: 4px solid var(--cf-coral);
+  padding-left: 20px;
+  color: var(--cf-text-medium);
+  font-style: italic;
+}
+
+.article-template__back {
+  color: var(--cf-navy);
+  font-weight: 600;
+}
+
+.article-template__back:hover {
+  color: var(--cf-coral);
+}
+
+/* Share Button */
+.share-button {
+  border-color: var(--cf-border);
+}
+
+.share-button:hover {
+  border-color: var(--cf-navy);
+}
+
+/* Comments */
+.article-template__comment-item {
+  border-bottom: 1px solid var(--cf-border);
+  padding: 24px 0;
+}
+
+.article-template__comment-author {
+  font-weight: 600;
+  color: var(--cf-deep-blue);
+}
+
+/* ========================================
+   PASSWORD PAGE
+   ======================================== */
+.password-header {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.password-logo {
+  margin-bottom: 30px;
+}
+
+.password-content {
+  font-size: 18px;
+  color: var(--cf-text-medium);
+  max-width: 500px;
+  margin: 0 auto 30px;
+}
+
+.password-link {
+  color: var(--cf-navy);
+  font-weight: 600;
+}
+
+.password-link:hover {
+  color: var(--cf-coral);
+}
+
+.password-modal__content {
+  background: #fff;
+  border-radius: 16px;
+  padding: 40px;
+  max-width: 400px;
+}
+
+.password-modal__content-heading {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+  margin-bottom: 24px;
+}
+
+.password-field .field__input {
+  border: 2px solid var(--cf-border);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.password-field .field__input:focus {
+  border-color: var(--cf-navy);
+  box-shadow: 0 0 0 3px rgba(45, 90, 135, 0.1);
+}
+
+.password-button {
+  background: var(--cf-coral);
+  color: #fff;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-weight: 600;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.password-button:hover {
+  background: #ff5252;
+}
+
+.password__footer-text {
+  color: var(--cf-text-light);
+  margin-top: 20px;
+  display: block;
+}
+
+.password__footer-text a {
+  color: var(--cf-navy);
+}
+
+/* ========================================
+   PAGINATION (Shared)
+   ======================================== */
+.pagination .pagination__item {
+  color: var(--cf-navy);
+  font-weight: 600;
+}
+
+.pagination .pagination__item--current {
+  background: var(--cf-navy);
+  color: #fff;
+  border-radius: 6px;
+}
+
+.pagination .pagination__item:hover:not(.pagination__item--current) {
+  color: var(--cf-coral);
+}
+
+/* ========================================
+   GENERAL OVERRIDES
+   ======================================== */
+.button:not(.button--tertiary) {
+  border-radius: 8px;
+}
+
+.button--primary {
+  background: var(--cf-coral);
+}
+
+.button--primary:hover {
+  background: #ff5252;
+}
+
+.underlined-link {
+  color: var(--cf-navy);
+}
+
+.underlined-link:hover {
+  color: var(--cf-coral);
+}

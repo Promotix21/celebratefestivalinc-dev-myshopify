@@ -1036,6 +1036,66 @@
     color: #0080b3;
 }
 
+/* Single Product Page - Login for Member Pricing CTA (CF Inc products) */
+.spp-login-member-pricing {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d5a87;
+    text-decoration: none;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+    border: 2px solid rgba(45, 90, 135, 0.3);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
+}
+
+.spp-login-member-pricing:hover {
+    background: linear-gradient(135deg, #bfdbfe 0%, #dbeafe 100%);
+    color: #1a365d;
+    border-color: rgba(45, 90, 135, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(45, 90, 135, 0.15);
+}
+
+.spp-login-member-pricing .spp-lock-icon {
+    font-size: 16px;
+}
+
+/* Single Product Page - Call for Details CTA (Other vendor products - MAP compliance) */
+.spp-call-for-details {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a365d;
+    text-decoration: none;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
+}
+
+.spp-call-for-details:hover {
+    background: linear-gradient(135deg, #1a365d 0%, #2d5a87 100%);
+    color: #ffffff;
+    border-color: #1a365d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26, 54, 93, 0.2);
+}
+
+.spp-call-for-details .spp-phone-icon {
+    font-size: 16px;
+}
+
 /* Responsive for Two-Card Layout */
 @media (max-width: 480px) {
     .price-cards-row {

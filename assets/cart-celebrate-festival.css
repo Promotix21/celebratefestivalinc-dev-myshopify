@@ -1,0 +1,840 @@
+/* ========================================
+   CART STYLES - CELEBRATE FESTIVAL
+   Modern, professional cart matching brand design
+   ======================================== */
+
+/* ========================================
+   CART CONTAINER & LAYOUT
+   ======================================== */
+.cart-celebrate-festival {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Reset some theme defaults */
+.cart-celebrate-festival .cart__items,
+.cart-celebrate-festival .cart__footer {
+  border: none;
+  padding: 0;
+}
+
+.cart-celebrate-festival .page-width {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+@media (max-width: 768px) {
+  .cart-celebrate-festival .page-width {
+    padding: 0 20px;
+  }
+}
+
+/* Page title section */
+.cart-celebrate-festival .cart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--cf-border);
+}
+
+.cart-celebrate-festival .cart-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+}
+
+.cart-celebrate-festival .cart-title::before {
+  content: '';
+  width: 4px;
+  height: 32px;
+  background: linear-gradient(180deg, var(--cf-coral) 0%, var(--cf-navy) 100%);
+  border-radius: 2px;
+}
+
+.cart-celebrate-festival .continue-shopping {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cf-navy);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.cart-celebrate-festival .continue-shopping:hover {
+  color: var(--cf-coral);
+  gap: 12px;
+}
+
+.cart-celebrate-festival .continue-shopping::before {
+  content: '←';
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
+
+.cart-celebrate-festival .continue-shopping:hover::before {
+  transform: translateX(-4px);
+}
+
+/* ========================================
+   CART LAYOUT - TWO COLUMN
+   ======================================== */
+.cart-celebrate-festival .cart-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+@media (max-width: 992px) {
+  .cart-celebrate-festival .cart-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========================================
+   CART ITEMS TABLE
+   ======================================== */
+.cart-celebrate-festival .cart-items-wrapper {
+  background: var(--cf-bg-white);
+  border-radius: 12px;
+  border: 1px solid var(--cf-border);
+  overflow: hidden;
+}
+
+.cart-celebrate-festival .cart-items-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.cart-celebrate-festival .cart-items-table thead {
+  background: var(--cf-bg-light);
+  border-bottom: 1px solid var(--cf-border);
+}
+
+.cart-celebrate-festival .cart-items-table th {
+  padding: 16px 20px;
+  text-align: left;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--cf-text-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cart-celebrate-festival .cart-items-table th.text-center {
+  text-align: center;
+}
+
+.cart-celebrate-festival .cart-items-table th.text-right {
+  text-align: right;
+}
+
+/* ========================================
+   CART ITEM ROW
+   ======================================== */
+.cart-celebrate-festival .cart-item-row {
+  border-bottom: 1px solid var(--cf-border);
+  transition: background-color 0.2s ease;
+}
+
+.cart-celebrate-festival .cart-item-row:hover {
+  background-color: rgba(45, 90, 135, 0.02);
+}
+
+.cart-celebrate-festival .cart-item-row:last-child {
+  border-bottom: none;
+}
+
+.cart-celebrate-festival .cart-item-row td {
+  padding: 24px 20px;
+  vertical-align: middle;
+}
+
+/* ========================================
+   PRODUCT IMAGE
+   ======================================== */
+.cart-celebrate-festival .cart-item-image-wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--cf-border);
+  background: var(--cf-bg-light);
+}
+
+.cart-celebrate-festival .cart-item-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cart-celebrate-festival .cart-item-image-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ========================================
+   PRODUCT DETAILS
+   ======================================== */
+.cart-celebrate-festival .cart-item-details {
+  min-width: 250px;
+}
+
+.cart-celebrate-festival .cart-item-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--cf-deep-blue);
+  text-decoration: none;
+  display: block;
+  margin-bottom: 8px;
+  line-height: 1.4;
+  transition: color 0.2s ease;
+}
+
+.cart-celebrate-festival .cart-item-title:hover {
+  color: var(--cf-coral);
+}
+
+.cart-celebrate-festival .cart-item-vendor {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cf-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.cart-celebrate-festival .cart-item-variant {
+  font-size: 13px;
+  color: var(--cf-text-light);
+  margin-top: 6px;
+}
+
+.cart-celebrate-festival .cart-item-variant-label {
+  font-weight: 600;
+  color: var(--cf-text-medium);
+  margin-right: 6px;
+}
+
+.cart-celebrate-festival .cart-item-sku {
+  font-size: 11px;
+  color: var(--cf-text-muted);
+  margin-top: 4px;
+  font-family: 'Courier New', monospace;
+}
+
+/* Discounts on line items */
+.cart-celebrate-festival .cart-item-discount {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cf-success);
+  margin-top: 8px;
+}
+
+.cart-celebrate-festival .cart-item-discount svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ========================================
+   UNIT PRICE
+   ======================================== */
+.cart-celebrate-festival .cart-item-price {
+  text-align: center;
+}
+
+.cart-celebrate-festival .cart-item-price-amount {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+}
+
+.cart-celebrate-festival .cart-item-price-compare {
+  font-size: 13px;
+  color: var(--cf-text-muted);
+  text-decoration: line-through;
+  display: block;
+  margin-top: 4px;
+}
+
+.cart-celebrate-festival .cart-item-price-sale {
+  color: var(--cf-coral);
+}
+
+/* ========================================
+   QUANTITY SELECTOR
+   ======================================== */
+.cart-celebrate-festival .cart-quantity-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.cart-celebrate-festival .cart-quantity-selector {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--cf-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--cf-bg-white);
+}
+
+.cart-celebrate-festival .cart-quantity-btn {
+  width: 36px;
+  height: 36px;
+  background: var(--cf-bg-light);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cf-navy);
+  font-size: 18px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.cart-celebrate-festival .cart-quantity-btn:hover:not(:disabled) {
+  background: var(--cf-navy);
+  color: white;
+}
+
+.cart-celebrate-festival .cart-quantity-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.cart-celebrate-festival .cart-quantity-input {
+  width: 50px;
+  height: 36px;
+  border: none;
+  border-left: 1px solid var(--cf-border);
+  border-right: 1px solid var(--cf-border);
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cf-deep-blue);
+  -moz-appearance: textfield;
+}
+
+.cart-celebrate-festival .cart-quantity-input::-webkit-outer-spin-button,
+.cart-celebrate-festival .cart-quantity-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.cart-celebrate-festival .cart-quantity-input:focus {
+  outline: none;
+  background: rgba(45, 90, 135, 0.05);
+}
+
+/* Remove button */
+.cart-celebrate-festival .cart-remove-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 12px;
+  padding: 0;
+}
+
+.cart-celebrate-festival .cart-remove-btn:hover {
+  background: #dc2626;
+  color: white;
+  border-color: #dc2626;
+  transform: scale(1.05);
+}
+
+.cart-celebrate-festival .cart-remove-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ========================================
+   LINE TOTAL
+   ======================================== */
+.cart-celebrate-festival .cart-item-total {
+  text-align: right;
+}
+
+.cart-celebrate-festival .cart-item-total-amount {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--cf-deep-blue);
+}
+
+.cart-celebrate-festival .cart-item-total-compare {
+  font-size: 14px;
+  color: var(--cf-text-muted);
+  text-decoration: line-through;
+  display: block;
+  margin-top: 4px;
+}
+
+.cart-celebrate-festival .cart-item-total-sale {
+  color: var(--cf-coral);
+}
+
+/* ========================================
+   ORDER SUMMARY SIDEBAR
+   ======================================== */
+.cart-celebrate-festival .cart-summary {
+  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+  border: 1px solid rgba(45, 90, 135, 0.2);
+  border-radius: 12px;
+  padding: 24px;
+  position: sticky;
+  top: 20px;
+  height: fit-content;
+}
+
+.cart-celebrate-festival .cart-summary-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+  margin: 0 0 20px 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(45, 90, 135, 0.2);
+}
+
+/* Summary rows */
+.cart-celebrate-festival .cart-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+
+.cart-celebrate-festival .cart-summary-label {
+  color: var(--cf-text-medium);
+  font-weight: 500;
+}
+
+.cart-celebrate-festival .cart-summary-value {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  color: var(--cf-deep-blue);
+}
+
+/* Cart discounts */
+.cart-celebrate-festival .cart-summary-discount {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 14px;
+}
+
+.cart-celebrate-festival .cart-summary-discount-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cf-success);
+  margin-bottom: 4px;
+}
+
+.cart-celebrate-festival .cart-summary-discount-amount {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cf-success);
+  text-align: right;
+}
+
+/* Total */
+.cart-celebrate-festival .cart-summary-total {
+  border-top: 2px solid rgba(45, 90, 135, 0.3);
+  padding-top: 16px;
+  margin-top: 16px;
+  margin-bottom: 20px;
+}
+
+.cart-celebrate-festival .cart-summary-total-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+}
+
+.cart-celebrate-festival .cart-summary-total-amount {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--cf-coral);
+}
+
+/* Tax note */
+.cart-celebrate-festival .cart-summary-tax-note {
+  font-size: 11px;
+  color: var(--cf-text-light);
+  text-align: center;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+/* Free shipping indicator */
+.cart-celebrate-festival .cart-free-shipping {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.cart-celebrate-festival .cart-free-shipping-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cf-success);
+}
+
+.cart-celebrate-festival .cart-free-shipping-badge svg {
+  width: 18px;
+  height: 18px;
+}
+
+.cart-celebrate-festival .cart-free-shipping-text {
+  font-size: 11px;
+  color: var(--cf-text-medium);
+  margin-top: 6px;
+}
+
+/* ========================================
+   CHECKOUT BUTTON
+   ======================================== */
+.cart-celebrate-festival .cart-checkout-btn {
+  width: 100%;
+  background: var(--cf-coral);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 16px 24px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.cart-celebrate-festival .cart-checkout-btn:hover:not(:disabled) {
+  background: #ff5252;
+  box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+  transform: translateY(-2px);
+}
+
+.cart-celebrate-festival .cart-checkout-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.cart-celebrate-festival .cart-checkout-btn::after {
+  content: '→';
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+.cart-celebrate-festival .cart-checkout-btn:hover:not(:disabled)::after {
+  transform: translateX(4px);
+}
+
+/* ========================================
+   CART NOTE
+   ======================================== */
+.cart-celebrate-festival .cart-note-section {
+  background: var(--cf-bg-white);
+  border: 1px solid var(--cf-border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.cart-celebrate-festival .cart-note-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cf-deep-blue);
+  display: block;
+  margin-bottom: 10px;
+}
+
+.cart-celebrate-festival .cart-note-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px;
+  border: 1px solid var(--cf-border);
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--cf-text-dark);
+  resize: vertical;
+  transition: border-color 0.2s ease;
+}
+
+.cart-celebrate-festival .cart-note-textarea:focus {
+  outline: none;
+  border-color: var(--cf-navy);
+  box-shadow: 0 0 0 3px rgba(45, 90, 135, 0.1);
+}
+
+.cart-celebrate-festival .cart-note-textarea::placeholder {
+  color: var(--cf-text-muted);
+}
+
+/* ========================================
+   EMPTY CART STATE
+   ======================================== */
+.cart-celebrate-festival .cart-empty {
+  text-align: center;
+  padding: 80px 40px;
+  background: var(--cf-bg-light);
+  border-radius: 12px;
+  border: 1px solid var(--cf-border);
+}
+
+.cart-celebrate-festival .cart-empty-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  opacity: 0.3;
+}
+
+.cart-celebrate-festival .cart-empty-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+  margin: 0 0 12px 0;
+}
+
+.cart-celebrate-festival .cart-empty-text {
+  font-size: 15px;
+  color: var(--cf-text-medium);
+  margin-bottom: 30px;
+}
+
+.cart-celebrate-festival .cart-empty-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--cf-navy);
+  color: white;
+  padding: 14px 28px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.cart-celebrate-festival .cart-empty-btn:hover {
+  background: var(--cf-navy-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(45, 90, 135, 0.3);
+}
+
+/* ========================================
+   LOADING STATES
+   ======================================== */
+.cart-celebrate-festival .cart-updating {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.cart-celebrate-festival .cart-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(45, 90, 135, 0.2);
+  border-top-color: var(--cf-navy);
+  border-radius: 50%;
+  animation: cartSpinnerRotate 0.8s linear infinite;
+}
+
+@keyframes cartSpinnerRotate {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ========================================
+   MOBILE RESPONSIVE
+   ======================================== */
+@media (max-width: 992px) {
+  .cart-celebrate-festival .cart-summary {
+    position: static;
+    margin-top: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .cart-celebrate-festival .cart-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .cart-celebrate-festival .cart-title {
+    font-size: 24px;
+  }
+
+  /* Hide table, show card layout */
+  .cart-celebrate-festival .cart-items-table thead {
+    display: none;
+  }
+
+  .cart-celebrate-festival .cart-items-table,
+  .cart-celebrate-festival .cart-items-table tbody,
+  .cart-celebrate-festival .cart-item-row {
+    display: block;
+  }
+
+  .cart-celebrate-festival .cart-item-row {
+    margin-bottom: 20px;
+    border: 1px solid var(--cf-border);
+    border-radius: 12px;
+    padding: 16px !important;
+  }
+
+  .cart-celebrate-festival .cart-item-row td {
+    display: block;
+    padding: 8px 0 !important;
+    text-align: left !important;
+  }
+
+  .cart-celebrate-festival .cart-item-image-wrapper {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 16px;
+  }
+
+  .cart-celebrate-festival .cart-quantity-wrapper,
+  .cart-celebrate-festival .cart-item-price,
+  .cart-celebrate-festival .cart-item-total {
+    text-align: left;
+  }
+
+  .cart-celebrate-festival .cart-item-total {
+    border-top: 1px solid var(--cf-border);
+    padding-top: 16px !important;
+    margin-top: 12px;
+  }
+
+  .cart-celebrate-festival .cart-item-total::before {
+    content: 'Total: ';
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    color: var(--cf-text-medium);
+    margin-right: 8px;
+  }
+}
+
+@media (max-width: 576px) {
+  .cart-celebrate-festival .cart-title {
+    font-size: 20px;
+  }
+
+  .cart-celebrate-festival .cart-summary {
+    padding: 20px 16px;
+  }
+}
+
+/* ========================================
+   TRUST BADGES (Optional)
+   ======================================== */
+.cart-celebrate-festival .cart-trust-badges {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: var(--cf-bg-light);
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+.cart-celebrate-festival .cart-trust-badge {
+  text-align: center;
+  flex: 1;
+}
+
+.cart-celebrate-festival .cart-trust-badge-icon {
+  width: 32px;
+  height: 32px;
+  margin: 0 auto 8px;
+  opacity: 0.7;
+}
+
+.cart-celebrate-festival .cart-trust-badge-text {
+  font-size: 10px;
+  color: var(--cf-text-medium);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* ========================================
+   DYNAMIC CHECKOUT BUTTONS
+   ======================================== */
+.cart-celebrate-festival .cart-dynamic-checkout {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(45, 90, 135, 0.2);
+}
+
+.cart-celebrate-festival .cart-dynamic-checkout-text {
+  font-size: 11px;
+  color: var(--cf-text-muted);
+  text-align: center;
+  margin-bottom: 12px;
+}

@@ -1,0 +1,260 @@
+/* Partner Section - Diagonal Clip Image Right Design */
+
+.partner-section-wrapper {
+  display: block;
+  width: 100%;
+}
+
+.partner-section {
+  position: relative;
+  width: 100%;
+  min-height: 600px;
+  background: #1c2b48;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* Subtle background texture */
+.partner-section__texture {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    radial-gradient(circle at 80% 20%, rgba(233, 91, 98, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, rgba(50, 82, 119, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Content Left */
+.partner-section__content {
+  position: relative;
+  z-index: 3;
+  width: 50%;
+  padding: 80px;
+}
+
+/* Badge */
+.partner-section__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(233, 91, 98, 0.15);
+  border: 1px solid rgba(233, 91, 98, 0.3);
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #e95b62;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+/* Title */
+.partner-section__title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(32px, 3.5vw, 46px);
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+  margin: 0 0 20px 0;
+}
+
+.partner-section__title-highlight {
+  color: #e95b62;
+}
+
+/* Description */
+.partner-section__desc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.8;
+  margin: 0 0 32px 0;
+  max-width: 480px;
+}
+
+/* Feature list */
+.partner-section__features {
+  list-style: none;
+  margin: 0 0 36px 0;
+  padding: 0;
+}
+
+.partner-section__feature {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.partner-section__feature:last-child {
+  margin-bottom: 0;
+}
+
+.partner-section__feature-icon {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  background: linear-gradient(135deg, #e95b62 0%, #a72a45 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.partner-section__feature-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke: #ffffff;
+  fill: none;
+  stroke-width: 2.5;
+}
+
+/* Button */
+.partner-section__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #e95b62 0%, #a72a45 100%);
+  color: #ffffff;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(233, 91, 98, 0.3);
+}
+
+.partner-section__btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(233, 91, 98, 0.4);
+  color: #ffffff;
+}
+
+.partner-section__btn svg {
+  transition: transform 0.3s ease;
+}
+
+.partner-section__btn:hover svg {
+  transform: translateX(4px);
+}
+
+/* Diagonal Image - Right Side */
+.partner-section__image {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 55%;
+  height: 100%;
+  clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+  z-index: 2;
+}
+
+.partner-section__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.partner-section__image-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #2d5a87 0%, #1a365d 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.partner-section__image-placeholder .placeholder-svg {
+  width: 120px;
+  height: 120px;
+  opacity: 0.3;
+}
+
+/* =====================================================
+   RESPONSIVE STYLES
+   ===================================================== */
+
+@media (max-width: 1100px) {
+  .partner-section {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .partner-section__content {
+    width: 100%;
+    padding: 60px 40px;
+    text-align: center;
+    order: 2;
+  }
+
+  .partner-section__desc {
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .partner-section__features {
+    display: inline-block;
+    text-align: left;
+  }
+
+  .partner-section__image {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    clip-path: none;
+    order: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .partner-section__content {
+    padding: 50px 24px;
+  }
+
+  .partner-section__title {
+    font-size: 28px;
+  }
+
+  .partner-section__image {
+    height: 300px;
+  }
+
+  .partner-section__feature {
+    font-size: 14px;
+  }
+
+  .partner-section__btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .partner-section__content {
+    padding: 40px 20px;
+  }
+
+  .partner-section__title {
+    font-size: 24px;
+  }
+
+  .partner-section__desc {
+    font-size: 14px;
+  }
+
+  .partner-section__image {
+    height: 250px;
+  }
+}

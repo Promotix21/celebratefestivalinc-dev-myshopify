@@ -1,0 +1,455 @@
+{% comment %}
+  Brands Landing Page Section
+  Displays all brand logos in a grid with links to brand collection pages
+{% endcomment %}
+
+<style>
+.cf-brands {
+  --deep-blue: #1a365d;
+  --primary-navy: #2d5a87;
+  --coral: #ff6b6b;
+  --text-dark: #0f172a;
+  --text-medium: #475569;
+  --text-light: #64748b;
+  --border-color: #e2e8f0;
+  --bg-light: #f8fafc;
+}
+
+.cf-brands__hero {
+  background: linear-gradient(135deg, var(--deep-blue) 0%, #0f172a 100%);
+  padding: 60px 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.cf-brands__hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.5;
+}
+
+.cf-brands__hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.cf-brands__title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 42px;
+  font-weight: 800;
+  color: white;
+  margin: 0 0 16px;
+}
+
+.cf-brands__subtitle {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.cf-brands__container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px;
+}
+
+/* Priority Brands Section */
+.cf-brands__priority {
+  margin-bottom: 60px;
+}
+
+.cf-brands__section-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--deep-blue);
+  margin: 0 0 30px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cf-brands__section-title::before {
+  content: '';
+  width: 4px;
+  height: 28px;
+  background: linear-gradient(180deg, var(--coral) 0%, var(--primary-navy) 100%);
+  border-radius: 2px;
+}
+
+.cf-brands__priority-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 1200px) {
+  .cf-brands__priority-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .cf-brands__priority-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .cf-brands__priority-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Brand Card */
+.cf-brands__card {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  min-height: 140px;
+}
+
+.cf-brands__card:hover {
+  border-color: var(--primary-navy);
+  box-shadow: 0 8px 30px rgba(26, 54, 93, 0.15);
+  transform: translateY(-4px);
+}
+
+.cf-brands__card-logo {
+  max-width: 100%;
+  max-height: 60px;
+  object-fit: contain;
+  margin-bottom: 12px;
+}
+
+.cf-brands__card-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-medium);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cf-brands__card:hover .cf-brands__card-name {
+  color: var(--primary-navy);
+}
+
+/* Featured Badge */
+.cf-brands__card--featured {
+  border-color: var(--coral);
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.05) 0%, white 100%);
+}
+
+.cf-brands__card--featured::before {
+  content: 'Featured';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--coral);
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+/* All Brands Grid */
+.cf-brands__all {
+  margin-top: 40px;
+}
+
+.cf-brands__all-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1200px) {
+  .cf-brands__all-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .cf-brands__all-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .cf-brands__all-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .cf-brands__all-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.cf-brands__small-card {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  min-height: 80px;
+}
+
+.cf-brands__small-card:hover {
+  border-color: var(--primary-navy);
+  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.12);
+  transform: translateY(-2px);
+}
+
+.cf-brands__small-card img {
+  max-width: 100%;
+  max-height: 50px;
+  object-fit: contain;
+}
+
+/* Text fallback */
+.cf-brands__text-logo {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-medium);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* Alphabet Filter */
+.cf-brands__filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: var(--bg-light);
+  border-radius: 12px;
+}
+
+.cf-brands__filter-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  background: white;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cf-brands__filter-btn:hover,
+.cf-brands__filter-btn.active {
+  background: var(--deep-blue);
+  border-color: var(--deep-blue);
+  color: white;
+}
+
+/* Contact CTA */
+.cf-brands__cta {
+  margin-top: 60px;
+  padding: 40px;
+  background: var(--bg-light);
+  border-radius: 16px;
+  text-align: center;
+}
+
+.cf-brands__cta-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--deep-blue);
+  margin: 0 0 12px;
+}
+
+.cf-brands__cta-text {
+  font-size: 15px;
+  color: var(--text-medium);
+  margin: 0 0 24px;
+}
+
+.cf-brands__cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, var(--coral) 0%, #e55555 100%);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.cf-brands__cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+}
+</style>
+
+<div class="cf-brands">
+  <!-- Hero Section -->
+  <div class="cf-brands__hero">
+    <div class="cf-brands__hero-content">
+      <h1 class="cf-brands__title">{{ section.settings.page_title | default: 'Shop by Brand' }}</h1>
+      <p class="cf-brands__subtitle">{{ section.settings.page_subtitle | default: 'Browse our extensive collection of trusted brands in commercial restaurant equipment and supplies.' }}</p>
+    </div>
+  </div>
+
+  <div class="cf-brands__container">
+    <!-- Priority Brands (18 from Excel) -->
+    <section class="cf-brands__priority">
+      <h2 class="cf-brands__section-title">Featured Brands</h2>
+      <div class="cf-brands__priority-grid">
+        {% assign priority_brands = 'atosa,gsw,thunder-group,rational,robot-coupe,cac,turbo-air,waring,eurodib,winco,sammic,globe,shaan,somerset,global-solutions,rotoquip,kwitex,yanco' | split: ',' %}
+
+        {% for brand_handle in priority_brands %}
+          {% assign brand_name = brand_handle | replace: '-', ' ' | capitalize %}
+          {% case brand_handle %}
+            {% when 'gsw' %}{% assign brand_name = 'GSW' %}
+            {% when 'cac' %}{% assign brand_name = 'CAC' %}
+            {% when 'thunder-group' %}{% assign brand_name = 'Thunder Group' %}
+            {% when 'robot-coupe' %}{% assign brand_name = 'Robot Coupe' %}
+            {% when 'turbo-air' %}{% assign brand_name = 'Turbo Air' %}
+            {% when 'global-solutions' %}{% assign brand_name = 'Global Solutions' %}
+          {% endcase %}
+
+          <a href="/collections/vendors?q={{ brand_name | url_encode }}" class="cf-brands__card">
+            <img src="{{ 'brand-logo-' | append: brand_handle | append: '.png' | asset_url }}"
+                 alt="{{ brand_name }} logo"
+                 class="cf-brands__card-logo"
+                 loading="lazy"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <span class="cf-brands__card-name" style="display: none;">{{ brand_name }}</span>
+            <span class="cf-brands__card-name">{{ brand_name }}</span>
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- All Brands Section -->
+    <section class="cf-brands__all">
+      <h2 class="cf-brands__section-title">All Brands A-Z</h2>
+
+      <!-- Alphabet Filter -->
+      <div class="cf-brands__filter" id="brand-filter">
+        <button type="button" class="cf-brands__filter-btn active" data-letter="all">All</button>
+        {% assign alphabet = 'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z' | split: ',' %}
+        {% for letter in alphabet %}
+          <button type="button" class="cf-brands__filter-btn" data-letter="{{ letter }}">{{ letter }}</button>
+        {% endfor %}
+      </div>
+
+      <div class="cf-brands__all-grid" id="all-brands-grid">
+        {% comment %} All brand logos {% endcomment %}
+        {% assign all_brands = 'adcraft,advance-tabco,ammex,anets,apw,arctic-air,astra,atosa,bakers-pride,bally,bissell,bizerba,bunn,cac,captiveaire,cdn,cellucap,champion,channel-mfg,chase-doors,chef-master,chef-specialties,chef-works,chefs-choice,cma-dishmachines,continental,cooktek,crestware,crown-steam,disco,dormont,doyon,dukers,dynamic,eastern,edlund,eurodib,federal,fogel,get-enterprises,global-solutions,globe,gmcw,grosfillex,gsw,hamilton-beach,hatco,hawkins,hoshizaki,hospeco,howard-mccray,hubbell,hydrakool,ice-o-matic,impact,imperial,insinger,iti,jackson,john-boos,john-ritzenthaler,just-chairs,klingers,krowne,kwitex,la-coppera,la-rosa,larkin,louis-tellier,magikitchen,marsal,menu-solutions,mercer,micromatic,middleby,mkld,moffat,mts-seating,mundial,naks,nemco,newton,nextstep,nor-lake,oak-street,omcan,perfect-fry,piper-products,pitco,pizza-group,precision-pour,preethi,prestige,quantum-foodservice,radius,rational,rf-hunter,robot-coupe,rotoquip,royal-industries,sammic,san-jamar,senneca,shaan,sharp,somerset,southbend,spaceman,spill-stop,star,steril-sil,sterno,tablecraft,taylor,texican,thunder-group,toastmaster,town,true,ts-brass,turbo-air,unified,unipro,univex,uniworld,us-cooler,vertex,victorinox,vollrath,waring,wells,winco,world-dryer,yanco' | split: ',' %}
+
+        {% for brand_handle in all_brands %}
+          {% assign brand_name = brand_handle | replace: '-', ' ' | capitalize %}
+          {% assign first_letter = brand_name | slice: 0 | upcase %}
+
+          <a href="/collections/vendors?q={{ brand_name | url_encode }}"
+             class="cf-brands__small-card"
+             data-brand="{{ brand_name }}"
+             data-letter="{{ first_letter }}">
+            <img src="{{ 'brand-logo-' | append: brand_handle | append: '.png' | asset_url }}"
+                 alt="{{ brand_name }}"
+                 loading="lazy"
+                 onerror="this.outerHTML='<span class=cf-brands__text-logo>{{ brand_name }}</span>';">
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Contact CTA -->
+    <div class="cf-brands__cta">
+      <h3 class="cf-brands__cta-title">Can't Find Your Brand?</h3>
+      <p class="cf-brands__cta-text">Contact us and we'll help you source the equipment you need from any manufacturer.</p>
+      <a href="https://celebratefestivalinc.com/pages/contact-us" class="cf-brands__cta-btn">
+        Contact Us
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const filterBtns = document.querySelectorAll('.cf-brands__filter-btn');
+  const brandCards = document.querySelectorAll('.cf-brands__small-card');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      // Update active state
+      filterBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+
+      const letter = this.dataset.letter;
+
+      // Filter cards
+      brandCards.forEach(card => {
+        if (letter === 'all' || card.dataset.letter === letter) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+});
+</script>
+
+{% schema %}
+{
+  "name": "Brands Page",
+  "tag": "section",
+  "class": "section-brands-page",
+  "settings": [
+    {
+      "type": "text",
+      "id": "page_title",
+      "label": "Page Title",
+      "default": "Shop by Brand"
+    },
+    {
+      "type": "textarea",
+      "id": "page_subtitle",
+      "label": "Page Subtitle",
+      "default": "Browse our extensive collection of trusted brands in commercial restaurant equipment and supplies."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Brands Page"
+    }
+  ]
+}
+{% endschema %}

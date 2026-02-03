@@ -136,7 +136,7 @@
  <div class="filter-section">
   <div class="filter-title-row">
     <h3 class="filter-title">Product Type</h3>
-    <a href="/collections/all" class="view-all-filter-link">Browse All</a>
+    <a href="/collections" class="view-all-filter-link">Browse All</a>
   </div>
   <div class="filter-group" id="type-filter-group">
       {% assign product_types = search.results | map: 'type' | uniq | sort %}
@@ -170,7 +170,7 @@
  <div class="filter-section">
   <div class="filter-title-row">
     <h3 class="filter-title">Brand</h3>
-    <a href="/pages/brands" class="view-all-filter-link">All Brands</a>
+    <a href="/collections/brands" class="view-all-filter-link">All Brands</a>
   </div>
   <div class="filter-group" id="vendor-filter-group">
       {% assign vendors = search.results | map: 'vendor' | uniq | sort %}

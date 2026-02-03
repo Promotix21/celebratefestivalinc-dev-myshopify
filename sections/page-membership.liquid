@@ -1,0 +1,890 @@
+{% comment %}
+  Membership Page Section
+  Displays membership benefits, pricing tiers, and FAQ
+{% endcomment %}
+
+<div class="membership-page section-spacing">
+  <div class="container">
+
+    {%- comment -%} Page Header {%- endcomment -%}
+    <div class="page-header text-center">
+      <h1 class="page-title">{{ section.settings.page_title }}</h1>
+    </div>
+
+    {%- comment -%} Hero Section {%- endcomment -%}
+    <div class="membership-hero">
+      <h2>{{ section.settings.hero_title }}</h2>
+      <p>{{ section.settings.hero_description }}</p>
+    </div>
+
+    {%- comment -%} Benefits Section {%- endcomment -%}
+    {% if section.blocks.size > 0 %}
+      <div class="membership-benefits">
+        <h3 class="section-heading">{{ section.settings.benefits_title }}</h3>
+        <div class="benefits-grid">
+          {% for block in section.blocks %}
+            {% if block.type == 'benefit' %}
+              <div class="benefit-card" {{ block.shopify_attributes }}>
+                <h4>{{ block.settings.title }}</h4>
+                <p>{{ block.settings.description }}</p>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {%- comment -%} Pricing Section {%- endcomment -%}
+    <div class="membership-pricing">
+      <h3 class="section-heading text-center">{{ section.settings.pricing_title }}</h3>
+      <div class="pricing-cards">
+
+        {%- comment -%} Annual Membership {%- endcomment -%}
+        <div class="pricing-card">
+          <h4>{{ section.settings.annual_title }}</h4>
+          <p class="price">{{ section.settings.annual_price }}</p>
+          <p class="price-description">{{ section.settings.annual_description }}</p>
+          <div class="features-list">
+            {{ section.settings.annual_features }}
+          </div>
+          <a href="{{ section.settings.annual_button_url }}" class="btn-primary">
+            {{ section.settings.annual_button_text }}
+          </a>
+        </div>
+
+        {%- comment -%} Business Membership {%- endcomment -%}
+        <div class="pricing-card featured">
+          <div class="featured-badge">{{ section.settings.featured_badge_text }}</div>
+          <h4>{{ section.settings.business_title }}</h4>
+          <p class="price">{{ section.settings.business_price }}</p>
+          <p class="price-description">{{ section.settings.business_description }}</p>
+          <div class="features-list">
+            {{ section.settings.business_features }}
+          </div>
+          <a href="{{ section.settings.business_button_url }}" class="btn-primary">
+            {{ section.settings.business_button_text }}
+          </a>
+        </div>
+      </div>
+    </div>
+
+    {%- comment -%} How It Works Section {%- endcomment -%}
+    <div class="membership-how-it-works">
+      <h3 class="section-heading">{{ section.settings.how_it_works_title }}</h3>
+      <div class="steps-list">
+        <div class="step-item">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>{{ section.settings.step1_title }}</h4>
+            <p>{{ section.settings.step1_description }}</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>{{ section.settings.step2_title }}</h4>
+            <p>{{ section.settings.step2_description }}</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>{{ section.settings.step3_title }}</h4>
+            <p>{{ section.settings.step3_description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {%- comment -%} FAQ Section {%- endcomment -%}
+    <div class="membership-faq">
+      <h3 class="section-heading">{{ section.settings.faq_title }}</h3>
+      <div class="faq-list">
+        {% for block in section.blocks %}
+          {% if block.type == 'faq' %}
+            <div class="faq-item" {{ block.shopify_attributes }}>
+              <h4>{{ block.settings.question }}</h4>
+              <p>{{ block.settings.answer }}</p>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    {%- comment -%} CTA Section {%- endcomment -%}
+    <div class="membership-cta">
+      <h3>{{ section.settings.cta_title }}</h3>
+      <p>{{ section.settings.cta_description }}</p>
+      <a href="{{ section.settings.cta_button_url }}" class="btn-primary btn-large">
+        {{ section.settings.cta_button_text }}
+      </a>
+      <p class="cta-note">
+        {{ section.settings.cta_note }}
+        <a href="{{ section.settings.cta_login_url }}">{{ section.settings.cta_login_text }}</a>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<style>
+.membership-page {
+  font-family: 'Inter', sans-serif;
+}
+
+.membership-page .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.section-spacing {
+  padding: 60px 0;
+}
+
+.page-header {
+  margin-bottom: 40px;
+}
+
+.page-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--cf-deep-blue, #1a365d);
+  margin: 0;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.section-heading {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--cf-deep-blue, #1a365d);
+  margin-bottom: 30px;
+}
+
+/* Hero Section */
+.membership-hero {
+  background: linear-gradient(135deg, var(--cf-deep-blue, #1a365d) 0%, var(--cf-navy, #2d5a87) 100%);
+  color: white;
+  padding: 60px 40px;
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.membership-hero h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+}
+
+.membership-hero p {
+  font-size: 18px;
+  max-width: 700px;
+  margin: 0 auto;
+  opacity: 0.95;
+  line-height: 1.6;
+}
+
+/* Benefits Section */
+.membership-benefits {
+  margin-bottom: 60px;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.benefit-card {
+  background: var(--cf-bg-light, #f8fafc);
+  padding: 24px;
+  border-radius: 8px;
+  border-left: 4px solid var(--cf-coral, #ff6b6b);
+  transition: all 0.3s ease;
+}
+
+.benefit-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.benefit-card h4 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--cf-deep-blue, #1a365d);
+  margin: 0 0 12px 0;
+}
+
+.benefit-card p {
+  color: var(--cf-text-medium, #475569);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Pricing Section */
+.membership-pricing {
+  margin-bottom: 60px;
+}
+
+.pricing-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.pricing-card {
+  background: white;
+  border: 2px solid var(--cf-border, #e2e8f0);
+  border-radius: 12px;
+  padding: 40px 30px;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.pricing-card:hover {
+  border-color: var(--cf-navy, #2d5a87);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+.pricing-card.featured {
+  border-color: var(--cf-coral, #ff6b6b);
+  background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+}
+
+.featured-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--cf-coral, #ff6b6b);
+  color: white;
+  padding: 4px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pricing-card h4 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--cf-deep-blue, #1a365d);
+  margin: 0 0 12px 0;
+}
+
+.pricing-card .price {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--cf-coral, #ff6b6b);
+  margin: 16px 0;
+}
+
+.price-description {
+  color: var(--cf-text-medium, #475569);
+  font-size: 15px;
+  margin-bottom: 24px;
+}
+
+.features-list {
+  text-align: left;
+  margin: 24px 0;
+  padding: 0;
+}
+
+.features-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.features-list li {
+  padding: 10px 0 10px 28px;
+  position: relative;
+  color: var(--cf-text-medium, #475569);
+  line-height: 1.5;
+}
+
+.features-list li:before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--cf-success, #10b981);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* Buttons */
+.btn-primary {
+  display: inline-block;
+  background: var(--cf-navy, #2d5a87);
+  color: white;
+  padding: 14px 28px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: var(--cf-navy-hover, #3d6a9f);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(45, 90, 135, 0.3);
+}
+
+.btn-large {
+  padding: 18px 40px;
+  font-size: 18px;
+}
+
+/* How It Works Section */
+.membership-how-it-works {
+  background: var(--cf-bg-light, #f8fafc);
+  padding: 50px 40px;
+  border-radius: 12px;
+  margin-bottom: 60px;
+}
+
+.steps-list {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.step-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+
+.step-item:last-child {
+  margin-bottom: 0;
+}
+
+.step-number {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  background: var(--cf-coral, #ff6b6b);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  margin-right: 20px;
+}
+
+.step-content h4 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--cf-deep-blue, #1a365d);
+  margin: 0 0 8px 0;
+}
+
+.step-content p {
+  color: var(--cf-text-medium, #475569);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* FAQ Section */
+.membership-faq {
+  margin-bottom: 60px;
+}
+
+.faq-list {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.faq-item {
+  padding: 24px 0;
+  border-bottom: 1px solid var(--cf-border, #e2e8f0);
+}
+
+.faq-item:last-child {
+  border-bottom: none;
+}
+
+.faq-item h4 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--cf-deep-blue, #1a365d);
+  margin: 0 0 12px 0;
+}
+
+.faq-item p {
+  color: var(--cf-text-medium, #475569);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* CTA Section */
+.membership-cta {
+  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+  padding: 60px 40px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.membership-cta h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--cf-deep-blue, #1a365d);
+  margin: 0 0 16px 0;
+}
+
+.membership-cta > p {
+  font-size: 18px;
+  color: var(--cf-text-medium, #475569);
+  margin: 0 0 28px 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta-note {
+  font-size: 15px;
+  color: var(--cf-text-light, #64748b);
+  margin-top: 20px;
+}
+
+.cta-note a {
+  color: var(--cf-navy, #2d5a87);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.cta-note a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 32px;
+  }
+
+  .membership-hero {
+    padding: 40px 24px;
+  }
+
+  .membership-hero h2 {
+    font-size: 24px;
+  }
+
+  .membership-hero p {
+    font-size: 16px;
+  }
+
+  .section-heading {
+    font-size: 24px;
+  }
+
+  .benefits-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pricing-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .pricing-card .price {
+    font-size: 30px;
+  }
+
+  .membership-how-it-works {
+    padding: 40px 24px;
+  }
+
+  .membership-cta {
+    padding: 40px 24px;
+  }
+
+  .membership-cta h3 {
+    font-size: 24px;
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Membership Page",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Page Header"
+    },
+    {
+      "type": "text",
+      "id": "page_title",
+      "label": "Page Title",
+      "default": "Become a Plus Member"
+    },
+    {
+      "type": "header",
+      "content": "Hero Section"
+    },
+    {
+      "type": "text",
+      "id": "hero_title",
+      "label": "Hero Title",
+      "default": "Unlock Exclusive Wholesale Pricing"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_description",
+      "label": "Hero Description",
+      "default": "Join our Plus Membership program and save on every purchase with special wholesale pricing available only to members."
+    },
+    {
+      "type": "header",
+      "content": "Benefits Section"
+    },
+    {
+      "type": "text",
+      "id": "benefits_title",
+      "label": "Benefits Title",
+      "default": "Member Benefits"
+    },
+    {
+      "type": "header",
+      "content": "Pricing - Annual Membership"
+    },
+    {
+      "type": "text",
+      "id": "pricing_title",
+      "label": "Pricing Section Title",
+      "default": "Membership Options"
+    },
+    {
+      "type": "text",
+      "id": "annual_title",
+      "label": "Annual Membership Title",
+      "default": "Annual Membership"
+    },
+    {
+      "type": "text",
+      "id": "annual_price",
+      "label": "Annual Price",
+      "default": "$99/year"
+    },
+    {
+      "type": "text",
+      "id": "annual_description",
+      "label": "Annual Description",
+      "default": "Best value for regular purchasers"
+    },
+    {
+      "type": "html",
+      "id": "annual_features",
+      "label": "Annual Features (HTML list)",
+      "default": "<ul><li>All member benefits</li><li>Unlimited wholesale pricing access</li><li>Priority customer support</li></ul>"
+    },
+    {
+      "type": "text",
+      "id": "annual_button_text",
+      "label": "Annual Button Text",
+      "default": "Sign Up Now"
+    },
+    {
+      "type": "text",
+      "id": "annual_button_url",
+      "label": "Annual Button URL",
+      "default": "/account/register"
+    },
+    {
+      "type": "header",
+      "content": "Pricing - Business Membership"
+    },
+    {
+      "type": "text",
+      "id": "featured_badge_text",
+      "label": "Featured Badge Text",
+      "default": "Most Popular"
+    },
+    {
+      "type": "text",
+      "id": "business_title",
+      "label": "Business Membership Title",
+      "default": "Business Membership"
+    },
+    {
+      "type": "text",
+      "id": "business_price",
+      "label": "Business Price",
+      "default": "$299/year"
+    },
+    {
+      "type": "text",
+      "id": "business_description",
+      "label": "Business Description",
+      "default": "Perfect for restaurants and businesses"
+    },
+    {
+      "type": "html",
+      "id": "business_features",
+      "label": "Business Features (HTML list)",
+      "default": "<ul><li>All annual membership benefits</li><li>Additional bulk pricing discounts</li><li>Dedicated account manager</li><li>Net 30 payment terms available</li></ul>"
+    },
+    {
+      "type": "text",
+      "id": "business_button_text",
+      "label": "Business Button Text",
+      "default": "Contact Sales"
+    },
+    {
+      "type": "text",
+      "id": "business_button_url",
+      "label": "Business Button URL",
+      "default": "/pages/contact"
+    },
+    {
+      "type": "header",
+      "content": "How It Works"
+    },
+    {
+      "type": "text",
+      "id": "how_it_works_title",
+      "label": "How It Works Title",
+      "default": "How It Works"
+    },
+    {
+      "type": "text",
+      "id": "step1_title",
+      "label": "Step 1 Title",
+      "default": "Sign Up"
+    },
+    {
+      "type": "textarea",
+      "id": "step1_description",
+      "label": "Step 1 Description",
+      "default": "Create your account and choose your membership level"
+    },
+    {
+      "type": "text",
+      "id": "step2_title",
+      "label": "Step 2 Title",
+      "default": "Get Verified"
+    },
+    {
+      "type": "textarea",
+      "id": "step2_description",
+      "label": "Step 2 Description",
+      "default": "We'll verify your information (usually within 24 hours)"
+    },
+    {
+      "type": "text",
+      "id": "step3_title",
+      "label": "Step 3 Title",
+      "default": "Start Saving"
+    },
+    {
+      "type": "textarea",
+      "id": "step3_description",
+      "label": "Step 3 Description",
+      "default": "Once approved, you'll immediately see member pricing on all eligible products"
+    },
+    {
+      "type": "header",
+      "content": "FAQ Section"
+    },
+    {
+      "type": "text",
+      "id": "faq_title",
+      "label": "FAQ Title",
+      "default": "Frequently Asked Questions"
+    },
+    {
+      "type": "header",
+      "content": "Call to Action"
+    },
+    {
+      "type": "text",
+      "id": "cta_title",
+      "label": "CTA Title",
+      "default": "Ready to Start Saving?"
+    },
+    {
+      "type": "textarea",
+      "id": "cta_description",
+      "label": "CTA Description",
+      "default": "Join thousands of foodservice professionals who trust Celebrate Festival for their equipment needs."
+    },
+    {
+      "type": "text",
+      "id": "cta_button_text",
+      "label": "CTA Button Text",
+      "default": "Create Your Account"
+    },
+    {
+      "type": "text",
+      "id": "cta_button_url",
+      "label": "CTA Button URL",
+      "default": "/account/register"
+    },
+    {
+      "type": "text",
+      "id": "cta_note",
+      "label": "CTA Note Text",
+      "default": "Already have an account?"
+    },
+    {
+      "type": "text",
+      "id": "cta_login_text",
+      "label": "CTA Login Link Text",
+      "default": "Log in"
+    },
+    {
+      "type": "text",
+      "id": "cta_login_url",
+      "label": "CTA Login URL",
+      "default": "/account/login"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Member Benefit",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Benefit Title",
+          "default": "Exclusive Wholesale Pricing"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Benefit Description",
+          "default": "Access special member-only prices on thousands of products"
+        }
+      ]
+    },
+    {
+      "type": "faq",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "Who can become a Plus Member?"
+        },
+        {
+          "type": "textarea",
+          "id": "answer",
+          "label": "Answer",
+          "default": "Any registered business, restaurant, caterer, or professional in the foodservice industry can apply for Plus Membership."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Membership Page",
+      "blocks": [
+        {
+          "type": "benefit",
+          "settings": {
+            "title": "Exclusive Wholesale Pricing",
+            "description": "Access special member-only prices on thousands of products"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "title": "Additional Savings",
+            "description": "Save 2% or more on select items with Plus Member pricing"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "title": "Priority Support",
+            "description": "Get dedicated customer service and faster response times"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "title": "Early Access",
+            "description": "Be first to know about new products and special promotions"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "title": "Free Shipping",
+            "description": "Enjoy free shipping on qualifying orders"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "title": "Exclusive Deals",
+            "description": "Access member-only sales and promotions throughout the year"
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "Who can become a Plus Member?",
+            "answer": "Any registered business, restaurant, caterer, or professional in the foodservice industry can apply for Plus Membership."
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "How much can I save?",
+            "answer": "Savings vary by product, but most members save 2-15% on their purchases with wholesale pricing. High-volume buyers can save even more with our Business Membership tier."
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "Is there a minimum order requirement?",
+            "answer": "No, there are no minimum order requirements. You'll see member pricing on every qualifying item regardless of order size."
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "Can I cancel my membership?",
+            "answer": "Yes, you can cancel anytime. Memberships are non-refundable but will remain active until the end of your billing period."
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "How do I see member pricing?",
+            "answer": "Once logged in with an active membership, you'll automatically see member pricing displayed on all product pages and in your cart."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,14 @@
+{
+  "sections": {
+    "brands": {
+      "type": "page-brands",
+      "settings": {
+        "page_title": "Shop by Brand",
+        "page_subtitle": "Browse our extensive collection of trusted brands in commercial restaurant equipment and supplies."
+      }
+    }
+  },
+  "order": [
+    "brands"
+  ]
+}

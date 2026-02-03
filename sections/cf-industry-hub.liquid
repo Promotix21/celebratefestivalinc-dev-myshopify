@@ -1,0 +1,414 @@
+{% comment %}
+  CF Industry Hub Section
+  Displays industry-specific equipment grids based on the page handle
+  Handles: pizza-restaurants, italian-restaurants, french-bistros, fast-casual, indian-restaurants, bakery-cafe
+{% endcomment %}
+
+{%- liquid
+  assign page_handle = page.handle | downcase
+  assign industry_title = page.title | default: 'Industry Equipment'
+  assign industry_subtitle = ''
+
+  # Detect which industry this is
+  assign is_pizza = false
+  assign is_italian = false
+  assign is_french = false
+  assign is_fastcasual = false
+  assign is_indian = false
+  assign is_bakery = false
+
+  if page_handle contains 'pizza'
+    assign is_pizza = true
+    assign industry_title = 'Pizza Restaurant Equipment'
+    assign industry_subtitle = 'Complete solutions for pizzerias from dough preparation to wood-fired perfection'
+  elsif page_handle contains 'italian'
+    assign is_italian = true
+    assign industry_title = 'Italian Restaurant Equipment'
+    assign industry_subtitle = 'Authentic equipment for pasta making, sauce preparation, and fine Italian cuisine'
+  elsif page_handle contains 'french' or page_handle contains 'bistro'
+    assign is_french = true
+    assign industry_title = 'French Bistro Equipment'
+    assign industry_subtitle = 'Precision cooking equipment for fine French cuisine and artisanal preparations'
+  elsif page_handle contains 'fast-casual' or page_handle contains 'fastcasual'
+    assign is_fastcasual = true
+    assign industry_title = 'Fast Casual Restaurant Equipment'
+    assign industry_subtitle = 'High-volume equipment designed for speed and consistency in fast-casual dining'
+  elsif page_handle contains 'indian'
+    assign is_indian = true
+    assign industry_title = 'Indian Restaurant Equipment'
+    assign industry_subtitle = 'Authentic tandoors and specialty equipment for traditional Indian cooking methods'
+  elsif page_handle contains 'bakery' or page_handle contains 'cafe'
+    assign is_bakery = true
+    assign industry_title = 'Bakery & Cafe Equipment'
+    assign industry_subtitle = 'Professional baking equipment and display solutions for bakeries and coffee shops'
+  endif
+-%}
+
+<style>
+  .cf-industry-hub {
+    padding: 0;
+    background: var(--cf-bg-light, #f8fafc);
+  }
+
+  .cf-industry-hub__hero {
+    background: linear-gradient(135deg, var(--cf-deep-blue, #1a365d) 0%, #0f172a 100%);
+    padding: 60px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cf-industry-hub__hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+  }
+
+  .cf-industry-hub__hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .cf-industry-hub__icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  .cf-industry-hub__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 12px;
+  }
+
+  .cf-industry-hub__subtitle {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .cf-industry-hub__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+
+  .cf-industry-hub__section-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--cf-deep-blue, #1a365d);
+    margin: 0 0 30px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .cf-industry-hub__section-title::before {
+    content: '';
+    width: 4px;
+    height: 28px;
+    background: linear-gradient(180deg, var(--cf-coral, #ff6b6b) 0%, var(--cf-navy, #2d5a87) 100%);
+    border-radius: 2px;
+  }
+
+  .cf-industry-hub__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-bottom: 50px;
+  }
+
+  .cf-industry-hub__grid--3col {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .cf-industry-hub__card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid var(--cf-border, #e2e8f0);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: block;
+  }
+
+  .cf-industry-hub__card:hover {
+    border-color: var(--cf-navy, #2d5a87);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+  }
+
+  .cf-industry-hub__card-image {
+    aspect-ratio: 1;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .cf-industry-hub__card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .cf-industry-hub__card:hover .cf-industry-hub__card-image img {
+    transform: scale(1.05);
+  }
+
+  /* Product Slideshow Styles */
+  .cf-industry-hub__slideshow {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .cf-industry-hub__slideshow-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+    background: #f8fafc;
+    padding: 10px;
+  }
+
+  .cf-industry-hub__slideshow-img.active {
+    opacity: 1;
+  }
+
+  .cf-industry-hub__card:hover .cf-industry-hub__slideshow-img {
+    transform: scale(1.05);
+  }
+
+  .cf-industry-hub__card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(26, 54, 93, 0.85);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cf-industry-hub__card:hover .cf-industry-hub__card-overlay {
+    opacity: 1;
+  }
+
+  .cf-industry-hub__card-overlay-text {
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    text-align: center;
+    padding: 10px;
+  }
+
+  .cf-industry-hub__card-content {
+    padding: 20px;
+    text-align: center;
+  }
+
+  .cf-industry-hub__card-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--cf-text-dark, #0f172a);
+    margin: 0 0 12px;
+  }
+
+  .cf-industry-hub__card-btn {
+    display: inline-block;
+    padding: 8px 20px;
+    background: var(--cf-navy, #2d5a87);
+    color: #fff;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.3s ease;
+  }
+
+  .cf-industry-hub__card:hover .cf-industry-hub__card-btn {
+    background: var(--cf-coral, #ff6b6b);
+  }
+
+  .cf-industry-hub__cta {
+    background: linear-gradient(135deg, var(--cf-deep-blue, #1a365d) 0%, #0f172a 100%);
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .cf-industry-hub__cta-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 12px;
+  }
+
+  .cf-industry-hub__cta-text {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0 0 24px;
+  }
+
+  .cf-industry-hub__cta-btn {
+    display: inline-block;
+    padding: 14px 32px;
+    background: var(--cf-coral, #ff6b6b);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .cf-industry-hub__cta-btn:hover {
+    background: #e85555;
+    transform: translateY(-2px);
+  }
+
+  /* Responsive */
+  @media (max-width: 1200px) {
+    .cf-industry-hub__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .cf-industry-hub__grid--3col {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .cf-industry-hub__hero {
+      padding: 40px 20px;
+    }
+    .cf-industry-hub__title {
+      font-size: 28px;
+    }
+    .cf-industry-hub__grid,
+    .cf-industry-hub__grid--3col {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .cf-industry-hub__card-content {
+      padding: 16px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .cf-industry-hub__grid,
+    .cf-industry-hub__grid--3col {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<section class="cf-industry-hub">
+  <div class="cf-industry-hub__hero">
+    <div class="cf-industry-hub__hero-content">
+      {% if is_pizza %}<div class="cf-industry-hub__icon">🍕</div>{% endif %}
+      {% if is_italian %}<div class="cf-industry-hub__icon">🍝</div>{% endif %}
+      {% if is_french %}<div class="cf-industry-hub__icon">🥖</div>{% endif %}
+      {% if is_fastcasual %}<div class="cf-industry-hub__icon">🍔</div>{% endif %}
+      {% if is_indian %}<div class="cf-industry-hub__icon">🍛</div>{% endif %}
+      {% if is_bakery %}<div class="cf-industry-hub__icon">🧁</div>{% endif %}
+      <h1 class="cf-industry-hub__title">{{ industry_title }}</h1>
+      {% if industry_subtitle != blank %}
+        <p class="cf-industry-hub__subtitle">{{ industry_subtitle }}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="cf-industry-hub__container">
+    {%- if is_pizza -%}
+      {%- render 'cf-industry-pizza' -%}
+    {%- elsif is_italian -%}
+      {%- render 'cf-industry-italian' -%}
+    {%- elsif is_french -%}
+      {%- render 'cf-industry-french' -%}
+    {%- elsif is_fastcasual -%}
+      {%- render 'cf-industry-fastcasual' -%}
+    {%- elsif is_indian -%}
+      {%- render 'cf-industry-indian' -%}
+    {%- elsif is_bakery -%}
+      {%- render 'cf-industry-bakery' -%}
+    {%- else -%}
+      <p style="text-align: center; color: #666;">Industry page not configured. Please check the page handle.</p>
+    {%- endif -%}
+
+    <div class="cf-industry-hub__cta">
+      <h3 class="cf-industry-hub__cta-title">Need Help Choosing Equipment?</h3>
+      <p class="cf-industry-hub__cta-text">Our equipment experts can help you select the perfect setup for your business.</p>
+      <a href="/pages/contact" class="cf-industry-hub__cta-btn">Get Free Consultation</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Product Image Slideshow for Industry Hub Cards
+  document.addEventListener('DOMContentLoaded', function() {
+    const slideshows = document.querySelectorAll('.cf-industry-hub__slideshow');
+
+    slideshows.forEach(function(slideshow) {
+      const images = slideshow.querySelectorAll('.cf-industry-hub__slideshow-img');
+      if (images.length <= 1) return;
+
+      let currentIndex = 0;
+      images[0].classList.add('active');
+
+      setInterval(function() {
+        images[currentIndex].classList.remove('active');
+        currentIndex = (currentIndex + 1) % images.length;
+        images[currentIndex].classList.add('active');
+      }, 2500); // Change image every 2.5 seconds
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "CF Industry Hub",
+  "tag": "section",
+  "class": "section-cf-industry-hub",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Industry Hub Settings"
+    },
+    {
+      "type": "paragraph",
+      "content": "This section automatically detects the industry based on the page handle and displays the appropriate equipment grid."
+    }
+  ],
+  "presets": [
+    {
+      "name": "CF Industry Hub",
+      "category": "Industry Pages"
+    }
+  ]
+}
+{% endschema %}

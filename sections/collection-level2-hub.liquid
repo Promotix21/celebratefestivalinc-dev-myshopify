@@ -27,14 +27,16 @@
 {% endfor %}
 
 {% comment %} Collect L3 collection handles with fallback {% endcomment %}
+{% comment %} FIXED: Menu is source of truth - show ALL items from menu, not just collections with products {% endcomment %}
 {% assign l3_collection_handles = '' %}
+{% assign l3_menu_titles = '' %}
 {% assign handle_mappings = 'meat-processing-equipment:new-theme-meat-process-equipment,vegetable-slicers-and-cutters-2:new-theme-vegetable-slicers-and-cutters,rice-cooker:new-theme-rice-cooker,commercial-can-openers:new-theme-commercial-can-openers,stainless-steel-work-tables-with-undershelves-1:new-theme-stainless-steel-work-tables-with-undershelves,stainless-steel-enclosed-base-work-tables-1:new-theme-stainless-steel-work-tables-with-undershelves,open-base-work-tables:new-theme-stainless-steel-work-tables-with-undershelves,equipment-stands-mixer-tables:new-theme-equipment-stands,work-table-preparation-stations:new-theme-preparation-stations' %}
 
 {% if l3_children.size > 0 %}
   {% for child_link in l3_children %}
     {% assign child_handle = child_link.url | split: '/' | last | split: '?' | first %}
+    {% assign menu_title = child_link.title %}
     {% assign child_coll = collections[child_handle] %}
-    {% assign final_coll = nil %}
     {% assign used_handle = child_handle %}
 
     {% assign new_theme_handle = 'new-theme-' | append: child_handle %}
@@ -43,12 +45,10 @@
     {% assign orig_count = child_coll.products_count | default: 0 | plus: 0 %}
     {% assign new_count = new_theme_coll.products_count | default: 0 | plus: 0 %}
 
-    {% if child_coll and orig_count > 0 %}
-      {% assign final_coll = child_coll %}
-    {% elsif new_theme_coll and new_count > 0 %}
-      {% assign final_coll = new_theme_coll %}
+    {% comment %} Try to find best collection handle for filtering {% endcomment %}
+    {% if new_theme_coll and new_count > 0 %}
       {% assign used_handle = new_theme_handle %}
-    {% else %}
+    {% elsif orig_count == 0 %}
       {% assign mappings_array = handle_mappings | split: ',' %}
       {% for mapping in mappings_array %}
         {% assign mapping_parts = mapping | split: ':' %}
@@ -58,7 +58,6 @@
           {% assign mapped_coll = collections[map_to] %}
           {% assign map_count = mapped_coll.products_count | default: 0 | plus: 0 %}
           {% if mapped_coll and map_count > 0 %}
-            {% assign final_coll = mapped_coll %}
             {% assign used_handle = map_to %}
           {% endif %}
           {% break %}
@@ -66,17 +65,19 @@
       {% endfor %}
     {% endif %}
 
-    {% if final_coll %}
-      {% if l3_collection_handles == '' %}
-        {% assign l3_collection_handles = used_handle %}
-      {% else %}
-        {% assign l3_collection_handles = l3_collection_handles | append: ',' | append: used_handle %}
-      {% endif %}
+    {% comment %} ALWAYS add to array - menu is source of truth (no product count check) {% endcomment %}
+    {% if l3_collection_handles == '' %}
+      {% assign l3_collection_handles = used_handle %}
+      {% assign l3_menu_titles = menu_title %}
+    {% else %}
+      {% assign l3_collection_handles = l3_collection_handles | append: '|||' | append: used_handle %}
+      {% assign l3_menu_titles = l3_menu_titles | append: '|||' | append: menu_title %}
     {% endif %}
   {% endfor %}
 {% endif %}
 
-{% assign l3_handle_array = l3_collection_handles | split: ',' %}
+{% assign l3_handle_array = l3_collection_handles | split: '|||' %}
+{% assign l3_title_array = l3_menu_titles | split: '|||' %}
 
 {% comment %} Calculate totals {% endcomment %}
 {% assign total_l3_products = 0 %}
@@ -366,6 +367,21 @@
 
 .cf-plp__pill.active .cf-plp__pill-count {
   background: rgba(255,255,255,0.2);
+}
+
+/* Pill Link (navigates to another page instead of filtering) */
+.cf-plp__pill--link {
+  text-decoration: none;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+  border-color: var(--primary-red);
+  color: var(--primary-red);
+}
+
+.cf-plp__pill--link:hover {
+  background: var(--primary-red);
+  border-color: var(--primary-red);
+  color: white;
+  text-decoration: none;
 }
 
 /* Main Container */
@@ -1101,6 +1117,27 @@
   border-style: solid;
 }
 
+/* Call for Details Prompt - MAP Compliance for non-CF vendors */
+.cf-plp__call-prompt {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--deep-blue);
+  font-size: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.cf-plp__call-prompt:hover {
+  background: linear-gradient(135deg, var(--deep-blue) 0%, var(--primary-blue) 100%);
+  color: white;
+  border-color: var(--deep-blue);
+}
+
 /* Shipping Badge */
 .cf-plp__shipping {
   display: inline-block;
@@ -1315,9 +1352,398 @@
   justify-content: center;
   color: var(--text-muted);
 }
+
+/* ============================================
+   COMPACT MODE - 5 Columns (Scaled Down)
+   ============================================ */
+.cf-plp--compact .cf-plp__pills {
+  padding: 10px 30px;
+  gap: 8px;
+}
+
+.cf-plp--compact .cf-plp__pills-label {
+  font-size: 11px;
+}
+
+.cf-plp--compact .cf-plp__pill {
+  padding: 6px 12px;
+  font-size: 11px;
+  border-radius: 20px;
+}
+
+.cf-plp--compact .cf-plp__container {
+  gap: 20px;
+}
+
+.cf-plp--compact .cf-plp__sidebar {
+  width: 220px;
+  padding: 16px;
+}
+
+.cf-plp--compact .cf-plp__filters-title {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.cf-plp--compact .cf-plp__filter-group {
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+}
+
+.cf-plp--compact .cf-plp__filter-title {
+  font-size: 11px;
+  padding: 0;
+  margin: 0 0 6px;
+}
+
+.cf-plp--compact .cf-plp__filter-options li {
+  margin-bottom: 4px;
+}
+
+.cf-plp--compact .cf-plp__filter-option {
+  font-size: 11px;
+  padding: 2px 0;
+  gap: 6px;
+}
+
+.cf-plp--compact .cf-plp__filter-option input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+}
+
+.cf-plp--compact .cf-plp__products-area {
+  padding: 16px 20px;
+}
+
+.cf-plp--compact .cf-plp__grid {
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+
+.cf-plp--compact .cf-plp__card {
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.cf-plp--compact .cf-plp__card-badge {
+  top: 10px;
+  left: 10px;
+  font-size: 9px;
+  padding: 3px 8px;
+}
+
+.cf-plp--compact .cf-plp__card-image-wrap {
+  height: 120px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+}
+
+.cf-plp--compact .cf-plp__card-category {
+  font-size: 9px;
+  padding: 3px 8px;
+  margin-bottom: 6px;
+}
+
+.cf-plp--compact .cf-plp__card-title {
+  font-size: 11px;
+  margin-bottom: 6px;
+  line-height: 1.35;
+  min-height: calc(11px * 1.35 * 2);
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cf-plp--compact .cf-plp__card-sku {
+  font-size: 9px;
+  margin-bottom: 4px;
+}
+
+.cf-plp--compact .cf-plp__price-box {
+  padding: 8px 6px;
+  border-radius: 6px;
+}
+
+.cf-plp--compact .cf-plp__price-label {
+  font-size: 9px;
+  margin-bottom: 2px;
+}
+
+.cf-plp--compact .cf-plp__price-main {
+  font-size: 15px;
+}
+
+.cf-plp--compact .cf-plp__price-regular {
+  font-size: 10px;
+}
+
+.cf-plp--compact .cf-plp__shipping {
+  font-size: 9px;
+  padding: 4px 8px;
+  margin-top: 6px;
+}
+
+.cf-plp--compact .cf-plp__cart-row {
+  margin-top: 8px;
+  gap: 6px;
+}
+
+.cf-plp--compact .cf-plp__qty-input {
+  width: 50px;
+  padding: 6px 4px;
+  font-size: 11px;
+}
+
+.cf-plp--compact .cf-plp__add-btn {
+  padding: 8px 10px;
+  font-size: 10px;
+}
+
+.cf-plp--compact .cf-plp__variants-badge {
+  padding: 3px 8px;
+  font-size: 9px;
+}
+
+/* Compact toolbar */
+.cf-plp--compact .cf-plp__toolbar-compact {
+  padding: 10px 20px;
+}
+
+.cf-plp--compact .cf-plp__toolbar-compact__left {
+  flex: 1;
+  min-width: 0;
+}
+
+.cf-plp--compact .cf-plp__active-filters-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cf-plp--compact .cf-plp__active-filters-label {
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.cf-plp--compact .cf-plp__active-filters-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.cf-plp--compact .cf-plp__clear-all {
+  padding: 4px 8px;
+  font-size: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.cf-plp--compact .cf-plp__filter-chip {
+  padding: 3px 8px;
+  font-size: 10px;
+  gap: 4px;
+  border-radius: 12px;
+}
+
+.cf-plp--compact .cf-plp__filter-chip-remove {
+  width: 12px;
+  height: 12px;
+  font-size: 8px;
+}
+
+.cf-plp--compact .cf-plp__results-count {
+  font-size: 12px;
+}
+
+.cf-plp--compact .cf-plp__sort label {
+  display: none;
+}
+
+.cf-plp--compact .cf-plp__sort select {
+  font-size: 11px;
+  padding: 6px 10px;
+}
+
+/* View toggle - icons only in compact mode */
+.cf-plp--compact .cf-plp__view-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  justify-content: center;
+}
+
+.cf-plp--compact .cf-plp__view-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Hide text in view toggle buttons */
+.cf-plp--compact .cf-plp__view-btn {
+  font-size: 0;
+  gap: 0;
+}
+
+/* Compact pagination */
+.cf-plp--compact .cf-plp__pagination {
+  padding: 16px;
+  gap: 6px;
+}
+
+.cf-plp--compact .cf-plp__page-btn {
+  width: 32px;
+  height: 32px;
+  font-size: 12px;
+}
+
+/* Mobile Filter Button */
+.cf-plp__mobile-filter-btn {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--deep-blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cf-plp__mobile-filter-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Mobile Filter Drawer */
+.cf-plp__mobile-filter-drawer {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+}
+
+.cf-plp__mobile-filter-drawer.active {
+  display: block;
+}
+
+.cf-plp__mobile-filter-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+}
+
+.cf-plp__mobile-filter-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 280px;
+  max-width: 85%;
+  height: 100%;
+  background: white;
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.cf-plp__mobile-filter-drawer.active .cf-plp__mobile-filter-panel {
+  transform: translateX(0);
+}
+
+.cf-plp__mobile-filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--deep-blue);
+  color: white;
+}
+
+.cf-plp__mobile-filter-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cf-plp__mobile-filter-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.cf-plp__mobile-filter-content {
+  padding: 12px 16px;
+}
+
+.cf-plp__mobile-filter-apply {
+  position: sticky;
+  bottom: 0;
+  padding: 12px 16px;
+  background: white;
+  border-top: 1px solid var(--border-color);
+}
+
+.cf-plp__mobile-filter-apply button {
+  width: 100%;
+  padding: 12px;
+  background: var(--primary-red);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Compact responsive adjustments */
+@media (max-width: 1400px) {
+  .cf-plp--compact .cf-plp__grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 1100px) {
+  .cf-plp--compact .cf-plp__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .cf-plp--compact .cf-plp__sidebar {
+    display: none;
+  }
+  .cf-plp--compact .cf-plp__mobile-filter-btn {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 768px) {
+  .cf-plp--compact .cf-plp__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .cf-plp--compact .cf-plp__card {
+    padding: 10px;
+  }
+  .cf-plp--compact .cf-plp__card-image-wrap {
+    height: 100px;
+  }
+}
 </style>
 
-<div class="cf-plp" data-section-id="{{ section.id }}">
+<div class="cf-plp{% if section.settings.compact_mode %} cf-plp--compact{% endif %}" data-section-id="{{ section.id }}">
 
   {% comment %} Compact Header Row 1: Breadcrumb (left) | Title (right) {% endcomment %}
   <header class="cf-plp__header-compact">
@@ -1343,7 +1769,7 @@
     <h1 class="cf-plp__title-compact">{{ collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</h1>
   </header>
 
-  {% comment %} L3 Filter Pills (L2 only) {% endcomment %}
+  {% comment %} L3 Filter Pills (L2 only) - Menu is source of truth {% endcomment %}
   {% if l3_handle_array.size > 0 %}
     <nav class="cf-plp__pills" aria-label="Filter by category">
       <span class="cf-plp__pills-label">Subcategory:</span>
@@ -1354,13 +1780,20 @@
 
       {% for handle in l3_handle_array %}
         {% assign handle_clean = handle | strip %}
+        {% assign pill_index = forloop.index0 %}
+        {% assign pill_title = l3_title_array[pill_index] | default: handle_clean %}
         {% if handle_clean != blank %}
-          {% assign pill_coll = collections[handle_clean] %}
-          {% comment %} BUG-020 FIX: Remove common prefixes to match menu labels {% endcomment %}
-          {% assign pill_title = pill_coll.title | remove: 'New Theme - ' | remove: 'New Theme- ' | remove: 'NT - ' | remove: 'Serve-ware Collection: ' | remove: 'Serveware: ' | remove: 'Indian Specialty - ' | remove: 'Restaurant - ' %}
-          <button type="button" class="cf-plp__pill" data-filter="{{ handle_clean }}">
-            {{ pill_title }}
-          </button>
+          {% comment %} Special case: Indian Specialty pills link to L1 page instead of filtering {% endcomment %}
+          {% assign pill_title_lower = pill_title | downcase %}
+          {% if pill_title_lower contains 'indian specialty' %}
+            <a href="/collections/indian-specialty" class="cf-plp__pill cf-plp__pill--link">
+              {{ pill_title }}
+            </a>
+          {% else %}
+            <button type="button" class="cf-plp__pill" data-filter="{{ handle_clean }}">
+              {{ pill_title }}
+            </button>
+          {% endif %}
         {% endif %}
       {% endfor %}
     </nav>
@@ -1678,8 +2111,16 @@
           </div>
         </div>
 
-        <!-- Right Side: View Toggle + Sort -->
+        <!-- Right Side: Mobile Filter + View Toggle + Sort -->
         <div class="cf-plp__toolbar-compact__right">
+          <button type="button" class="cf-plp__mobile-filter-btn" id="mobile-filter-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="4" y1="6" x2="20" y2="6"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+              <line x1="11" y1="18" x2="13" y2="18"></line>
+            </svg>
+            Filters
+          </button>
           <div class="cf-plp__view-toggle">
             <button class="cf-plp__view-btn active" data-view="grid">
               <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
@@ -1753,7 +2194,7 @@
                     <span class="cf-plp__card-badge">Sale</span>
                   {% endif %}
 
-                  <a href="{{ product.url }}" class="cf-plp__card-image-wrap">
+                  <a href="{{ product.url }}?variant={{ product.variants.first.id }}" class="cf-plp__card-image-wrap">
                     {% if product.featured_image %}
                       <img src="{{ product.featured_image | image_url: width: 320 }}"
                            alt="{{ product.title }}"
@@ -1783,7 +2224,7 @@
                   <div class="cf-plp__card-content">
                     <span class="cf-plp__card-category">{{ l3_category | truncate: 25 }}</span>
 
-                    <a href="{{ product.url }}" class="cf-plp__card-title">
+                    <a href="{{ product.url }}?variant={{ product.variants.first.id }}" class="cf-plp__card-title" title="{{ product.title | escape }}">
                       {{ product.title }}
                     </a>
 
@@ -1802,15 +2243,19 @@
                       {% assign is_member = false %}
                       {% if customer %}
                         {% assign is_logged_in = true %}
-                        {% if customer.tags contains 'plus-member' or customer.tags contains 'wholesale' or customer.tags contains 'member' %}
-                          {% assign is_member = true %}
-                        {% endif %}
+                        {% for tag in customer.tags %}
+                          {% assign tag_lower = tag | downcase %}
+                          {% if tag_lower contains 'wholesale' or tag_lower contains 'plus' or tag_lower contains 'member' or tag_lower contains 'cph' or tag_lower contains 'rou' or tag_lower contains 'margin' %}
+                            {% assign is_member = true %}
+                            {% break %}
+                          {% endif %}
+                        {% endfor %}
                       {% endif %}
 
                       {% if is_logged_in and is_member %}
                         {% comment %} Member view - show member price {% endcomment %}
                         {% if product.compare_at_price > product.price %}
-                          <div class="cf-plp__price-label">Plus Member Sale</div>
+                          <div class="cf-plp__price-label">Member Price</div>
                           <div class="cf-plp__price-main">
                             {{ product.price | money }}<span class="cf-plp__price-unit">/Each</span>
                           </div>
@@ -1818,26 +2263,36 @@
                             Was {{ product.compare_at_price | money }}
                           </div>
                         {% else %}
-                          <div class="cf-plp__price-label">Plus Member Price</div>
+                          <div class="cf-plp__price-label">Member Price</div>
                           <div class="cf-plp__price-main">
                             {{ product.price | money }}<span class="cf-plp__price-unit">/Each</span>
                           </div>
                         {% endif %}
                       {% else %}
-                        {% comment %} Non-member view - show regular price + login prompt {% endcomment %}
-                        <div class="cf-plp__price-label">Price</div>
+                        {% comment %} Non-member view - show RETAIL price (compare_at_price) + vendor-specific CTA {% endcomment %}
+                        {% assign retail_price = product.price %}
+                        {% if product.compare_at_price > product.price %}
+                          {% assign retail_price = product.compare_at_price %}
+                        {% endif %}
+                        <div class="cf-plp__price-label">Retail Price</div>
                         <div class="cf-plp__price-main">
-                          {{ product.price | money }}<span class="cf-plp__price-unit">/Each</span>
+                          {{ retail_price | money }}<span class="cf-plp__price-unit">/Each</span>
                         </div>
-                        {% comment %} Only show login prompt for Celebrate Festival Inc products {% endcomment %}
+                        {% comment %} Vendor-specific CTAs for non-members {% endcomment %}
                         {% assign vendor_lower = product.vendor | downcase %}
                         {% assign is_own_brand = false %}
                         {% if vendor_lower contains 'celebrate festival' %}
                           {% assign is_own_brand = true %}
                         {% endif %}
                         {% if is_own_brand %}
-                          <a href="/account/login?return_url={{ request.path | url_param_escape }}" class="cf-plp__login-prompt">
+                          {% comment %} CF Inc products - Show login CTA {% endcomment %}
+                          <a href="/account/login?return_url={{ request.path }}{% if request.query_string != blank %}%3F{{ request.query_string | url_param_escape }}{% endif %}" class="cf-plp__login-prompt">
                             🔒 Login for member pricing
+                          </a>
+                        {% else %}
+                          {% comment %} Other vendor products - Show call for details CTA (MAP compliance) {% endcomment %}
+                          <a href="tel:+14086739999" class="cf-plp__call-prompt">
+                            📞 Call for More Details - (408) 673-9999
                           </a>
                         {% endif %}
                       {% endif %}
@@ -1884,7 +2339,7 @@
                 <span class="cf-plp__card-badge">Sale</span>
               {% endif %}
 
-              <a href="{{ product.url }}" class="cf-plp__card-image-wrap">
+              <a href="{{ product.url }}?variant={{ product.variants.first.id }}" class="cf-plp__card-image-wrap">
                 {% if product.featured_image %}
                   <img src="{{ product.featured_image | image_url: width: 320 }}"
                        alt="{{ product.title }}"
@@ -1902,7 +2357,7 @@
               </a>
 
               <div class="cf-plp__card-content">
-                <a href="{{ product.url }}" class="cf-plp__card-title">
+                <a href="{{ product.url }}?variant={{ product.variants.first.id }}" class="cf-plp__card-title" title="{{ product.title | escape }}">
                   {{ product.title }}
                 </a>
 
@@ -1921,15 +2376,19 @@
                   {% assign is_member = false %}
                   {% if customer %}
                     {% assign is_logged_in = true %}
-                    {% if customer.tags contains 'plus-member' or customer.tags contains 'wholesale' or customer.tags contains 'member' %}
-                      {% assign is_member = true %}
-                    {% endif %}
+                    {% for tag in customer.tags %}
+                      {% assign tag_lower = tag | downcase %}
+                      {% if tag_lower contains 'wholesale' or tag_lower contains 'plus' or tag_lower contains 'member' or tag_lower contains 'cph' or tag_lower contains 'rou' or tag_lower contains 'margin' %}
+                        {% assign is_member = true %}
+                        {% break %}
+                      {% endif %}
+                    {% endfor %}
                   {% endif %}
 
                   {% if is_logged_in and is_member %}
                     {% comment %} Member view - show member price {% endcomment %}
                     {% if product.compare_at_price > product.price %}
-                      <div class="cf-plp__price-label">Plus Member Sale</div>
+                      <div class="cf-plp__price-label">Member Price</div>
                       <div class="cf-plp__price-main">
                         {{ product.price | money }}<span class="cf-plp__price-unit">/Each</span>
                       </div>
@@ -1937,26 +2396,36 @@
                         Was {{ product.compare_at_price | money }}
                       </div>
                     {% else %}
-                      <div class="cf-plp__price-label">Plus Member Price</div>
+                      <div class="cf-plp__price-label">Member Price</div>
                       <div class="cf-plp__price-main">
                         {{ product.price | money }}<span class="cf-plp__price-unit">/Each</span>
                       </div>
                     {% endif %}
                   {% else %}
-                    {% comment %} Non-member view - show regular price + login prompt {% endcomment %}
-                    <div class="cf-plp__price-label">Price</div>
+                    {% comment %} Non-member view - show RETAIL price (compare_at_price) + vendor-specific CTA {% endcomment %}
+                    {% assign retail_price = product.price %}
+                    {% if product.compare_at_price > product.price %}
+                      {% assign retail_price = product.compare_at_price %}
+                    {% endif %}
+                    <div class="cf-plp__price-label">Retail Price</div>
                     <div class="cf-plp__price-main">
-                      {{ product.price | money }}<span class="cf-plp__price-unit">/Each</span>
+                      {{ retail_price | money }}<span class="cf-plp__price-unit">/Each</span>
                     </div>
-                    {% comment %} Only show login prompt for Celebrate Festival Inc products {% endcomment %}
+                    {% comment %} Vendor-specific CTAs for non-members {% endcomment %}
                     {% assign vendor_lower = product.vendor | downcase %}
                     {% assign is_own_brand = false %}
                     {% if vendor_lower contains 'celebrate festival' %}
                       {% assign is_own_brand = true %}
                     {% endif %}
                     {% if is_own_brand %}
-                      <a href="/account/login?return_url={{ request.path | url_param_escape }}" class="cf-plp__login-prompt">
+                      {% comment %} CF Inc products - Show login CTA {% endcomment %}
+                      <a href="/account/login?return_url={{ request.path }}{% if request.query_string != blank %}%3F{{ request.query_string | url_param_escape }}{% endif %}" class="cf-plp__login-prompt">
                         🔒 Login for member pricing
+                      </a>
+                    {% else %}
+                      {% comment %} Other vendor products - Show call for details CTA (MAP compliance) {% endcomment %}
+                      <a href="tel:+14086739999" class="cf-plp__call-prompt">
+                        📞 Call for More Details - (408) 673-9999
                       </a>
                     {% endif %}
                   {% endif %}
@@ -2022,6 +2491,23 @@
 
     </main>
   </div>
+
+  <!-- Mobile Filter Drawer -->
+  <div class="cf-plp__mobile-filter-drawer" id="mobile-filter-drawer">
+    <div class="cf-plp__mobile-filter-overlay" onclick="closeMobileFilters()"></div>
+    <div class="cf-plp__mobile-filter-panel">
+      <div class="cf-plp__mobile-filter-header">
+        <h3>Filters</h3>
+        <button type="button" class="cf-plp__mobile-filter-close" onclick="closeMobileFilters()">&times;</button>
+      </div>
+      <div class="cf-plp__mobile-filter-content" id="mobile-filter-content">
+        <!-- Filters will be cloned here via JavaScript -->
+      </div>
+      <div class="cf-plp__mobile-filter-apply">
+        <button type="button" onclick="closeMobileFilters()">Apply Filters</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -2039,6 +2525,67 @@ function toggleAboutCategory(btn) {
   } else {
     content.style.maxHeight = '0';
   }
+}
+
+// Mobile Filter Drawer Functions
+function openMobileFilters() {
+  const drawer = document.getElementById('mobile-filter-drawer');
+  const content = document.getElementById('mobile-filter-content');
+  const sidebar = document.querySelector('.cf-plp__sidebar');
+
+  if (drawer && sidebar && content) {
+    // Clone sidebar content if not already done
+    if (!content.hasChildNodes()) {
+      const clone = sidebar.cloneNode(true);
+      clone.style.display = 'block';
+      clone.style.width = '100%';
+      clone.style.padding = '0';
+      clone.style.background = 'transparent';
+      content.appendChild(clone);
+
+      // Sync checkbox states from original to clone
+      syncFilterStates(sidebar, clone);
+
+      // Add change listeners to cloned checkboxes
+      clone.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', function() {
+          // Find matching checkbox in original sidebar and trigger change
+          const name = this.getAttribute('name');
+          const value = this.getAttribute('value');
+          const original = sidebar.querySelector(`input[name="${name}"][value="${value}"]`);
+          if (original && original.checked !== this.checked) {
+            original.checked = this.checked;
+            original.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        });
+      });
+    } else {
+      // Sync states before showing
+      syncFilterStates(sidebar, content.firstChild);
+    }
+
+    drawer.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeMobileFilters() {
+  const drawer = document.getElementById('mobile-filter-drawer');
+  if (drawer) {
+    drawer.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+}
+
+function syncFilterStates(source, target) {
+  source.querySelectorAll('input[type="checkbox"]').forEach(sourceCb => {
+    const name = sourceCb.getAttribute('name');
+    const value = sourceCb.getAttribute('value');
+    const targetCb = target.querySelector(`input[name="${name}"][value="${value}"]`);
+    if (targetCb) {
+      targetCb.checked = sourceCb.checked;
+    }
+  });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -2691,7 +3238,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Show toast notification instead of cart drawer
         if (typeof window.cfShowCartToast === 'function') {
-          window.cfShowCartToast(data, quantity);
+          window.cfShowCartToast(data, qty);
         }
 
         setTimeout(() => {
@@ -2719,6 +3266,12 @@ document.addEventListener('DOMContentLoaded', function() {
     url.searchParams.set('sort_by', value);
     window.location = url;
   };
+
+  // Mobile Filter Button
+  const mobileFilterBtn = document.getElementById('mobile-filter-btn');
+  if (mobileFilterBtn) {
+    mobileFilterBtn.addEventListener('click', openMobileFilters);
+  }
 
   // Initialize
   initProductData();
@@ -2748,6 +3301,13 @@ document.addEventListener('DOMContentLoaded', function() {
       "step": 24,
       "default": 48,
       "label": "Products per page"
+    },
+    {
+      "type": "checkbox",
+      "id": "compact_mode",
+      "label": "Compact Mode (5 columns)",
+      "default": true,
+      "info": "Show 5 products per row with smaller cards"
     }
   ],
   "presets": [

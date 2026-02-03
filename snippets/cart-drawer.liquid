@@ -15,6 +15,34 @@
   .drawer {
     visibility: hidden;
   }
+
+  /* Save for Later Button in Cart Drawer */
+  .cart-save-for-later-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: 4px;
+    padding: 0;
+  }
+
+  .cart-save-for-later-btn:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #2563eb;
+  }
+
+  .cart-save-for-later-btn svg {
+    width: 14px;
+    height: 14px;
+  }
 </style>
 
 <cart-drawer class="drawer{% if cart == empty %} is-empty{% endif %}">
@@ -367,6 +395,25 @@
                                   </span>
                                 </button>
                               </cart-remove-button>
+                              <button
+                                type="button"
+                                class="button button--tertiary cart-save-for-later-btn"
+                                aria-label="Save for later: {{ item.title | escape }}"
+                                data-save-for-later
+                                data-variant-id="{{ item.variant.id }}"
+                                data-product-id="{{ item.product.id }}"
+                                data-product-title="{{ item.product.title | escape }}"
+                                data-product-handle="{{ item.product.handle }}"
+                                data-product-image="{{ item.image | image_url: width: 400 }}"
+                                data-product-price="{{ item.original_price }}"
+                                data-product-compare-price="{{ item.variant.compare_at_price }}"
+                                data-product-url="{{ item.product.url }}"
+                                title="Save for later"
+                              >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                              </button>
                             </div>
                             {%- if has_qty_rules or has_vol_pricing -%}
                               <button

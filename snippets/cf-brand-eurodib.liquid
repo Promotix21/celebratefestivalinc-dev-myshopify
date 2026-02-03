@@ -1,0 +1,29 @@
+{% comment %} CF Brand: Eurodib {% endcomment %}
+
+{%- liquid
+  assign eurodib_categories = 'eurodib-dishwasher,eurodib-ice-refrigiration,eurodib-mixers,eurodib-kitchen-equipment,eurodib-baking-equipment-page,eurodibt-all' | split: ','
+  assign eurodib_titles = 'Dishwasher,Ice & Refrigeration,Mixers,Kitchen Equipments,Baking Equipment,Eurodib - All' | split: ','
+  assign eurodib_images = 'eurodib_a2ae1639-987f-4bb6-8c75-ae843e0ac119.png,eurodib_a2ae1639-987f-4bb6-8c75-ae843e0ac119.png,eurodib_a2ae1639-987f-4bb6-8c75-ae843e0ac119.png,eurodib_a2ae1639-987f-4bb6-8c75-ae843e0ac119.png,eurodib_a2ae1639-987f-4bb6-8c75-ae843e0ac119.png,eurodib_a2ae1639-987f-4bb6-8c75-ae843e0ac119.png' | split: ','
+-%}
+
+<div class="cf-brand-hub__grid">
+  {%- for handle in eurodib_categories -%}
+    {%- assign idx = forloop.index0 -%}
+    {%- assign title = eurodib_titles[idx] -%}
+    {%- assign image_file = eurodib_images[idx] -%}
+    {%- assign cdn_url = 'https://celebratefestivalinc.com/cdn/shop/files/' | append: image_file | append: '?width=400&height=400&crop=center' -%}
+
+    <a href="/collections/{{ handle }}" class="cf-brand-hub__card">
+      <div class="cf-brand-hub__card-image">
+        <img src="{{ cdn_url }}" alt="{{ title }}" loading="lazy">
+        <div class="cf-brand-hub__card-overlay">
+          <span class="cf-brand-hub__card-overlay-text">{{ title }}</span>
+        </div>
+      </div>
+      <div class="cf-brand-hub__card-content">
+        <h3 class="cf-brand-hub__card-title">{{ title }}</h3>
+        <span class="cf-brand-hub__card-btn">Shop Now</span>
+      </div>
+    </a>
+  {%- endfor -%}
+</div>

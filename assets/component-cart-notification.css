@@ -17,10 +17,12 @@
   right: 0;
   transform: translateY(-100%);
   visibility: hidden;
+  opacity: 0;
   width: 100%;
   box-shadow: var(--popup-shadow-horizontal-offset) var(--popup-shadow-vertical-offset) var(--popup-shadow-blur-radius)
     rgba(var(--color-shadow), var(--popup-shadow-opacity));
   z-index: 1001;
+  pointer-events: none;
 }
 
 .cart-notification.focused {
@@ -59,8 +61,10 @@
 
 .cart-notification.active {
   transform: translateY(0);
-  transition: transform var(--duration-default) ease, visibility 0s;
+  transition: transform var(--duration-default) ease, visibility 0s, opacity var(--duration-default) ease;
   visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .cart-notification__header {

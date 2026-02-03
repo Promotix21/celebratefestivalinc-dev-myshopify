@@ -1,0 +1,31 @@
+{% comment %} CF Brand: Robot Coupe {% endcomment %}
+
+{%- liquid
+  assign robotcoupe_categories = 'robot-coupe-immersion-blenders,robot-coupe-vegetable-preparation-machines,robot-coupe-combination-processors,robot-coupe-cutter-mixer,robot-coupe-blixer,robotcoupe-all,robot-coupe-juice-extractors,robot-coupe-automatic-sieves,robotcoupe-all' | split: ','
+
+  assign robotcoupe_titles = 'Immersion Blenders,Vegetable Preparation Machines,Combination Processor,Cutter Mixer,Blixer,Disc Collection,Juice Extractors,Automatic Sieves,Robot Coupe - All' | split: ','
+
+  assign robotcoupe_images = '5011_MP_paysage_arf_RVB_NB.webp,4712_coupe_legumes_paysage_arsf_RVB_NB.jpg,Ambiance_540x420px-Combine.webp,Ambiance_540x420px-Cutter.webp,Ambiance-540x420px-Blixer.webp,Disques.webp,Extracteur_de_Jus_resize.webp,C80_Ambiance.webp,robot-coupe-logo.jpg' | split: ','
+-%}
+
+<div class="cf-brand-hub__grid">
+  {%- for handle in robotcoupe_categories -%}
+    {%- assign idx = forloop.index0 -%}
+    {%- assign title = robotcoupe_titles[idx] -%}
+    {%- assign image_file = robotcoupe_images[idx] -%}
+    {%- assign cdn_url = 'https://celebratefestivalinc.com/cdn/shop/files/' | append: image_file | append: '?width=400&height=400&crop=center' -%}
+
+    <a href="/collections/{{ handle }}" class="cf-brand-hub__card">
+      <div class="cf-brand-hub__card-image">
+        <img src="{{ cdn_url }}" alt="{{ title }}" loading="lazy">
+        <div class="cf-brand-hub__card-overlay">
+          <span class="cf-brand-hub__card-overlay-text">{{ title }}</span>
+        </div>
+      </div>
+      <div class="cf-brand-hub__card-content">
+        <h3 class="cf-brand-hub__card-title">{{ title }}</h3>
+        <span class="cf-brand-hub__card-btn">Explore All Products</span>
+      </div>
+    </a>
+  {%- endfor -%}
+</div>

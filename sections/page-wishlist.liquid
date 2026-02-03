@@ -1,0 +1,166 @@
+{{ 'wishlist.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'wishlist.js' | asset_url }}" defer></script>
+
+<div class="wishlist-page">
+  <!-- Wishlist Header -->
+  <div class="wishlist-header">
+    <h1 class="wishlist-title">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+      </svg>
+      {{ section.settings.page_title | default: "My Wishlist" }}
+      <span class="wishlist-count" data-wishlist-count>0</span>
+    </h1>
+
+    <div class="wishlist-actions">
+      <button type="button" class="wishlist-clear-btn" onclick="CelebrateFestivalWishlist.clearWishlist()">
+        {{ section.settings.clear_button_text | default: "Clear Wishlist" }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Wishlist Grid (populated by JavaScript) -->
+  <div id="wishlist-grid" class="wishlist-grid"></div>
+
+  <!-- Empty State -->
+  <div id="wishlist-empty" class="wishlist-empty" style="display: none;">
+    <div class="wishlist-empty-icon">
+      <svg width="80" height="80" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+      </svg>
+    </div>
+    <h2 class="wishlist-empty-title">{{ section.settings.empty_title | default: "Your Wishlist is Empty" }}</h2>
+    <p class="wishlist-empty-text">{{ section.settings.empty_text | default: "Start adding products you love to your wishlist!" }}</p>
+    <a href="{{ section.settings.empty_button_link | default: '/collections/all' }}" class="wishlist-empty-btn">
+      {{ section.settings.empty_button_text | default: "Start Shopping" }}
+    </a>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  renderWishlist();
+
+  // Re-render on storage change
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'cf_wishlist') {
+      renderWishlist();
+    }
+  });
+
+  function renderWishlist() {
+    const wishlist = CelebrateFestivalWishlist.getWishlist();
+    const grid = document.getElementById('wishlist-grid');
+    const empty = document.getElementById('wishlist-empty');
+
+    if (wishlist.length === 0) {
+      grid.style.display = 'none';
+      empty.style.display = 'block';
+      return;
+    }
+
+    grid.style.display = 'grid';
+    empty.style.display = 'none';
+
+    grid.innerHTML = wishlist.map(item => {
+      const currentPrice = item.price ? (item.price / 100).toFixed(2) : '0.00';
+      const comparePrice = item.comparePrice && item.comparePrice > item.price
+        ? (item.comparePrice / 100).toFixed(2)
+        : null;
+
+      return `
+        <div class="wishlist-item" data-product-id="${item.id}">
+          <div class="wishlist-item-image">
+            <img src="${item.image || '/cdn/shop/t/1/assets/placeholder.svg'}"
+                 alt="${item.title}"
+                 loading="lazy">
+            <button
+              type="button"
+              class="wishlist-item-remove"
+              onclick="CelebrateFestivalWishlist.removeFromWishlist(${item.id}); renderWishlist();"
+              aria-label="Remove from wishlist"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="wishlist-item-content">
+            <h3 class="wishlist-item-title">${item.title}</h3>
+            <div class="wishlist-item-price">
+              <span class="wishlist-item-price-current">$${currentPrice}</span>
+              ${comparePrice ? `<span class="wishlist-item-price-compare">$${comparePrice}</span>` : ''}
+            </div>
+            <div class="wishlist-item-actions">
+              <a href="${item.url}" class="wishlist-item-view-btn">
+                View Product
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Make renderWishlist available globally
+  window.renderWishlist = renderWishlist;
+});
+</script>
+
+{% schema %}
+{
+  "name": "Wishlist Page",
+  "class": "wishlist-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Page Content"
+    },
+    {
+      "type": "text",
+      "id": "page_title",
+      "label": "Page Title",
+      "default": "My Wishlist"
+    },
+    {
+      "type": "text",
+      "id": "clear_button_text",
+      "label": "Clear Button Text",
+      "default": "Clear Wishlist"
+    },
+    {
+      "type": "header",
+      "content": "Empty State"
+    },
+    {
+      "type": "text",
+      "id": "empty_title",
+      "label": "Empty Title",
+      "default": "Your Wishlist is Empty"
+    },
+    {
+      "type": "textarea",
+      "id": "empty_text",
+      "label": "Empty Description",
+      "default": "Start adding products you love to your wishlist!"
+    },
+    {
+      "type": "text",
+      "id": "empty_button_text",
+      "label": "Empty Button Text",
+      "default": "Start Shopping"
+    },
+    {
+      "type": "url",
+      "id": "empty_button_link",
+      "label": "Empty Button Link",
+      "default": "/collections/all"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Wishlist Page"
+    }
+  ]
+}
+{% endschema %}

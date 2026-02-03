@@ -200,13 +200,13 @@
     <div class="card-image">
       {%- if product.featured_media -%}
         <img
-          src="{{ product.featured_media | image_url: width: 400 }}"
-          srcset="{{ product.featured_media | image_url: width: 200 }} 200w,
-                  {{ product.featured_media | image_url: width: 400 }} 400w"
+          src="{{ product.featured_media | image_url: width: 500 }}"
+          srcset="{{ product.featured_media | image_url: width: 300 }} 300w,
+                  {{ product.featured_media | image_url: width: 500 }} 500w"
           alt="{{ product.featured_media.alt | escape }}"
           loading="lazy"
-          width="160"
-          height="160"
+          width="200"
+          height="200"
         >
 
         {%- if product.media[1] != nil -%}
@@ -268,7 +268,7 @@
 
   <!-- Product Info -->
   <div class="card-content">
-    <a href="{{ product.url }}" class="product-title-link">
+    <a href="{{ product.url }}" class="product-title-link" data-full-title="{{ product.title | escape }}">
       <h3 class="card-title">{{ product.title }}</h3>
     </a>
 
@@ -346,11 +346,24 @@
               data-wpd-product-collection-ids="{% assign wpdProductCollectionIds = product.collections | map:'id' %}{{ wpdProductCollectionIds | join:',' }}"
               data-wpd-product-id="{{ product.id }}">{{ product.price | money }}<span class="price-unit">/Each</span></div>
           </div>
-          <!-- Login for Member Pricing Label - Only for own-brand products (Celebrate Festival Inc), not USA products -->
-          {%- if is_own_brand and customer == nil and is_usa_product == false -%}
-            <a href="/account/login?return_url={{ product.url | url_encode }}" class="login-member-pricing-link">
-              <span class="lock-icon">&#128274;</span> Login for Member Pricing
-            </a>
+          {%- comment -%}
+            Vendor-specific CTAs for non-members:
+            - CF Inc products: "Login for Member Pricing" (encourage signups)
+            - Other vendors: "Call for More Details" (MAP compliance)
+          {%- endcomment -%}
+          {%- if is_member == false -%}
+            {%- if is_own_brand and is_usa_product == false -%}
+              {%- comment -%} CF Inc products - Show login CTA {%- endcomment -%}
+              {%- capture current_page_url -%}{{ request.path }}{% if request.query_string != blank %}?{{ request.query_string }}{% endif %}{%- endcapture -%}
+              <a href="/account/login?return_url={{ current_page_url | url_encode }}" class="login-member-pricing-link">
+                <span class="lock-icon">&#128274;</span> Login for Member Pricing
+              </a>
+            {%- else -%}
+              {%- comment -%} Other vendor products - Show call for details CTA (MAP compliance) {%- endcomment -%}
+              <a href="tel:+14086739999" class="call-for-details-link">
+                <span class="phone-icon">&#128222;</span> Call for More Details - (408) 673-9999
+              </a>
+            {%- endif -%}
           {%- endif -%}
 
       {%- endcase -%}
@@ -440,7 +453,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 16px;
+    padding: 0;
     overflow: hidden;
   }
 
@@ -567,12 +580,50 @@
     color: #1a365d;
     line-height: 1.4;
     margin-bottom: 10px;
-    display: block;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: calc(13px * 1.4 * 3); /* 3 lines based on font-size and line-height */
     transition: color 0.2s ease;
   }
 
   .product-card .product-title-link {
     text-decoration: none;
+    position: relative;
+  }
+
+  .product-card .product-title-link:hover .card-title {
+    color: #2d5a87;
+  }
+
+  /* Full title tooltip on hover */
+  .product-card .product-title-link::after {
+    content: attr(data-full-title);
+    position: absolute;
+    left: 0;
+    top: 100%;
+    background: #1a365d;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+    white-space: normal;
+    max-width: 280px;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    pointer-events: none;
+  }
+
+  .product-card .product-title-link:hover::after {
+    opacity: 1;
+    visibility: visible;
   }
 
   .product-card .card-title:hover {
@@ -665,8 +716,9 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     text-align: center;
-    margin-bottom: 4px;
+    margin-bottom: 0;
     font-weight: 600;
+    line-height: 1.2;
   }
 
   .product-card .member-price-amount {
@@ -675,8 +727,9 @@
     color: #ffffff;
     text-align: center;
     letter-spacing: -0.5px;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     font-family: 'Montserrat', sans-serif;
+    line-height: 1.2;
   }
 
   .product-card .regular-price-strike {
@@ -717,8 +770,9 @@
     color: #1a365d;
     text-align: center;
     letter-spacing: -0.5px;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     font-family: 'Montserrat', sans-serif;
+    line-height: 1.2;
   }
 
   .product-card .member-view-regular {
@@ -764,6 +818,34 @@
   }
 
   .product-card .login-member-pricing-link .lock-icon {
+    font-size: 12px;
+  }
+
+  /* Call for More Details Link - MAP Compliance for non-CF vendors */
+  .product-card .call-for-details-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #1a365d;
+    text-decoration: none;
+    padding: 8px 10px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
+  }
+
+  .product-card .call-for-details-link:hover {
+    background: linear-gradient(135deg, #1a365d 0%, #2d5a87 100%);
+    color: #ffffff;
+    border-color: #1a365d;
+  }
+
+  .product-card .call-for-details-link .phone-icon {
     font-size: 12px;
   }
 
@@ -986,6 +1068,15 @@
             const cartCount = document.querySelector('.cart-count');
             if (cartCount) {
               cartCount.textContent = cart.item_count;
+            }
+            // Update cart count bubble
+            const cartCountBubble = document.querySelector('.cart-count-bubble span[aria-hidden="true"]');
+            if (cartCountBubble) {
+              cartCountBubble.textContent = cart.item_count;
+            }
+            // Show toast notification
+            if (typeof window.cfShowCartToast === 'function') {
+              window.cfShowCartToast(data, quantity);
             }
           });
 
