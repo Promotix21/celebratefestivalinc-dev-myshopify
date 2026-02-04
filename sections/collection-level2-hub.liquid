@@ -2238,6 +2238,32 @@
                     {% endif %}
 
                     <div class="cf-plp__price-box">
+                      {% comment %} WSH Integration - Get wholesale price {% endcomment %}
+                      {%- capture wcp_output -%}
+                        {%- render 'wcp_discount', wcp_discount: product, wpd_is_render: 'yes' -%}
+                      {%- endcapture -%}
+                      {%- assign wcp_output_clean = wcp_output | strip -%}
+                      {%- assign wcp_values = wcp_output_clean | split: '|' -%}
+                      {%- assign wcp_price = wcp_values[0] | plus: 0 -%}
+                      {%- assign wcp_compare_at_price = wcp_values[1] | plus: 0 -%}
+
+                      {% comment %} Determine retail and member prices {% endcomment %}
+                      {%- assign retail_price = product.price -%}
+                      {%- assign member_price = product.price -%}
+                      {%- assign has_member_pricing = false -%}
+
+                      {% comment %} Case 1: WSH individual variant pricing {% endcomment %}
+                      {%- if wcp_price != blank and wcp_price > 0 and wcp_price < product.price -%}
+                        {%- assign has_member_pricing = true -%}
+                        {%- assign retail_price = product.price -%}
+                        {%- assign member_price = wcp_price -%}
+                      {% comment %} Case 2: Bulk discount via compare_at_price {% endcomment %}
+                      {%- elsif product.compare_at_price != blank and product.compare_at_price > product.price -%}
+                        {%- assign has_member_pricing = true -%}
+                        {%- assign retail_price = product.compare_at_price -%}
+                        {%- assign member_price = product.price -%}
+                      {%- endif -%}
+
                       {% comment %} Check if user is logged in and is a member {% endcomment %}
                       {% assign is_logged_in = false %}
                       {% assign is_member = false %}
@@ -2254,34 +2280,30 @@
 
                       {% if is_logged_in and is_member %}
                         {% comment %} Member view - show member price {% endcomment %}
-                        {% if product.compare_at_price > product.price %}
+                        {% if has_member_pricing %}
                           <div class="cf-plp__price-label">Member Price</div>
                           <div class="cf-plp__price-main">
-                            {{ product.price | money }}<span class="cf-plp__price-unit">/Each</span>
+                            {{ member_price | money }}<span class="cf-plp__price-unit">/Each</span>
                           </div>
                           <div class="cf-plp__price-regular">
-                            Was {{ product.compare_at_price | money }}
+                            Was {{ retail_price | money }}
                           </div>
                         {% else %}
-                          <div class="cf-plp__price-label">Member Price</div>
+                          <div class="cf-plp__price-label">Price</div>
                           <div class="cf-plp__price-main">
                             {{ product.price | money }}<span class="cf-plp__price-unit">/Each</span>
                           </div>
                         {% endif %}
                       {% else %}
-                        {% comment %} Non-member view - show RETAIL price (compare_at_price) + vendor-specific CTA {% endcomment %}
-                        {% assign retail_price = product.price %}
-                        {% if product.compare_at_price > product.price %}
-                          {% assign retail_price = product.compare_at_price %}
-                        {% endif %}
-                        <div class="cf-plp__price-label">Retail Price</div>
+                        {% comment %} Non-member view - show RETAIL price + vendor-specific CTA {% endcomment %}
+                        <div class="cf-plp__price-label">{% if has_member_pricing %}Retail Price{% else %}Price{% endif %}</div>
                         <div class="cf-plp__price-main">
                           {{ retail_price | money }}<span class="cf-plp__price-unit">/Each</span>
                         </div>
                         {% comment %} Vendor-specific CTAs for non-members {% endcomment %}
                         {% assign vendor_lower = product.vendor | downcase %}
                         {% assign is_own_brand = false %}
-                        {% if vendor_lower contains 'celebrate festival' %}
+                        {% if vendor_lower contains 'celebrate festival' or vendor_lower contains 'celebratefest' or vendor_lower contains 'cf inc' %}
                           {% assign is_own_brand = true %}
                         {% endif %}
                         {% if is_own_brand %}
@@ -2371,6 +2393,32 @@
                 {% endif %}
 
                 <div class="cf-plp__price-box">
+                  {% comment %} WSH Integration - Get wholesale price {% endcomment %}
+                  {%- capture wcp_output -%}
+                    {%- render 'wcp_discount', wcp_discount: product, wpd_is_render: 'yes' -%}
+                  {%- endcapture -%}
+                  {%- assign wcp_output_clean = wcp_output | strip -%}
+                  {%- assign wcp_values = wcp_output_clean | split: '|' -%}
+                  {%- assign wcp_price = wcp_values[0] | plus: 0 -%}
+                  {%- assign wcp_compare_at_price = wcp_values[1] | plus: 0 -%}
+
+                  {% comment %} Determine retail and member prices {% endcomment %}
+                  {%- assign retail_price = product.price -%}
+                  {%- assign member_price = product.price -%}
+                  {%- assign has_member_pricing = false -%}
+
+                  {% comment %} Case 1: WSH individual variant pricing {% endcomment %}
+                  {%- if wcp_price != blank and wcp_price > 0 and wcp_price < product.price -%}
+                    {%- assign has_member_pricing = true -%}
+                    {%- assign retail_price = product.price -%}
+                    {%- assign member_price = wcp_price -%}
+                  {% comment %} Case 2: Bulk discount via compare_at_price {% endcomment %}
+                  {%- elsif product.compare_at_price != blank and product.compare_at_price > product.price -%}
+                    {%- assign has_member_pricing = true -%}
+                    {%- assign retail_price = product.compare_at_price -%}
+                    {%- assign member_price = product.price -%}
+                  {%- endif -%}
+
                   {% comment %} Check if user is logged in and is a member {% endcomment %}
                   {% assign is_logged_in = false %}
                   {% assign is_member = false %}
@@ -2387,34 +2435,30 @@
 
                   {% if is_logged_in and is_member %}
                     {% comment %} Member view - show member price {% endcomment %}
-                    {% if product.compare_at_price > product.price %}
+                    {% if has_member_pricing %}
                       <div class="cf-plp__price-label">Member Price</div>
                       <div class="cf-plp__price-main">
-                        {{ product.price | money }}<span class="cf-plp__price-unit">/Each</span>
+                        {{ member_price | money }}<span class="cf-plp__price-unit">/Each</span>
                       </div>
                       <div class="cf-plp__price-regular">
-                        Was {{ product.compare_at_price | money }}
+                        Was {{ retail_price | money }}
                       </div>
                     {% else %}
-                      <div class="cf-plp__price-label">Member Price</div>
+                      <div class="cf-plp__price-label">Price</div>
                       <div class="cf-plp__price-main">
                         {{ product.price | money }}<span class="cf-plp__price-unit">/Each</span>
                       </div>
                     {% endif %}
                   {% else %}
-                    {% comment %} Non-member view - show RETAIL price (compare_at_price) + vendor-specific CTA {% endcomment %}
-                    {% assign retail_price = product.price %}
-                    {% if product.compare_at_price > product.price %}
-                      {% assign retail_price = product.compare_at_price %}
-                    {% endif %}
-                    <div class="cf-plp__price-label">Retail Price</div>
+                    {% comment %} Non-member view - show RETAIL price + vendor-specific CTA {% endcomment %}
+                    <div class="cf-plp__price-label">{% if has_member_pricing %}Retail Price{% else %}Price{% endif %}</div>
                     <div class="cf-plp__price-main">
                       {{ retail_price | money }}<span class="cf-plp__price-unit">/Each</span>
                     </div>
                     {% comment %} Vendor-specific CTAs for non-members {% endcomment %}
                     {% assign vendor_lower = product.vendor | downcase %}
                     {% assign is_own_brand = false %}
-                    {% if vendor_lower contains 'celebrate festival' %}
+                    {% if vendor_lower contains 'celebrate festival' or vendor_lower contains 'celebratefest' or vendor_lower contains 'cf inc' %}
                       {% assign is_own_brand = true %}
                     {% endif %}
                     {% if is_own_brand %}

@@ -36,7 +36,7 @@
   # Check if product is own-brand (Celebrate Festival Inc) for vendor-specific pricing display
   assign is_own_brand = false
   assign vendor_lower = product.vendor | downcase
-  if vendor_lower contains 'celebrate festival' or vendor_lower contains 'celebratefest'
+  if vendor_lower contains 'celebrate festival' or vendor_lower contains 'celebratefest' or vendor_lower contains 'cf inc'
     assign is_own_brand = true
   endif
 -%}

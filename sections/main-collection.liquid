@@ -2340,7 +2340,7 @@
                   endcomment
                   assign is_own_brand = false
                   assign vendor_lower = product.vendor | downcase
-                  if vendor_lower contains 'celebrate festival' or vendor_lower contains 'celebratefest'
+                  if vendor_lower contains 'celebrate festival' or vendor_lower contains 'celebratefest' or vendor_lower contains 'cf inc'
                     assign is_own_brand = true
                   endif
 
@@ -2481,6 +2481,7 @@
                     {%- when 'price-member-view' -%}
                       {%- comment -%} MEMBER VIEW - Always shows member pricing with coral border {%- endcomment -%}
                       <div class="l3-price-member-view">
+                        <div class="l3-member-price-label">{% if has_wholesale_price %}Member Price{% else %}Price{% endif %}</div>
                         <div class="l3-member-view-price">
                           {%- if has_wholesale_price -%}
                             {{ member_price | money }}<span class="l3-price-unit">/Each</span>
@@ -2511,7 +2512,7 @@
                     {%- else -%}
                       {%- comment -%} PUBLIC VIEW - Restricted Products: Single retail price only {%- endcomment -%}
                       <div class="l3-price-single">
-                        <div class="l3-price-label">Retail Price</div>
+                        <div class="l3-price-label">{% if has_wholesale_price %}Retail Price{% else %}Price{% endif %}</div>
                         <div class="l3-price-main">{{ retail_price | money }}<span class="l3-price-unit">/Each</span></div>
                       </div>
                       {%- comment -%} Call for Details CTA - Other vendor products (MAP compliance) {%- endcomment -%}
@@ -2592,7 +2593,7 @@
               endcomment
               assign is_own_brand = false
               assign vendor_lower = product.vendor | downcase
-              if vendor_lower contains 'celebrate festival' or vendor_lower contains 'celebratefest'
+              if vendor_lower contains 'celebrate festival' or vendor_lower contains 'celebratefest' or vendor_lower contains 'cf inc'
                 assign is_own_brand = true
               endif
 
@@ -2775,6 +2776,7 @@
                 {%- when 'price-member-view' -%}
                   {%- comment -%} MEMBER VIEW - Always shows member pricing with coral border {%- endcomment -%}
                   <div class="l3-price-member-view">
+                    <div class="l3-member-price-label">{% if has_wholesale_price %}Member Price{% else %}Price{% endif %}</div>
                     <div class="l3-member-view-price">
                       {%- if has_wholesale_price -%}
                         {{ member_price | money }}<span class="l3-price-unit">/Each</span>
@@ -2805,7 +2807,7 @@
                 {%- else -%}
                   {%- comment -%} PUBLIC VIEW - Restricted Products: Single retail price only {%- endcomment -%}
                   <div class="l3-price-single">
-                    <div class="l3-price-label">Retail Price</div>
+                    <div class="l3-price-label">{% if has_wholesale_price %}Retail Price{% else %}Price{% endif %}</div>
                     <div class="l3-price-main">{{ retail_price | money }}<span class="l3-price-unit">/Each</span></div>
                   </div>
                   {%- comment -%} Call for Details CTA - Other vendor products (MAP compliance) {%- endcomment -%}

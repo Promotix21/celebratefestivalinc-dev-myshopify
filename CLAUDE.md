@@ -7,6 +7,103 @@
 
 ---
 
+## 🚨 ACTIVE BUG - SESSION HANDOVER (February 2026)
+
+### Problem Statement
+**Member pricing is inconsistent between SPP and collection pages (L2/L3)**
+
+**Symptoms:**
+1. On L3 collection pages (e.g., "Commercial Ovens"), member pricing does NOT show correctly
+2. When clicking through to SPP (Single Product Page), the SAME product shows TWO prices (Member Price + Retail Price)
+3. On collection grids (L2/L3), only ONE price shows - and it may be the wrong price
+4. Issue is inconsistent - some pages work, some don't
+5. User is logged in as a member and still not seeing member pricing on collection pages
+
+### What Works vs What Doesn't
+
+| Page Type | Status | Notes |
+|-----------|--------|-------|
+| SPP (Single Product Page) | ✅ WORKS | Shows dual pricing correctly (Member + Retail) |
+| L2 (some pages) | ⚠️ PARTIAL | merchandising-refrigeration works, food-preparation didn't |
+| L3 (Collection pages) | ❌ BROKEN | e.g., Commercial Ovens - not showing member pricing |
+| Search Results | ❓ UNTESTED | WSH integration added but not verified |
+
+### Root Cause Analysis (UNRESOLVED)
+
+**The core issue:** SPP and collection pages use different methods to get WSH prices, and they're producing different results for the same products.
+
+**SPP Pricing Logic (WORKS):**
+```liquid
+{%- capture wcp_output -%}
+  {%- render 'wcp_discount', wcp_discount: product, wpd_is_render: 'yes' -%}
+{%- endcapture -%}
+# Parses: wcp_price|wcp_compare_at_price|...
+# Case 1: wcp_price < product.price → member_price = wcp_price
+# Case 2: compare_at_price > product.price → member_price = product.price
+```
+
+**L2/L3 Pricing Logic (INCONSISTENT):**
+- Same code was added to L2 and L3
+- BUT results differ from SPP for the same products
+- `has_wholesale_price` evaluates to `false` on collection pages but `true` on SPP
+
+### Suspected Issues (TO INVESTIGATE)
+
+1. **WSH snippet behavior in loops**: The `wcp_discount` snippet may behave differently when called multiple times in a `{% for product in collection.products %}` loop vs. once on SPP
+
+2. **Product object differences**: The `product` object in collection loops might have different data than the full product object on SPP
+
+3. **Customer context**: WSH might not have access to customer login status when rendering inside collection loops
+
+4. **Caching/State issues**: WSH snippet might have internal state that doesn't reset between products in a loop
+
+### Files Modified in This Session
+
+| File | Changes Made |
+|------|--------------|
+| `sections/collection-level2-hub.liquid` | Added WSH integration, price labels, vendor detection |
+| `sections/main-collection.liquid` | Added price labels, vendor detection ('cf inc') |
+| `sections/search-results-cf.liquid` | Added WSH integration, price labels, vendor detection |
+| `sections/product-celebrate-festival.liquid` | Added 'cf inc' to vendor detection |
+| `CLAUDE.md` | Updated pricing documentation |
+
+### Debugging Plan for Next Session
+
+**DO NOT CODE until these steps are completed:**
+
+1. **Create debug output**: Add temporary debug output to L3 to see actual values:
+   ```liquid
+   <!-- DEBUG: wcp_output = {{ wcp_output_clean }} -->
+   <!-- DEBUG: wcp_price = {{ wcp_price }} -->
+   <!-- DEBUG: product.price = {{ product.price }} -->
+   <!-- DEBUG: compare_at_price = {{ product.compare_at_price }} -->
+   <!-- DEBUG: has_wholesale_price = {{ has_wholesale_price }} -->
+   ```
+
+2. **Compare same product**: Pick ONE product that shows member pricing on SPP but not on L3. Compare the debug values.
+
+3. **Check WSH snippet**: Read `snippets/wcp_discount.liquid` to understand what it actually does and returns
+
+4. **Test hypothesis**: Try calling WSH snippet BEFORE the product loop to see if it's a loop-related issue
+
+5. **Check WSH documentation**: Research if WSH has known issues with collection page rendering
+
+### Test URLs
+
+- L3 (broken): `https://celebratefestivalinc.com/collections/commercial-ovens`
+- L2: `https://celebratefestivalinc.com/collections/food-preparation`
+- L2: `https://celebratefestivalinc.com/collections/merchandising-refrigeration`
+- Preview: `https://celebratefestivalinc.myshopify.com?preview_theme_id=148264910893`
+
+### Key Questions to Answer
+
+1. What does `wcp_discount` snippet actually return on L3 vs SPP for the same product?
+2. Is the customer/member status available inside collection product loops?
+3. Does WSH plugin have any documentation about collection page support?
+4. Is there a different WSH snippet or method for collection pages?
+
+---
+
 ## QUICK REFERENCE
 
 ### Brand Colors (USE THESE, NOT MOCKUP COLORS)
