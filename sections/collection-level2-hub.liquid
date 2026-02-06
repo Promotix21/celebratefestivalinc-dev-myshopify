@@ -3228,8 +3228,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Category Pills
-  document.querySelectorAll('.cf-plp__pill').forEach(pill => {
+  // Category Pills (skip link pills - they navigate to another page)
+  document.querySelectorAll('.cf-plp__pill:not(.cf-plp__pill--link)').forEach(pill => {
     pill.addEventListener('click', function() {
       document.querySelectorAll('.cf-plp__pill').forEach(p => p.classList.remove('active'));
       this.classList.add('active');
