@@ -47,6 +47,31 @@
 
     {{ content_for_header }}
 
+    {% comment %} WSH Client-Side Bridge: loads wpd.js to get wholesale prices for products missing wcp_set_prices metafield {% endcomment %}
+    {% if customer %}
+    <script>
+      window.wpdExtensionIsProductPage = {% if request.page_type == 'product' %}{{ product | json }}{% else %}""{% endif %};
+      window.wpdExtensionIsCartPage = {% if request.page_type == 'cart' %}true{% else %}false{% endif %};
+      window.showCrossOutPrice = true;
+      window.WPDAppProxy = "/apps/wpdapp";
+      window.WPDMarketLocalization = "";
+      window.WPDMoneyFormat = {{ shop.money_format | json }};
+      window.is_wcp_wholesale_customer = true;
+      window.wcp_customer = {
+        email: {{ customer.email | json }},
+        id: {{ customer.id | json }},
+        tags: {{ customer.tags | json }},
+        default_address: {{ customer.default_address | json }},
+        tax_exempt: {{ customer.tax_exempt | json }}
+      };
+      window.shopPermanentDomain = "{{ shop.permanent_domain }}";
+      window.wpdAPIRootUrl = "https://bdr.wholesalehelper.io/";
+    </script>
+    <style>.wpd-bridge{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;pointer-events:none!important;}</style>
+    <script src="https://cdn.shopify.com/extensions/019c2c43-0ded-76f6-8e5c-346dbe892703/wholesale-pricing-discount-by-wholesale-helper-97/assets/wpd.js" async></script>
+    <script src="{{ 'wpd-bridge.js' | asset_url }}" defer></script>
+    {% endif %}
+
     {%- liquid
       assign body_font_bold = settings.type_body_font | font_modify: 'weight', 'bold'
       assign body_font_italic = settings.type_body_font | font_modify: 'style', 'italic'
@@ -403,9 +428,14 @@
     <script src="{{ 'cart-toast.js' | asset_url }}" defer></script>
     <script src="{{ 'cart-integration.js' | asset_url }}" defer></script>
 
-    {%- comment -%} WSH Wholesale Pricing - Cart Integration {%- endcomment -%}
+    {%- comment -%} WSH Wholesale Pricing - Cart Integration
+         MUST use {% include %} not {% render %} because wcp_cart.liquid
+         internally uses {% include %} for wcp_discount, wcp_variant, and wcp_net.
+         {% include %} inside {% render %} is not allowed in Shopify Liquid,
+         which causes JS syntax errors that break the WSH checkout interception.
+    {%- endcomment -%}
     {%- if customer.tags.size > 0 and template == 'cart' -%}
-      {%- render 'wcp_cart' -%}
+      {%- include 'wcp_cart' -%}
     {%- endif -%}
 
   </body>
