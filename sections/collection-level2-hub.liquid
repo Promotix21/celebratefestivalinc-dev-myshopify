@@ -1096,6 +1096,24 @@
   margin-top: 4px;
 }
 
+/* Sale price strikethrough (compare_at_price) for everyone */
+.cf-plp__price-original {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.cf-plp__price-original s {
+  text-decoration: line-through;
+}
+
+.cf-plp__sale-savings {
+  font-size: 11px;
+  color: #10b981;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
 /* Login Prompt */
 .cf-plp__login-prompt {
   display: inline-block;
@@ -1789,6 +1807,10 @@
             <a href="/collections/indian-specialty" class="cf-plp__pill cf-plp__pill--link">
               {{ pill_title }}
             </a>
+          {% elsif pill_title_lower contains 'food holding' %}
+            <a href="/collections/food-holding-and-warming-equipment" class="cf-plp__pill cf-plp__pill--link">
+              {{ pill_title }}
+            </a>
           {% else %}
             <button type="button" class="cf-plp__pill" data-filter="{{ handle_clean }}">
               {{ pill_title }}
@@ -1952,7 +1974,7 @@
       {% assign variation_options = '' %}
       {% assign all_option_values = '' %}
 
-      {% comment %} Collect all unique options from products {% endcomment %}
+      {% comment %} Collect all unique options from products (excluding Shopify default "Title") {% endcomment %}
       {% for handle in l3_handle_array limit: 5 %}
         {% assign handle_clean = handle | strip %}
         {% if handle_clean != blank %}
@@ -1960,12 +1982,16 @@
           {% for product in coll.products limit: 20 %}
             {% for option in product.options_with_values %}
               {% assign opt_name = option.name %}
-              {% unless variation_options contains opt_name %}
-                {% if variation_options == '' %}
-                  {% assign variation_options = opt_name %}
-                {% else %}
-                  {% assign variation_options = variation_options | append: '|||' | append: opt_name %}
-                {% endif %}
+              {% assign opt_name_lower = opt_name | downcase %}
+              {% comment %} Skip Shopify's default "Title" option (for single-variant products) {% endcomment %}
+              {% unless opt_name_lower == 'title' %}
+                {% unless variation_options contains opt_name %}
+                  {% if variation_options == '' %}
+                    {% assign variation_options = opt_name %}
+                  {% else %}
+                    {% assign variation_options = variation_options | append: '|||' | append: opt_name %}
+                  {% endif %}
+                {% endunless %}
               {% endunless %}
             {% endfor %}
           {% endfor %}
@@ -2165,6 +2191,7 @@
             {% assign l3_coll = collections[handle_clean] %}
             {% assign l3_category = l3_coll.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
             {% for product in l3_coll.products limit: 100 %}
+              {% if product.price == 0 %}{% continue %}{% endif %}
               {% if products_shown < products_limit %}
                 {% assign products_shown = products_shown | plus: 1 %}
                 {% assign shipment_text = product.metafields.custom.shipment_text %}
@@ -2187,7 +2214,8 @@
                   {% endif %}
                 {% endfor %}
 
-                <div class="cf-plp__card" data-category="{{ handle_clean }}" data-vendor="{{ product.vendor | handleize }}" data-type="{{ product.type | handleize }}" data-price="{{ product.price }}" data-options="{{ variant_options_data }}">
+                <div class="cf-plp__card" data-category="{{ handle_clean }}" data-vendor="{{ product.vendor | handleize }}" data-type="{{ product.type | handleize }}" data-price="{{ product.price }}" data-title="{{ product.title | escape }}" data-index="{{ products_shown }}" data-options="{{ variant_options_data }}">
+                  <span class="wpd-bridge" data-wpd-product-handle="{{ product.handle }}" data-wpd-product-id="{{ product.id }}" data-wpd-variant-id="{{ product.variants.first.id }}" data-wpd-variant-price="{{ product.price }}"></span>
                   {% if product.tags contains 'best-seller' or product.tags contains 'featured' %}
                     <span class="cf-plp__card-badge">Best Seller</span>
                   {% elsif product.compare_at_price > product.price %}
@@ -2238,81 +2266,123 @@
                     {% endif %}
 
                     <div class="cf-plp__price-box">
-                      {% comment %} WSH Integration - Get wholesale price {% endcomment %}
+                      {%- liquid
+                        comment
+                          Check if user is a member
+                        endcomment
+                        assign is_member = false
+                        if customer
+                          for tag in customer.tags
+                            assign tag_lower = tag | downcase
+                            if tag_lower contains 'wholesale' or tag_lower contains 'plus' or tag_lower contains 'member' or tag_lower contains 'cph' or tag_lower contains 'rou' or tag_lower contains 'margin'
+                              assign is_member = true
+                              break
+                            endif
+                          endfor
+                        endif
+
+                        comment
+                          Config-driven vendor detection
+                        endcomment
+                        assign is_own_brand = false
+                        assign own_brands = settings.own_brand_vendors | downcase | split: ','
+                        assign vendor_check = product.vendor | downcase | strip
+                        for brand in own_brands
+                          assign brand_check = brand | strip
+                          if vendor_check == brand_check
+                            assign is_own_brand = true
+                            break
+                          endif
+                        endfor
+                      -%}
+
+                      {% comment %} WSH pricing call {% endcomment %}
                       {%- capture wcp_output -%}
                         {%- render 'wcp_discount', wcp_discount: product, wpd_is_render: 'yes' -%}
                       {%- endcapture -%}
-                      {%- assign wcp_output_clean = wcp_output | strip -%}
-                      {%- assign wcp_values = wcp_output_clean | split: '|' -%}
-                      {%- assign wcp_price = wcp_values[0] | plus: 0 -%}
-                      {%- assign wcp_compare_at_price = wcp_values[1] | plus: 0 -%}
 
-                      {% comment %} Determine retail and member prices {% endcomment %}
-                      {%- assign retail_price = product.price -%}
-                      {%- assign member_price = product.price -%}
-                      {%- assign has_member_pricing = false -%}
+                      {%- liquid
+                        assign wcp_price = wcp_output | strip | split: '|' | first | plus: 0
 
-                      {% comment %} Case 1: WSH individual variant pricing {% endcomment %}
-                      {%- if wcp_price != blank and wcp_price > 0 and wcp_price < product.price -%}
-                        {%- assign has_member_pricing = true -%}
-                        {%- assign retail_price = product.price -%}
-                        {%- assign member_price = wcp_price -%}
-                      {% comment %} Case 2: Bulk discount via compare_at_price {% endcomment %}
-                      {%- elsif product.compare_at_price != blank and product.compare_at_price > product.price -%}
-                        {%- assign has_member_pricing = true -%}
-                        {%- assign retail_price = product.compare_at_price -%}
-                        {%- assign member_price = product.price -%}
-                      {%- endif -%}
+                        comment
+                          Variant capability scanning
+                        endcomment
+                        assign any_variant_has_compare_at = false
+                        for variant in product.variants
+                          if variant.compare_at_price != blank and variant.compare_at_price > variant.price
+                            assign any_variant_has_compare_at = true
+                            break
+                          endif
+                        endfor
 
-                      {% comment %} Check if user is logged in and is a member {% endcomment %}
-                      {% assign is_logged_in = false %}
-                      {% assign is_member = false %}
-                      {% if customer %}
-                        {% assign is_logged_in = true %}
-                        {% for tag in customer.tags %}
-                          {% assign tag_lower = tag | downcase %}
-                          {% if tag_lower contains 'wholesale' or tag_lower contains 'plus' or tag_lower contains 'member' or tag_lower contains 'cph' or tag_lower contains 'rou' or tag_lower contains 'margin' %}
-                            {% assign is_member = true %}
-                            {% break %}
-                          {% endif %}
-                        {% endfor %}
-                      {% endif %}
+                        assign any_variant_has_wsh = false
+                        if wcp_price > 0 and wcp_price < product.price
+                          assign any_variant_has_wsh = true
+                        endif
 
-                      {% if is_logged_in and is_member %}
-                        {% comment %} Member view - show member price {% endcomment %}
-                        {% if has_member_pricing %}
-                          <div class="cf-plp__price-label">Member Price</div>
-                          <div class="cf-plp__price-main">
-                            {{ member_price | money }}<span class="cf-plp__price-unit">/Each</span>
-                          </div>
-                          <div class="cf-plp__price-regular">
-                            Was {{ retail_price | money }}
-                          </div>
-                        {% else %}
-                          <div class="cf-plp__price-label">Price</div>
-                          <div class="cf-plp__price-main">
-                            {{ product.price | money }}<span class="cf-plp__price-unit">/Each</span>
-                          </div>
+                        assign original_price = product.compare_at_price
+                        assign sale_price = product.price
+                        assign member_price = wcp_price
+                        assign retail_price = product.price
+
+                        assign savings_amount = 0
+                        if any_variant_has_wsh and retail_price > member_price
+                          assign savings_amount = retail_price | minus: member_price
+                        endif
+
+                        comment
+                          Variant price range detection (independent of WSH/compare_at/login)
+                        endcomment
+                        assign price_varies = false
+                        if product.price_min != product.price_max
+                          assign price_varies = true
+                        endif
+                      -%}
+
+                      {% if price_varies %}
+                        <!-- PRICE RANGE - Multiple variants with different prices -->
+                        <div class="cf-plp__price-label">Price</div>
+                        <div class="cf-plp__price-main">{{ product.price_min | money }} – {{ product.price_max | money }}</div>
+                      {% elsif is_member and any_variant_has_wsh %}
+                        {% comment %} Member with WSH pricing {% endcomment %}
+                        <div class="cf-plp__price-label">Member Price</div>
+                        <div class="cf-plp__price-main">
+                          {{ member_price | money }}<span class="cf-plp__price-unit">/Each</span>
+                        </div>
+                        <div class="cf-plp__price-regular">Was: <s>{{ retail_price | money }}</s></div>
+                        {% if savings_amount > 0 %}
+                          <div class="cf-plp__sale-savings">You Save {{ savings_amount | money }}</div>
+                        {% endif %}
+                      {% elsif is_member %}
+                        {% comment %} Member without WSH - NOT "Member Price" label {% endcomment %}
+                        <div class="cf-plp__price-label">{% if any_variant_has_compare_at %}Sale Price{% else %}Price{% endif %}</div>
+                        <div class="cf-plp__price-main">
+                          {{ sale_price | money }}<span class="cf-plp__price-unit">/Each</span>
+                        </div>
+                        {% if any_variant_has_compare_at %}
+                          <div class="cf-plp__price-original"><s>{{ original_price | money }}</s></div>
                         {% endif %}
                       {% else %}
-                        {% comment %} Non-member view - show RETAIL price + vendor-specific CTA {% endcomment %}
-                        <div class="cf-plp__price-label">{% if has_member_pricing %}Retail Price{% else %}Price{% endif %}</div>
-                        <div class="cf-plp__price-main">
-                          {{ retail_price | money }}<span class="cf-plp__price-unit">/Each</span>
-                        </div>
-                        {% comment %} Vendor-specific CTAs for non-members {% endcomment %}
-                        {% assign vendor_lower = product.vendor | downcase %}
-                        {% assign is_own_brand = false %}
-                        {% if vendor_lower contains 'celebrate festival' or vendor_lower contains 'celebratefest' or vendor_lower contains 'cf inc' %}
-                          {% assign is_own_brand = true %}
+                        {% comment %} Non-member view {% endcomment %}
+                        {% if any_variant_has_compare_at %}
+                          <div class="cf-plp__price-original"><s>{{ original_price | money }}</s></div>
+                          <div class="cf-plp__price-label">Sale Price</div>
+                        {% else %}
+                          <div class="cf-plp__price-label">Price</div>
                         {% endif %}
+                        <div class="cf-plp__price-main">
+                          {{ sale_price | money }}<span class="cf-plp__price-unit">/Each</span>
+                        </div>
+                        {% if any_variant_has_compare_at %}
+                          {%- assign sale_savings = original_price | minus: sale_price -%}
+                          <div class="cf-plp__sale-savings">Save {{ sale_savings | money }}</div>
+                        {% endif %}
+                        {% comment %} CTA: own brand → Login, non-own-brand + WSH → Call, else nothing {% endcomment %}
                         {% if is_own_brand %}
-                          {% comment %} CF Inc products - Show login CTA {% endcomment %}
                           <a href="/account/login?return_url={{ request.path }}{% if request.query_string != blank %}%3F{{ request.query_string | url_param_escape }}{% endif %}" class="cf-plp__login-prompt">
                             🔒 Login for member pricing
                           </a>
                         {% else %}
-                          {% comment %} Other vendor products - Show call for details CTA (MAP compliance) {% endcomment %}
                           <a href="tel:+14086739999" class="cf-plp__call-prompt">
                             📞 Call for More Details - (408) 673-9999
                           </a>
@@ -2348,6 +2418,7 @@
         {% comment %} Fallback: Show L2 products if no L3 products {% endcomment %}
         {% if products_shown == 0 %}
           {% for product in l2_collection.products limit: products_limit %}
+            {% if product.price == 0 %}{% continue %}{% endif %}
             {% assign shipment_text = product.metafields.custom.shipment_text %}
             {% assign shipping_class = 'cf-plp__shipping--regular' %}
             {% if shipment_text contains 'Free' %}
@@ -2356,7 +2427,8 @@
               {% assign shipping_class = 'cf-plp__shipping--quick' %}
             {% endif %}
 
-            <div class="cf-plp__card" data-category="all" data-vendor="{{ product.vendor | handleize }}" data-type="{{ product.type | handleize }}" data-price="{{ product.price }}">
+            <div class="cf-plp__card" data-category="all" data-vendor="{{ product.vendor | handleize }}" data-type="{{ product.type | handleize }}" data-price="{{ product.price }}" data-title="{{ product.title | escape }}">
+              <span class="wpd-bridge" data-wpd-product-handle="{{ product.handle }}" data-wpd-product-id="{{ product.id }}" data-wpd-variant-id="{{ product.variants.first.id }}" data-wpd-variant-price="{{ product.price }}"></span>
               {% if product.compare_at_price > product.price %}
                 <span class="cf-plp__card-badge">Sale</span>
               {% endif %}
@@ -2393,81 +2465,123 @@
                 {% endif %}
 
                 <div class="cf-plp__price-box">
-                  {% comment %} WSH Integration - Get wholesale price {% endcomment %}
+                  {%- liquid
+                    comment
+                      Check if user is a member
+                    endcomment
+                    assign is_member = false
+                    if customer
+                      for tag in customer.tags
+                        assign tag_lower = tag | downcase
+                        if tag_lower contains 'wholesale' or tag_lower contains 'plus' or tag_lower contains 'member' or tag_lower contains 'cph' or tag_lower contains 'rou' or tag_lower contains 'margin'
+                          assign is_member = true
+                          break
+                        endif
+                      endfor
+                    endif
+
+                    comment
+                      Config-driven vendor detection
+                    endcomment
+                    assign is_own_brand = false
+                    assign own_brands = settings.own_brand_vendors | downcase | split: ','
+                    assign vendor_check = product.vendor | downcase | strip
+                    for brand in own_brands
+                      assign brand_check = brand | strip
+                      if vendor_check == brand_check
+                        assign is_own_brand = true
+                        break
+                      endif
+                    endfor
+                  -%}
+
+                  {% comment %} WSH pricing call {% endcomment %}
                   {%- capture wcp_output -%}
                     {%- render 'wcp_discount', wcp_discount: product, wpd_is_render: 'yes' -%}
                   {%- endcapture -%}
-                  {%- assign wcp_output_clean = wcp_output | strip -%}
-                  {%- assign wcp_values = wcp_output_clean | split: '|' -%}
-                  {%- assign wcp_price = wcp_values[0] | plus: 0 -%}
-                  {%- assign wcp_compare_at_price = wcp_values[1] | plus: 0 -%}
 
-                  {% comment %} Determine retail and member prices {% endcomment %}
-                  {%- assign retail_price = product.price -%}
-                  {%- assign member_price = product.price -%}
-                  {%- assign has_member_pricing = false -%}
+                  {%- liquid
+                    assign wcp_price = wcp_output | strip | split: '|' | first | plus: 0
 
-                  {% comment %} Case 1: WSH individual variant pricing {% endcomment %}
-                  {%- if wcp_price != blank and wcp_price > 0 and wcp_price < product.price -%}
-                    {%- assign has_member_pricing = true -%}
-                    {%- assign retail_price = product.price -%}
-                    {%- assign member_price = wcp_price -%}
-                  {% comment %} Case 2: Bulk discount via compare_at_price {% endcomment %}
-                  {%- elsif product.compare_at_price != blank and product.compare_at_price > product.price -%}
-                    {%- assign has_member_pricing = true -%}
-                    {%- assign retail_price = product.compare_at_price -%}
-                    {%- assign member_price = product.price -%}
-                  {%- endif -%}
+                    comment
+                      Variant capability scanning
+                    endcomment
+                    assign any_variant_has_compare_at = false
+                    for variant in product.variants
+                      if variant.compare_at_price != blank and variant.compare_at_price > variant.price
+                        assign any_variant_has_compare_at = true
+                        break
+                      endif
+                    endfor
 
-                  {% comment %} Check if user is logged in and is a member {% endcomment %}
-                  {% assign is_logged_in = false %}
-                  {% assign is_member = false %}
-                  {% if customer %}
-                    {% assign is_logged_in = true %}
-                    {% for tag in customer.tags %}
-                      {% assign tag_lower = tag | downcase %}
-                      {% if tag_lower contains 'wholesale' or tag_lower contains 'plus' or tag_lower contains 'member' or tag_lower contains 'cph' or tag_lower contains 'rou' or tag_lower contains 'margin' %}
-                        {% assign is_member = true %}
-                        {% break %}
-                      {% endif %}
-                    {% endfor %}
-                  {% endif %}
+                    assign any_variant_has_wsh = false
+                    if wcp_price > 0 and wcp_price < product.price
+                      assign any_variant_has_wsh = true
+                    endif
 
-                  {% if is_logged_in and is_member %}
-                    {% comment %} Member view - show member price {% endcomment %}
-                    {% if has_member_pricing %}
-                      <div class="cf-plp__price-label">Member Price</div>
-                      <div class="cf-plp__price-main">
-                        {{ member_price | money }}<span class="cf-plp__price-unit">/Each</span>
-                      </div>
-                      <div class="cf-plp__price-regular">
-                        Was {{ retail_price | money }}
-                      </div>
-                    {% else %}
-                      <div class="cf-plp__price-label">Price</div>
-                      <div class="cf-plp__price-main">
-                        {{ product.price | money }}<span class="cf-plp__price-unit">/Each</span>
-                      </div>
+                    assign original_price = product.compare_at_price
+                    assign sale_price = product.price
+                    assign member_price = wcp_price
+                    assign retail_price = product.price
+
+                    assign savings_amount = 0
+                    if any_variant_has_wsh and retail_price > member_price
+                      assign savings_amount = retail_price | minus: member_price
+                    endif
+
+                    comment
+                      Variant price range detection (independent of WSH/compare_at/login)
+                    endcomment
+                    assign price_varies = false
+                    if product.price_min != product.price_max
+                      assign price_varies = true
+                    endif
+                  -%}
+
+                  {% if price_varies %}
+                    <!-- PRICE RANGE - Multiple variants with different prices -->
+                    <div class="cf-plp__price-label">Price</div>
+                    <div class="cf-plp__price-main">{{ product.price_min | money }} – {{ product.price_max | money }}</div>
+                  {% elsif is_member and any_variant_has_wsh %}
+                    {% comment %} Member with WSH pricing {% endcomment %}
+                    <div class="cf-plp__price-label">Member Price</div>
+                    <div class="cf-plp__price-main">
+                      {{ member_price | money }}<span class="cf-plp__price-unit">/Each</span>
+                    </div>
+                    <div class="cf-plp__price-regular">Was: <s>{{ retail_price | money }}</s></div>
+                    {% if savings_amount > 0 %}
+                      <div class="cf-plp__sale-savings">You Save {{ savings_amount | money }}</div>
+                    {% endif %}
+                  {% elsif is_member %}
+                    {% comment %} Member without WSH - NOT "Member Price" label {% endcomment %}
+                    <div class="cf-plp__price-label">{% if any_variant_has_compare_at %}Sale Price{% else %}Price{% endif %}</div>
+                    <div class="cf-plp__price-main">
+                      {{ sale_price | money }}<span class="cf-plp__price-unit">/Each</span>
+                    </div>
+                    {% if any_variant_has_compare_at %}
+                      <div class="cf-plp__price-original"><s>{{ original_price | money }}</s></div>
                     {% endif %}
                   {% else %}
-                    {% comment %} Non-member view - show RETAIL price + vendor-specific CTA {% endcomment %}
-                    <div class="cf-plp__price-label">{% if has_member_pricing %}Retail Price{% else %}Price{% endif %}</div>
-                    <div class="cf-plp__price-main">
-                      {{ retail_price | money }}<span class="cf-plp__price-unit">/Each</span>
-                    </div>
-                    {% comment %} Vendor-specific CTAs for non-members {% endcomment %}
-                    {% assign vendor_lower = product.vendor | downcase %}
-                    {% assign is_own_brand = false %}
-                    {% if vendor_lower contains 'celebrate festival' or vendor_lower contains 'celebratefest' or vendor_lower contains 'cf inc' %}
-                      {% assign is_own_brand = true %}
+                    {% comment %} Non-member view {% endcomment %}
+                    {% if any_variant_has_compare_at %}
+                      <div class="cf-plp__price-original"><s>{{ original_price | money }}</s></div>
+                      <div class="cf-plp__price-label">Sale Price</div>
+                    {% else %}
+                      <div class="cf-plp__price-label">Price</div>
                     {% endif %}
+                    <div class="cf-plp__price-main">
+                      {{ sale_price | money }}<span class="cf-plp__price-unit">/Each</span>
+                    </div>
+                    {% if any_variant_has_compare_at %}
+                      {%- assign sale_savings = original_price | minus: sale_price -%}
+                      <div class="cf-plp__sale-savings">Save {{ sale_savings | money }}</div>
+                    {% endif %}
+                    {% comment %} CTA: own brand → Login, non-own-brand + WSH → Call, else nothing {% endcomment %}
                     {% if is_own_brand %}
-                      {% comment %} CF Inc products - Show login CTA {% endcomment %}
                       <a href="/account/login?return_url={{ request.path }}{% if request.query_string != blank %}%3F{{ request.query_string | url_param_escape }}{% endif %}" class="cf-plp__login-prompt">
                         🔒 Login for member pricing
                       </a>
                     {% else %}
-                      {% comment %} Other vendor products - Show call for details CTA (MAP compliance) {% endcomment %}
                       <a href="tel:+14086739999" class="cf-plp__call-prompt">
                         📞 Call for More Details - (408) 673-9999
                       </a>
@@ -2668,17 +2782,19 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize Data Cache
   function initProductData() {
     const cards = document.querySelectorAll('.cf-plp__card');
-    productData = Array.from(cards).map(card => {
+    productData = Array.from(cards).map((card, idx) => {
       // Pre-parse price to avoid parsing in loop
       const priceRaw = card.dataset.price;
       const price = priceRaw ? (parseInt(priceRaw) / 100) : 0;
-      
+
       return {
         element: card,
         category: card.dataset.category,
         vendor: card.dataset.vendor, // handleized
         productType: card.dataset.type, // handleized
         price: price,
+        title: (card.dataset.title || '').toLowerCase(),
+        originalIndex: idx,
         optionsStr: card.dataset.options,
         // Lazy-loaded options cache
         _options: null
@@ -3304,11 +3420,32 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Sort Handler
+  // Sort Handler — client-side sort (products are from multiple L3 collections)
   window.handleSort = function(value) {
-    const url = new URL(window.location);
-    url.searchParams.set('sort_by', value);
-    window.location = url;
+    const grid = document.getElementById('product-grid');
+    if (!grid) return;
+
+    productData.sort((a, b) => {
+      switch (value) {
+        case 'price-ascending':
+          return a.price - b.price;
+        case 'price-descending':
+          return b.price - a.price;
+        case 'title-ascending':
+          return a.title.localeCompare(b.title);
+        case 'best-selling':
+        default:
+          return a.originalIndex - b.originalIndex;
+      }
+    });
+
+    // Re-append cards in sorted order
+    for (const item of productData) {
+      grid.appendChild(item.element);
+    }
+
+    // Re-apply filters + pagination with new order
+    applyFilters();
   };
 
   // Mobile Filter Button
