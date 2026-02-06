@@ -10,7 +10,7 @@
 {
   "sections": {
     "level2_hub": {
-      "type": "collection-level2-hub",
+      "type": "collection-level2-hub-ajax",
       "settings": {
         "menu": "cf-menu-31-12-2026",
         "products_per_page": 192

@@ -1,0 +1,2689 @@
+{% comment %}
+  Collection Level 2 Hub - AJAX Filtering Version
+  This version fetches ALL products via AJAX to build 100% accurate filters
+  Trade-off: Filters take 3-10 seconds to load, but show ALL brands/types
+{% endcomment %}
+
+{% comment %} ========================================
+   COLLECTION HANDLE FALLBACK LOGIC
+   Menu URLs may point to empty collections.
+   Try: original -> new-theme-{handle} -> special mappings
+======================================== {% endcomment %}
+
+{% assign menu_handle = section.settings.menu | default: 'main-menu' %}
+{% assign l3_children = blank %}
+{% assign found_in_menu = false %}
+
+{% comment %} Find current collection in menu and get L3 children {% endcomment %}
+{% for link in linklists[menu_handle].links %}
+  {% for l2_link in link.links %}
+    {% assign l2_handle = l2_link.url | split: '/' | last | split: '?' | first %}
+    {% if l2_handle == collection.handle %}
+      {% assign l3_children = l2_link.links %}
+      {% assign found_in_menu = true %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+  {% if found_in_menu %}{% break %}{% endif %}
+{% endfor %}
+
+{% comment %} Collect L3 collection handles with fallback {% endcomment %}
+{% assign l3_collection_handles = '' %}
+{% assign l3_menu_titles = '' %}
+{% assign handle_mappings = 'meat-processing-equipment:new-theme-meat-process-equipment,vegetable-slicers-and-cutters-2:new-theme-vegetable-slicers-and-cutters,rice-cooker:new-theme-rice-cooker,commercial-can-openers:new-theme-commercial-can-openers,stainless-steel-work-tables-with-undershelves-1:new-theme-stainless-steel-work-tables-with-undershelves,stainless-steel-enclosed-base-work-tables-1:new-theme-stainless-steel-work-tables-with-undershelves,open-base-work-tables:new-theme-stainless-steel-work-tables-with-undershelves,equipment-stands-mixer-tables:new-theme-equipment-stands,work-table-preparation-stations:new-theme-preparation-stations' %}
+
+{% if l3_children.size > 0 %}
+  {% for child_link in l3_children %}
+    {% assign child_handle = child_link.url | split: '/' | last | split: '?' | first %}
+    {% assign menu_title = child_link.title %}
+    {% assign child_coll = collections[child_handle] %}
+    {% assign used_handle = child_handle %}
+
+    {% assign new_theme_handle = 'new-theme-' | append: child_handle %}
+    {% assign new_theme_coll = collections[new_theme_handle] %}
+
+    {% assign orig_count = child_coll.products_count | default: 0 | plus: 0 %}
+    {% assign new_count = new_theme_coll.products_count | default: 0 | plus: 0 %}
+
+    {% if new_theme_coll and new_count > 0 %}
+      {% assign used_handle = new_theme_handle %}
+    {% elsif orig_count == 0 %}
+      {% assign mappings_array = handle_mappings | split: ',' %}
+      {% for mapping in mappings_array %}
+        {% assign mapping_parts = mapping | split: ':' %}
+        {% assign map_from = mapping_parts[0] %}
+        {% assign map_to = mapping_parts[1] %}
+        {% if map_from == child_handle %}
+          {% assign mapped_coll = collections[map_to] %}
+          {% assign map_count = mapped_coll.products_count | default: 0 | plus: 0 %}
+          {% if mapped_coll and map_count > 0 %}
+            {% assign used_handle = map_to %}
+          {% endif %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    {% if l3_collection_handles == '' %}
+      {% assign l3_collection_handles = used_handle %}
+      {% assign l3_menu_titles = menu_title %}
+    {% else %}
+      {% assign l3_collection_handles = l3_collection_handles | append: '|||' | append: used_handle %}
+      {% assign l3_menu_titles = l3_menu_titles | append: '|||' | append: menu_title %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{% assign l3_handle_array = l3_collection_handles | split: '|||' %}
+{% assign l3_title_array = l3_menu_titles | split: '|||' %}
+
+{% comment %} Calculate totals {% endcomment %}
+{% assign total_l3_products = 0 %}
+{% for handle in l3_handle_array %}
+  {% assign handle_clean = handle | strip %}
+  {% if handle_clean != blank %}
+    {% assign coll = collections[handle_clean] %}
+    {% if coll %}
+      {% assign total_l3_products = total_l3_products | plus: coll.products_count %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
+{% comment %} L2 collection fallback {% endcomment %}
+{% assign l2_collection = collection %}
+{% if collection.products_count == 0 %}
+  {% assign l2_new_theme_handle = 'new-theme-' | append: collection.handle %}
+  {% assign l2_new_theme_coll = collections[l2_new_theme_handle] %}
+  {% if l2_new_theme_coll and l2_new_theme_coll.products_count > 0 %}
+    {% assign l2_collection = l2_new_theme_coll %}
+  {% endif %}
+{% endif %}
+
+{% assign grand_total_products = l2_collection.products_count | plus: total_l3_products %}
+
+<style>
+/* ========================================
+   LEVEL 2 PLP STYLES - AJAX Version
+   ======================================== */
+
+/* Color Variables */
+.cf-plp-ajax {
+  --deep-blue: #1a3a5c;
+  --primary-blue: #2563eb;
+  --medium-blue: #3b82f6;
+  --light-blue: #60a5fa;
+  --pale-blue: #dbeafe;
+  --sky-blue: #e0f2fe;
+  --deep-red: #991b1b;
+  --primary-red: #dc2626;
+  --bright-red: #ef4444;
+  --text-dark: #0f172a;
+  --text-medium: #475569;
+  --text-light: #64748b;
+  --text-muted: #94a3b8;
+  --border-color: #e2e8f0;
+  --bg-light: #f8fafc;
+  --bg-white: #ffffff;
+  --rating-gold: #f59e0b;
+  --success-green: #10b981;
+}
+
+.cf-plp-ajax {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-white);
+  max-width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.cf-plp-ajax *,
+.cf-plp-ajax *::before,
+.cf-plp-ajax *::after {
+  box-sizing: border-box;
+}
+
+/* Header Row */
+.cf-plp-ajax__header-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 40px;
+  background: var(--bg-white);
+  border-bottom: 1px solid var(--border-color);
+  gap: 20px;
+}
+
+.cf-plp-ajax__breadcrumb-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  margin: 0;
+}
+
+.cf-plp-ajax__breadcrumb-inline a {
+  color: var(--primary-blue);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.cf-plp-ajax__breadcrumb-inline a:hover {
+  color: var(--primary-red);
+}
+
+.cf-plp-ajax__breadcrumb-sep {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.cf-plp-ajax__breadcrumb-current {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.cf-plp-ajax__title-compact {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--deep-blue);
+  margin: 0;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* L3 Filter Pills */
+.cf-plp-ajax__pills {
+  padding: 10px 40px;
+  background: var(--bg-light);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cf-plp-ajax__pills-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-medium);
+}
+
+.cf-plp-ajax__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 25px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.cf-plp-ajax__pill:hover {
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+}
+
+.cf-plp-ajax__pill.active {
+  background: var(--deep-blue);
+  border-color: var(--deep-blue);
+  color: white;
+}
+
+.cf-plp-ajax__pill-count {
+  background: rgba(0,0,0,0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.cf-plp-ajax__pill.active .cf-plp-ajax__pill-count {
+  background: rgba(255,255,255,0.2);
+}
+
+/* Pill Link (navigates to another page instead of filtering) */
+.cf-plp-ajax__pill--link {
+  text-decoration: none;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+  border-color: var(--primary-red);
+  color: var(--primary-red);
+}
+
+.cf-plp-ajax__pill--link:hover {
+  background: var(--primary-red);
+  border-color: var(--primary-red);
+  color: white;
+  text-decoration: none;
+}
+
+/* ============================================
+   COMPACT MODE - 5 Columns (Scaled Down)
+   ============================================ */
+.cf-plp-ajax--compact .cf-plp-ajax__pills {
+  padding: 10px 30px;
+  gap: 8px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__pills-label {
+  font-size: 11px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__pill {
+  padding: 6px 12px;
+  font-size: 11px;
+  border-radius: 20px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__container {
+  gap: 20px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__sidebar {
+  width: 220px;
+  padding: 16px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__filters-title {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__filter-group {
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__filter-title {
+  font-size: 11px;
+  padding: 0;
+  margin: 0 0 6px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__filter-options li {
+  margin-bottom: 4px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__filter-option {
+  font-size: 11px;
+  padding: 2px 0;
+  gap: 6px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__filter-option input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__products {
+  padding: 16px 20px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__grid {
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__grid.list-view {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__grid.list-view .cf-plp-ajax__card {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__grid.list-view .cf-plp-ajax__card-image-wrap {
+  width: 160px;
+  min-width: 160px;
+  height: 140px;
+  margin-bottom: 0;
+  align-self: center;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__grid.list-view .cf-plp-ajax__card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__grid.list-view .cf-plp-ajax__card-title {
+  white-space: normal;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+  min-height: auto;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__card {
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__card-badge {
+  top: 10px;
+  left: 10px;
+  font-size: 9px;
+  padding: 3px 8px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__card-image-wrap {
+  height: 120px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__card-category {
+  font-size: 9px;
+  padding: 3px 8px;
+  margin-bottom: 6px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__card-title {
+  font-size: 11px;
+  margin-bottom: 6px;
+  line-height: 1.35;
+  min-height: calc(11px * 1.35 * 2);
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__card-sku {
+  font-size: 9px;
+  margin-bottom: 4px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__price-box {
+  padding: 8px 6px;
+  border-radius: 6px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__price-label {
+  font-size: 9px;
+  margin-bottom: 2px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__price-main {
+  font-size: 15px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__price-regular {
+  font-size: 10px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__price-original {
+  font-size: 10px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__sale-savings {
+  font-size: 9px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__shipping {
+  font-size: 9px;
+  padding: 4px 8px;
+  margin-top: 6px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__cart-row {
+  margin-top: 8px;
+  gap: 6px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__qty-input {
+  width: 50px;
+  padding: 6px 4px;
+  font-size: 11px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__add-btn {
+  padding: 8px 10px;
+  font-size: 10px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__variants-badge {
+  padding: 3px 8px;
+  font-size: 9px;
+}
+
+/* Compact toolbar */
+.cf-plp-ajax--compact .cf-plp-ajax__toolbar-compact {
+  padding: 10px 20px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__toolbar-compact__left {
+  flex: 1;
+  min-width: 0;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__active-filters-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__active-filters-label {
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__active-filters-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__clear-all {
+  padding: 4px 8px;
+  font-size: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__filter-chip {
+  padding: 3px 8px;
+  font-size: 10px;
+  gap: 4px;
+  border-radius: 12px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__filter-chip-remove {
+  width: 12px;
+  height: 12px;
+  font-size: 8px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__results-count {
+  font-size: 12px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__sort label {
+  display: none;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__sort select {
+  font-size: 11px;
+  padding: 6px 10px;
+}
+
+/* View toggle - icons only in compact mode */
+.cf-plp-ajax--compact .cf-plp-ajax__view-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  justify-content: center;
+  font-size: 0;
+  gap: 0;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__view-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Compact pagination */
+.cf-plp-ajax--compact .cf-plp-ajax__pagination {
+  padding: 16px;
+  gap: 6px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__page-btn {
+  font-size: 12px;
+}
+
+/* Compact login/call prompts */
+.cf-plp-ajax--compact .cf-plp-ajax__login-prompt {
+  font-size: 9px;
+  padding: 4px 8px;
+  margin-top: 6px;
+}
+
+.cf-plp-ajax--compact .cf-plp-ajax__call-prompt {
+  font-size: 9px;
+  padding: 4px 8px;
+  margin-top: 6px;
+}
+
+/* Compact responsive */
+@media (max-width: 1200px) {
+  .cf-plp-ajax--compact .cf-plp-ajax__grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .cf-plp-ajax--compact .cf-plp-ajax__grid.list-view {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 992px) {
+  .cf-plp-ajax--compact .cf-plp-ajax__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .cf-plp-ajax--compact .cf-plp-ajax__grid.list-view {
+    grid-template-columns: 1fr;
+  }
+  .cf-plp-ajax--compact .cf-plp-ajax__sidebar {
+    display: none;
+  }
+  .cf-plp-ajax--compact .cf-plp-ajax__mobile-filter-btn {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 768px) {
+  .cf-plp-ajax--compact .cf-plp-ajax__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .cf-plp-ajax--compact .cf-plp-ajax__grid.list-view {
+    grid-template-columns: 1fr;
+  }
+  .cf-plp-ajax--compact .cf-plp-ajax__grid.list-view .cf-plp-ajax__card {
+    flex-direction: column;
+  }
+  .cf-plp-ajax--compact .cf-plp-ajax__grid.list-view .cf-plp-ajax__card-image-wrap {
+    width: 100%;
+    min-width: unset;
+  }
+  .cf-plp-ajax--compact .cf-plp-ajax__card {
+    padding: 10px;
+  }
+  .cf-plp-ajax--compact .cf-plp-ajax__card-image-wrap {
+    height: 100px;
+  }
+}
+
+/* Main Container */
+.cf-plp-ajax__container {
+  display: flex;
+  background: var(--bg-white);
+  min-height: 800px;
+  overflow-x: hidden;
+}
+
+/* Filters Sidebar */
+.cf-plp-ajax__sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  padding: 24px;
+  border-right: 1px solid var(--border-color);
+  background: var(--bg-light);
+}
+
+.cf-plp-ajax__filters-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--deep-blue);
+  margin: 0 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cf-plp-ajax__filters-title::before {
+  content: '';
+  width: 3px;
+  height: 18px;
+  background: var(--primary-red);
+  border-radius: 2px;
+}
+
+.cf-plp-ajax__filter-group {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cf-plp-ajax__filter-group:last-child {
+  border-bottom: none;
+}
+
+.cf-plp-ajax__filter-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--deep-blue);
+  margin: 0 0 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cf-plp-ajax__filter-options {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cf-plp-ajax__filter-options li {
+  margin-bottom: 10px;
+}
+
+.cf-plp-ajax__filter-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-medium);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.cf-plp-ajax__filter-option:hover {
+  color: var(--deep-blue);
+}
+
+.cf-plp-ajax__filter-option input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary-blue);
+  cursor: pointer;
+}
+
+/* Loading State for Filters */
+.cf-plp-ajax__filter-loading {
+  padding: 20px;
+  text-align: center;
+}
+
+.cf-plp-ajax__filter-spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--primary-blue);
+  border-radius: 50%;
+  animation: cf-spin 0.8s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes cf-spin {
+  to { transform: rotate(360deg); }
+}
+
+.cf-plp-ajax__filter-loading-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: block;
+}
+
+.cf-plp-ajax__filter-progress {
+  font-size: 11px;
+  color: var(--primary-blue);
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+/* Toolbar */
+.cf-plp-ajax__toolbar-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 40px;
+  background: var(--bg-light);
+  border-bottom: 1px solid var(--border-color);
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.cf-plp-ajax__toolbar-compact__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cf-plp-ajax__toolbar-compact__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cf-plp-ajax__results-count {
+  font-size: 13px;
+  color: var(--text-medium);
+}
+
+.cf-plp-ajax__view-toggle {
+  display: flex;
+  gap: 0;
+}
+
+.cf-plp-ajax__view-btn {
+  padding: 10px 16px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-white);
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-medium);
+  transition: all 0.2s ease;
+}
+
+.cf-plp-ajax__view-btn:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.cf-plp-ajax__view-btn:last-child {
+  border-radius: 0 6px 6px 0;
+  border-left: none;
+}
+
+.cf-plp-ajax__view-btn.active {
+  background: var(--deep-blue);
+  color: white;
+  border-color: var(--deep-blue);
+}
+
+.cf-plp-ajax__sort {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cf-plp-ajax__sort label {
+  font-size: 13px;
+  color: var(--text-medium);
+}
+
+.cf-plp-ajax__sort select {
+  padding: 10px 36px 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 13px;
+  background: var(--bg-white);
+  cursor: pointer;
+}
+
+/* Active Filters */
+.cf-plp-ajax__active-filters-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cf-plp-ajax__active-filters-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-medium);
+}
+
+.cf-plp-ajax__active-filters-list {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cf-plp-ajax__clear-all {
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary-blue);
+  cursor: pointer;
+  padding: 0;
+  margin-left: 8px;
+}
+
+.cf-plp-ajax__clear-all:hover {
+  color: var(--primary-red);
+}
+
+.cf-plp-ajax__filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--pale-blue);
+  border: 1px solid var(--primary-blue);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--deep-blue);
+}
+
+.cf-plp-ajax__filter-chip-remove {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-blue);
+  color: white;
+  border-radius: 50%;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cf-plp-ajax__filter-chip-remove:hover {
+  background: var(--primary-red);
+  transform: scale(1.1);
+}
+
+/* Products Area */
+.cf-plp-ajax__products {
+  flex: 1;
+  padding: 20px 30px;
+  min-width: 0; /* Prevents flex item from overflowing */
+  overflow-x: hidden;
+}
+
+/* Product Grid */
+.cf-plp-ajax__grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+}
+
+/* List View Mode - horizontal card: image left, content right, 2 per row */
+.cf-plp-ajax__grid.list-view {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.cf-plp-ajax__grid.list-view .cf-plp-ajax__card {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.cf-plp-ajax__grid.list-view .cf-plp-ajax__card-image-wrap {
+  width: 180px;
+  min-width: 180px;
+  height: 160px;
+  margin-bottom: 0;
+  align-self: center;
+}
+
+.cf-plp-ajax__grid.list-view .cf-plp-ajax__card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.cf-plp-ajax__grid.list-view .cf-plp-ajax__card-title {
+  white-space: normal;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+  min-height: auto;
+}
+
+.cf-plp-ajax__grid.list-view .cf-plp-ajax__card-badge {
+  top: 12px;
+  left: 12px;
+}
+
+.cf-plp-ajax__grid.list-view .cf-plp-ajax__price-box {
+  max-width: 280px;
+}
+
+.cf-plp-ajax__grid.list-view .cf-plp-ajax__cart-row {
+  max-width: 320px;
+}
+
+@media (max-width: 1400px) {
+  .cf-plp-ajax__grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .cf-plp-ajax__grid.list-view {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1200px) {
+  .cf-plp-ajax__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .cf-plp-ajax__grid.list-view {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 992px) {
+  .cf-plp-ajax__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .cf-plp-ajax__grid.list-view {
+    grid-template-columns: 1fr;
+  }
+  .cf-plp-ajax__sidebar {
+    display: none;
+  }
+}
+
+/* Product Card */
+.cf-plp-ajax__card {
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.cf-plp-ajax__card:hover {
+  border-color: var(--primary-blue);
+  box-shadow: 0 12px 40px rgba(37, 99, 235, 0.12);
+  transform: translateY(-4px);
+}
+
+.cf-plp-ajax__card-badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: var(--deep-blue);
+  color: white;
+  font-size: 10px;
+  padding: 4px 10px;
+  font-weight: 700;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 2;
+}
+
+.cf-plp-ajax__card-image-wrap {
+  display: block;
+  width: 100%;
+  height: 160px;
+  margin-bottom: 16px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.cf-plp-ajax__card-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.cf-plp-ajax__card:hover .cf-plp-ajax__card-image {
+  filter: brightness(1.08);
+  transform: scale(1.02);
+}
+
+.cf-plp-ajax__card-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  background: var(--sky-blue);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.cf-plp-ajax__card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--deep-blue);
+  text-decoration: none;
+  line-height: 1.4;
+  display: block;
+  margin-bottom: 8px;
+  transition: color 0.2s ease;
+}
+
+.cf-plp-ajax__card-title:hover {
+  color: var(--primary-blue);
+}
+
+.cf-plp-ajax__card-sku {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+/* Variants Badge */
+.cf-plp-ajax__variants-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--deep-blue);
+  color: white;
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  z-index: 5;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.cf-plp-ajax__variants-text {
+  display: block;
+}
+
+.cf-plp-ajax__variants-tooltip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--deep-blue);
+  color: white;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  min-width: 180px;
+  max-width: 280px;
+  white-space: normal;
+  text-align: left;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.cf-plp-ajax__variants-badge:hover .cf-plp-ajax__variants-tooltip {
+  display: block;
+}
+
+/* Price Box */
+.cf-plp-ajax__price-box {
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border: 1px solid #e2e8f0;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  text-align: center;
+  border-radius: 6px;
+}
+
+.cf-plp-ajax__price-label {
+  font-size: 10px;
+  color: var(--primary-blue);
+  font-weight: 700;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cf-plp-ajax__price-main {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary-red);
+}
+
+.cf-plp-ajax__price-unit {
+  font-size: 12px;
+  color: var(--text-medium);
+  font-weight: 400;
+}
+
+.cf-plp-ajax__price-regular {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-decoration: line-through;
+  margin-top: 4px;
+}
+
+/* Sale price strikethrough (compare_at_price) for everyone */
+.cf-plp-ajax__price-original {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.cf-plp-ajax__price-original s {
+  text-decoration: line-through;
+}
+
+.cf-plp-ajax__sale-savings {
+  font-size: 11px;
+  color: #10b981;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* Login/Call Prompts */
+.cf-plp-ajax__login-prompt {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(26, 58, 92, 0.1) 100%);
+  border: 1px dashed var(--primary-blue);
+  border-radius: 6px;
+  color: var(--primary-blue);
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.cf-plp-ajax__login-prompt:hover {
+  background: var(--primary-blue);
+  color: white;
+  border-style: solid;
+}
+
+.cf-plp-ajax__call-prompt {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--deep-blue);
+  font-size: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.cf-plp-ajax__call-prompt:hover {
+  background: linear-gradient(135deg, var(--deep-blue) 0%, var(--primary-blue) 100%);
+  color: white;
+  border-color: var(--deep-blue);
+}
+
+/* Shipping Badge */
+.cf-plp-ajax__shipping {
+  display: inline-block;
+  font-size: 10px;
+  padding: 5px 12px;
+  font-weight: 700;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.cf-plp-ajax__shipping--free {
+  background: linear-gradient(135deg, var(--success-green) 0%, #059669 100%);
+  color: white;
+}
+
+.cf-plp-ajax__shipping--quick {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--deep-blue) 100%);
+  color: white;
+}
+
+.cf-plp-ajax__shipping--regular {
+  background: var(--bg-light);
+  color: var(--text-medium);
+}
+
+/* Add to Cart Row */
+.cf-plp-ajax__cart-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.cf-plp-ajax__qty-input {
+  width: 50px;
+  height: 38px;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.cf-plp-ajax__qty-input:focus {
+  outline: none;
+  border-color: #2d5a87;
+}
+
+.cf-plp-ajax__add-btn {
+  flex: 1;
+  height: 38px;
+  background: linear-gradient(135deg, #2d5a87 0%, #1a365d 100%);
+  color: #ffffff;
+  border: none;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cf-plp-ajax__add-btn:hover {
+  background: linear-gradient(135deg, #3d6a9f 0%, #2d5a87 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(45, 90, 135, 0.3);
+}
+
+/* Pagination */
+.cf-plp-ajax__pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 30px 0;
+  margin-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.cf-plp-ajax__page-btn {
+  padding: 10px 20px;
+  border: 1px solid var(--border-color);
+  background: white;
+  color: var(--text-dark);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cf-plp-ajax__page-btn:hover:not(:disabled) {
+  border-color: var(--deep-blue);
+  color: var(--deep-blue);
+  background: var(--bg-light);
+}
+
+.cf-plp-ajax__page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cf-plp-ajax__page-numbers {
+  display: flex;
+  gap: 4px;
+}
+
+.cf-plp-ajax__page-num {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  background: white;
+  color: var(--text-dark);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cf-plp-ajax__page-num:hover {
+  border-color: var(--deep-blue);
+  color: var(--deep-blue);
+}
+
+.cf-plp-ajax__page-num.active {
+  background: var(--deep-blue);
+  border-color: var(--deep-blue);
+  color: white;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .cf-plp-ajax__grid.list-view .cf-plp-ajax__card {
+    flex-direction: column;
+  }
+  .cf-plp-ajax__grid.list-view .cf-plp-ajax__card-image-wrap {
+    width: 100%;
+    min-width: unset;
+  }
+  .cf-plp-ajax__grid.list-view .cf-plp-ajax__price-box,
+  .cf-plp-ajax__grid.list-view .cf-plp-ajax__cart-row {
+    max-width: 100%;
+  }
+
+  .cf-plp-ajax__header-compact {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 20px;
+  }
+
+  .cf-plp-ajax__title-compact {
+    font-size: 18px;
+    white-space: normal;
+  }
+
+  .cf-plp-ajax__toolbar-compact {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px 20px;
+  }
+
+  .cf-plp-ajax__toolbar-compact__left {
+    justify-content: flex-start;
+  }
+
+  .cf-plp-ajax__toolbar-compact__right {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .cf-plp-ajax__pills {
+    padding: 10px 20px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+}
+
+/* Mobile Filter Button */
+.cf-plp-ajax__mobile-filter-btn {
+  display: none;
+  padding: 10px 16px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-white);
+  font-size: 13px;
+  cursor: pointer;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-medium);
+  border-radius: 6px;
+}
+
+@media (max-width: 992px) {
+  .cf-plp-ajax__mobile-filter-btn {
+    display: flex;
+  }
+}
+
+/* Filter Count Badge */
+.cf-plp-ajax__filter-count {
+  color: var(--text-muted);
+  margin-left: auto;
+  font-size: 12px;
+}
+</style>
+
+<div class="cf-plp-ajax{% if section.settings.compact_mode %} cf-plp-ajax--compact{% endif %}">
+  {% comment %} Compact Header Row 1: Breadcrumb (left) | Title (right) {% endcomment %}
+  <header class="cf-plp-ajax__header-compact">
+    <nav class="cf-plp-ajax__breadcrumb-inline" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span class="cf-plp-ajax__breadcrumb-sep">›</span>
+      {% assign breadcrumb_found = false %}
+      {% for link in linklists[menu_handle].links %}
+        {% unless breadcrumb_found %}
+          {% for l2_link in link.links %}
+            {% assign l2_handle = l2_link.url | split: '/' | last | split: '?' | first %}
+            {% if l2_handle == collection.handle %}
+              <a href="{{ link.url }}">{{ link.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</a>
+              <span class="cf-plp-ajax__breadcrumb-sep">›</span>
+              {% assign breadcrumb_found = true %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+        {% endunless %}
+      {% endfor %}
+      <span class="cf-plp-ajax__breadcrumb-current">{{ collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</span>
+    </nav>
+    <h1 class="cf-plp-ajax__title-compact">{{ collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</h1>
+  </header>
+
+  {% comment %} L3 Filter Pills (L2 only) - Menu is source of truth {% endcomment %}
+  {% if l3_handle_array.size > 0 %}
+    <nav class="cf-plp-ajax__pills" aria-label="Filter by category">
+      <span class="cf-plp-ajax__pills-label">Subcategory:</span>
+
+      <button type="button" class="cf-plp-ajax__pill active" data-filter="all">
+        All Products
+      </button>
+
+      {% for handle in l3_handle_array %}
+        {% assign handle_clean = handle | strip %}
+        {% assign pill_index = forloop.index0 %}
+        {% assign pill_title = l3_title_array[pill_index] | default: handle_clean %}
+        {% if handle_clean != blank %}
+          {% comment %} Special case: Indian Specialty pills link to L1 page instead of filtering {% endcomment %}
+          {% assign pill_title_lower = pill_title | downcase %}
+          {% if pill_title_lower contains 'indian specialty' %}
+            <a href="/collections/indian-specialty" class="cf-plp-ajax__pill cf-plp-ajax__pill--link">
+              {{ pill_title }}
+            </a>
+          {% elsif pill_title_lower contains 'food holding' %}
+            <a href="/collections/food-holding-and-warming-equipment" class="cf-plp-ajax__pill cf-plp-ajax__pill--link">
+              {{ pill_title }}
+            </a>
+          {% elsif pill_title_lower contains 'storage racks' %}
+            <a href="/collections/chrome" class="cf-plp-ajax__pill cf-plp-ajax__pill--link">
+              {{ pill_title }}
+            </a>
+          {% else %}
+            <button type="button" class="cf-plp-ajax__pill" data-filter="{{ handle_clean }}">
+              {{ pill_title }}
+            </button>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </nav>
+  {% endif %}
+
+  {% comment %} Toolbar Row {% endcomment %}
+  <div class="cf-plp-ajax__toolbar-compact">
+    <div class="cf-plp-ajax__toolbar-compact__left">
+      <div class="cf-plp-ajax__active-filters-inline" id="active-filters-ajax" style="display: none;">
+        <span class="cf-plp-ajax__active-filters-label">Active Filters:</span>
+        <div class="cf-plp-ajax__active-filters-list" id="active-filters-list-ajax"></div>
+        <button type="button" class="cf-plp-ajax__clear-all" id="clear-all-filters-ajax">Clear All</button>
+      </div>
+      <div class="cf-plp-ajax__results-count">
+        <strong id="filtered-count-ajax">{{ grand_total_products }}</strong> products
+      </div>
+    </div>
+
+    <div class="cf-plp-ajax__toolbar-compact__right">
+      <button type="button" class="cf-plp-ajax__mobile-filter-btn" id="mobile-filter-btn-ajax">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="4" y1="6" x2="20" y2="6"></line>
+          <line x1="8" y1="12" x2="16" y2="12"></line>
+          <line x1="11" y1="18" x2="13" y2="18"></line>
+        </svg>
+        Filters
+      </button>
+      <div class="cf-plp-ajax__view-toggle">
+        <button class="cf-plp-ajax__view-btn active" data-view="grid">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+            <rect x="0" y="0" width="7" height="7" rx="1"/>
+            <rect x="9" y="0" width="7" height="7" rx="1"/>
+            <rect x="0" y="9" width="7" height="7" rx="1"/>
+            <rect x="9" y="9" width="7" height="7" rx="1"/>
+          </svg>
+          Grid
+        </button>
+        <button class="cf-plp-ajax__view-btn" data-view="list">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+            <rect x="0" y="1" width="16" height="3" rx="1"/>
+            <rect x="0" y="6" width="16" height="3" rx="1"/>
+            <rect x="0" y="11" width="16" height="3" rx="1"/>
+          </svg>
+          List
+        </button>
+      </div>
+
+      <div class="cf-plp-ajax__sort">
+        <label for="plp-sort-ajax">Sort by</label>
+        <select id="plp-sort-ajax" onchange="handleSortAjax(this.value)">
+          <option value="best-selling">Most Popular</option>
+          <option value="price-ascending">Price: Low to High</option>
+          <option value="price-descending">Price: High to Low</option>
+          <option value="title-ascending">Name: A-Z</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  {% comment %} Main Container {% endcomment %}
+  <div class="cf-plp-ajax__container">
+
+    {% comment %} Filters Sidebar with AJAX Loading {% endcomment %}
+    <aside class="cf-plp-ajax__sidebar">
+      <h2 class="cf-plp-ajax__filters-title">Filters</h2>
+
+      {% comment %} Brand Filter - AJAX Loaded {% endcomment %}
+      <div class="cf-plp-ajax__filter-group" id="brand-filter-group">
+        <h3 class="cf-plp-ajax__filter-title">Brand</h3>
+        <div class="cf-plp-ajax__filter-loading" id="brand-filter-loading">
+          <div class="cf-plp-ajax__filter-spinner"></div>
+          <span class="cf-plp-ajax__filter-loading-text">Loading brands...</span>
+          <div class="cf-plp-ajax__filter-progress" id="brand-filter-progress"></div>
+        </div>
+        <ul class="cf-plp-ajax__filter-options" id="brand-filter-options" style="display: none;"></ul>
+      </div>
+
+      {% comment %} Product Type Filter - AJAX Loaded {% endcomment %}
+      <div class="cf-plp-ajax__filter-group" id="type-filter-group">
+        <h3 class="cf-plp-ajax__filter-title">Product Type</h3>
+        <div class="cf-plp-ajax__filter-loading" id="type-filter-loading">
+          <div class="cf-plp-ajax__filter-spinner"></div>
+          <span class="cf-plp-ajax__filter-loading-text">Loading types...</span>
+        </div>
+        <ul class="cf-plp-ajax__filter-options" id="type-filter-options" style="display: none;"></ul>
+      </div>
+
+      {% comment %} Price Range Filter - Static {% endcomment %}
+      <div class="cf-plp-ajax__filter-group">
+        <h3 class="cf-plp-ajax__filter-title">Price Range</h3>
+        <ul class="cf-plp-ajax__filter-options">
+          <li>
+            <label class="cf-plp-ajax__filter-option">
+              <input type="checkbox" name="price-ajax" value="0-500">
+              Under $500
+            </label>
+          </li>
+          <li>
+            <label class="cf-plp-ajax__filter-option">
+              <input type="checkbox" name="price-ajax" value="500-1000">
+              $500 - $1,000
+            </label>
+          </li>
+          <li>
+            <label class="cf-plp-ajax__filter-option">
+              <input type="checkbox" name="price-ajax" value="1000-2500">
+              $1,000 - $2,500
+            </label>
+          </li>
+          <li>
+            <label class="cf-plp-ajax__filter-option">
+              <input type="checkbox" name="price-ajax" value="2500+">
+              $2,500+
+            </label>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    {% comment %} Products Area {% endcomment %}
+    <div class="cf-plp-ajax__products">
+      <div class="cf-plp-ajax__grid" id="product-grid-ajax">
+        {% assign products_shown = 0 %}
+        {% assign products_limit = 500 %}
+
+        {% for handle in l3_handle_array %}
+          {% assign handle_clean = handle | strip %}
+          {% if handle_clean != blank %}
+            {% assign l3_coll = collections[handle_clean] %}
+            {% assign l3_category = l3_coll.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
+            {% for product in l3_coll.products limit: 100 %}
+              {% if product.price == 0 %}{% continue %}{% endif %}
+              {% if products_shown < products_limit %}
+                {% assign products_shown = products_shown | plus: 1 %}
+                {% assign shipment_text = product.metafields.custom.shipment_text %}
+                {% assign shipping_class = 'cf-plp-ajax__shipping--regular' %}
+                {% if shipment_text contains 'Free' %}
+                  {% assign shipping_class = 'cf-plp-ajax__shipping--free' %}
+                {% elsif shipment_text contains 'Quick' %}
+                  {% assign shipping_class = 'cf-plp-ajax__shipping--quick' %}
+                {% endif %}
+
+                {% assign variant_options_data = '' %}
+                {% for option in product.options_with_values %}
+                  {% assign opt_name_handle = option.name | handleize %}
+                  {% assign opt_values_joined = option.values | join: ',' %}
+                  {% if variant_options_data == '' %}
+                    {% assign variant_options_data = opt_name_handle | append: ':' | append: opt_values_joined %}
+                  {% else %}
+                    {% assign variant_options_data = variant_options_data | append: '|' | append: opt_name_handle | append: ':' | append: opt_values_joined %}
+                  {% endif %}
+                {% endfor %}
+
+                <div class="cf-plp-ajax__card" data-category="{{ handle_clean }}" data-vendor="{{ product.vendor | handleize }}" data-vendor-raw="{{ product.vendor | escape }}" data-type="{{ product.type | handleize }}" data-type-raw="{{ product.type | escape }}" data-price="{{ product.price }}" data-title="{{ product.title | escape }}" data-index="{{ products_shown }}" data-options="{{ variant_options_data }}">
+                  <span class="wpd-bridge" style="display:none!important" data-wpd-product-handle="{{ product.handle }}" data-wpd-product-id="{{ product.id }}" data-wpd-variant-id="{{ product.variants.first.id }}" data-wpd-variant-price="{{ product.price }}"></span>
+                  {% if product.tags contains 'best-seller' or product.tags contains 'featured' %}
+                    <span class="cf-plp-ajax__card-badge">Best Seller</span>
+                  {% elsif product.compare_at_price > product.price %}
+                    <span class="cf-plp-ajax__card-badge">Sale</span>
+                  {% endif %}
+
+                  <a href="{{ product.url }}?variant={{ product.variants.first.id }}" class="cf-plp-ajax__card-image-wrap">
+                    {% if product.featured_image %}
+                      <img src="{{ product.featured_image | image_url: width: 320 }}"
+                           alt="{{ product.title }}"
+                           class="cf-plp-ajax__card-image"
+                           loading="lazy">
+                    {% else %}
+                      <div class="cf-plp-ajax__card-image" style="display:flex;align-items:center;justify-content:center;font-size:40px;color:#94a3b8;">📦</div>
+                    {% endif %}
+                    {% if product.variants.size > 1 %}
+                      {% assign variation_list = '' %}
+                      {% for option in product.options_with_values %}
+                        {% assign opt_values = option.values | join: ', ' %}
+                        {% if variation_list == '' %}
+                          {% assign variation_list = option.name | append: ': ' | append: opt_values %}
+                        {% else %}
+                          {% assign variation_list = variation_list | append: ' | ' | append: option.name | append: ': ' | append: opt_values %}
+                        {% endif %}
+                      {% endfor %}
+                      <span class="cf-plp-ajax__variants-badge" data-variants="{{ product.variants.size }}">
+                        <span class="cf-plp-ajax__variants-text">{{ product.variants.size }} Variations</span>
+                        <span class="cf-plp-ajax__variants-tooltip">{{ variation_list | truncate: 150 }}</span>
+                      </span>
+                    {% endif %}
+                  </a>
+
+                  <div class="cf-plp-ajax__card-content">
+                    <span class="cf-plp-ajax__card-category">{{ l3_category | truncate: 25 }}</span>
+
+                    <a href="{{ product.url }}?variant={{ product.variants.first.id }}" class="cf-plp-ajax__card-title" title="{{ product.title | escape }}">
+                      {{ product.title }}
+                    </a>
+
+                    {% if product.variants.first.sku %}
+                      <div class="cf-plp-ajax__card-sku">#{{ product.variants.first.sku }}</div>
+                    {% endif %}
+
+                    <div class="cf-plp-ajax__price-box">
+                      {%- liquid
+                        comment
+                          Check if user is a member
+                        endcomment
+                        assign is_member = false
+                        if customer
+                          for tag in customer.tags
+                            assign tag_lower = tag | downcase
+                            if tag_lower contains 'wholesale' or tag_lower contains 'plus' or tag_lower contains 'member' or tag_lower contains 'cph' or tag_lower contains 'rou' or tag_lower contains 'margin'
+                              assign is_member = true
+                              break
+                            endif
+                          endfor
+                        endif
+
+                        comment
+                          Config-driven vendor detection
+                        endcomment
+                        assign is_own_brand = false
+                        assign own_brands = settings.own_brand_vendors | downcase | split: ','
+                        assign vendor_check = product.vendor | downcase | strip
+                        for brand in own_brands
+                          assign brand_check = brand | strip
+                          if vendor_check == brand_check
+                            assign is_own_brand = true
+                            break
+                          endif
+                        endfor
+                      -%}
+
+                      {% comment %} WSH pricing call {% endcomment %}
+                      {%- capture wcp_output -%}
+                        {%- render 'wcp_discount', wcp_discount: product, wpd_is_render: 'yes' -%}
+                      {%- endcapture -%}
+
+                      {%- liquid
+                        assign wcp_price = wcp_output | strip | split: '|' | first | plus: 0
+
+                        comment
+                          Variant capability scanning
+                        endcomment
+                        assign any_variant_has_compare_at = false
+                        for variant in product.variants
+                          if variant.compare_at_price != blank and variant.compare_at_price > variant.price
+                            assign any_variant_has_compare_at = true
+                            break
+                          endif
+                        endfor
+
+                        assign any_variant_has_wsh = false
+                        if wcp_price > 0 and wcp_price < product.price
+                          assign any_variant_has_wsh = true
+                        endif
+
+                        assign original_price = product.compare_at_price
+                        assign sale_price = product.price
+                        assign member_price = wcp_price
+                        assign retail_price = product.price
+
+                        assign savings_amount = 0
+                        if any_variant_has_wsh and retail_price > member_price
+                          assign savings_amount = retail_price | minus: member_price
+                        endif
+
+                        comment
+                          Variant price range detection (independent of WSH/compare_at/login)
+                        endcomment
+                        assign price_varies = false
+                        if product.price_min != product.price_max
+                          assign price_varies = true
+                        endif
+                      -%}
+
+                      {% if price_varies %}
+                        <!-- PRICE RANGE - Multiple variants with different prices -->
+                        <div class="cf-plp-ajax__price-label">Price</div>
+                        <div class="cf-plp-ajax__price-main">{{ product.price_min | money }} – {{ product.price_max | money }}</div>
+                      {% elsif is_member and any_variant_has_wsh %}
+                        {% comment %} Member with WSH pricing {% endcomment %}
+                        <div class="cf-plp-ajax__price-label">Member Price</div>
+                        <div class="cf-plp-ajax__price-main">
+                          {{ member_price | money }}<span class="cf-plp-ajax__price-unit">/Each</span>
+                        </div>
+                        <div class="cf-plp-ajax__price-regular">Was: <s>{{ retail_price | money }}</s></div>
+                        {% if savings_amount > 0 %}
+                          <div class="cf-plp-ajax__sale-savings">You Save {{ savings_amount | money }}</div>
+                        {% endif %}
+                      {% elsif is_member %}
+                        {% comment %} Member without WSH - NOT "Member Price" label {% endcomment %}
+                        <div class="cf-plp-ajax__price-label">{% if any_variant_has_compare_at %}Sale Price{% else %}Price{% endif %}</div>
+                        <div class="cf-plp-ajax__price-main">
+                          {{ sale_price | money }}<span class="cf-plp-ajax__price-unit">/Each</span>
+                        </div>
+                        {% if any_variant_has_compare_at %}
+                          <div class="cf-plp-ajax__price-original"><s>{{ original_price | money }}</s></div>
+                        {% endif %}
+                      {% else %}
+                        {% comment %} Non-member view {% endcomment %}
+                        {% if any_variant_has_compare_at %}
+                          <div class="cf-plp-ajax__price-original"><s>{{ original_price | money }}</s></div>
+                          <div class="cf-plp-ajax__price-label">Sale Price</div>
+                        {% else %}
+                          <div class="cf-plp-ajax__price-label">Price</div>
+                        {% endif %}
+                        <div class="cf-plp-ajax__price-main">
+                          {{ sale_price | money }}<span class="cf-plp-ajax__price-unit">/Each</span>
+                        </div>
+                        {% if any_variant_has_compare_at %}
+                          {%- assign sale_savings = original_price | minus: sale_price -%}
+                          <div class="cf-plp-ajax__sale-savings">Save {{ sale_savings | money }}</div>
+                        {% endif %}
+                        {% comment %} CTA: own brand → Login, non-own-brand → Call, else nothing {% endcomment %}
+                        {% if is_own_brand %}
+                          <a href="/account/login?return_url={{ request.path }}{% if request.query_string != blank %}%3F{{ request.query_string | url_param_escape }}{% endif %}" class="cf-plp-ajax__login-prompt">
+                            🔒 Login for member pricing
+                          </a>
+                        {% else %}
+                          <a href="tel:+14086739999" class="cf-plp-ajax__call-prompt">
+                            📞 Call for More Details - (408) 673-9999
+                          </a>
+                        {% endif %}
+                      {% endif %}
+                    </div>
+
+                    {% if shipment_text != blank %}
+                      <div class="cf-plp-ajax__shipping {{ shipping_class }}">
+                        {% if shipment_text contains 'Free' %}
+                          🚚 Free Shipping
+                        {% elsif shipment_text contains 'Quick' %}
+                          ⚡ Quick Ship
+                        {% else %}
+                          📦 {{ shipment_text | truncate: 20 }}
+                        {% endif %}
+                      </div>
+                    {% endif %}
+
+                    <div class="cf-plp-ajax__cart-row">
+                      <input type="number" class="cf-plp-ajax__qty-input" value="1" min="1" aria-label="Quantity">
+                      <button type="button" class="cf-plp-ajax__add-btn" data-variant-id="{{ product.variants.first.id }}">
+                        Add to Cart
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+
+        {% if products_shown == 0 %}
+          {% for product in l2_collection.products limit: products_limit %}
+            {% if product.price == 0 %}{% continue %}{% endif %}
+            {% assign shipment_text = product.metafields.custom.shipment_text %}
+            {% assign shipping_class = 'cf-plp-ajax__shipping--regular' %}
+            {% if shipment_text contains 'Free' %}
+              {% assign shipping_class = 'cf-plp-ajax__shipping--free' %}
+            {% elsif shipment_text contains 'Quick' %}
+              {% assign shipping_class = 'cf-plp-ajax__shipping--quick' %}
+            {% endif %}
+
+            <div class="cf-plp-ajax__card" data-category="all" data-vendor="{{ product.vendor | handleize }}" data-vendor-raw="{{ product.vendor | escape }}" data-type="{{ product.type | handleize }}" data-type-raw="{{ product.type | escape }}" data-price="{{ product.price }}" data-title="{{ product.title | escape }}">
+              <span class="wpd-bridge" style="display:none!important" data-wpd-product-handle="{{ product.handle }}" data-wpd-product-id="{{ product.id }}" data-wpd-variant-id="{{ product.variants.first.id }}" data-wpd-variant-price="{{ product.price }}"></span>
+              {% if product.compare_at_price > product.price %}
+                <span class="cf-plp-ajax__card-badge">Sale</span>
+              {% endif %}
+
+              <a href="{{ product.url }}?variant={{ product.variants.first.id }}" class="cf-plp-ajax__card-image-wrap">
+                {% if product.featured_image %}
+                  <img src="{{ product.featured_image | image_url: width: 320 }}"
+                       alt="{{ product.title }}"
+                       class="cf-plp-ajax__card-image"
+                       loading="lazy">
+                {% else %}
+                  <div class="cf-plp-ajax__card-image" style="display:flex;align-items:center;justify-content:center;font-size:40px;color:#94a3b8;">📦</div>
+                {% endif %}
+              </a>
+
+              <div class="cf-plp-ajax__card-content">
+                <a href="{{ product.url }}?variant={{ product.variants.first.id }}" class="cf-plp-ajax__card-title" title="{{ product.title | escape }}">
+                  {{ product.title }}
+                </a>
+
+                {% if product.variants.first.sku %}
+                  <div class="cf-plp-ajax__card-sku">#{{ product.variants.first.sku }}</div>
+                {% endif %}
+
+                <div class="cf-plp-ajax__price-box">
+                  {%- liquid
+                    assign is_member = false
+                    if customer
+                      for tag in customer.tags
+                        assign tag_lower = tag | downcase
+                        if tag_lower contains 'wholesale' or tag_lower contains 'plus' or tag_lower contains 'member' or tag_lower contains 'cph' or tag_lower contains 'rou' or tag_lower contains 'margin'
+                          assign is_member = true
+                          break
+                        endif
+                      endfor
+                    endif
+
+                    assign is_own_brand = false
+                    assign own_brands = settings.own_brand_vendors | downcase | split: ','
+                    assign vendor_check = product.vendor | downcase | strip
+                    for brand in own_brands
+                      assign brand_check = brand | strip
+                      if vendor_check == brand_check
+                        assign is_own_brand = true
+                        break
+                      endif
+                    endfor
+                  -%}
+
+                  {%- capture wcp_output -%}
+                    {%- render 'wcp_discount', wcp_discount: product, wpd_is_render: 'yes' -%}
+                  {%- endcapture -%}
+
+                  {%- liquid
+                    assign wcp_price = wcp_output | strip | split: '|' | first | plus: 0
+
+                    assign any_variant_has_compare_at = false
+                    for variant in product.variants
+                      if variant.compare_at_price != blank and variant.compare_at_price > variant.price
+                        assign any_variant_has_compare_at = true
+                        break
+                      endif
+                    endfor
+
+                    assign any_variant_has_wsh = false
+                    if wcp_price > 0 and wcp_price < product.price
+                      assign any_variant_has_wsh = true
+                    endif
+
+                    assign original_price = product.compare_at_price
+                    assign sale_price = product.price
+                    assign member_price = wcp_price
+                    assign retail_price = product.price
+
+                    assign savings_amount = 0
+                    if any_variant_has_wsh and retail_price > member_price
+                      assign savings_amount = retail_price | minus: member_price
+                    endif
+
+                    assign price_varies = false
+                    if product.price_min != product.price_max
+                      assign price_varies = true
+                    endif
+                  -%}
+
+                  {% if price_varies %}
+                    <div class="cf-plp-ajax__price-label">Price</div>
+                    <div class="cf-plp-ajax__price-main">{{ product.price_min | money }} – {{ product.price_max | money }}</div>
+                  {% elsif is_member and any_variant_has_wsh %}
+                    <div class="cf-plp-ajax__price-label">Member Price</div>
+                    <div class="cf-plp-ajax__price-main">
+                      {{ member_price | money }}<span class="cf-plp-ajax__price-unit">/Each</span>
+                    </div>
+                    <div class="cf-plp-ajax__price-regular">Was: <s>{{ retail_price | money }}</s></div>
+                    {% if savings_amount > 0 %}
+                      <div class="cf-plp-ajax__sale-savings">You Save {{ savings_amount | money }}</div>
+                    {% endif %}
+                  {% elsif is_member %}
+                    <div class="cf-plp-ajax__price-label">{% if any_variant_has_compare_at %}Sale Price{% else %}Price{% endif %}</div>
+                    <div class="cf-plp-ajax__price-main">
+                      {{ sale_price | money }}<span class="cf-plp-ajax__price-unit">/Each</span>
+                    </div>
+                    {% if any_variant_has_compare_at %}
+                      <div class="cf-plp-ajax__price-original"><s>{{ original_price | money }}</s></div>
+                    {% endif %}
+                  {% else %}
+                    {% if any_variant_has_compare_at %}
+                      <div class="cf-plp-ajax__price-original"><s>{{ original_price | money }}</s></div>
+                      <div class="cf-plp-ajax__price-label">Sale Price</div>
+                    {% else %}
+                      <div class="cf-plp-ajax__price-label">Price</div>
+                    {% endif %}
+                    <div class="cf-plp-ajax__price-main">
+                      {{ sale_price | money }}<span class="cf-plp-ajax__price-unit">/Each</span>
+                    </div>
+                    {% if any_variant_has_compare_at %}
+                      {%- assign sale_savings = original_price | minus: sale_price -%}
+                      <div class="cf-plp-ajax__sale-savings">Save {{ sale_savings | money }}</div>
+                    {% endif %}
+                    {% if is_own_brand %}
+                      <a href="/account/login?return_url={{ request.path }}{% if request.query_string != blank %}%3F{{ request.query_string | url_param_escape }}{% endif %}" class="cf-plp-ajax__login-prompt">
+                        🔒 Login for member pricing
+                      </a>
+                    {% else %}
+                      <a href="tel:+14086739999" class="cf-plp-ajax__call-prompt">
+                        📞 Call for More Details - (408) 673-9999
+                      </a>
+                    {% endif %}
+                  {% endif %}
+                </div>
+
+                {% if shipment_text != blank %}
+                  <div class="cf-plp-ajax__shipping {{ shipping_class }}">
+                    {% if shipment_text contains 'Free' %}
+                      🚚 Free Shipping
+                    {% elsif shipment_text contains 'Quick' %}
+                      ⚡ Quick Ship
+                    {% else %}
+                      📦 {{ shipment_text | truncate: 20 }}
+                    {% endif %}
+                  </div>
+                {% endif %}
+
+                <div class="cf-plp-ajax__cart-row">
+                  <input type="number" class="cf-plp-ajax__qty-input" value="1" min="1" aria-label="Quantity">
+                  <button type="button" class="cf-plp-ajax__add-btn" data-variant-id="{{ product.variants.first.id }}">
+                    Add to Cart
+                  </button>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      {% comment %} Pagination {% endcomment %}
+      <div class="cf-plp-ajax__pagination" id="pagination-ajax" style="display: none;">
+        <button type="button" class="cf-plp-ajax__page-btn" id="prev-btn-ajax">Previous</button>
+        <div class="cf-plp-ajax__page-numbers" id="page-numbers-ajax"></div>
+        <button type="button" class="cf-plp-ajax__page-btn" id="next-btn-ajax">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // ========================================
+  // AJAX FILTER SYSTEM - 100% Accurate Filters
+  // ========================================
+
+  // L3 Collection handles passed from Liquid
+  const l3CollectionHandles = {{ l3_collection_handles | split: '|||' | json }};
+
+  console.log('CF-PLP-AJAX: Starting AJAX filter build for', l3CollectionHandles.length, 'collections');
+
+  // Filter state
+  const filterState = {
+    category: 'all',
+    brands: [],
+    productTypes: [],
+    priceRanges: []
+  };
+
+  // Product data cache
+  let productData = [];
+
+  // Pagination state
+  const paginationState = {
+    currentPage: 1,
+    itemsPerPage: {{ section.settings.products_per_page | default: 48 }},
+    totalPages: 1,
+    filteredCards: []
+  };
+
+  // DOM elements
+  const brandFilterLoading = document.getElementById('brand-filter-loading');
+  const brandFilterOptions = document.getElementById('brand-filter-options');
+  const brandFilterProgress = document.getElementById('brand-filter-progress');
+  const typeFilterLoading = document.getElementById('type-filter-loading');
+  const typeFilterOptions = document.getElementById('type-filter-options');
+  const resultsCount = document.getElementById('filtered-count-ajax');
+  const activeFiltersContainer = document.getElementById('active-filters-ajax');
+  const activeFiltersList = document.getElementById('active-filters-list-ajax');
+  const clearAllBtn = document.getElementById('clear-all-filters-ajax');
+  const paginationContainer = document.getElementById('pagination-ajax');
+  const prevBtn = document.getElementById('prev-btn-ajax');
+  const nextBtn = document.getElementById('next-btn-ajax');
+  const pageNumbersContainer = document.getElementById('page-numbers-ajax');
+
+  // ========================================
+  // AJAX PRODUCT FETCHING
+  // ========================================
+
+  async function fetchAllProducts() {
+    const allBrands = new Map(); // brand_handle -> { name: displayName, count: number }
+    const allTypes = new Map();  // type_handle -> { name: displayName, count: number }
+    let totalFetched = 0;
+    let collectionsProcessed = 0;
+
+    for (const handle of l3CollectionHandles) {
+      if (!handle || !handle.trim()) continue;
+
+      collectionsProcessed++;
+      if (brandFilterProgress) {
+        brandFilterProgress.textContent = `Processing ${collectionsProcessed}/${l3CollectionHandles.length} categories...`;
+      }
+
+      try {
+        // Fetch products from this collection (max 250 per request)
+        let page = 1;
+        let hasMore = true;
+
+        while (hasMore) {
+          const url = `/collections/${handle.trim()}/products.json?limit=250&page=${page}`;
+          const response = await fetch(url);
+
+          if (!response.ok) {
+            console.warn('CF-PLP-AJAX: Failed to fetch', url);
+            break;
+          }
+
+          const data = await response.json();
+          const products = data.products || [];
+
+          if (products.length === 0) {
+            hasMore = false;
+            break;
+          }
+
+          // Extract brands and types
+          for (const product of products) {
+            totalFetched++;
+
+            // Brand
+            if (product.vendor) {
+              const brandHandle = product.vendor.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+              if (allBrands.has(brandHandle)) {
+                allBrands.get(brandHandle).count++;
+              } else {
+                allBrands.set(brandHandle, { name: product.vendor, count: 1 });
+              }
+            }
+
+            // Product Type
+            if (product.product_type) {
+              const typeHandle = product.product_type.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+              if (allTypes.has(typeHandle)) {
+                allTypes.get(typeHandle).count++;
+              } else {
+                allTypes.set(typeHandle, { name: product.product_type, count: 1 });
+              }
+            }
+          }
+
+          // Check if there are more pages
+          if (products.length < 250) {
+            hasMore = false;
+          } else {
+            page++;
+            // Small delay to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+        }
+      } catch (error) {
+        console.error('CF-PLP-AJAX: Error fetching', handle, error);
+      }
+    }
+
+    console.log('CF-PLP-AJAX: Fetched', totalFetched, 'products,', allBrands.size, 'brands,', allTypes.size, 'types');
+
+    return { brands: allBrands, types: allTypes, totalProducts: totalFetched };
+  }
+
+  // ========================================
+  // BUILD FILTER UI FROM AJAX DATA
+  // ========================================
+
+  function buildBrandFilters(brands) {
+    if (!brandFilterOptions) return;
+
+    // Sort brands by count (descending), then alphabetically
+    const sortedBrands = Array.from(brands.entries()).sort((a, b) => {
+      if (b[1].count !== a[1].count) return b[1].count - a[1].count;
+      return a[1].name.localeCompare(b[1].name);
+    });
+
+    brandFilterOptions.innerHTML = '';
+
+    for (const [handle, data] of sortedBrands) {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <label class="cf-plp-ajax__filter-option">
+          <input type="checkbox" name="brand-ajax" value="${handle}">
+          ${data.name}
+          <span class="cf-plp-ajax__filter-count">(${data.count})</span>
+        </label>
+      `;
+      brandFilterOptions.appendChild(li);
+    }
+
+    // Hide loading, show options
+    if (brandFilterLoading) brandFilterLoading.style.display = 'none';
+    brandFilterOptions.style.display = 'block';
+
+    // Attach event listeners
+    brandFilterOptions.querySelectorAll('input[name="brand-ajax"]').forEach(cb => {
+      cb.addEventListener('change', function() {
+        if (this.checked) {
+          filterState.brands.push(this.value);
+        } else {
+          filterState.brands = filterState.brands.filter(b => b !== this.value);
+        }
+        applyFilters();
+      });
+    });
+  }
+
+  function buildTypeFilters(types) {
+    if (!typeFilterOptions) return;
+
+    // Sort types by count (descending), then alphabetically
+    const sortedTypes = Array.from(types.entries()).sort((a, b) => {
+      if (b[1].count !== a[1].count) return b[1].count - a[1].count;
+      return a[1].name.localeCompare(b[1].name);
+    });
+
+    typeFilterOptions.innerHTML = '';
+
+    for (const [handle, data] of sortedTypes) {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <label class="cf-plp-ajax__filter-option">
+          <input type="checkbox" name="type-ajax" value="${handle}">
+          ${data.name}
+          <span class="cf-plp-ajax__filter-count">(${data.count})</span>
+        </label>
+      `;
+      typeFilterOptions.appendChild(li);
+    }
+
+    // Hide loading, show options
+    if (typeFilterLoading) typeFilterLoading.style.display = 'none';
+    typeFilterOptions.style.display = 'block';
+
+    // Attach event listeners
+    typeFilterOptions.querySelectorAll('input[name="type-ajax"]').forEach(cb => {
+      cb.addEventListener('change', function() {
+        if (this.checked) {
+          filterState.productTypes.push(this.value);
+        } else {
+          filterState.productTypes = filterState.productTypes.filter(t => t !== this.value);
+        }
+        applyFilters();
+      });
+    });
+  }
+
+  // ========================================
+  // INITIALIZE PRODUCT DATA FROM DOM
+  // ========================================
+
+  function initProductData() {
+    const cards = document.querySelectorAll('.cf-plp-ajax__card');
+    productData = [];
+
+    cards.forEach((card, idx) => {
+      productData.push({
+        element: card,
+        category: card.dataset.category || '',
+        vendor: card.dataset.vendor || '',
+        productType: card.dataset.type || '',
+        price: parseFloat(card.dataset.price) || 0,
+        title: (card.dataset.title || '').toLowerCase(),
+        originalIndex: idx
+      });
+    });
+
+    paginationState.filteredCards = Array.from(cards);
+  }
+
+  // ========================================
+  // FILTER APPLICATION
+  // ========================================
+
+  function applyFilters(resetPage = true) {
+    paginationState.filteredCards = [];
+
+    const hasCategory = filterState.category !== 'all';
+    const hasBrands = filterState.brands.length > 0;
+    const hasProductTypes = filterState.productTypes.length > 0;
+    const hasPrices = filterState.priceRanges.length > 0;
+
+    for (let i = 0; i < productData.length; i++) {
+      const p = productData[i];
+      let visible = true;
+
+      // Category
+      if (hasCategory && p.category !== filterState.category) visible = false;
+
+      // Brand
+      if (visible && hasBrands && !filterState.brands.includes(p.vendor)) visible = false;
+
+      // Product Type
+      if (visible && hasProductTypes && !filterState.productTypes.includes(p.productType)) visible = false;
+
+      // Price
+      if (visible && hasPrices) {
+        let priceMatch = false;
+        for (const range of filterState.priceRanges) {
+          if (range === '0-500' && p.price < 50000) { priceMatch = true; break; }
+          if (range === '500-1000' && p.price >= 50000 && p.price < 100000) { priceMatch = true; break; }
+          if (range === '1000-2500' && p.price >= 100000 && p.price < 250000) { priceMatch = true; break; }
+          if (range === '2500+' && p.price >= 250000) { priceMatch = true; break; }
+        }
+        if (!priceMatch) visible = false;
+      }
+
+      if (visible) {
+        paginationState.filteredCards.push(p.element);
+      } else {
+        p.element.style.display = 'none';
+      }
+    }
+
+    if (resetPage) {
+      paginationState.currentPage = 1;
+    }
+
+    updateActiveFiltersDisplay();
+    applyPagination();
+  }
+
+  // ========================================
+  // ACTIVE FILTERS DISPLAY
+  // ========================================
+
+  function updateActiveFiltersDisplay() {
+    if (!activeFiltersContainer) return;
+
+    const activeChips = [];
+
+    if (filterState.category !== 'all') {
+      const categoryPill = document.querySelector(`.cf-plp-ajax__pill[data-filter="${filterState.category}"]`);
+      const categoryName = categoryPill ? categoryPill.textContent.trim() : filterState.category;
+      activeChips.push({
+        type: 'category',
+        label: `Category: ${categoryName}`,
+        value: filterState.category
+      });
+    }
+
+    filterState.brands.forEach(brand => {
+      const brandCheckbox = document.querySelector(`input[name="brand-ajax"][value="${brand}"]`);
+      const brandLabel = brandCheckbox ? brandCheckbox.parentElement.textContent.trim().replace(/\(\d+\)/, '').trim() : brand;
+      activeChips.push({
+        type: 'brand',
+        label: `Brand: ${brandLabel}`,
+        value: brand
+      });
+    });
+
+    filterState.productTypes.forEach(type => {
+      const typeCheckbox = document.querySelector(`input[name="type-ajax"][value="${type}"]`);
+      const typeLabel = typeCheckbox ? typeCheckbox.parentElement.textContent.trim().replace(/\(\d+\)/, '').trim() : type;
+      activeChips.push({
+        type: 'productType',
+        label: `Type: ${typeLabel}`,
+        value: type
+      });
+    });
+
+    filterState.priceRanges.forEach(range => {
+      let rangeLabel = '';
+      if (range === '0-500') rangeLabel = 'Under $500';
+      else if (range === '500-1000') rangeLabel = '$500 - $1,000';
+      else if (range === '1000-2500') rangeLabel = '$1,000 - $2,500';
+      else if (range === '2500+') rangeLabel = '$2,500+';
+
+      activeChips.push({
+        type: 'price',
+        label: `Price: ${rangeLabel}`,
+        value: range
+      });
+    });
+
+    if (activeChips.length > 0) {
+      activeFiltersContainer.style.display = 'flex';
+      if (activeFiltersList) {
+        activeFiltersList.innerHTML = activeChips.map(chip => `
+          <div class="cf-plp-ajax__filter-chip" data-type="${chip.type}" data-value="${chip.value}">
+            <span>${chip.label}</span>
+            <span class="cf-plp-ajax__filter-chip-remove" onclick="removeFilterAjax('${chip.type}', '${chip.value}')">×</span>
+          </div>
+        `).join('');
+      }
+    } else {
+      activeFiltersContainer.style.display = 'none';
+    }
+  }
+
+  // Global remove filter function
+  window.removeFilterAjax = function(type, value) {
+    if (type === 'category') {
+      filterState.category = 'all';
+      document.querySelectorAll('.cf-plp-ajax__pill').forEach(p => p.classList.remove('active'));
+      const allPill = document.querySelector('.cf-plp-ajax__pill[data-filter="all"]');
+      if (allPill) allPill.classList.add('active');
+    } else if (type === 'brand') {
+      filterState.brands = filterState.brands.filter(b => b !== value);
+      const checkbox = document.querySelector(`input[name="brand-ajax"][value="${value}"]`);
+      if (checkbox) checkbox.checked = false;
+    } else if (type === 'productType') {
+      filterState.productTypes = filterState.productTypes.filter(t => t !== value);
+      const checkbox = document.querySelector(`input[name="type-ajax"][value="${value}"]`);
+      if (checkbox) checkbox.checked = false;
+    } else if (type === 'price') {
+      filterState.priceRanges = filterState.priceRanges.filter(p => p !== value);
+      const checkbox = document.querySelector(`input[name="price-ajax"][value="${value}"]`);
+      if (checkbox) checkbox.checked = false;
+    }
+
+    applyFilters();
+  };
+
+  // ========================================
+  // PAGINATION
+  // ========================================
+
+  function applyPagination() {
+    const { filteredCards, currentPage, itemsPerPage } = paginationState;
+    const totalItems = filteredCards.length;
+    paginationState.totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    if (resultsCount) resultsCount.textContent = totalItems;
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
+    requestAnimationFrame(() => {
+      for (let i = 0; i < filteredCards.length; i++) {
+        if (i >= startIndex && i < endIndex) {
+          filteredCards[i].style.display = '';
+        } else {
+          filteredCards[i].style.display = 'none';
+        }
+      }
+    });
+
+    renderPagination();
+  }
+
+  function renderPagination() {
+    if (!paginationContainer) return;
+    const { currentPage, totalPages } = paginationState;
+
+    if (totalPages <= 1) {
+      paginationContainer.style.display = 'none';
+      return;
+    }
+    paginationContainer.style.display = 'flex';
+
+    if (prevBtn) prevBtn.disabled = currentPage === 1;
+    if (nextBtn) nextBtn.disabled = currentPage === totalPages;
+
+    if (pageNumbersContainer) {
+      pageNumbersContainer.innerHTML = '';
+      const maxVisible = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+      if (endPage - startPage < maxVisible - 1) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
+      }
+
+      if (startPage > 1) {
+        pageNumbersContainer.appendChild(createPageButton(1));
+        if (startPage > 2) {
+          const ellipsis = document.createElement('span');
+          ellipsis.className = 'cf-plp-ajax__page-ellipsis';
+          ellipsis.textContent = '...';
+          pageNumbersContainer.appendChild(ellipsis);
+        }
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbersContainer.appendChild(createPageButton(i));
+      }
+
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          const ellipsis = document.createElement('span');
+          ellipsis.className = 'cf-plp-ajax__page-ellipsis';
+          ellipsis.textContent = '...';
+          pageNumbersContainer.appendChild(ellipsis);
+        }
+        pageNumbersContainer.appendChild(createPageButton(totalPages));
+      }
+    }
+  }
+
+  function createPageButton(pageNum) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'cf-plp-ajax__page-num' + (pageNum === paginationState.currentPage ? ' active' : '');
+    btn.textContent = pageNum;
+    btn.addEventListener('click', () => goToPage(pageNum));
+    return btn;
+  }
+
+  function goToPage(pageNum) {
+    paginationState.currentPage = pageNum;
+    applyPagination();
+    const productsContainer = document.querySelector('.cf-plp-ajax__products');
+    if (productsContainer) {
+      productsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (paginationState.currentPage > 1) goToPage(paginationState.currentPage - 1);
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (paginationState.currentPage < paginationState.totalPages) goToPage(paginationState.currentPage + 1);
+    });
+  }
+
+  // ========================================
+  // EVENT LISTENERS
+  // ========================================
+
+  // Clear all filters
+  if (clearAllBtn) {
+    clearAllBtn.addEventListener('click', function() {
+      filterState.category = 'all';
+      filterState.brands = [];
+      filterState.productTypes = [];
+      filterState.priceRanges = [];
+
+      document.querySelectorAll('.cf-plp-ajax__pill').forEach(p => p.classList.remove('active'));
+      const allPill = document.querySelector('.cf-plp-ajax__pill[data-filter="all"]');
+      if (allPill) allPill.classList.add('active');
+
+      document.querySelectorAll('.cf-plp-ajax__sidebar input[type="checkbox"]').forEach(cb => cb.checked = false);
+
+      applyFilters();
+    });
+  }
+
+  // Category pills (skip link pills - they navigate to another page)
+  document.querySelectorAll('.cf-plp-ajax__pill:not(.cf-plp-ajax__pill--link)').forEach(pill => {
+    pill.addEventListener('click', function() {
+      document.querySelectorAll('.cf-plp-ajax__pill').forEach(p => p.classList.remove('active'));
+      this.classList.add('active');
+      filterState.category = this.dataset.filter;
+      applyFilters();
+    });
+  });
+
+  // Price range checkboxes
+  document.querySelectorAll('input[name="price-ajax"]').forEach(cb => {
+    cb.addEventListener('change', function() {
+      if (this.checked) {
+        filterState.priceRanges.push(this.value);
+      } else {
+        filterState.priceRanges = filterState.priceRanges.filter(p => p !== this.value);
+      }
+      applyFilters();
+    });
+  });
+
+  // View toggle
+  const productGrid = document.getElementById('product-grid-ajax');
+  document.querySelectorAll('.cf-plp-ajax__view-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.cf-plp-ajax__view-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+
+      const viewType = this.dataset.view;
+      if (viewType === 'list' && productGrid) {
+        productGrid.classList.add('list-view');
+      } else if (productGrid) {
+        productGrid.classList.remove('list-view');
+      }
+    });
+  });
+
+  // Add to Cart
+  document.querySelectorAll('.cf-plp-ajax__add-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const variantId = this.dataset.variantId;
+      const card = this.closest('.cf-plp-ajax__card');
+      const qty = card ? parseInt(card.querySelector('.cf-plp-ajax__qty-input').value) || 1 : 1;
+      const button = this;
+
+      button.disabled = true;
+      button.textContent = 'Adding...';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: parseInt(variantId), quantity: qty })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Add to cart failed');
+        return res.json();
+      })
+      .then(data => {
+        button.textContent = 'Added!';
+        button.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+
+        if (window.updateCartCount) window.updateCartCount();
+        else {
+          fetch('/cart.js').then(r => r.json()).then(cart => {
+            const countEls = document.querySelectorAll('.cart-count-bubble span, .cart-count, [data-cart-count]');
+            countEls.forEach(el => el.textContent = cart.item_count);
+          });
+        }
+
+        if (typeof window.cfShowCartToast === 'function') {
+          window.cfShowCartToast(data, qty);
+        }
+
+        setTimeout(() => {
+          button.textContent = 'Add to Cart';
+          button.style.background = '';
+          button.disabled = false;
+        }, 2000);
+      })
+      .catch(err => {
+        console.error('Cart error:', err);
+        button.textContent = 'Error';
+        button.style.background = '#ef4444';
+        setTimeout(() => {
+          button.textContent = 'Add to Cart';
+          button.style.background = '';
+          button.disabled = false;
+        }, 2000);
+      });
+    });
+  });
+
+  // Sort handler — client-side sort (products are rendered from DOM, not server)
+  window.handleSortAjax = function(value) {
+    const grid = document.getElementById('product-grid-ajax');
+    if (!grid) return;
+
+    productData.sort((a, b) => {
+      switch (value) {
+        case 'price-ascending':
+          return a.price - b.price;
+        case 'price-descending':
+          return b.price - a.price;
+        case 'title-ascending':
+          return a.title.localeCompare(b.title);
+        case 'best-selling':
+        default:
+          return a.originalIndex - b.originalIndex;
+      }
+    });
+
+    // Re-append cards in sorted order
+    for (const item of productData) {
+      grid.appendChild(item.element);
+    }
+
+    // Re-apply filters + pagination with new order
+    applyFilters();
+  };
+
+  // ========================================
+  // INITIALIZATION
+  // ========================================
+
+  initProductData();
+  applyFilters();
+
+  // Start AJAX fetch for filters
+  fetchAllProducts().then(({ brands, types, totalProducts }) => {
+    buildBrandFilters(brands);
+    buildTypeFilters(types);
+    console.log('CF-PLP-AJAX: Filter build complete -', brands.size, 'brands,', types.size, 'types from', totalProducts, 'API products');
+  }).catch(error => {
+    console.error('CF-PLP-AJAX: Failed to build filters', error);
+    if (brandFilterLoading) {
+      brandFilterLoading.innerHTML = '<span style="color: #ef4444; font-size: 12px;">Failed to load brands</span>';
+    }
+    if (typeFilterLoading) {
+      typeFilterLoading.innerHTML = '<span style="color: #ef4444; font-size: 12px;">Failed to load types</span>';
+    }
+  });
+
+  console.log('CF-PLP-AJAX: Initialized with', productData.length, 'products on page');
+});
+</script>
+
+{% schema %}
+{
+  "name": "L2 Collection Hub (AJAX)",
+  "tag": "section",
+  "class": "section-collection-level2-ajax",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Navigation Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 24,
+      "max": 480,
+      "step": 24,
+      "default": 48,
+      "label": "Products per page"
+    },
+    {
+      "type": "checkbox",
+      "id": "compact_mode",
+      "label": "Compact Mode (5 columns)",
+      "default": true,
+      "info": "Show 5 products per row with smaller cards"
+    }
+  ],
+  "presets": [
+    {
+      "name": "L2 Collection Hub (AJAX)"
+    }
+  ]
+}
+{% endschema %}
