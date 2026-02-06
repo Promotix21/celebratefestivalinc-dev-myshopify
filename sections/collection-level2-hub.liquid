@@ -1811,6 +1811,10 @@
             <a href="/collections/food-holding-and-warming-equipment" class="cf-plp__pill cf-plp__pill--link">
               {{ pill_title }}
             </a>
+          {% elsif pill_title_lower contains 'storage racks' %}
+            <a href="/collections/storage-racks" class="cf-plp__pill cf-plp__pill--link">
+              {{ pill_title }}
+            </a>
           {% else %}
             <button type="button" class="cf-plp__pill" data-filter="{{ handle_clean }}">
               {{ pill_title }}
