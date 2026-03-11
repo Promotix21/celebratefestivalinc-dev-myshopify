@@ -1,0 +1,29 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "page-privacy-policy",
+      "settings": {
+        "hero_tagline": "Legal",
+        "hero_title": "Privacy Policy",
+        "hero_subtitle": "How we collect, use, and protect your personal information.",
+        "last_updated": "June 11, 2025",
+        "contact_email": "rupesh@celebratefestivalinc.com",
+        "contact_phone": "(408) 673-9999",
+        "contact_address": "235 Whitney Place, Fremont, CA, 94539, US",
+        "show_contact_cta": true,
+        "cta_title": "Have Questions?",
+        "cta_text": "If you have any questions about our privacy practices, we're here to help."
+      }
+    }
+  },
+  "order": ["main"]
+}

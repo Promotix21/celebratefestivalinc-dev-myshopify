@@ -1,0 +1,236 @@
+{% comment %}
+  Partner Section - Diagonal Clip Image Right Design
+  Matches Hero Design 4 from mockup
+{% endcomment %}
+
+{{ 'partner-section.css' | asset_url | stylesheet_tag }}
+
+<section class="partner-section" id="partner-section-{{ section.id }}">
+  <!-- Subtle background texture -->
+  <div class="partner-section__texture"></div>
+
+  <!-- Content Left -->
+  <div class="partner-section__content">
+    {% if section.settings.show_badge %}
+      <div class="partner-section__badge">
+        {{ section.settings.badge_text }}
+      </div>
+    {% endif %}
+
+    <h2 class="partner-section__title">
+      {{ section.settings.title_line_1 }}<br>
+      <span class="partner-section__title-highlight">{{ section.settings.title_highlight }}</span> {{ section.settings.title_line_2 }}
+    </h2>
+
+    {% if section.settings.description != blank %}
+      <p class="partner-section__desc">
+        {{ section.settings.description }}
+      </p>
+    {% endif %}
+
+    {% if section.blocks.size > 0 %}
+      <ul class="partner-section__features">
+        {% for block in section.blocks %}
+          {% if block.type == 'feature' %}
+            <li class="partner-section__feature" {{ block.shopify_attributes }}>
+              <span class="partner-section__feature-icon">
+                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+              </span>
+              {{ block.settings.feature_text }}
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if section.settings.show_button and section.settings.button_text != blank %}
+      <a href="{{ section.settings.button_url }}" class="partner-section__btn">
+        {{ section.settings.button_text }}
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+    {% endif %}
+  </div>
+
+  <!-- Diagonal Image Right -->
+  <div class="partner-section__image">
+    {% if section.settings.image != blank %}
+      <img
+        src="{{ section.settings.image | image_url: width: 1200 }}"
+        srcset="{{ section.settings.image | image_url: width: 600 }} 600w,
+                {{ section.settings.image | image_url: width: 900 }} 900w,
+                {{ section.settings.image | image_url: width: 1200 }} 1200w"
+        sizes="(max-width: 1100px) 100vw, 55vw"
+        alt="{{ section.settings.image_alt | default: section.settings.title_highlight }}"
+        loading="lazy"
+        width="1200"
+        height="800"
+      >
+    {% else %}
+      <div class="partner-section__image-placeholder">
+        {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Partner Section",
+  "tag": "section",
+  "class": "partner-section-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Badge"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badge",
+      "label": "Show badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge text",
+      "default": "About Us"
+    },
+    {
+      "type": "header",
+      "content": "Title"
+    },
+    {
+      "type": "text",
+      "id": "title_line_1",
+      "label": "Title line 1",
+      "default": "Your Complete"
+    },
+    {
+      "type": "text",
+      "id": "title_highlight",
+      "label": "Title highlight (coral color)",
+      "default": "Restaurant Equipment"
+    },
+    {
+      "type": "text",
+      "id": "title_line_2",
+      "label": "Title line 2",
+      "default": "Partner"
+    },
+    {
+      "type": "header",
+      "content": "Description"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "We're dedicated to helping restaurants, hotels, and foodservice operations succeed with premium commercial kitchen equipment. From consultation to delivery, we're with you every step of the way."
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_button",
+      "label": "Show button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Learn More About Us"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Button URL"
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image alt text"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#1c2b48"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color (coral)",
+      "default": "#e95b62"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        {
+          "type": "text",
+          "id": "feature_text",
+          "label": "Feature text",
+          "default": "Expert product guidance & consultation"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Partner Section",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "feature_text": "Expert product guidance & consultation"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "feature_text": "Competitive pricing with price match guarantee"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "feature_text": "Fast, reliable nationwide shipping"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "feature_text": "Dedicated customer support team"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

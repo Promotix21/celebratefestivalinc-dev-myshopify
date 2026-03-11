@@ -1,0 +1,23 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main_collection": {
+      "type": "main-collection-cf",
+      "settings": {
+        "products_per_page": 24,
+        "compact_mode": true
+      }
+    }
+  },
+  "order": [
+    "main_collection"
+  ]
+}

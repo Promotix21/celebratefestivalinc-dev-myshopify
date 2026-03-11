@@ -1,0 +1,654 @@
+/* ========================================
+   COMPACT SPACING OVERRIDES
+   Celebrate Festival Theme
+   Based on WebstaurantStore Mockup
+   ========================================
+
+   Target Values from Mockup:
+   - Section padding: 15-25px (not 40-60px)
+   - Product card padding: 15px
+   - Grid gaps: 15-20px
+   - Sidebar padding: 15px
+   - Hero banner padding: 40px 30px
+   ======================================== */
+
+:root {
+  /* Compact Section Spacing */
+  --spacing-sections-mobile: 1.5rem;  /* 15px instead of 40px */
+  --spacing-sections-desktop: 2rem;   /* 20px instead of 60px */
+
+  /* Compact Grid Spacing */
+  --grid-mobile-horizontal-spacing: 1rem;   /* 10px */
+  --grid-mobile-vertical-spacing: 1rem;     /* 10px */
+  --grid-desktop-horizontal-spacing: 1.5rem; /* 15px */
+  --grid-desktop-vertical-spacing: 1.5rem;   /* 15px */
+
+  /* Compact Page Margins */
+  --page-width-margin: 1.5rem;
+}
+
+/* ========================================
+   GLOBAL SECTION SPACING
+   ======================================== */
+
+.section + .section {
+  margin-top: 1.5rem;
+}
+
+@media screen and (min-width: 750px) {
+  .section + .section {
+    margin-top: 2rem;
+  }
+}
+
+/* Page width padding - more compact */
+.page-width {
+  padding: 0 1.5rem;
+}
+
+@media screen and (min-width: 750px) {
+  .page-width {
+    padding: 0 2rem;
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .page-width {
+    padding: 0 2rem;
+  }
+}
+
+/* ========================================
+   COLLECTION PAGE - COMPACT
+   ======================================== */
+
+/* Collection header - reduced padding */
+.collection-header {
+  padding: 20px 0;
+}
+
+/* Collection content area */
+.collection-content {
+  padding: 20px 0 40px;
+}
+
+/* Collection grid - tighter gap */
+.collection-grid {
+  gap: 20px;
+}
+
+/* Filters sidebar - compact padding */
+.filters-sidebar {
+  padding: 15px;
+}
+
+.filter-section {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+}
+
+/* Products header toolbar */
+.products-header {
+  margin-bottom: 15px;
+  padding: 12px 15px;
+}
+
+/* Products grid - compact gap */
+.products-grid {
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+/* Product card - compact padding */
+.product-card {
+  border-radius: 4px;
+}
+
+.product-info {
+  padding: 15px;
+}
+
+/* ========================================
+   COMPONENT CARD - COMPACT
+   ======================================== */
+
+.card__content {
+  padding: 0.8rem;
+}
+
+.card__information {
+  padding: 1rem 0.8rem;
+}
+
+@media screen and (min-width: 750px) {
+  .card__information {
+    padding-bottom: 1rem;
+    padding-top: 1rem;
+  }
+}
+
+.card:not(.card--horizontal) > .card__content > .card__badge {
+  margin: 0.8rem;
+}
+
+/* ========================================
+   FEATURED CATEGORIES - COMPACT
+   ======================================== */
+
+.featured-categories-section {
+  padding: 25px 0;
+}
+
+.featured-categories-section .section-header {
+  margin-bottom: 20px;
+}
+
+.featured-categories-grid {
+  gap: 15px;
+  padding: 0 20px;
+}
+
+.category-feature-content {
+  padding: 15px;
+}
+
+.category-feature-image {
+  height: 140px;
+}
+
+.category-count-info {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+}
+
+/* ========================================
+   HERO BANNER - COMPACT
+   ======================================== */
+
+.banner__box {
+  padding: 2.5rem 1.5rem;
+}
+
+@media screen and (min-width: 750px) {
+  .banner__box {
+    padding: 2.5rem;
+  }
+
+  .banner--desktop-transparent .banner__box {
+    padding: 2.5rem 0;
+  }
+}
+
+.banner--mobile-bottom .banner__box {
+  padding: 2.5rem 2rem;
+}
+
+/* Collection Hero - compact */
+.collection-hero--with-image .collection-hero__text-wrapper {
+  padding: 2.5rem 0 2rem;
+}
+
+@media screen and (min-width: 750px) {
+  .collection-hero.collection-hero--with-image {
+    padding: calc(2rem + var(--page-width-margin)) 0;
+  }
+
+  .collection-hero--with-image .collection-hero__text-wrapper {
+    padding: 2rem 1.5rem 2rem 0;
+  }
+}
+
+/* ========================================
+   MULTICOLUMN SECTION - COMPACT
+   ======================================== */
+
+.multicolumn-card-spacing {
+  padding-top: 1.5rem;
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+}
+
+.multicolumn-card__info {
+  padding: 1.5rem;
+}
+
+.background-none .multicolumn-card__image-wrapper + .multicolumn-card__info {
+  padding-top: 1.5rem;
+}
+
+.multicolumn .button {
+  margin-top: 1rem;
+}
+
+@media screen and (min-width: 750px) {
+  .multicolumn .button {
+    margin-top: 2rem;
+  }
+}
+
+/* ========================================
+   COLLECTION LIST - COMPACT
+   ======================================== */
+
+.collection-list-view-all {
+  margin-top: 1.5rem;
+}
+
+/* ========================================
+   TITLE WRAPPERS - COMPACT
+   ======================================== */
+
+.title,
+.title-wrapper-with-link {
+  margin: 1.5rem 0 1rem;
+}
+
+.title-wrapper {
+  margin-bottom: 1.5rem;
+}
+
+@media screen and (min-width: 990px) {
+  .title,
+  .title-wrapper-with-link {
+    margin: 2rem 0 1.5rem;
+  }
+
+  .title--primary {
+    margin: 1rem 0;
+  }
+}
+
+/* ========================================
+   GRID COMPONENT - COMPACT
+   ======================================== */
+
+.grid {
+  margin-bottom: 1rem;
+}
+
+/* ========================================
+   BREADCRUMB - COMPACT
+   ======================================== */
+
+.breadcrumb {
+  padding: 12px 0;
+}
+
+/* ========================================
+   PAGINATION - COMPACT
+   ======================================== */
+
+.pagination {
+  margin-top: 25px;
+}
+
+/* ========================================
+   IMAGE BANNER - COMPACT
+   ======================================== */
+
+@media screen and (min-width: 750px) {
+  .banner__content {
+    padding: 2.5rem;
+  }
+}
+
+/* ========================================
+   PRODUCT PAGE - COMPACT
+   ======================================== */
+
+.product-section {
+  padding: 20px 0;
+}
+
+.product__info-wrapper {
+  padding: 15px 0;
+}
+
+/* ========================================
+   FOOTER - COMPACT
+   ======================================== */
+
+.footer {
+  padding-top: 25px;
+}
+
+.footer__content-top {
+  padding-bottom: 25px;
+}
+
+.footer__content-bottom {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+/* ========================================
+   MOBILE SPECIFIC COMPACT OVERRIDES
+   ======================================== */
+
+@media screen and (max-width: 749px) {
+  .collection-header {
+    padding: 15px 0;
+  }
+
+  .collection-content {
+    padding: 15px 0 30px;
+  }
+
+  .featured-categories-section {
+    padding: 20px 0;
+  }
+
+  .featured-categories-grid {
+    gap: 12px;
+    padding: 0 15px;
+  }
+
+  .category-feature-content {
+    padding: 12px;
+  }
+
+  .products-grid {
+    gap: 10px;
+  }
+
+  .product-info {
+    padding: 12px;
+  }
+}
+
+/* ========================================
+   LEVEL 2/3 COLLECTION PAGES - COMPACT
+   ======================================== */
+
+/* Level 2 Category sections */
+.level2-categories-section,
+.main-categories-section,
+.secondary-categories-section {
+  padding: 20px 15px;
+}
+
+.main-categories-grid,
+.secondary-categories-grid {
+  gap: 15px;
+}
+
+/* Icon categories row */
+.icon-categories-section {
+  padding: 12px 15px 20px;
+}
+
+.icon-categories-grid {
+  gap: 10px;
+}
+
+/* Level 2 icon section */
+.level2-icon-section {
+  padding: 15px;
+}
+
+.level2-icon-grid {
+  gap: 12px;
+}
+
+/* Brands section */
+.brands-section {
+  padding: 15px;
+}
+
+.brands-grid {
+  gap: 12px;
+}
+
+/* Top products section */
+.top-products-section {
+  padding: 20px 15px;
+}
+
+.products-carousel {
+  gap: 12px;
+}
+
+/* Other equipment section */
+.other-equipment-section {
+  padding: 20px 15px;
+}
+
+.other-equipment-grid {
+  gap: 15px;
+}
+
+/* ========================================
+   PRODUCT CARD (PLP) - COMPACT
+   ======================================== */
+
+.product-card-plp {
+  padding: 12px;
+}
+
+.product-card-plp .product-image {
+  height: 120px;
+  margin-bottom: 10px;
+}
+
+.price-box {
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+/* ========================================
+   FILTERS SIDEBAR (L3) - COMPACT
+   ======================================== */
+
+.filters-sidebar {
+  width: 200px;
+  padding: 12px;
+}
+
+.filter-group {
+  margin-bottom: 15px;
+  padding-bottom: 12px;
+}
+
+.filter-options li {
+  margin-bottom: 6px;
+}
+
+/* ========================================
+   PRODUCTS AREA - COMPACT
+   ======================================== */
+
+.products-area {
+  padding: 12px 15px;
+}
+
+.products-toolbar {
+  margin-bottom: 15px;
+  padding-bottom: 12px;
+}
+
+/* Power type section */
+.power-type-section {
+  margin-bottom: 20px;
+}
+
+.power-type-options {
+  gap: 15px;
+}
+
+.power-type-btn {
+  padding: 12px 15px;
+}
+
+/* ========================================
+   ANNOUNCEMENT BAR - COMPACT
+   ======================================== */
+
+.announcement-bar {
+  padding: 8px 0;
+}
+
+.announcement-bar__message {
+  padding: 6px 10px;
+}
+
+/* ========================================
+   NEWSLETTER SECTION - COMPACT
+   ======================================== */
+
+.newsletter-section {
+  padding: 25px 0;
+}
+
+/* ========================================
+   RICH TEXT SECTION - COMPACT
+   ======================================== */
+
+.rich-text {
+  padding: 25px 0;
+}
+
+/* ========================================
+   IMAGE WITH TEXT - COMPACT
+   ======================================== */
+
+.image-with-text__content {
+  padding: 20px;
+}
+
+@media screen and (min-width: 750px) {
+  .image-with-text__content {
+    padding: 30px;
+  }
+}
+
+/* ========================================
+   SLIDESHOW - COMPACT
+   ======================================== */
+
+.slideshow__content {
+  padding: 25px;
+}
+
+/* ========================================
+   VIDEO SECTION - COMPACT
+   ======================================== */
+
+.video-section {
+  padding: 20px 0;
+}
+
+/* ========================================
+   FEATURED COLLECTION - COMPACT
+   ======================================== */
+
+.featured-collection {
+  padding: 20px 0;
+}
+
+/* ========================================
+   TESTIMONIALS - COMPACT
+   ======================================== */
+
+.testimonials-section {
+  padding: 25px 0;
+}
+
+/* ========================================
+   STAFF PICKS - COMPACT
+   ======================================== */
+
+.staff-picks-section {
+  padding: 25px 0;
+}
+
+/* ========================================
+   RELATED PRODUCTS - COMPACT
+   ======================================== */
+
+.related-products {
+  padding: 20px 0;
+}
+
+/* ========================================
+   CART DRAWER - COMPACT
+   ======================================== */
+
+.cart-drawer__inner {
+  padding: 15px;
+}
+
+/* ========================================
+   SEARCH RESULTS - COMPACT
+   ======================================== */
+
+.search-results {
+  padding: 20px 0;
+}
+
+/* ========================================
+   FACETS - COMPACT
+   ======================================== */
+
+.facets-wrapper {
+  padding: 15px 0;
+}
+
+.facets__summary {
+  padding: 12px 15px;
+}
+
+/* ========================================
+   ELEMENT MARGINS - COMPACT
+   ======================================== */
+
+.element-margin-top {
+  margin-top: 2.5rem;
+}
+
+@media screen and (min-width: 750px) {
+  .element-margin {
+    margin-top: calc(2.5rem + var(--page-width-margin));
+  }
+}
+
+/* Horizontal rule */
+hr {
+  margin: 2.5rem 0;
+}
+
+@media screen and (min-width: 750px) {
+  hr {
+    margin: 3.5rem 0;
+  }
+}
+
+/* Page margin */
+.page-margin,
+.shopify-challenge__container {
+  margin: 3.5rem auto;
+}
+
+/* ========================================
+   COLLECTION EMPTY STATE - COMPACT
+   ======================================== */
+
+.collection-empty {
+  padding: 40px 15px;
+}
+
+/* ========================================
+   LOADING STATE - COMPACT
+   ======================================== */
+
+.loading {
+  padding: 25px;
+}
+
+/* ========================================
+   ACTIVE FILTERS - COMPACT
+   ======================================== */
+
+.active-filters {
+  margin-bottom: 15px;
+  padding: 12px 15px;
+}

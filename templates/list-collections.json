@@ -1,0 +1,25 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-list-collections",
+      "settings": {
+        "main_menu": "cf-menu-31-12-2026",
+        "show_breadcrumbs": true,
+        "title": "Shop by Category",
+        "description": "Browse our complete selection of professional restaurant equipment, kitchen supplies, and commercial-grade products.",
+        "header_bg_color": "#1a365d",
+        "header_overlay_color": "rgba(26, 54, 93, 0.85)"
+      }
+    }
+  },
+  "order": ["main"]
+}

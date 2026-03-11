@@ -1,0 +1,68 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "page-coming-soon",
+      "blocks": {
+        "feature_1": {
+          "type": "feature",
+          "settings": {
+            "icon": "&#9878;",
+            "label": "Professional Grade Equipment"
+          }
+        },
+        "feature_2": {
+          "type": "feature",
+          "settings": {
+            "icon": "&#9733;",
+            "label": "Exclusive Member Pricing"
+          }
+        },
+        "feature_3": {
+          "type": "feature",
+          "settings": {
+            "icon": "&#10003;",
+            "label": "Free Shipping on Select Items"
+          }
+        },
+        "feature_4": {
+          "type": "feature",
+          "settings": {
+            "icon": "&#9742;",
+            "label": "Expert Support: (408) 673-9999"
+          }
+        }
+      },
+      "block_order": [
+        "feature_1",
+        "feature_2",
+        "feature_3",
+        "feature_4"
+      ],
+      "settings": {
+        "pill_text": "Under Construction",
+        "heading_line_1": "Something Great",
+        "heading_line_2": "Is Coming Soon",
+        "subheading": "We're working hard to bring you this page. Professional-grade restaurant equipment, curated collections, and exclusive member pricing — all arriving shortly.",
+        "show_email_form": true,
+        "form_label": "Get notified when this page goes live",
+        "form_button_text": "Notify Me",
+        "primary_btn_text": "Back to Home",
+        "primary_btn_url": "/",
+        "secondary_btn_text": "Browse Collections",
+        "secondary_btn_url": "/collections/all"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

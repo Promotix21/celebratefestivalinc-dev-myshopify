@@ -1,0 +1,499 @@
+{% comment %}
+  Staff Picks Section - Redesigned with CF Brand Product Cards
+  Matches the mockup design with conditional pricing
+{% endcomment %}
+
+<style>
+  .staff-picks-section {
+    padding: 60px 0;
+    background: #f8fafc;
+  }
+
+  .staff-picks-container {
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0 40px 0 20px; /* Full width with more padding on right */
+  }
+
+  /* Section Header */
+  .staff-picks-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+  }
+
+  .staff-picks-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a365d;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+  }
+
+  .staff-picks-title::before {
+    content: '';
+    width: 4px;
+    height: 32px;
+    background: linear-gradient(180deg, #ff6b6b 0%, #1a365d 100%);
+    border-radius: 2px;
+  }
+
+  .staff-picks-subtitle {
+    color: #64748b;
+    font-size: 15px;
+    margin-top: 8px;
+  }
+
+  .staff-picks-nav {
+    display: flex;
+    gap: 12px;
+  }
+
+  .staff-picks-nav-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid #e2e8f0;
+    background: #ffffff;
+    color: #1a365d;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .staff-picks-nav-btn:hover {
+    background: #ff6b6b;
+    border-color: #ff6b6b;
+    color: #ffffff;
+  }
+
+  .staff-picks-nav-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Products Grid / Slider */
+  .staff-picks-slider.swiper {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .staff-picks-slider .swiper-wrapper {
+    display: flex;
+    width: max-content;
+    align-items: stretch;
+  }
+
+  /* ========== PRODUCT CARD OVERRIDES FOR SLIDER ========== */
+  .sp-slide-wrapper {
+    width: 220px !important;
+    min-width: 220px;
+    height: auto !important;
+  }
+
+  .sp-slide-wrapper .product-card {
+    width: 100%;
+    margin: 0;
+    background: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #e2e8f0;
+  }
+
+  .sp-slide-wrapper .product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(26, 54, 93, 0.15);
+    border-color: #2d5a87;
+  }
+
+  /* Compact card adjustments for slider */
+  .sp-slide-wrapper .product-card .card-image {
+    padding: 12px;
+    height: 140px;
+    aspect-ratio: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .sp-slide-wrapper .product-card .card-image img:not(.product-image-hover) {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain;
+  }
+
+  .sp-slide-wrapper .product-card .card-content {
+    padding: 12px;
+  }
+
+  .sp-slide-wrapper .product-card .card-title {
+    font-size: 12px;
+    min-height: 36px;
+    -webkit-line-clamp: 2;
+  }
+
+  .sp-slide-wrapper .product-card .sku {
+    font-size: 9px;
+  }
+
+  .sp-slide-wrapper .product-card .price-single,
+  .sp-slide-wrapper .product-card .price-dual,
+  .sp-slide-wrapper .product-card .price-member-view {
+    padding: 8px 6px;
+    min-height: 92px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .sp-slide-wrapper .product-card .price-amount-single,
+  .sp-slide-wrapper .product-card .member-price-amount,
+  .sp-slide-wrapper .product-card .member-view-price {
+    font-size: 13px !important;
+  }
+
+  .sp-slide-wrapper .product-card .compare-price-strike {
+    font-size: 11px;
+  }
+
+  .sp-slide-wrapper .product-card .price-label-single,
+  .sp-slide-wrapper .product-card .member-view-label {
+    font-size: 9px;
+  }
+
+  .sp-slide-wrapper .product-card .price-unit {
+    font-size: 10px;
+  }
+
+  .sp-slide-wrapper .product-card .card-actions {
+    padding: 0 12px 12px;
+  }
+
+  .sp-slide-wrapper .product-card .qty-input {
+    width: 50px;
+    height: 34px;
+    font-size: 12px;
+  }
+
+  .sp-slide-wrapper .product-card .add-to-cart {
+    height: 34px;
+    font-size: 11px;
+  }
+
+  .sp-slide-wrapper .product-card .add-to-cart:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+    opacity: 0.7;
+    flex: 1;
+  }
+
+  .sp-slide-wrapper .product-card .cf-plp__login-prompt,
+  .sp-slide-wrapper .product-card .cf-plp__call-prompt {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 6px;
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 9px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .sp-slide-wrapper .product-card .cf-plp__login-prompt {
+    background: rgba(45, 90, 135, 0.08);
+    border: 1px dashed #2d5a87;
+    color: #2d5a87;
+  }
+
+  .sp-slide-wrapper .product-card .cf-plp__call-prompt {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #1a365d;
+  }
+
+  /* Empty state */
+  .sp-empty-card {
+    width: 100%;
+    padding: 40px 20px;
+    text-align: center;
+    color: #64748b;
+  }
+
+  /* Swiper overrides */
+  .staff-picks-slider.swiper .swiper-slide {
+    width: 220px;
+    flex-shrink: 0;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .staff-picks-section {
+      padding: 40px 0;
+    }
+
+    .staff-picks-container {
+      padding: 0 16px;
+    }
+
+    .staff-picks-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .staff-picks-title {
+      font-size: 22px;
+    }
+
+    .sp-slide-wrapper {
+      width: 180px !important;
+      min-width: 180px;
+    }
+
+    .sp-slide-wrapper .product-card .card-image {
+      height: 120px;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    .sp-slide-wrapper .product-card .price-amount-single,
+    .sp-slide-wrapper .product-card .member-price-amount,
+    .sp-slide-wrapper .product-card .member-view-price {
+      font-size: 14px !important;
+    }
+  }
+
+  /* Mobile — compact card height */
+  @media (max-width: 576px) {
+    .sp-slide-wrapper {
+      width: 155px !important;
+      min-width: 155px;
+    }
+
+    .staff-picks-slider.swiper .swiper-slide {
+      width: 155px;
+    }
+
+    /* Shorter image */
+    .sp-slide-wrapper .product-card .card-image {
+      height: 95px;
+      padding: 8px;
+    }
+
+    /* Tighter content padding */
+    .sp-slide-wrapper .product-card .card-content {
+      padding: 8px;
+    }
+
+    /* Smaller title */
+    .sp-slide-wrapper .product-card .card-title {
+      font-size: 11px;
+      min-height: 30px;
+    }
+
+    /* Hide category label and SKU to save vertical space */
+    .sp-slide-wrapper .product-card .card-category,
+    .sp-slide-wrapper .product-card .card-sku {
+      display: none;
+    }
+
+    /* Compact price box */
+    .sp-slide-wrapper .product-card .price-single,
+    .sp-slide-wrapper .product-card .price-dual,
+    .sp-slide-wrapper .product-card .price-member-view {
+      padding: 6px 5px;
+      min-height: 60px;
+    }
+
+    .sp-slide-wrapper .product-card .price-amount-single,
+    .sp-slide-wrapper .product-card .member-price-amount,
+    .sp-slide-wrapper .product-card .member-view-price {
+      font-size: 12px !important;
+    }
+
+    .sp-slide-wrapper .product-card .compare-price-strike {
+      font-size: 10px;
+    }
+
+    .sp-slide-wrapper .product-card .sale-savings-tag {
+      font-size: 9px;
+    }
+
+    /* Compact add-to-cart row */
+    .sp-slide-wrapper .product-card .card-actions {
+      padding: 0 8px 8px;
+    }
+
+    .sp-slide-wrapper .product-card .qty-input {
+      width: 38px;
+      height: 28px;
+      font-size: 11px;
+    }
+
+    .sp-slide-wrapper .product-card .add-to-cart {
+      height: 28px;
+      font-size: 10px;
+    }
+
+    /* Compact vendor CTA links */
+    .sp-slide-wrapper .product-card .cf-plp__login-prompt,
+    .sp-slide-wrapper .product-card .cf-plp__call-prompt {
+      font-size: 8px;
+      padding: 4px 6px;
+      margin-top: 4px;
+    }
+  }
+</style>
+
+<section class="staff-picks-section">
+  <div class="staff-picks-container">
+    <!-- Header -->
+    <div class="staff-picks-header">
+      <div>
+        <h2 class="staff-picks-title">{{ section.settings.section_title | default: 'Staff Picks' }}</h2>
+        {% if section.settings.section_subtitle != blank %}
+          <p class="staff-picks-subtitle">{{ section.settings.section_subtitle }}</p>
+        {% endif %}
+      </div>
+      <div class="staff-picks-nav">
+        <button class="staff-picks-nav-btn" id="sp-prev-{{ section.id }}" aria-label="Previous">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+        <button class="staff-picks-nav-btn" id="sp-next-{{ section.id }}" aria-label="Next">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Products Slider -->
+    <div class="staff-picks-slider swiper" id="sp-swiper-{{ section.id }}">
+      <div class="swiper-wrapper staff-picks-grid">
+        {% comment %} Get products {% endcomment %}
+        {% assign staff_products = blank %}
+
+        {% if section.settings.product_source == 'collection' and section.settings.featured_collection != blank %}
+          {% assign staff_products = collections[section.settings.featured_collection].products %}
+        {% elsif section.settings.product_source == 'manual' %}
+          {% assign staff_products = section.settings.featured_products %}
+        {% endif %}
+
+        {% for product in staff_products limit: section.settings.products_limit %}
+          {% if product.price == 0 %}{% continue %}{% endif %}
+          <div class="swiper-slide sp-slide-wrapper">
+            {%- render 'product-card',
+              product: product,
+              show_vendor: false,
+              show_rating: false,
+              show_sale_badge: true,
+              show_shipping_badge: true,
+              show_sku: true,
+              show_qty_input: true,
+              homepage_pricing_mode: true
+            -%}
+          </div>
+        {% else %}
+          <div class="swiper-slide">
+            <div class="sp-empty-card">
+              <p>No products found. Please select a collection.</p>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize Swiper for Staff Picks slider - Infinite loop
+  const spSwiper{{ section.id | replace: '-', '_' }} = new Swiper('#sp-swiper-{{ section.id }}', {
+    slidesPerView: 'auto',
+    spaceBetween: 16,
+    loop: true,
+    loopedSlides: 8,
+    navigation: {
+      nextEl: '#sp-next-{{ section.id }}',
+      prevEl: '#sp-prev-{{ section.id }}',
+    },
+  });
+});
+</script>
+
+{% schema %}
+{
+  "name": "Staff Picks",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section Title",
+      "default": "Staff Picks"
+    },
+    {
+      "type": "text",
+      "id": "section_subtitle",
+      "label": "Section Subtitle",
+      "default": "Handpicked by our equipment experts"
+    },
+    {
+      "type": "header",
+      "content": "Product Source"
+    },
+    {
+      "type": "select",
+      "id": "product_source",
+      "label": "Product Source",
+      "options": [
+        { "value": "collection", "label": "Collection" },
+        { "value": "manual", "label": "Manual Selection" }
+      ],
+      "default": "collection"
+    },
+    {
+      "type": "collection",
+      "id": "featured_collection",
+      "label": "Featured Collection"
+    },
+    {
+      "type": "product_list",
+      "id": "featured_products",
+      "label": "Featured Products",
+      "limit": 12
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "label": "Products Limit",
+      "min": 4,
+      "max": 20,
+      "step": 1,
+      "default": 10
+    }
+  ],
+  "presets": [
+    {
+      "name": "Staff Picks"
+    }
+  ]
+}
+{% endschema %}

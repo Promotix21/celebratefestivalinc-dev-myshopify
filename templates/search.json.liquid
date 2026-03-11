@@ -1,0 +1,84 @@
+{% comment %}
+===========================================
+SEARCH.JSON.LIQUID - AJAX Search Results Template
+===========================================
+Create this file in your templates folder to enable live search
+{% endcomment %}
+
+{%- liquid
+  assign results = search.results
+  assign max_results = 6
+-%}
+
+{
+  "results": [
+    {%- for item in results limit: max_results -%}
+      {%- case item.object_type -%}
+        {%- when 'product' -%}
+          {
+            "type": "product",
+            "id": {{ item.id | json }},
+            "title": {{ item.title | json }},
+            "url": {{ item.url | json }},
+            "price": {%- if item.compare_at_price > item.price -%}
+              {{ item.compare_at_price | money | json }}
+            {%- else -%}
+              {{ item.price | money | json }}
+            {%- endif -%},
+            "compare_price": {%- if item.compare_at_price > item.price -%}
+              {{ item.price | money | json }}
+            {%- else -%}
+              null
+            {%- endif -%},
+            "available": {{ item.available | json }},
+            "image": {%- if item.featured_media -%}
+              {{ item.featured_media | image_url: width: 100 | json }}
+            {%- else -%}
+              {{ 'no-image.svg' | asset_url | json }}
+            {%- endif -%},
+            "vendor": {{ item.vendor | json }},
+            "product_type": {{ item.product_type | json }}
+          }
+        {%- when 'collection' -%}
+          {
+            "type": "collection",
+            "id": {{ item.id | json }},
+            "title": {{ item.title | json }},
+            "url": {{ item.url | json }},
+            "image": {%- if item.featured_image -%}
+              {{ item.featured_image | image_url: width: 100 | json }}
+            {%- else -%}
+              {{ 'no-image.svg' | asset_url | json }}
+            {%- endif -%},
+            "product_count": {{ item.products_count | json }}
+          }
+        {%- when 'page' -%}
+          {
+            "type": "page",
+            "id": {{ item.id | json }},
+            "title": {{ item.title | json }},
+            "url": {{ item.url | json }},
+            "excerpt": {{ item.content | strip_html | truncate: 100 | json }}
+          }
+        {%- when 'article' -%}
+          {
+            "type": "article",
+            "id": {{ item.id | json }},
+            "title": {{ item.title | json }},
+            "url": {{ item.url | json }},
+            "excerpt": {{ item.excerpt | default: item.content | strip_html | truncate: 100 | json }},
+            "image": {%- if item.image -%}
+              {{ item.image | image_url: width: 100 | json }}
+            {%- else -%}
+              {{ 'no-image.svg' | asset_url | json }}
+            {%- endif -%},
+            "published_at": {{ item.published_at | date: '%B %d, %Y' | json }}
+          }
+      {%- endcase -%}
+      {%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  ],
+  "results_count": {{ search.results_count }},
+  "terms": {{ search.terms | json }},
+  "has_more": {%- if search.results_count > max_results -%}true{%- else -%}false{%- endif -%}
+}

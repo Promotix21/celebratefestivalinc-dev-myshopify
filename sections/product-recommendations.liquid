@@ -1,0 +1,338 @@
+{% comment %}
+  Product Recommendations Section
+  Dynamically loads related products based on tags and collections
+{% endcomment %}
+
+<div class="product-recommendations-wrapper">
+  
+  {% comment %} Works With Section {% endcomment %}
+  {% if product.tags contains 'show:works-with' %}
+    {% assign works_with_collection = product.metafields.custom.works_with_collection | default: 'works-with' %}
+    {% assign works_with_products = collections[works_with_collection].products %}
+    
+    {% if works_with_products.size > 0 %}
+    <section class="works-with-section">
+      <div class="page-width">
+        <div class="section-header">
+          <h2 class="section-title">Works With</h2>
+          <p class="section-subtitle">Compatible products for this item</p>
+        </div>
+        
+        <div class="products-grid">
+          {% assign count = 0 %}
+          {% for item in works_with_products limit: 8 %}
+            {% unless item.id == product.id %}
+              {% if count < 4 %}
+                <div class="product-card">
+                  <a href="{{ item.url }}" class="product-card-link">
+                    <div class="product-card-image">
+                      {% if item.featured_image %}
+                        <img 
+                          src="{{ item.featured_image | img_url: '300x300' }}"
+                          alt="{{ item.featured_image.alt | escape }}"
+                          loading="lazy"
+                          width="300"
+                          height="300"
+                        >
+                      {% else %}
+                        <div class="placeholder-image">
+                          <i class="fas fa-box"></i>
+                        </div>
+                      {% endif %}
+                    </div>
+                    <div class="product-card-info">
+                      <h3 class="product-card-title">{{ item.title }}</h3>
+                      <div class="product-card-price">{{ item.price | money }}</div>
+                      
+                      {% if item.compare_at_price > item.price %}
+                        <div class="product-card-sale">
+                          <span class="original-price">{{ item.compare_at_price | money }}</span>
+                          <span class="sale-badge">Sale</span>
+                        </div>
+                      {% endif %}
+                    </div>
+                  </a>
+                </div>
+                {% assign count = count | plus: 1 %}
+              {% endif %}
+            {% endunless %}
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+    {% endif %}
+  {% endif %}
+
+  {% comment %} Parts & Accessories Section {% endcomment %}
+  {% if product.tags contains 'show:parts' or product.tags contains 'show:accessories' %}
+    {% assign parts_collection = product.metafields.custom.parts_collection | default: 'parts-accessories' %}
+    {% assign parts_products = collections[parts_collection].products %}
+    
+    {% if parts_products.size > 0 %}
+    <section class="parts-accessories-section">
+      <div class="page-width">
+        <div class="section-header">
+          <div class="header-with-icon">
+            <i class="fas fa-tools"></i>
+            <h2 class="section-title">
+              {% if product.tags contains 'show:parts' %}
+                Parts & Accessories
+              {% else %}
+                Recommended Accessories
+              {% endif %}
+            </h2>
+          </div>
+          <p class="section-subtitle">Essential items for maintenance and operation</p>
+        </div>
+        
+        <div class="products-grid">
+          {% assign count = 0 %}
+          {% for item in parts_products limit: 8 %}
+            {% unless item.id == product.id %}
+              {% if count < 4 %}
+                <div class="product-card">
+                  <a href="{{ item.url }}" class="product-card-link">
+                    <div class="product-card-image">
+                      {% if item.featured_image %}
+                        <img 
+                          src="{{ item.featured_image | img_url: '300x300' }}"
+                          alt="{{ item.featured_image.alt | escape }}"
+                          loading="lazy"
+                          width="300"
+                          height="300"
+                        >
+                      {% else %}
+                        <div class="placeholder-image">
+                          <i class="fas fa-cog"></i>
+                        </div>
+                      {% endif %}
+                      
+                      {% if item.tags contains 'genuine-part' %}
+                        <span class="product-badge genuine-badge">Genuine Part</span>
+                      {% endif %}
+                    </div>
+                    <div class="product-card-info">
+                      <h3 class="product-card-title">{{ item.title }}</h3>
+                      <div class="product-card-price">{{ item.price | money }}</div>
+                      
+                      {% if item.available %}
+                        <span class="stock-status in-stock">
+                          <i class="fas fa-check-circle"></i> In Stock
+                        </span>
+                      {% else %}
+                        <span class="stock-status out-of-stock">
+                          <i class="fas fa-times-circle"></i> Out of Stock
+                        </span>
+                      {% endif %}
+                    </div>
+                  </a>
+                </div>
+                {% assign count = count | plus: 1 %}
+              {% endif %}
+            {% endunless %}
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+    {% endif %}
+  {% endif %}
+
+  {% comment %} Cleaning & Maintenance Section {% endcomment %}
+  {% if product.tags contains 'show:cleaning' %}
+    {% assign cleaning_collection = product.metafields.custom.cleaning_collection | default: 'cleaning-supplies' %}
+    {% assign cleaning_products = collections[cleaning_collection].products %}
+    
+    {% if cleaning_products.size > 0 %}
+    <section class="cleaning-section">
+      <div class="page-width">
+        <div class="section-header">
+          <div class="header-with-icon">
+            <i class="fas fa-spray-can"></i>
+            <h2 class="section-title">Cleaning & Maintenance</h2>
+          </div>
+          <p class="section-subtitle">Keep your equipment in top condition</p>
+        </div>
+        
+        <div class="products-grid">
+          {% assign count = 0 %}
+          {% for item in cleaning_products limit: 8 %}
+            {% if count < 4 %}
+              <div class="product-card">
+                <a href="{{ item.url }}" class="product-card-link">
+                  <div class="product-card-image">
+                    {% if item.featured_image %}
+                      <img 
+                        src="{{ item.featured_image | img_url: '300x300' }}"
+                        alt="{{ item.featured_image.alt | escape }}"
+                        loading="lazy"
+                        width="300"
+                        height="300"
+                      >
+                    {% else %}
+                      <div class="placeholder-image">
+                        <i class="fas fa-spray-can"></i>
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="product-card-info">
+                    <h3 class="product-card-title">{{ item.title }}</h3>
+                    <div class="product-card-price">{{ item.price | money }}</div>
+                  </div>
+                </a>
+              </div>
+              {% assign count = count | plus: 1 %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+    {% endif %}
+  {% endif %}
+
+  {% comment %} General Related Products (Shopify Recommendations) {% endcomment %}
+  <section class="related-products-section">
+    <div class="page-width">
+      <h2 class="section-title">You May Also Like</h2>
+      
+      <div class="products-grid" id="relatedProductsGrid">
+        {% comment %} This will be populated by JavaScript {% endcomment %}
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<style>
+  .product-recommendations-wrapper {
+    margin: 60px 0;
+  }
+
+  .product-recommendations-wrapper section {
+    margin-bottom: 60px;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .header-with-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .header-with-icon i {
+    font-size: 2rem;
+    color: var(--primary-coral);
+  }
+
+  .section-subtitle {
+    color: var(--text-light);
+    font-size: 16px;
+    margin-top: 10px;
+  }
+
+  .placeholder-image {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--neutral-light);
+    color: var(--text-light);
+    font-size: 48px;
+  }
+
+  .product-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    z-index: 2;
+  }
+
+  .genuine-badge {
+    background: var(--success-green);
+    color: white;
+  }
+
+  .product-card-sale {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 5px;
+  }
+
+  .product-card-sale .original-price {
+    font-size: 13px;
+    color: var(--text-light);
+    text-decoration: line-through;
+  }
+
+  .product-card-sale .sale-badge {
+    background: var(--accent-orange);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .stock-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    margin-top: 8px;
+  }
+
+  .stock-status.in-stock {
+    color: var(--success-green);
+  }
+
+  .stock-status.out-of-stock {
+    color: var(--accent-orange);
+  }
+
+  @media (max-width: 768px) {
+    .header-with-icon {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Product Recommendations",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 4,
+      "label": "Products to show"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badges",
+      "label": "Show product badges",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,791 @@
+{% comment %}
+  Coming Soon Page Section - Celebrate Festival Inc
+  A premium placeholder page for sections/pages not yet built
+{% endcomment %}
+
+<div class="coming-soon-page">
+  <!-- Animated Background -->
+  <div class="cs-bg">
+    <div class="cs-bg__gradient"></div>
+    <div class="cs-bg__grid"></div>
+    <div class="cs-bg__orb cs-bg__orb--1"></div>
+    <div class="cs-bg__orb cs-bg__orb--2"></div>
+    <div class="cs-bg__orb cs-bg__orb--3"></div>
+    <div class="cs-bg__line cs-bg__line--1"></div>
+    <div class="cs-bg__line cs-bg__line--2"></div>
+    <div class="cs-bg__line cs-bg__line--3"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="cs-content">
+    <!-- Tagline Pill -->
+    <div class="cs-pill">
+      <span class="cs-pill__dot"></span>
+      <span>{{ section.settings.pill_text | default: 'Under Construction' }}</span>
+    </div>
+
+    <!-- Heading -->
+    <h1 class="cs-heading">
+      <span class="cs-heading__line cs-heading__line--1">{{ section.settings.heading_line_1 | default: 'Something Great' }}</span>
+      <span class="cs-heading__line cs-heading__line--2">{{ section.settings.heading_line_2 | default: 'Is Coming Soon' }}</span>
+    </h1>
+
+    <!-- Subheading -->
+    <p class="cs-subheading">
+      {{ section.settings.subheading | default: "We're working hard to bring you this page. Professional-grade restaurant equipment, curated collections, and exclusive member pricing — all arriving shortly." }}
+    </p>
+
+    <!-- Animated Visual Element — Geometric Assembly -->
+    <div class="cs-visual" aria-hidden="true">
+      <div class="cs-visual__ring cs-visual__ring--outer">
+        <div class="cs-visual__tick" style="--i:0"></div>
+        <div class="cs-visual__tick" style="--i:1"></div>
+        <div class="cs-visual__tick" style="--i:2"></div>
+        <div class="cs-visual__tick" style="--i:3"></div>
+        <div class="cs-visual__tick" style="--i:4"></div>
+        <div class="cs-visual__tick" style="--i:5"></div>
+        <div class="cs-visual__tick" style="--i:6"></div>
+        <div class="cs-visual__tick" style="--i:7"></div>
+        <div class="cs-visual__tick" style="--i:8"></div>
+        <div class="cs-visual__tick" style="--i:9"></div>
+        <div class="cs-visual__tick" style="--i:10"></div>
+        <div class="cs-visual__tick" style="--i:11"></div>
+      </div>
+      <div class="cs-visual__ring cs-visual__ring--inner"></div>
+      <div class="cs-visual__center">
+        <div class="cs-visual__pulse"></div>
+        <div class="cs-visual__icon">&#9670;</div>
+      </div>
+    </div>
+
+    <!-- Email Signup -->
+    {% if section.settings.show_email_form %}
+      <div class="cs-notify">
+        <p class="cs-notify__label">{{ section.settings.form_label | default: 'Get notified when this page goes live' }}</p>
+        <form class="cs-notify__form" action="/contact#contact_form" method="post" accept-charset="UTF-8">
+          <input type="hidden" name="form_type" value="customer">
+          <input type="hidden" name="utf8" value="✓">
+          <input type="hidden" name="contact[tags]" value="coming-soon-notify">
+          <div class="cs-notify__input-wrap">
+            <input
+              type="email"
+              name="contact[email]"
+              class="cs-notify__input"
+              placeholder="Enter your email address"
+              required
+              autocomplete="email"
+            >
+            <button type="submit" class="cs-notify__btn">
+              {{ section.settings.form_button_text | default: 'Notify Me' }}
+              <span class="cs-notify__btn-arrow">&rarr;</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    {% endif %}
+
+    <!-- CTA Buttons -->
+    <div class="cs-actions">
+      <a href="{{ section.settings.primary_btn_url | default: '/' }}" class="cs-btn cs-btn--primary">
+        <span>{{ section.settings.primary_btn_text | default: 'Back to Home' }}</span>
+      </a>
+      <a href="{{ section.settings.secondary_btn_url | default: '/collections/all' }}" class="cs-btn cs-btn--outline">
+        <span>{{ section.settings.secondary_btn_text | default: 'Browse Collections' }}</span>
+        <span class="cs-btn__arrow">&rarr;</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Feature Strip -->
+  <div class="cs-features">
+    {% for block in section.blocks %}
+      {% if block.type == 'feature' %}
+        <div class="cs-feature" {{ block.shopify_attributes }}>
+          <span class="cs-feature__icon">{{ block.settings.icon | default: '&#9733;' }}</span>
+          <span class="cs-feature__text">{{ block.settings.label | default: 'Feature' }}</span>
+        </div>
+      {% endif %}
+    {% endfor %}
+
+    {% if section.blocks.size == 0 %}
+      <div class="cs-feature">
+        <span class="cs-feature__icon">&#9878;</span>
+        <span class="cs-feature__text">Professional Grade Equipment</span>
+      </div>
+      <div class="cs-feature">
+        <span class="cs-feature__icon">&#9733;</span>
+        <span class="cs-feature__text">Exclusive Member Pricing</span>
+      </div>
+      <div class="cs-feature">
+        <span class="cs-feature__icon">&#10003;</span>
+        <span class="cs-feature__text">Free Shipping on Select Items</span>
+      </div>
+      <div class="cs-feature">
+        <span class="cs-feature__icon">&#9742;</span>
+        <span class="cs-feature__text">Expert Support: (408) 673-9999</span>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  /* ============================================
+     COMING SOON PAGE — Celebrate Festival Inc
+     ============================================ */
+
+  .coming-soon-page {
+    --cf-deep-blue: #1a365d;
+    --cf-navy: #2d5a87;
+    --cf-coral: #ff6b6b;
+    --cf-gold: #d4af37;
+    --cf-success: #10b981;
+    --cf-text-dark: #0f172a;
+    --cf-text-medium: #475569;
+    --cf-text-light: #64748b;
+    --cf-text-muted: #94a3b8;
+    --cf-border: #e2e8f0;
+    --cf-bg-light: #f8fafc;
+    --cf-bg-white: #ffffff;
+
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 60px 24px 0;
+    background: var(--cf-deep-blue);
+  }
+
+  /* ---- Animated Background ---- */
+
+  .cs-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .cs-bg__gradient {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(45, 90, 135, 0.5) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 90%, rgba(255, 107, 107, 0.08) 0%, transparent 50%),
+      linear-gradient(170deg, #0f1b30 0%, #1a365d 35%, #1e3f6b 65%, #0f172a 100%);
+  }
+
+  .cs-bg__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 20%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 20%, transparent 70%);
+  }
+
+  .cs-bg__orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.3;
+    animation: orbFloat 20s ease-in-out infinite;
+  }
+
+  .cs-bg__orb--1 {
+    width: 400px;
+    height: 400px;
+    background: var(--cf-navy);
+    top: -10%;
+    left: -5%;
+    animation-delay: 0s;
+  }
+
+  .cs-bg__orb--2 {
+    width: 300px;
+    height: 300px;
+    background: var(--cf-coral);
+    bottom: -5%;
+    right: -5%;
+    opacity: 0.12;
+    animation-delay: -7s;
+    animation-duration: 25s;
+  }
+
+  .cs-bg__orb--3 {
+    width: 200px;
+    height: 200px;
+    background: var(--cf-gold);
+    top: 50%;
+    left: 60%;
+    opacity: 0.08;
+    animation-delay: -14s;
+    animation-duration: 18s;
+  }
+
+  .cs-bg__line {
+    position: absolute;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.04), transparent);
+    animation: linePulse 8s ease-in-out infinite;
+  }
+
+  .cs-bg__line--1 { left: 25%; animation-delay: 0s; }
+  .cs-bg__line--2 { left: 50%; animation-delay: -3s; }
+  .cs-bg__line--3 { left: 75%; animation-delay: -6s; }
+
+  @keyframes orbFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -20px) scale(1.05); }
+    66% { transform: translate(-20px, 15px) scale(0.95); }
+  }
+
+  @keyframes linePulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+  }
+
+  /* ---- Main Content ---- */
+
+  .cs-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 680px;
+    width: 100%;
+  }
+
+  /* ---- Pill ---- */
+
+  .cs-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 18px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 40px;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: 'DM Sans', 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    animation: fadeInDown 0.8s ease-out both;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .cs-pill__dot {
+    width: 6px;
+    height: 6px;
+    background: var(--cf-coral);
+    border-radius: 50%;
+    animation: dotPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes dotPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---- Heading ---- */
+
+  .cs-heading {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 56px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin: 0 0 24px;
+    animation: fadeInUp 0.8s ease-out 0.15s both;
+  }
+
+  .cs-heading__line {
+    display: block;
+  }
+
+  .cs-heading__line--1 {
+    color: #ffffff;
+  }
+
+  .cs-heading__line--2 {
+    background: linear-gradient(135deg, var(--cf-coral) 0%, var(--cf-gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ---- Subheading ---- */
+
+  .cs-subheading {
+    font-family: 'DM Sans', 'Inter', sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.55);
+    margin: 0 auto 40px;
+    max-width: 540px;
+    animation: fadeInUp 0.8s ease-out 0.3s both;
+  }
+
+  /* ---- Visual Element ---- */
+
+  .cs-visual {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    margin: 0 auto 44px;
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+  }
+
+  .cs-visual__ring--outer {
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    animation: ringRotate 30s linear infinite;
+  }
+
+  .cs-visual__tick {
+    position: absolute;
+    width: 2px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 1px;
+    top: -1px;
+    left: 50%;
+    transform-origin: 50% 80px;
+    transform: translateX(-50%) rotate(calc(var(--i) * 30deg));
+  }
+
+  .cs-visual__tick:nth-child(3n+1) {
+    height: 14px;
+    background: var(--cf-coral);
+    opacity: 0.6;
+  }
+
+  .cs-visual__ring--inner {
+    position: absolute;
+    inset: 24px;
+    border: 1px dashed rgba(255, 255, 255, 0.06);
+    border-radius: 50%;
+    animation: ringRotate 20s linear infinite reverse;
+  }
+
+  .cs-visual__center {
+    position: absolute;
+    inset: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cs-visual__pulse {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 107, 107, 0.15) 0%, transparent 70%);
+    animation: centerPulse 3s ease-in-out infinite;
+  }
+
+  .cs-visual__icon {
+    position: relative;
+    font-size: 24px;
+    color: var(--cf-coral);
+    animation: iconSpin 8s ease-in-out infinite;
+  }
+
+  @keyframes ringRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes centerPulse {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.3); opacity: 0.2; }
+  }
+
+  @keyframes iconSpin {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(90deg); }
+    50% { transform: rotate(180deg); }
+    75% { transform: rotate(270deg); }
+  }
+
+  /* ---- Notify Form ---- */
+
+  .cs-notify {
+    margin-bottom: 36px;
+    animation: fadeInUp 0.8s ease-out 0.5s both;
+  }
+
+  .cs-notify__label {
+    font-family: 'DM Sans', 'Inter', sans-serif;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.4);
+    margin: 0 0 12px;
+    letter-spacing: 0.3px;
+  }
+
+  .cs-notify__form {
+    max-width: 460px;
+    margin: 0 auto;
+  }
+
+  .cs-notify__input-wrap {
+    display: flex;
+    gap: 0;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .cs-notify__input-wrap:focus-within {
+    border-color: var(--cf-coral);
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15);
+  }
+
+  .cs-notify__input {
+    flex: 1;
+    padding: 14px 18px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #ffffff;
+    font-family: 'DM Sans', 'Inter', sans-serif;
+    font-size: 14px;
+  }
+
+  .cs-notify__input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  .cs-notify__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 22px;
+    background: linear-gradient(135deg, var(--cf-coral) 0%, #ff5252 100%);
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
+  }
+
+  .cs-notify__btn:hover {
+    background: linear-gradient(135deg, #ff5252 0%, #e84545 100%);
+  }
+
+  .cs-notify__btn-arrow {
+    transition: transform 0.3s ease;
+  }
+
+  .cs-notify__btn:hover .cs-notify__btn-arrow {
+    transform: translateX(3px);
+  }
+
+  /* ---- CTA Buttons ---- */
+
+  .cs-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    animation: fadeInUp 0.8s ease-out 0.6s both;
+  }
+
+  .cs-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 28px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 8px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
+  }
+
+  .cs-btn--primary {
+    background: linear-gradient(135deg, var(--cf-coral) 0%, #ff5252 100%);
+    color: #ffffff;
+    border: 2px solid transparent;
+  }
+
+  .cs-btn--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255, 107, 107, 0.3);
+  }
+
+  .cs-btn--outline {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .cs-btn--outline:hover {
+    border-color: rgba(255, 255, 255, 0.35);
+    color: #ffffff;
+    transform: translateY(-2px);
+  }
+
+  .cs-btn__arrow {
+    transition: transform 0.3s ease;
+    font-size: 16px;
+  }
+
+  .cs-btn--outline:hover .cs-btn__arrow {
+    transform: translateX(4px);
+  }
+
+  /* ---- Feature Strip ---- */
+
+  .cs-features {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 900px;
+    margin-top: auto;
+    padding: 32px 0 36px;
+    animation: fadeInUp 0.8s ease-out 0.75s both;
+  }
+
+  .cs-feature {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+  }
+
+  .cs-feature:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+    transform: translateY(-2px);
+  }
+
+  .cs-feature__icon {
+    font-size: 16px;
+    color: var(--cf-coral);
+    line-height: 1;
+  }
+
+  .cs-feature__text {
+    font-family: 'DM Sans', 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+
+  /* ---- Shared Keyframes ---- */
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---- Responsive ---- */
+
+  @media (max-width: 1200px) {
+    .cs-heading { font-size: 48px; }
+  }
+
+  @media (max-width: 992px) {
+    .coming-soon-page { padding: 48px 20px 0; }
+    .cs-heading { font-size: 42px; }
+    .cs-subheading { font-size: 16px; }
+    .cs-visual { width: 140px; height: 140px; }
+    .cs-visual__tick { transform-origin: 50% 70px; }
+  }
+
+  @media (max-width: 768px) {
+    .cs-heading { font-size: 36px; }
+    .cs-subheading { font-size: 15px; max-width: 420px; }
+    .cs-visual { width: 120px; height: 120px; margin-bottom: 36px; }
+    .cs-visual__tick { transform-origin: 50% 60px; }
+    .cs-visual__ring--inner { inset: 20px; }
+    .cs-visual__center { inset: 36px; }
+    .cs-pill { font-size: 11px; padding: 5px 14px; margin-bottom: 24px; }
+    .cs-notify__input-wrap { flex-direction: column; }
+    .cs-notify__btn { justify-content: center; }
+    .cs-features { gap: 8px; }
+    .cs-feature { padding: 6px 12px; }
+    .cs-feature__text { font-size: 11px; }
+  }
+
+  @media (max-width: 576px) {
+    .coming-soon-page { padding: 36px 16px 0; }
+    .cs-heading { font-size: 30px; }
+    .cs-subheading { font-size: 14px; line-height: 1.6; }
+    .cs-actions { flex-direction: column; width: 100%; max-width: 300px; margin: 0 auto; }
+    .cs-btn { width: 100%; justify-content: center; }
+    .cs-features { flex-direction: column; align-items: center; gap: 6px; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Coming Soon Page",
+  "tag": "section",
+  "class": "section-coming-soon",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Pill Badge"
+    },
+    {
+      "type": "text",
+      "id": "pill_text",
+      "label": "Pill Text",
+      "default": "Under Construction"
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "heading_line_1",
+      "label": "Heading Line 1",
+      "default": "Something Great"
+    },
+    {
+      "type": "text",
+      "id": "heading_line_2",
+      "label": "Heading Line 2 (Gradient)",
+      "default": "Is Coming Soon"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "We're working hard to bring you this page. Professional-grade restaurant equipment, curated collections, and exclusive member pricing — all arriving shortly."
+    },
+    {
+      "type": "header",
+      "content": "Email Signup"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_email_form",
+      "label": "Show email notification form",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "form_label",
+      "label": "Form Label",
+      "default": "Get notified when this page goes live"
+    },
+    {
+      "type": "text",
+      "id": "form_button_text",
+      "label": "Form Button Text",
+      "default": "Notify Me"
+    },
+    {
+      "type": "header",
+      "content": "Buttons"
+    },
+    {
+      "type": "text",
+      "id": "primary_btn_text",
+      "label": "Primary Button Text",
+      "default": "Back to Home"
+    },
+    {
+      "type": "url",
+      "id": "primary_btn_url",
+      "label": "Primary Button URL",
+      "default": "/"
+    },
+    {
+      "type": "text",
+      "id": "secondary_btn_text",
+      "label": "Secondary Button Text",
+      "default": "Browse Collections"
+    },
+    {
+      "type": "url",
+      "id": "secondary_btn_url",
+      "label": "Secondary Button URL",
+      "default": "/collections/all"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature Badge",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon (HTML entity or emoji)",
+          "default": "&#9733;",
+          "info": "Examples: &#9733; (star), &#9878; (gear), &#10003; (check), &#9742; (phone)"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Feature"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Coming Soon Page",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": { "icon": "&#9878;", "label": "Professional Grade Equipment" }
+        },
+        {
+          "type": "feature",
+          "settings": { "icon": "&#9733;", "label": "Exclusive Member Pricing" }
+        },
+        {
+          "type": "feature",
+          "settings": { "icon": "&#10003;", "label": "Free Shipping on Select Items" }
+        },
+        {
+          "type": "feature",
+          "settings": { "icon": "&#9742;", "label": "Expert Support: (408) 673-9999" }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

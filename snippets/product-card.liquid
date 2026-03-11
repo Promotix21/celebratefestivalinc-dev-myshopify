@@ -1,0 +1,369 @@
+{%- comment -%}
+  Universal product card for ALL pages (collections, search, home, L2 hub).
+  Single source of truth — do NOT inline product card HTML in section files.
+
+  Accepts:
+  - product:         {Object}  Product object (REQUIRED)
+  - collection_ref:  {Object}  Collection for category fallback (optional)
+  - show_vendor:     {Boolean} Show brand/vendor (default: true)
+  - show_rating:     {Boolean} Show rating stars (default: true)
+  - show_sku:        {Boolean} Show SKU (default: true)
+  - show_qty_input:  {Boolean} Show qty + add-to-cart row (default: true)
+  - show_category:   {Boolean} Show product type label (default: true)
+  - data_category:   {String}  Extra data-category attribute for L2 AJAX filtering (optional)
+
+  Usage:
+  {% render 'product-card', product: product, collection_ref: collection %}
+{%- endcomment -%}
+
+{%- liquid
+  assign show_vendor = show_vendor | default: true
+  assign show_rating = show_rating | default: true
+  assign show_sku = show_sku | default: true
+  assign show_qty_input = show_qty_input | default: true
+  assign show_category = show_category | default: true
+
+  comment
+    Sale / compare_at detection
+  endcomment
+  assign on_sale = false
+  if product.compare_at_price > product.price
+    assign on_sale = true
+  endif
+
+  assign any_variant_has_compare_at = false
+  for variant in product.variants
+    if variant.compare_at_price != blank and variant.compare_at_price > variant.price
+      assign any_variant_has_compare_at = true
+      break
+    endif
+  endfor
+
+  comment
+    Price range detection
+  endcomment
+  assign price_varies = false
+  if product.price_min != product.price_max
+    assign price_varies = true
+  endif
+
+  assign sale_price = product.price
+  assign original_price = product.compare_at_price
+
+  comment
+    Call-for-price products
+  endcomment
+  assign call_for_price = false
+  if product.metafields.custom.call_for_price == true or product.tags contains 'call-for-price'
+    assign call_for_price = true
+  endif
+
+  comment
+    Call-to-order products — listed but not purchasable online
+  endcomment
+  assign call_to_order = false
+  if product.tags contains 'call-to-order'
+    assign call_to_order = true
+  endif
+
+  assign product_sku = product.selected_or_first_available_variant.sku
+
+  comment
+    Voltage badge from tags
+  endcomment
+  assign voltage_badge = blank
+  for tag in product.tags
+    assign tag_lower = tag | downcase
+    if tag_lower contains 'volt' or tag_lower contains '115v' or tag_lower contains '208v' or tag_lower contains '220v' or tag_lower contains '240v'
+      assign voltage_badge = tag
+      break
+    endif
+  endfor
+
+  comment
+    Shipping info from tags
+  endcomment
+  assign shipment_text = blank
+  for tag in product.tags
+    assign tag_lower = tag | downcase
+    if tag_lower contains 'free-shipping' or tag_lower contains 'free shipping'
+      assign shipment_text = 'Free Shipping'
+      break
+    elsif tag_lower contains 'quick-ship' or tag_lower contains 'quick ship'
+      assign shipment_text = 'Quick Ship'
+      break
+    endif
+  endfor
+
+  comment
+    Low stock detection
+  endcomment
+  assign low_stock = false
+  assign total_inventory = 0
+  for variant in product.variants
+    assign total_inventory = total_inventory | plus: variant.inventory_quantity
+  endfor
+  if total_inventory > 0 and total_inventory <= 10
+    assign low_stock = true
+  endif
+
+  comment
+    Vendor detection — CF Inc own brand check
+  endcomment
+  assign is_own_brand = false
+  assign vendor_lower = product.vendor | downcase
+  if vendor_lower contains 'cf inc' or vendor_lower contains 'celebrate festival'
+    assign is_own_brand = true
+  endif
+
+  comment
+    Member detection
+  endcomment
+  assign is_member = false
+  if customer
+    for tag in customer.tags
+      assign tag_lower_m = tag | downcase
+      if tag_lower_m contains 'wholesale' or tag_lower_m contains 'plus' or tag_lower_m contains 'member' or tag_lower_m contains 'cph' or tag_lower_m contains 'rou' or tag_lower_m contains 'margin'
+        assign is_member = true
+        break
+      endif
+    endfor
+  endif
+
+  assign category_label = product.type | default: collection_ref.title | truncate: 25
+-%}
+
+<div class="product-card cf-plp__card"
+  data-product-id="{{ product.id }}"
+  data-vendor="{{ product.vendor | handleize }}"
+  data-vendor-raw="{{ product.vendor | escape }}"
+  data-type="{{ product.type | handleize }}"
+  data-type-raw="{{ product.type | escape }}"
+  data-price="{{ product.price }}"
+  data-available="{{ product.available }}"
+  data-title="{{ product.title | escape }}"
+  data-cf-product-id="{{ product.id }}"
+  data-cf-variant-id="{{ product.selected_or_first_available_variant.id }}"
+  data-cf-price="{{ product.selected_or_first_available_variant.price }}"
+  data-cf-compare-at-price="{{ product.selected_or_first_available_variant.compare_at_price }}"
+  data-cf-handle="{{ product.handle }}"
+  data-cf-collection-ids="{{ product.collections | map: 'id' | join: ',' }}"
+  {%- if data_category %} data-category="{{ data_category }}"{% endif -%}
+>
+  <a href="{{ product.url }}?variant={{ product.selected_or_first_available_variant.id }}" class="product-link">
+    <!-- Product Image -->
+    <div class="card-image product-image cf-plp__card-image-wrap">
+      {%- if product.featured_media -%}
+        <img
+          class="cf-plp__card-image"
+          src="{{ product.featured_media | image_url: width: 500 }}"
+          srcset="{{ product.featured_media | image_url: width: 300 }} 300w,
+                  {{ product.featured_media | image_url: width: 500 }} 500w"
+          alt="{{ product.featured_media.alt | escape }}"
+          loading="lazy"
+          width="200"
+          height="200"
+        >
+        {%- if product.media[1] != nil -%}
+          <img
+            src="{{ product.media[1] | image_url: width: 400 }}"
+            alt="{{ product.media[1].alt | escape }}"
+            loading="lazy"
+            class="product-image-hover"
+          >
+        {%- endif -%}
+      {%- else -%}
+        <div style="display:flex;align-items:center;justify-content:center;font-size:40px;color:#94a3b8;width:100%;height:100%;">📦</div>
+      {%- endif -%}
+
+      <!-- Badges -->
+      <div class="badge-container product-badges cf-plp__card-badge">
+        {%- if voltage_badge != blank -%}
+          <span class="voltage-badge">{{ voltage_badge }}</span>
+        {%- endif -%}
+        {%- if low_stock -%}
+          <span class="badge low-stock-badge">Low Stock</span>
+        {%- endif -%}
+        {%- if product.tags contains 'best-seller' or product.tags contains 'featured' -%}
+          <span class="badge best-seller-badge">Best Seller</span>
+        {%- elsif any_variant_has_compare_at -%}
+          <span class="badge sale-badge">Sale</span>
+        {%- endif -%}
+        {%- if product.tags contains 'new' -%}
+          <span class="badge new-badge">New</span>
+        {%- endif -%}
+      </div>
+
+      <!-- Variations badge -->
+      {%- if product.variants.size > 1 -%}
+        {%- assign variation_list = '' -%}
+        {%- for option in product.options_with_values -%}
+          {%- assign opt_values = option.values | join: ', ' -%}
+          {%- if variation_list == '' -%}
+            {%- assign variation_list = option.name | append: ': ' | append: opt_values -%}
+          {%- else -%}
+            {%- assign variation_list = variation_list | append: ' | ' | append: option.name | append: ': ' | append: opt_values -%}
+          {%- endif -%}
+        {%- endfor -%}
+        <span class="variations-badge cf-plp__variants-badge" title="{{ variation_list | truncate: 150 }}">
+          📦 {{ product.variants.size }} Variations
+        </span>
+      {%- endif -%}
+
+      <!-- Wishlist Button -->
+      <button type="button" class="wishlist-btn"
+        data-wishlist-btn
+        data-product-id="{{ product.id }}"
+        data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+        data-product-title="{{ product.title | escape }}"
+        data-product-handle="{{ product.handle }}"
+        data-product-image="{{ product.featured_media | image_url: width: 400 }}"
+        data-product-price="{{ product.price }}"
+        data-product-compare-price="{{ product.compare_at_price }}"
+        data-product-url="{{ product.url }}"
+        aria-label="Add to wishlist"
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      </button>
+    </div>
+  </a>
+
+  <!-- Product Info -->
+  <div class="card-content product-info cf-plp__card-content">
+    {%- if show_category and category_label != blank -%}
+      <span class="card-category product-brand cf-plp__card-category">{{ category_label }}</span>
+    {%- endif -%}
+
+    <a href="{{ product.url }}?variant={{ product.selected_or_first_available_variant.id }}" class="product-title-link" data-full-title="{{ product.title | escape }}">
+      <h3 class="card-title product-title cf-plp__card-title">{{ product.title }}</h3>
+    </a>
+
+    {%- if show_sku and product_sku != blank -%}
+      <div class="card-sku product-sku cf-plp__card-sku">#{{ product_sku }}</div>
+    {%- endif -%}
+
+    <!-- Pricing -->
+    {%- if call_for_price -%}
+      <div class="price-single price-box cf-plp__price-box">
+        <div class="price-label-single price-label cf-plp__price-label">Contact Us</div>
+        <a href="{{ product.url }}" class="price-amount-single" style="font-size:18px;color:#2d5a87;text-decoration:none;">Call for Best Price</a>
+      </div>
+    {%- elsif price_varies -%}
+      <div class="price-single price-box cf-plp__price-box">
+        {%- assign compare_max = product.compare_at_price_max | default: 0 -%}
+        {%- if any_variant_has_compare_at and compare_max > 0 -%}
+          <div class="compare-price-strike cf-plp__price-original"><s>{{ compare_max | money }}</s></div>
+          <div class="price-label-single price-label cf-plp__price-label">Sale Price</div>
+        {%- else -%}
+          <div class="price-label-single price-label cf-plp__price-label">Price</div>
+        {%- endif -%}
+        <div class="price-amount-single current-price cf-plp__price-main">{{ product.price_min | money }} – {{ product.price_max | money }}</div>
+        {%- if any_variant_has_compare_at and compare_max > 0 -%}
+          {%- assign sale_savings = compare_max | minus: product.price_min -%}
+          {%- if sale_savings > 0 -%}
+            {%- assign sale_percent = sale_savings | times: 100.0 | divided_by: compare_max | round -%}
+            <div class="sale-savings-tag cf-plp__sale-savings">Save up to {{ sale_percent }}%</div>
+          {%- endif -%}
+        {%- endif -%}
+      </div>
+    {%- else -%}
+      <div class="price-single price-box cf-plp__price-box">
+        {%- if any_variant_has_compare_at and original_price > 0 and original_price > sale_price -%}
+          <div class="compare-price-strike cf-plp__price-original"><s>{{ original_price | money }}</s></div>
+          <div class="price-label-single price-label cf-plp__price-label">Sale Price</div>
+        {%- else -%}
+          <div class="price-label-single price-label cf-plp__price-label">Price</div>
+        {%- endif -%}
+        <div class="price-amount-single current-price cf-plp__price-main">{{ sale_price | money }}<span class="price-unit cf-plp__price-unit">/Each</span></div>
+        {%- if any_variant_has_compare_at and original_price > 0 and original_price > sale_price -%}
+          {%- assign sale_savings = original_price | minus: sale_price -%}
+          {%- assign sale_percent = sale_savings | times: 100.0 | divided_by: original_price | round -%}
+          <div class="sale-savings-tag cf-plp__sale-savings">Save {{ sale_percent }}%</div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <!-- Vendor CTAs (non-members only, only when product has a real price) -->
+    {%- unless is_member or call_for_price or product.price == 0 -%}
+      {%- if is_own_brand -%}
+        <a href="{{ routes.account_login_url }}" class="login-member-pricing-link cf-plp__login-prompt js-login-return" style="display:block;width:100%;box-sizing:border-box;text-align:center;">
+          <span class="lock-icon">&#128274;</span><span>Login for Member Pricing</span>
+        </a>
+      {%- else -%}
+        <a href="tel:+14086739999" class="call-for-details-link cf-plp__call-prompt" style="display:block;width:100%;box-sizing:border-box;text-align:center;">
+          <span class="phone-icon">&#128222;</span><span>Call for More Details - (408) 673-9999</span>
+        </a>
+      {%- endif -%}
+    {%- endunless -%}
+
+    <!-- Shipping -->
+    {%- if shipment_text != blank -%}
+      <div class="card-shipping cf-plp__shipping{% if shipment_text contains 'Free' %} cf-plp__shipping--free{% elsif shipment_text contains 'Quick' %} cf-plp__shipping--quick{% else %} cf-plp__shipping--regular{% endif %}">
+        {%- if shipment_text contains 'Free' -%}
+          🚚 Free Shipping
+        {%- elsif shipment_text contains 'Quick' -%}
+          ⚡ Quick Ship
+        {%- else -%}
+          📦 {{ shipment_text }}
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <!-- Add to Cart Row -->
+    <div class="card-actions product-actions cf-plp__cart-row">
+      {%- if call_to_order -%}
+        <a href="tel:+14086739999"
+          class="cf-plp__add-btn cf-plp__call-to-order-btn"
+          style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;background:linear-gradient(135deg,#1a365d 0%,#2d5a87 100%);color:#fff;height:38px;border-radius:6px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">
+          <span>&#128222;</span> Call to Order
+        </a>
+      {%- elsif call_for_price or product.price == 0 -%}
+        <a href="{{ product.url }}"
+          class="cf-plp__add-btn"
+          style="flex:1;display:flex;align-items:center;justify-content:center;text-decoration:none;background:linear-gradient(135deg,#475569 0%,#334155 100%);color:#fff;height:38px;border-radius:6px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">
+          View Details
+        </a>
+      {%- elsif product.available -%}
+        {%- if product.variants.size > 1 -%}
+          <input type="number" class="qty-input cf-plp__qty-input" value="1" min="1" aria-label="Quantity" data-product-id="{{ product.id }}">
+          <button type="button" class="add-to-cart add-to-cart-btn quick-add-btn cf-plp__add-btn"
+            data-product-id="{{ product.id }}"
+            data-variant-id="{{ product.selected_or_first_available_variant.id }}">
+            Add to Cart
+          </button>
+        {%- else -%}
+          <input type="number" class="qty-input cf-plp__qty-input" value="1" min="1" aria-label="Quantity" data-product-id="{{ product.id }}">
+          <button type="button" class="add-to-cart add-to-cart-btn quick-add-btn cf-plp__add-btn"
+            data-product-id="{{ product.id }}"
+            data-variant-id="{{ product.selected_or_first_available_variant.id }}">
+            Add to Cart
+          </button>
+        {%- endif -%}
+      {%- else -%}
+        <button class="add-to-cart cf-plp__add-btn" disabled>
+          Sold Out
+        </button>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{%- comment -%} Fix login redirect: DOMContentLoaded already fired by the time product cards
+    render, so check readyState and run immediately if DOM is ready. Runs once. {%- endcomment -%}
+<script>
+if (!window.__cfLoginReturnFixed) {
+  window.__cfLoginReturnFixed = true;
+  function cfFixLoginReturn() {
+    var returnPath = window.location.pathname + window.location.search;
+    var encoded = encodeURIComponent(returnPath);
+    document.querySelectorAll('a.js-login-return').forEach(function(link) {
+      link.href = '/account/login?return_url=' + encoded;
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', cfFixLoginReturn);
+  } else {
+    cfFixLoginReturn();
+  }
+}
+</script>

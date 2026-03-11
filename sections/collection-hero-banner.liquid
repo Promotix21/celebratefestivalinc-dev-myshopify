@@ -1,0 +1,227 @@
+{% comment %}
+  Collection Hero Banner Section
+  Simple full-width image banner - NO text overlay
+
+  Uses collection.image or fallback image from settings
+  WebstaurantStore style: clean, minimal, just the image
+{% endcomment %}
+
+{%- liquid
+  assign banner_image = collection.image
+  if banner_image == blank and section.settings.fallback_image != blank
+    assign banner_image = section.settings.fallback_image
+  endif
+-%}
+
+{%- if banner_image != blank or section.settings.show_placeholder -%}
+  <div class="collection-hero-banner">
+    <div class="collection-hero-banner__inner">
+      {%- if banner_image != blank -%}
+        <img
+          src="{{ banner_image | image_url: width: 1920 }}"
+          srcset="
+            {{ banner_image | image_url: width: 640 }} 640w,
+            {{ banner_image | image_url: width: 960 }} 960w,
+            {{ banner_image | image_url: width: 1280 }} 1280w,
+            {{ banner_image | image_url: width: 1600 }} 1600w,
+            {{ banner_image | image_url: width: 1920 }} 1920w
+          "
+          sizes="100vw"
+          alt="{{ collection.title | remove: 'New Theme - ' | escape }}"
+          class="collection-hero-banner__image"
+          loading="eager"
+          fetchpriority="high"
+        >
+      {%- else -%}
+        <div class="collection-hero-banner__placeholder">
+          <svg viewBox="0 0 1920 400" xmlns="http://www.w3.org/2000/svg">
+            <rect fill="#f0f0f0" width="1920" height="400"/>
+            <text x="50%" y="50%" font-family="sans-serif" font-size="24" fill="#999" text-anchor="middle" dominant-baseline="middle">
+              Collection Banner Image
+            </text>
+          </svg>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Collection Hero Banner",
+  "tag": "section",
+  "class": "section-collection-hero-banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Banner Image"
+    },
+    {
+      "type": "paragraph",
+      "content": "Uses the collection's image by default. Set a fallback image for collections without images."
+    },
+    {
+      "type": "image_picker",
+      "id": "fallback_image",
+      "label": "Fallback image",
+      "info": "Shown when collection has no image"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_placeholder",
+      "label": "Show placeholder when no image",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Banner Size"
+    },
+    {
+      "type": "select",
+      "id": "banner_height",
+      "label": "Banner height",
+      "options": [
+        { "value": "small", "label": "Small (250px)" },
+        { "value": "medium", "label": "Medium (350px)" },
+        { "value": "large", "label": "Large (450px)" },
+        { "value": "xlarge", "label": "Extra Large (550px)" },
+        { "value": "adapt", "label": "Adapt to image" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "range",
+      "id": "custom_height_desktop",
+      "label": "Custom height (desktop)",
+      "min": 150,
+      "max": 600,
+      "step": 25,
+      "default": 350,
+      "unit": "px",
+      "info": "Only used when height is not 'Adapt to image'"
+    },
+    {
+      "type": "range",
+      "id": "custom_height_mobile",
+      "label": "Custom height (mobile)",
+      "min": 120,
+      "max": 400,
+      "step": 20,
+      "default": 200,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Image Position"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image focal point",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "label": "Bottom margin",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full width (edge to edge)",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Hero Banner"
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+  .collection-hero-banner {
+    margin-bottom: {{ section.settings.margin_bottom }}px;
+    {%- unless section.settings.full_width -%}
+      max-width: 1400px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 0 20px;
+    {%- endunless -%}
+  }
+
+  .collection-hero-banner__inner {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background-color: #f5f5f5;
+
+    {%- case section.settings.banner_height -%}
+      {%- when 'small' -%}
+        height: 250px;
+      {%- when 'medium' -%}
+        height: 350px;
+      {%- when 'large' -%}
+        height: 450px;
+      {%- when 'xlarge' -%}
+        height: 550px;
+      {%- when 'adapt' -%}
+        height: auto;
+      {%- else -%}
+        height: {{ section.settings.custom_height_desktop }}px;
+    {%- endcase -%}
+  }
+
+  .collection-hero-banner__image {
+    width: 100%;
+    {%- if section.settings.banner_height == 'adapt' -%}
+      height: auto;
+      display: block;
+    {%- else -%}
+      height: 100%;
+      object-fit: cover;
+      object-position: center {{ section.settings.image_position }};
+    {%- endif -%}
+  }
+
+  .collection-hero-banner__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+  }
+
+  .collection-hero-banner__placeholder svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .collection-hero-banner {
+      margin-bottom: {{ section.settings.margin_bottom | divided_by: 1.5 | round }}px;
+    }
+
+    .collection-hero-banner__inner {
+      {%- unless section.settings.banner_height == 'adapt' -%}
+        height: {{ section.settings.custom_height_mobile }}px;
+      {%- endunless -%}
+    }
+  }
+</style>

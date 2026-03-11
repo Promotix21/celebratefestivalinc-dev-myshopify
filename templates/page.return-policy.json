@@ -1,0 +1,27 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "page-return-policy",
+      "settings": {
+        "hero_tagline": "Policy",
+        "hero_title": "Return & Refund Policy",
+        "hero_subtitle": "Our commitment to your satisfaction with clear and fair return guidelines.",
+        "contact_email": "sales@celebratefestivalinc.com",
+        "contact_phone": "(408) 673-9999",
+        "show_contact_cta": true,
+        "cta_title": "Need to Start a Return?",
+        "cta_text": "Contact our customer care team to get a return authorization and instructions."
+      }
+    }
+  },
+  "order": ["main"]
+}

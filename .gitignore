@@ -1,0 +1,37 @@
+# ===== SECRETS / API KEYS =====
+.env
+.env.local
+.env.*.local
+*.env
+
+# ===== Shopify CLI =====
+node_modules/
+.shopify/
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Claude Code =====
+.claude/settings.local.json
+
+# ===== Python =====
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+
+# ===== Temp / Debug =====
+tmp/
+temp/
+*.tmp
+*.log
+*.bak
+
+# ===== Screenshots / large binaries (optional — uncomment if needed) =====
+# *.png
+# *.jpeg
+# *.jpg
+# *.xlsx

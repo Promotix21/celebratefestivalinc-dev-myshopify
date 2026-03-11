@@ -1,0 +1,385 @@
+{% comment %}
+  Vendor Brand Hero - Shows brand hero on /collections/vendors?q=BRAND_NAME
+  Detects vendor from URL query parameter and displays appropriate brand hero
+{% endcomment %}
+
+<style>
+  .vendor-brand-hero {
+    background: linear-gradient(135deg, #1a365d 0%, #0f172a 100%);
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .vendor-brand-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+  }
+
+  .vendor-brand-hero__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .vendor-brand-hero__logo {
+    flex-shrink: 0;
+    width: 180px;
+    height: 180px;
+    background: #fff;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  .vendor-brand-hero__logo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .vendor-brand-hero__logo-placeholder {
+    font-size: 48px;
+    font-weight: 700;
+    color: #1a365d;
+    text-transform: uppercase;
+  }
+
+  .vendor-brand-hero__content {
+    flex: 1;
+  }
+
+  .vendor-brand-hero__tagline {
+    display: inline-block;
+    background: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+
+  .vendor-brand-hero__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 12px;
+    line-height: 1.2;
+  }
+
+  .vendor-brand-hero__description {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0;
+  }
+
+  .vendor-brand-hero__stats {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+  }
+
+  .vendor-brand-hero__stat {
+    text-align: center;
+  }
+
+  .vendor-brand-hero__stat-value {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #ff6b6b;
+  }
+
+  .vendor-brand-hero__stat-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+  }
+
+  /* Hidden by default - shown via JS when vendor detected */
+  .vendor-brand-hero {
+    display: none;
+  }
+
+  .vendor-brand-hero.active {
+    display: block;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .vendor-brand-hero {
+      padding: 30px 20px;
+    }
+
+    .vendor-brand-hero__container {
+      flex-direction: column;
+      text-align: center;
+      gap: 24px;
+    }
+
+    .vendor-brand-hero__logo {
+      width: 120px;
+      height: 120px;
+    }
+
+    .vendor-brand-hero__title {
+      font-size: 28px;
+    }
+
+    .vendor-brand-hero__description {
+      font-size: 14px;
+    }
+
+    .vendor-brand-hero__stats {
+      justify-content: center;
+    }
+  }
+</style>
+
+<div class="vendor-brand-hero" id="vendor-brand-hero">
+  <div class="vendor-brand-hero__container">
+    <div class="vendor-brand-hero__logo">
+      <img id="vendor-logo" src="" alt="" style="display: none;">
+      <span id="vendor-logo-placeholder" class="vendor-brand-hero__logo-placeholder"></span>
+    </div>
+    <div class="vendor-brand-hero__content">
+      <span class="vendor-brand-hero__tagline" id="vendor-tagline">Official Partner</span>
+      <h1 class="vendor-brand-hero__title" id="vendor-title"></h1>
+      <p class="vendor-brand-hero__description" id="vendor-description"></p>
+      <div class="vendor-brand-hero__stats" id="vendor-stats"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Only run on vendors collection
+  if (!window.location.pathname.includes('/collections/vendors')) return;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const vendorQuery = urlParams.get('q');
+
+  if (!vendorQuery) return;
+
+  const vendorName = vendorQuery.toLowerCase().trim();
+
+  // Brand data mapping
+  const brandData = {
+    'turbo air': {
+      name: 'Turbo Air',
+      tagline: 'Premium Refrigeration',
+      description: 'Industry-leading commercial refrigeration solutions. Turbo Air offers energy-efficient reach-ins, prep tables, undercounters, and display cases trusted by professionals worldwide.',
+      logo: 'https://celebratefestivalinc.com/cdn/shop/files/brand-logo-turbo-air.png',
+      stats: [
+        { value: '50+', label: 'Years Experience' },
+        { value: '100+', label: 'Products' },
+        { value: '#1', label: 'In Refrigeration' }
+      ]
+    },
+    'globe': {
+      name: 'Globe Food Equipment',
+      tagline: 'Professional Food Equipment',
+      description: 'Globe has been a trusted name in commercial food equipment since 1906. From slicers to mixers, Globe delivers quality and reliability for every kitchen.',
+      logo: 'https://celebratefestivalinc.com/cdn/shop/files/brand-logo-globe.png',
+      stats: [
+        { value: '115+', label: 'Years Heritage' },
+        { value: '200+', label: 'Products' }
+      ]
+    },
+    'robot coupe': {
+      name: 'Robot Coupe',
+      tagline: 'The Original Food Processor',
+      description: 'Robot Coupe invented the food processor and continues to lead in commercial food preparation. Professional-grade blenders, cutters, and processors for demanding kitchens.',
+      logo: 'https://celebratefestivalinc.com/cdn/shop/files/brand-logo-robot-coupe.png',
+      stats: [
+        { value: '60+', label: 'Years Innovation' },
+        { value: 'Pro', label: 'Grade Quality' }
+      ]
+    },
+    'waring': {
+      name: 'Waring Commercial',
+      tagline: 'Blending Excellence',
+      description: 'Waring invented the blender and continues to innovate in commercial kitchen equipment. High-performance blenders, toasters, and food prep solutions.',
+      logo: 'https://celebratefestivalinc.com/cdn/shop/files/brand-logo-waring.png',
+      stats: [
+        { value: '85+', label: 'Years Legacy' },
+        { value: 'USA', label: 'Engineered' }
+      ]
+    },
+    'eurodib': {
+      name: 'Eurodib',
+      tagline: 'European Quality',
+      description: 'Eurodib brings European engineering excellence to commercial kitchens. Premium cooking equipment, refrigeration, and specialty items for discerning chefs.',
+      logo: 'https://celebratefestivalinc.com/cdn/shop/files/brand-logo-eurodib.png',
+      stats: [
+        { value: 'EU', label: 'Quality Standards' },
+        { value: '150+', label: 'Products' }
+      ]
+    },
+    'thunder group': {
+      name: 'Thunder Group',
+      tagline: 'Complete Kitchen Solutions',
+      description: 'Thunder Group offers comprehensive foodservice supplies including cookware, melamine dinnerware, kitchen tools, and storage solutions at competitive prices.',
+      logo: 'https://celebratefestivalinc.com/cdn/shop/files/brand-logo-thunder-group.png',
+      stats: [
+        { value: '10K+', label: 'Products' },
+        { value: 'Best', label: 'Value' }
+      ]
+    },
+    'cac china': {
+      name: 'CAC China',
+      tagline: 'Fine Commercial Dinnerware',
+      description: 'CAC China specializes in high-quality commercial dinnerware and serveware. Durable, elegant designs for restaurants, hotels, and catering services.',
+      logo: 'https://celebratefestivalinc.com/cdn/shop/files/brand-logo-cac.png',
+      stats: [
+        { value: '5K+', label: 'Patterns' },
+        { value: 'Pro', label: 'Durability' }
+      ]
+    },
+    'global solutions': {
+      name: 'Global Solutions',
+      tagline: 'Reliable Equipment',
+      description: 'Global Solutions provides dependable commercial kitchen equipment designed for everyday use. Quality warming, holding, and display solutions.',
+      logo: 'https://celebratefestivalinc.com/cdn/shop/files/brand-logo-global-solutions.png',
+      stats: [
+        { value: '100+', label: 'Products' }
+      ]
+    },
+    'yanco': {
+      name: 'Yanco',
+      tagline: 'Dinnerware Excellence',
+      description: 'Yanco delivers high-quality melamine and porcelain dinnerware for the foodservice industry. Stylish, durable designs for every dining concept.',
+      logo: 'https://celebratefestivalinc.com/cdn/shop/files/brand-logo-yanco.png',
+      stats: [
+        { value: '3K+', label: 'Products' },
+        { value: 'NSF', label: 'Certified' }
+      ]
+    },
+    'atosa': {
+      name: 'Atosa',
+      tagline: 'Value-Driven Refrigeration',
+      description: 'Atosa offers commercial refrigeration and cooking equipment with exceptional value. Reliable performance for kitchens of all sizes.',
+      logo: 'https://celebratefestivalinc.com/cdn/shop/files/brand-logo-atosa.png',
+      stats: [
+        { value: '200+', label: 'Products' },
+        { value: 'Best', label: 'Value' }
+      ]
+    },
+    'true': {
+      name: 'True Manufacturing',
+      tagline: 'American Made Excellence',
+      description: 'True has been manufacturing commercial refrigeration in the USA since 1945. Industry-leading quality, reliability, and energy efficiency.',
+      logo: 'https://celebratefestivalinc.com/cdn/shop/files/brand-logo-true.png',
+      stats: [
+        { value: 'USA', label: 'Made' },
+        { value: '#1', label: 'In Quality' }
+      ]
+    },
+    'beverage-air': {
+      name: 'Beverage-Air',
+      tagline: 'Premium Refrigeration',
+      description: 'Beverage-Air delivers premium commercial refrigeration solutions built for performance and longevity. Trusted by foodservice professionals nationwide.',
+      logo: 'https://celebratefestivalinc.com/cdn/shop/files/brand-logo-beverage-air.png',
+      stats: [
+        { value: '75+', label: 'Years' },
+        { value: 'Pro', label: 'Grade' }
+      ]
+    }
+  };
+
+  // Find matching brand (check various formats)
+  let brandInfo = null;
+  const searchTerms = [
+    vendorName,
+    vendorName.replace(/\+/g, ' '),
+    vendorName.replace(/-/g, ' '),
+    vendorName.replace(/_/g, ' ')
+  ];
+
+  for (const term of searchTerms) {
+    for (const [key, data] of Object.entries(brandData)) {
+      if (key.includes(term) || term.includes(key)) {
+        brandInfo = data;
+        break;
+      }
+    }
+    if (brandInfo) break;
+  }
+
+  // If no specific brand found, create generic hero
+  if (!brandInfo) {
+    const formattedName = vendorQuery
+      .replace(/\+/g, ' ')
+      .replace(/-/g, ' ')
+      .replace(/_/g, ' ')
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+
+    brandInfo = {
+      name: formattedName,
+      tagline: 'Official Brand Partner',
+      description: `Browse our complete selection of ${formattedName} products. Quality equipment and supplies for your commercial kitchen needs.`,
+      logo: null,
+      stats: []
+    };
+  }
+
+  // Populate the hero
+  const heroEl = document.getElementById('vendor-brand-hero');
+  const logoImg = document.getElementById('vendor-logo');
+  const logoPlaceholder = document.getElementById('vendor-logo-placeholder');
+  const titleEl = document.getElementById('vendor-title');
+  const taglineEl = document.getElementById('vendor-tagline');
+  const descEl = document.getElementById('vendor-description');
+  const statsEl = document.getElementById('vendor-stats');
+
+  titleEl.textContent = brandInfo.name;
+  taglineEl.textContent = brandInfo.tagline;
+  descEl.textContent = brandInfo.description;
+
+  if (brandInfo.logo) {
+    logoImg.src = brandInfo.logo;
+    logoImg.alt = brandInfo.name;
+    logoImg.style.display = 'block';
+    logoPlaceholder.style.display = 'none';
+  } else {
+    logoPlaceholder.textContent = brandInfo.name.charAt(0);
+    logoImg.style.display = 'none';
+    logoPlaceholder.style.display = 'block';
+  }
+
+  if (brandInfo.stats && brandInfo.stats.length > 0) {
+    statsEl.innerHTML = brandInfo.stats.map(stat => `
+      <div class="vendor-brand-hero__stat">
+        <div class="vendor-brand-hero__stat-value">${stat.value}</div>
+        <div class="vendor-brand-hero__stat-label">${stat.label}</div>
+      </div>
+    `).join('');
+  } else {
+    statsEl.style.display = 'none';
+  }
+
+  // Show the hero
+  heroEl.classList.add('active');
+});
+</script>

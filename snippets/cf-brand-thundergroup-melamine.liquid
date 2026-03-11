@@ -1,0 +1,67 @@
+{% comment %} CF Brand: Thunder Group Melamine - Asian & Western Collections {% endcomment %}
+
+{% comment %} ========== ASIAN MELAMINE SECTION ========== {% endcomment %}
+<h2 class="cf-brand-hub__section-title" style="border-top: none; margin-top: 0;">Thunder Group Melamine Asian Product Collection</h2>
+
+{%- liquid
+  assign asian_categories = 'melamine-asian-blue-bamboo,melamine-asian-blue-dragon,melamine-asian-blue-jade,melamine-asian-gold-orchid,melamine-asian-longevity,melamine-asian-lotus,melamine-asian-peacock,melamine-asian-rose,melamine-asian-tenmoku,melamine-asia-classic-white,melamine-asian-classic-black,melamine-asian-wei,melamine-asian-imperial,melamine-asian-classic-red,melamine-asian-others' | split: ','
+
+  assign asian_titles = 'Blue Bamboo,Blue Dragon,Blue Jade,Gold Orchid,Longevity,Lotus,Peacock,Rose,Tenmoku,Classic White,Classic Black,Wei,Imperial,Classic Pure Red,Others' | split: ','
+
+  assign asian_images = 'blue_bamboo.png,blue_draggon.png,blue_jade.png,gold_orchid.png,longevity.png,lotus.png,peacock.png,rose.png,tenmoku.png,classic_white.png,classic_black.png,wei.png,imperial_bac135e9-cd50-4417-b0e8-394cf7fc6c93.png,classic_red.png,Melamine_Asian_Others.png' | split: ','
+-%}
+
+<div class="cf-brand-hub__grid">
+  {%- for handle in asian_categories -%}
+    {%- assign idx = forloop.index0 -%}
+    {%- assign title = asian_titles[idx] -%}
+    {%- assign image_file = asian_images[idx] -%}
+    {%- assign cdn_url = 'https://celebratefestivalinc.com/cdn/shop/files/' | append: image_file | append: '?width=400&height=400&crop=center' -%}
+
+    <a href="/collections/{{ handle }}" class="cf-brand-hub__card">
+      <div class="cf-brand-hub__card-image">
+        <img src="{{ cdn_url }}" alt="{{ title }}" loading="lazy">
+        <div class="cf-brand-hub__card-overlay">
+          <span class="cf-brand-hub__card-overlay-text">{{ title }}</span>
+        </div>
+      </div>
+      <div class="cf-brand-hub__card-content">
+        <h3 class="cf-brand-hub__card-title">{{ title }}</h3>
+        <span class="cf-brand-hub__card-btn">Shop Now</span>
+      </div>
+    </a>
+  {%- endfor -%}
+</div>
+
+{% comment %} ========== WESTERN MELAMINE SECTION ========== {% endcomment %}
+<h2 class="cf-brand-hub__section-title">Thunder Group Melamine Western Product Collection</h2>
+
+{%- liquid
+  assign western_categories = 'melamine-western-jazz,melamine-western-gn-pan,melamine-western-cups,melamine-western-bowl,melamine-western-mug,melamine-western-soup-bowl,melamine-western-graham,melamine-western-black-pearl,melamine-western-gold-pearl,melamine-western-onyx,melamine-western-sequoia,melamine-western-nu-stone-tan,melamine-western-white-shadow,melamine-western-nu-stone-white,melamine-western-passion-pearl,melamine-western-passion-red,melamine-western-passion-white,melamine-western-classic-black,melamine-western-classic-white,melamine-western-classic-stone-blue,melamine-western-classic-stone-grey,melamine-western-seaside,melamine-western-victoria,melamine-western-plate' | split: ','
+
+  assign western_titles = 'Jazz,Gn Pan,Cups,Bowl,Mugs,Soup Bowl,Graham,Black Pearl,Gold Pearl,Onyx,Sequoia,Nu Stone Tan,White Shadow,Nu Stone White,Passion Pearl,Passion Red,Passion White,Classic Black,Classic White,Classic Stone Blue,Classic Stone Grey,Seaside,Victoria,Plate' | split: ','
+
+  assign western_images = 'Jazz_749dcb14-6018-4a21-aecb-92319e8db590.png,gn_pans.png,cups.png,jazz.png,Melamine_Asian_Mugs.png,Melamine_Western_Soup_bowls.png,graham.png,Black_pearl.png,gold_pearl.png,onyx.png,Melamine_Asian_Sequoia.png,nustone_tan.png,Melamine_Western_White_shadow.png,nustone_white.png,passion_pearl.png,passion_red.png,passion_white.png,classic_black.png,classic_white.png,stone_blue.png,stone_grey.png,seaside.png,victoria.png,melamine-western-plate.png' | split: ','
+-%}
+
+<div class="cf-brand-hub__grid">
+  {%- for handle in western_categories -%}
+    {%- assign idx = forloop.index0 -%}
+    {%- assign title = western_titles[idx] -%}
+    {%- assign image_file = western_images[idx] -%}
+    {%- assign cdn_url = 'https://celebratefestivalinc.com/cdn/shop/files/' | append: image_file | append: '?width=400&height=400&crop=center' -%}
+
+    <a href="/collections/{{ handle }}" class="cf-brand-hub__card">
+      <div class="cf-brand-hub__card-image">
+        <img src="{{ cdn_url }}" alt="{{ title }}" loading="lazy">
+        <div class="cf-brand-hub__card-overlay">
+          <span class="cf-brand-hub__card-overlay-text">{{ title }}</span>
+        </div>
+      </div>
+      <div class="cf-brand-hub__card-content">
+        <h3 class="cf-brand-hub__card-title">{{ title }}</h3>
+        <span class="cf-brand-hub__card-btn">Shop Now</span>
+      </div>
+    </a>
+  {%- endfor -%}
+</div>
