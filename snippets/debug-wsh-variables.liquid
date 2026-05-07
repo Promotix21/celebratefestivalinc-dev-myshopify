@@ -1,0 +1,119 @@
+{% comment %}
+  WSH Wholesale Variables Detection
+  This checks what variables/objects WSH plugin exposes
+{% endcomment %}
+
+<div style="background: #1a1a2e; color: #eee; padding: 20px; margin: 20px 0; border-radius: 8px; font-family: monospace; font-size: 11px;">
+  <h3 style="margin: 0 0 15px 0; color: #00d9ff; font-family: sans-serif;">🔬 WSH Variables Detection</h3>
+
+  <div style="background: #16213e; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+    <strong style="color: #f39c12;">Testing WSH Liquid Variables:</strong><br><br>
+
+    {% comment %} Test common WSH variable patterns {% endcomment %}
+
+    <strong>1. product.wsh_wholesale_price:</strong><br>
+    {% if product.wsh_wholesale_price %}
+      <span style="color: #2ecc71;">✅ FOUND:</span> <code>{{ product.wsh_wholesale_price }}</code>
+    {% else %}
+      <span style="color: #e74c3c;">❌ Not found</span>
+    {% endif %}
+    <br><br>
+
+    <strong>2. product.wholesale_price:</strong><br>
+    {% if product.wholesale_price %}
+      <span style="color: #2ecc71;">✅ FOUND:</span> <code>{{ product.wholesale_price }}</code>
+    {% else %}
+      <span style="color: #e74c3c;">❌ Not found</span>
+    {% endif %}
+    <br><br>
+
+    <strong>3. customer.wholesale_discount:</strong><br>
+    {% if customer.wholesale_discount %}
+      <span style="color: #2ecc71;">✅ FOUND:</span> <code>{{ customer.wholesale_discount }}</code>
+    {% else %}
+      <span style="color: #e74c3c;">❌ Not found</span>
+    {% endif %}
+    <br><br>
+
+    <strong>4. Checking product.price vs product.selected_or_first_available_variant.price:</strong><br>
+    product.price: <code style="color: #3498db;">{{ product.price | money }}</code><br>
+    variant.price: <code style="color: #3498db;">{{ product.selected_or_first_available_variant.price | money }}</code><br>
+    {% if product.price != product.selected_or_first_available_variant.price %}
+      <span style="color: #f39c12;">⚠️ PRICES DIFFER - WSH might be modifying variant price!</span>
+    {% endif %}
+    <br><br>
+
+    <strong>5. Check if in WSH wholesale section:</strong><br>
+    {% if request.path contains '/apps/wpdapp/wholesale' or request.path contains '/wholesale' %}
+      <span style="color: #2ecc71;">✅ IN WHOLESALE SECTION</span>
+    {% else %}
+      <span style="color: #e74c3c;">❌ Not in wholesale section</span><br>
+      <em style="color: #95a5a6;">Try visiting: /apps/wpdapp/wholesale</em>
+    {% endif %}
+    <br><br>
+
+    <strong>6. All available product properties:</strong><br>
+    <div style="max-height: 150px; overflow-y: auto; background: #0f3460; padding: 10px; border-radius: 4px; margin-top: 10px;">
+      {% for property in product %}
+        {% if property[0] contains 'price' or property[0] contains 'wholesale' or property[0] contains 'wsh' %}
+          <div style="margin-bottom: 5px;">
+            <strong style="color: #00d9ff;">{{ property[0] }}:</strong>
+            <code style="color: #f39c12;">{{ property[1] }}</code>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <div style="background: #16213e; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+    <strong style="color: #f39c12;">Customer Tags Analysis:</strong><br><br>
+
+    {% if customer %}
+      Your tags: <code style="color: #3498db;">{{ customer.tags | join: ', ' }}</code><br><br>
+
+      <strong>WSH Discount Groups (from your setup):</strong><br>
+      <div style="margin-left: 20px; margin-top: 10px;">
+        {% assign wsh_tags = 'CPH,UMRP,5% Margin,10% Margin,15% Margin,20% Margin,ROU,30% Margin,Premium' | split: ',' %}
+        {% for wsh_tag in wsh_tags %}
+          {% assign wsh_tag_clean = wsh_tag | strip %}
+          {% if customer.tags contains wsh_tag_clean %}
+            <span style="color: #2ecc71;">✅ {{ wsh_tag_clean }}</span> - <strong style="color: #f39c12;">ACTIVE DISCOUNT GROUP</strong><br>
+          {% else %}
+            <span style="color: #95a5a6;">○ {{ wsh_tag_clean }}</span><br>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <span style="color: #e74c3c;">Not logged in</span>
+    {% endif %}
+  </div>
+
+  <div style="background: #16213e; padding: 15px; border-radius: 4px;">
+    <strong style="color: #f39c12;">💡 Recommendation:</strong><br><br>
+
+    {% if customer %}
+      {% assign has_wsh_tag = false %}
+      {% assign wsh_tags = 'CPH,UMRP,5% Margin,10% Margin,15% Margin,20% Margin,ROU,30% Margin,Premium' | split: ',' %}
+      {% for wsh_tag in wsh_tags %}
+        {% assign wsh_tag_clean = wsh_tag | strip %}
+        {% if customer.tags contains wsh_tag_clean %}
+          {% assign has_wsh_tag = true %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
+
+      {% if has_wsh_tag %}
+        <span style="color: #2ecc71;">✅ You have a WSH discount group tag!</span><br>
+        <strong>Next step:</strong> Visit the dedicated wholesale section:<br>
+        <a href="/apps/wpdapp/wholesale" style="color: #00d9ff; text-decoration: underline;">/apps/wpdapp/wholesale</a><br><br>
+        WSH stores individual variant pricing in its own section. The regular product pages might not show wholesale prices unless you're in the WSH wholesale section.
+      {% else %}
+        <span style="color: #f39c12;">⚠️ You don't have a WSH discount group tag</span><br>
+        Current tags: <code>{{ customer.tags | join: ', ' }}</code><br>
+        You need one of: CPH, UMRP, 5% Margin, 10% Margin, 15% Margin, 20% Margin, ROU, 30% Margin, Premium
+      {% endif %}
+    {% else %}
+      <span style="color: #e74c3c;">❌ Not logged in</span>
+    {% endif %}
+  </div>
+</div>

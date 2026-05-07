@@ -1,0 +1,40 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-collection",
+      "settings": {
+        "products_per_page": 12,
+        "products_per_row_desktop": 3,
+        "products_per_row_tablet": 2,
+        "image_ratio": "adapt",
+        "enable_filtering": true,
+        "filter_type": "vertical",
+        "enable_sorting": true,
+        "enable_view_toggle": true,
+        "show_vendor": true,
+        "show_rating": false,
+        "show_quick_add": false,
+        "show_sale_badge": true,
+        "show_sale_percentage": true,
+        "show_shipping_badge": true,
+        "free_shipping_tag": "free-shipping",
+        "show_low_stock_badge": true,
+        "low_stock_threshold": 10,
+        "show_new_badge": true,
+        "new_badge_tag": "new",
+        "show_collection_description": true,
+        "show_breadcrumbs": true
+      }
+    }
+  },
+  "order": ["main"]
+}

@@ -1,0 +1,2129 @@
+{{ 'enhanced-header.css' | asset_url | stylesheet_tag }}
+
+{% comment %} Set member promo visibility - defaults to true {% endcomment %}
+{% assign show_member_promo = section.settings.show_member_promo %}
+{% if show_member_promo == nil %}
+  {% assign show_member_promo = true %}
+{% endif %}
+
+{% comment %} Build full return URL including query string (e.g. /search?q=rational) {% endcomment %}
+{%- if request.query_string != blank -%}
+  {%- assign return_path = request.path | append: '?' | append: request.query_string -%}
+{%- else -%}
+  {%- assign return_path = request.path -%}
+{%- endif -%}
+
+<style>
+  .enhanced-header-wrapper .header-logo {
+    max-width: {{ section.settings.logo_max_width | default: 180 }}px !important;
+  }
+  .enhanced-header-wrapper .header-logo img {
+    max-height: {{ section.settings.logo_height | default: 55 }}px !important;
+  }
+  .enhanced-header-wrapper .nav-icon {
+    width: {{ section.settings.nav_icon_size | default: 20 }}px !important;
+    height: {{ section.settings.nav_icon_size | default: 20 }}px !important;
+  }
+
+  /* ============================================
+     NEW WARM HOSPITALITY TOPBAR STYLES
+     Adapted to Celebrate Festival brand colors
+     ============================================ */
+  .topbar-hospitality {
+    background: linear-gradient(90deg, #1a365d 0%, #0f172a 100%);
+    padding: 10px 40px;
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: #fff;
+    min-height: 42px;
+  }
+
+  .topbar-hospitality .welcome {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .topbar-hospitality .welcome i,
+  .topbar-hospitality .welcome svg {
+    color: #d4af37;
+    font-size: 16px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .topbar-hospitality .welcome span {
+    color: #93c5fd;
+  }
+
+  .topbar-hospitality .center-info {
+    display: flex;
+    gap: 40px;
+  }
+
+  .topbar-hospitality .info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .topbar-hospitality .info-item i,
+  .topbar-hospitality .info-item svg {
+    color: #d4af37;
+    width: 16px;
+    height: 16px;
+  }
+
+  .topbar-hospitality .right-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .topbar-hospitality .right-actions a {
+    color: #93c5fd;
+    text-decoration: none;
+    transition: color 0.2s;
+    font-size: 13px;
+  }
+
+  .topbar-hospitality .right-actions a:hover {
+    color: #fff;
+  }
+
+  .topbar-hospitality .divider {
+    width: 1px;
+    height: 16px;
+    background: rgba(255,255,255,0.3);
+  }
+
+  .topbar-hospitality .live-chat {
+    background: #ff6b6b;
+    color: #fff;
+    padding: 5px 14px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+
+  .topbar-hospitality .live-chat:hover {
+    background: #ff5252;
+    transform: scale(1.02);
+    color: #fff;
+  }
+
+  .topbar-hospitality .live-chat .pulse {
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+  }
+
+  /* Topbar phone link — prevent blue auto-link */
+  .topbar-hospitality .topbar-phone-link {
+    color: inherit;
+    text-decoration: none;
+  }
+  .topbar-hospitality .topbar-phone-link span {
+    color: #fff;
+  }
+
+  /* Topbar Mobile Responsive */
+  @media (max-width: 992px) {
+    .topbar-hospitality {
+      padding: 10px 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .topbar-hospitality .center-info {
+      gap: 20px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .topbar-hospitality {
+      padding: 8px 15px;
+    }
+    .topbar-hospitality .welcome {
+      display: none;
+    }
+    .topbar-hospitality .center-info {
+      gap: 15px;
+      flex: 1;
+    }
+    .topbar-hospitality .info-item span {
+      font-size: 12px;
+      color: #ffffff !important;
+    }
+    .topbar-hospitality .topbar-phone-link,
+    .topbar-hospitality .topbar-phone-link span {
+      color: #ffffff !important;
+    }
+    .topbar-hospitality a {
+      color: inherit;
+    }
+    .topbar-hospitality .right-actions a:not(.live-chat) {
+      display: none;
+    }
+    .topbar-hospitality .divider {
+      display: none;
+    }
+    .topbar-hospitality .live-chat {
+      padding: 4px 12px;
+      font-size: 11px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .topbar-hospitality {
+      justify-content: center;
+    }
+    .topbar-hospitality .center-info {
+      flex-direction: column;
+      gap: 4px;
+      align-items: center;
+      text-align: center;
+    }
+    .topbar-hospitality .info-item {
+      font-size: 11px;
+    }
+    .topbar-hospitality .info-item span {
+      color: #ffffff !important;
+    }
+    .topbar-hospitality .right-actions {
+      display: none;
+    }
+  }
+
+  /* ============================================
+     MEMBER PRICING PROMO PILL STYLES
+     ============================================ */
+  .member-promo-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1a365d;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .member-promo-pill::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: shimmer 3s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { left: -100%; }
+    50%, 100% { left: 100%; }
+  }
+
+  .member-promo-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+    border-color: rgba(212, 175, 55, 0.6);
+  }
+
+  .member-promo-pill .promo-icon {
+    width: 16px;
+    height: 16px;
+    color: #d4af37;
+  }
+
+  .member-promo-pill .promo-text {
+    position: relative;
+    z-index: 1;
+  }
+
+  .member-promo-pill .promo-arrow {
+    font-size: 14px;
+    transition: transform 0.2s ease;
+  }
+
+  .member-promo-pill:hover .promo-arrow {
+    transform: translateX(3px);
+  }
+
+  /* Logged-in member version */
+  .member-promo-pill.is-member {
+    background: linear-gradient(135deg, #dcfce7 0%, #d1fae5 100%);
+    border-color: rgba(16, 185, 129, 0.4);
+  }
+
+  .member-promo-pill.is-member .promo-icon {
+    color: #10b981;
+  }
+
+  /* Premium (CPH) member version */
+  .member-promo-pill.is-premium {
+    background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);
+    border-color: rgba(212, 175, 55, 0.5);
+  }
+  .member-promo-pill.is-premium .promo-icon {
+    color: #d4af37;
+  }
+  .member-promo-pill.is-premium .promo-arrow {
+    font-size: 14px;
+    transition: transform 0.2s ease;
+  }
+  .member-promo-pill.is-premium:hover .promo-arrow {
+    transform: translateX(3px);
+  }
+
+  /* Mega menu promo pill container */
+  .mega-menu-member-promo {
+    padding: 6px 14px;
+    background: linear-gradient(90deg, rgba(26, 54, 93, 0.03) 0%, transparent 100%);
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .mega-menu-member-promo .member-promo-pill {
+    padding: 5px 10px;
+    font-size: 11px;
+    gap: 6px;
+  }
+
+  .mega-menu-member-promo .promo-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .mega-menu-member-promo .promo-text {
+    font-size: 11px;
+  }
+
+  /* Navigation bar member promo (subtle) */
+  .nav-member-promo {
+    margin-left: auto;
+    padding-right: 20px;
+  }
+
+  .nav-member-promo .member-promo-pill {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+
+  @media (max-width: 1200px) {
+    .nav-member-promo {
+      display: none;
+    }
+  }
+
+  /* Account Dropdown Styles */
+  .account-dropdown-wrapper {
+    position: relative;
+  }
+
+  .account-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    min-width: 250px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+  }
+
+  .account-dropdown-wrapper:hover .account-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .account-dropdown-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+    border-radius: 8px 8px 0 0;
+  }
+
+  .account-dropdown-name {
+    font-weight: 700;
+    font-size: 15px;
+    color: #1a365d;
+    margin-bottom: 4px;
+  }
+
+  .account-dropdown-email {
+    font-size: 12px;
+    color: #64748b;
+  }
+
+  .account-dropdown-menu {
+    list-style: none;
+    margin: 0;
+    padding: 8px 0;
+  }
+
+  .account-dropdown-menu li {
+    margin: 0;
+  }
+
+  .account-dropdown-menu a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    color: #475569;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .account-dropdown-menu a:hover {
+    background: #f8fafc;
+    color: #1a365d;
+  }
+
+  .account-dropdown-menu svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  .account-dropdown-divider {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 8px 0;
+  }
+
+  .account-dropdown-menu li:last-child a {
+    color: #dc2626;
+  }
+
+  .account-dropdown-menu li:last-child a:hover {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+</style>
+
+<div class="enhanced-header-wrapper">
+  <!-- Warm Hospitality Top Bar -->
+  {% if section.settings.enable_top_bar %}
+    <div class="topbar-hospitality">
+      <div class="welcome">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+          <path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/>
+        </svg>
+        <span>{{ section.settings.topbar_welcome_text | default: 'Welcome to Celebrate Festival — Your Partner in Foodservice Excellence' }}</span>
+      </div>
+      <div class="center-info">
+        <div class="info-item">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+          </svg>
+          <a href="tel:{{ section.settings.topbar_phone | default: '(408) 673-9999' | remove: '(' | remove: ')' | remove: ' ' | remove: '-' }}" class="topbar-phone-link">
+            <span>{{ section.settings.topbar_phone | default: '(408) 673-9999' }}</span>
+          </a>
+        </div>
+        <div class="info-item">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+          </svg>
+          <span>{{ section.settings.topbar_hours | default: 'Mon-Sat: 9AM-6PM PST' }}</span>
+        </div>
+      </div>
+      <div class="right-actions">
+        <a href="{{ section.settings.topbar_link_1_url | default: '/pages/coming-soon' }}">{{ section.settings.topbar_link_1_text | default: 'Track Order' }}</a>
+        <span class="divider"></span>
+        <a href="{{ section.settings.topbar_link_2_url | default: '/pages/coming-soon' }}">{{ section.settings.topbar_link_2_text | default: 'Financing' }}</a>
+        {% if section.settings.show_live_chat %}
+          <span class="divider"></span>
+          <a href="{{ section.settings.topbar_chat_url | default: '/pages/contact' }}" class="live-chat">
+            <span class="pulse"></span>
+            {{ section.settings.topbar_chat_text | default: 'Live Chat' }}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Main Header -->
+  <header class="main-header">
+    <div class="header-container">
+      <!-- Mobile Menu Button -->
+      <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <!-- Logo -->
+      <div class="header-logo">
+        {% if section.settings.logo %}
+          <a href="{{ routes.root_url }}">
+            {{ section.settings.logo | image_url: width: 150 | image_tag: loading: 'eager', alt: shop.name }}
+          </a>
+        {% else %}
+          <a href="{{ routes.root_url }}" style="font-size: 24px; font-weight: bold; text-decoration: none; color: inherit;">
+            {{ shop.name }}
+          </a>
+        {% endif %}
+      </div>
+
+     <!-- Desktop Search Bar -->
+<div class="header-search desktop-only">
+  <form class="search-form" action="{{ routes.search_url }}" method="get" role="search">
+    <input
+      type="search"
+      name="q"
+      class="search-input"
+      id="desktop-search-input"
+      placeholder="{{ section.settings.search_placeholder | default: 'Search 10,000+ products...' }}"
+      value="{{ search.terms | escape }}"
+      autocomplete="off">
+    <input type="hidden" name="type" value="product">
+    <input type="hidden" name="options[prefix]" value="last">
+    <button type="submit" class="search-button" aria-label="Search">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+        <path d="M21.71 20.29L18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 7-7 7 7 0 0 1-7 7Z"/>
+      </svg>
+    </button>
+    <div class="search-autocomplete" id="desktop-autocomplete"></div>
+  </form>
+</div>
+
+      <!-- Desktop Header Actions -->
+      <div class="header-actions desktop-only">
+        <!-- Expert Help -->
+<!-- Expert Help / Contact Us - Bug Fix #5: Linked to Contact Page -->
+{% if section.settings.show_expert_help %}
+  <a href="/pages/contact-us" class="expert-help" id="expert-help-btn" style="text-decoration: none !important;" title="Contact Us">
+    <div class="expert-help-icon" id="expert-help-icon">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+        <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+      </svg>
+    </div>
+    <div class="expert-help-content">
+      <span class="expert-help-label" id="expert-help-label">{{ section.settings.expert_help_label | default: 'CONTACT US' }}</span>
+      <span class="expert-help-phone" id="expert-help-phone">
+        {{ section.settings.expert_help_phone | default: '(408) 673-9999' }}
+      </span>
+    </div>
+  </a>
+{% endif %}
+
+        <!-- Header Links -->
+        <div class="header-links">
+          <div class="header-link account-dropdown-wrapper">
+            <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}?return_url={{ return_path | url_param_escape }}{% endif %}" class="header-link{% unless customer %} js-login-return{% endunless %}">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+              </svg>
+              {% if customer %}My Account{% else %}Login{% endif %}
+            </a>
+
+            {% if customer %}
+            <div class="account-dropdown">
+              <div class="account-dropdown-header">
+                <div class="account-dropdown-name">{{ customer.first_name | default: customer.name }}</div>
+                <div class="account-dropdown-email">{{ customer.email }}</div>
+              </div>
+              <ul class="account-dropdown-menu">
+                <li>
+                  <a href="{{ routes.account_url }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    Account Dashboard
+                  </a>
+                </li>
+                <li>
+                  <a href="{{ routes.account_url }}/orders">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                      <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                    </svg>
+                    Orders
+                  </a>
+                </li>
+                <li>
+                  <a href="{{ routes.account_url }}/addresses">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    Addresses
+                  </a>
+                </li>
+                <li class="account-dropdown-divider"></li>
+                <li>
+                  <a href="{{ routes.account_logout_url }}?return_to={{ request.path | url_param_escape }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                      <polyline points="16 17 21 12 16 7"/>
+                      <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    Logout
+                  </a>
+                </li>
+              </ul>
+            </div>
+            {% endif %}
+          </div>
+
+          {% comment %} BUG-017 FIX: Add wishlist link to header {% endcomment %}
+          <a href="/pages/my-wishlist" class="header-link wishlist-link" title="My Wishlist">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <span class="visually-hidden">Wishlist</span>
+          </a>
+
+          <a href="{{ routes.cart_url }}" class="header-link cart-link">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+              <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+            </svg>
+            {% if cart.item_count > 0 %}
+              <span class="cart-count">{{ cart.item_count }}</span>
+            {% endif %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Header Bar (visible only on mobile <=768px) -->
+  <div class="mobile-header-bar">
+    <button class="mobile-hb-hamburger" id="mobile-hb-toggle" aria-label="Open menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <a href="{{ routes.root_url }}" class="mobile-hb-logo">
+      {% if section.settings.logo %}
+        {{ section.settings.logo | image_url: width: 120 | image_tag: loading: 'eager', alt: shop.name }}
+      {% else %}
+        <span class="mobile-hb-shop-name">{{ shop.name }}</span>
+      {% endif %}
+    </a>
+
+    <a href="tel:{{ section.settings.expert_help_phone | default: '(408) 673-9999' | remove: '(' | remove: ')' | remove: ' ' | remove: '-' }}" class="mobile-hb-phone">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+        <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+      </svg>
+      <span>{{ section.settings.expert_help_phone | default: '(408) 673-9999' }}</span>
+    </a>
+
+    <div class="mobile-hb-icons">
+      <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}?return_url={{ return_path | url_param_escape }}{% endif %}" class="mobile-hb-icon{% unless customer %} js-login-return{% endunless %}" aria-label="Account">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+        </svg>
+      </a>
+      <a href="{{ routes.cart_url }}" class="mobile-hb-icon mobile-hb-cart" aria-label="Cart">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+          <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+        </svg>
+        {% if cart.item_count > 0 %}
+          <span class="mobile-hb-cart-badge">{{ cart.item_count }}</span>
+        {% endif %}
+      </a>
+    </div>
+  </div>
+
+  <!-- Mobile Search Bar (visible only on mobile <=768px) -->
+  <div class="mobile-search-bar">
+    <form class="search-form" action="{{ routes.search_url }}" method="get" role="search">
+      <input
+        type="search"
+        name="q"
+        class="search-input"
+        id="mobile-bar-search-input"
+        placeholder="{{ section.settings.search_placeholder | default: 'What are you looking for?' }}"
+        value="{{ search.terms | escape }}"
+        autocomplete="off">
+      <input type="hidden" name="type" value="product">
+      <input type="hidden" name="options[prefix]" value="last">
+      <button type="submit" class="search-button" aria-label="Search">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+          <path d="M21.71 20.29L18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 7-7 7 7 0 0 1-7 7Z"/>
+        </svg>
+      </button>
+      <div class="search-autocomplete" id="mobile-bar-autocomplete"></div>
+    </form>
+  </div>
+
+  <!-- Desktop Navigation -->
+  <nav class="main-navigation desktop-only">
+    <div class="nav-container">
+      <!-- Navigation Links -->
+      <ul class="nav-list">
+        {% for link in linklists[section.settings.main_menu].links %}
+          {% assign menu_type = 'regular' %}
+          {% assign menu_icon = '' %}
+          {% assign current_block = null %}
+
+          {% for block in section.blocks %}
+            {% if block.settings.menu_item_title == link.title %}
+              {% assign menu_type = block.type %}
+              {% assign menu_icon = block.settings.menu_icon %}
+              {% assign current_block = block %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+
+          <li class="nav-item" data-menu-type="{{ menu_type }}" data-menu-handle="{{ link.handle }}">
+            <a href="{{ link.url }}" class="nav-link">
+              {% if menu_icon != blank %}
+                <img src="{{ menu_icon | image_url: width: 22 }}" alt="" class="nav-icon">
+              {% endif %}
+              {{ link.title }}
+              {% if link.links.size > 0 or menu_type != 'regular' %}
+                <svg class="nav-dropdown-arrow" viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
+                  <path d="M7 10l5 5 5-5z"/>
+                </svg>
+              {% endif %}
+            </a>
+            
+            <!-- Simple Dropdown -->
+            {% if menu_type == 'simple_dropdown' and link.links.size > 0 %}
+              <div class="simple-dropdown-menu" data-menu-handle="{{ link.handle }}">
+                <ul>
+                  {% for child_link in link.links %}
+                    <li>
+                      <a href="{{ child_link.url }}">{{ child_link.title }}</a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+
+      <!-- Member Pricing Promo Pill (Navigation Bar) -->
+      {% if show_member_promo %}
+      <div class="nav-member-promo">
+        {% if customer %}
+          {% comment %} Bug Fix #8: All logged-in users see "Member Pricing Active" - no promotional prompts {% endcomment %}
+          {% assign is_member = false %}
+          {% assign is_cph_member = false %}
+          {% assign is_hashtag_member = false %}
+          {% for tag in customer.tags %}
+            {% assign tag_lower = tag | downcase %}
+            {% if tag_lower == 'cph' %}
+              {% assign is_cph_member = true %}
+              {% assign is_member = true %}
+            {% endif %}
+            {% if tag_lower == 'hashtag' %}
+              {% assign is_hashtag_member = true %}
+              {% assign is_member = true %}
+            {% endif %}
+            {% if tag_lower contains 'wholesale' or tag_lower contains 'plus' or tag_lower contains 'member' or tag_lower contains 'cph' or tag_lower contains 'rou' or tag_lower contains 'margin' or tag_lower contains 'hashtag' %}
+              {% assign is_member = true %}
+            {% endif %}
+          {% endfor %}
+
+          {% if is_cph_member %}
+            {%- comment -%} CPH Premium members: gold pill linking to exclusive page {%- endcomment -%}
+            <a href="/pages/cph-page-pm" class="member-promo-pill is-premium">
+              <svg class="promo-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+              </svg>
+              <span class="promo-text">My Portal</span>
+              <span class="promo-arrow">→</span>
+            </a>
+          {% elsif is_hashtag_member %}
+            {%- comment -%} Hashtag members: gold pill linking to Hashtag portal {%- endcomment -%}
+            <a href="/pages/hashtag-member-portal" class="member-promo-pill is-premium">
+              <svg class="promo-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+              </svg>
+              <span class="promo-text">My Portal</span>
+              <span class="promo-arrow">→</span>
+            </a>
+          {% else %}
+            {%- comment -%} Bug Fix #8: Show Member Pricing Active for ALL other logged-in users {%- endcomment -%}
+            <span class="member-promo-pill is-member">
+              <svg class="promo-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+              <span class="promo-text">{{ section.settings.member_promo_member_text | default: 'Member Pricing Active' }}</span>
+            </span>
+          {% endif %}
+        {% else %}
+          <a href="{{ routes.account_login_url }}?return_url={{ return_path | url_param_escape }}" class="member-promo-pill js-login-return">
+            <svg class="promo-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/>
+            </svg>
+            <span class="promo-text">{{ section.settings.member_promo_guest_text | default: 'Members Save More' }}</span>
+            <span class="promo-arrow">→</span>
+          </a>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Mega Menu Containers -->
+      <div class="mega-menu-containers">
+        {% for link in linklists[section.settings.main_menu].links %}
+          {% assign menu_type = 'regular' %}
+          {% assign current_block = null %}
+
+          {% for block in section.blocks %}
+            {% if block.settings.menu_item_title == link.title %}
+              {% assign menu_type = block.type %}
+              {% assign current_block = block %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+
+          {% case menu_type %}
+            {% when 'mega_menu_thumbnails' %}
+              {% if link.links.size > 0 %}
+                <div class="mega-menu mega-menu-{{ link.handle }}" data-menu-handle="{{ link.handle }}">
+                  <div class="mega-menu-container">
+                    <!-- 60/40 Split Layout -->
+                    <div class="mega-menu-layout">
+
+                      <!-- LEFT SIDE: 60% - Subcategory Items with Thumbnails -->
+                      <div class="mega-menu-subcategories">
+                        <div class="subcategory-grid">
+                          {% assign total_items = link.links.size %}
+                          {% assign items_per_column = total_items | plus: 1 | divided_by: 2 %}
+
+                          <!-- Column 1 -->
+                          <div class="subcategory-column">
+                            {% for child_link in link.links limit: items_per_column %}
+                              {% comment %} Get collection handle from URL {% endcomment %}
+                              {% assign collection_handle = child_link.url | split: '/collections/' | last | split: '/' | first %}
+                              {% assign current_collection = collections[collection_handle] %}
+                              {% assign thumbnail_image = current_collection.featured_image %}
+
+                              <div class="subcategory-item" data-subcategory-id="{{ child_link.handle }}" data-has-children="{{ child_link.links.size | default: 0 }}">
+                                <a href="{{ child_link.url }}" class="subcategory-link">
+                                  <div class="subcategory-thumb">
+                                    {% if thumbnail_image %}
+                                      <img src="{{ thumbnail_image | image_url: width: 50 }}" alt="{{ child_link.title }}">
+                                    {% else %}
+                                      <div class="thumb-placeholder">
+                                        <span>IMG</span>
+                                      </div>
+                                    {% endif %}
+                                  </div>
+                                  <span class="subcategory-title">{{ child_link.title }}</span>
+                                </a>
+                              </div>
+                            {% endfor %}
+                          </div>
+
+                          <!-- Column 2 -->
+                          <div class="subcategory-column">
+                            {% for child_link in link.links offset: items_per_column %}
+                              {% comment %} Get collection handle from URL {% endcomment %}
+                              {% assign collection_handle = child_link.url | split: '/collections/' | last | split: '/' | first %}
+                              {% assign current_collection = collections[collection_handle] %}
+                              {% assign thumbnail_image = current_collection.featured_image %}
+
+                              <div class="subcategory-item" data-subcategory-id="{{ child_link.handle }}" data-has-children="{{ child_link.links.size | default: 0 }}">
+                                <a href="{{ child_link.url }}" class="subcategory-link">
+                                  <div class="subcategory-thumb">
+                                    {% if thumbnail_image %}
+                                      <img src="{{ thumbnail_image | image_url: width: 50 }}" alt="{{ child_link.title }}">
+                                    {% else %}
+                                      <div class="thumb-placeholder">
+                                        <span>IMG</span>
+                                      </div>
+                                    {% endif %}
+                                  </div>
+                                  <span class="subcategory-title">{{ child_link.title }}</span>
+                                </a>
+                              </div>
+                            {% endfor %}
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- RIGHT SIDE: 40% - Static L3 Items List -->
+                      <div class="mega-menu-more" data-parent-handle="{{ link.handle }}">
+                        <div class="more-content-default more-content-active">
+                          <h3 class="more-title">All {{ link.title }}</h3>
+
+                          {% comment %} Flatten all L3 items into a single loop {% endcomment %}
+                          {% assign l3_items = '' %}
+                          {% assign item_count = 0 %}
+
+                          {% for child_link in link.links %}
+                            {% for grandchild_link in child_link.links %}
+                              {% if item_count < 15 %}
+                                {% assign l3_items = l3_items | append: grandchild_link.title | append: '|' | append: grandchild_link.url | append: '||' %}
+                                {% assign item_count = item_count | plus: 1 %}
+                              {% endif %}
+                            {% endfor %}
+                          {% endfor %}
+
+                          {% if item_count > 0 %}
+                            {% assign items_array = l3_items | split: '||' %}
+
+                            <div class="more-items-grid">
+                              <!-- Column 1: First 8 items -->
+                              <div class="more-column">
+                                {% for i in (0..7) %}
+                                  {% if items_array[i] and items_array[i] != '' %}
+                                    {% assign item_data = items_array[i] | split: '|' %}
+                                    <a href="{{ item_data[1] }}" class="more-link">
+                                      {{ item_data[0] }}
+                                    </a>
+                                  {% endif %}
+                                {% endfor %}
+                              </div>
+
+                              <!-- Column 2: Next 7 items + View More -->
+                              <div class="more-column">
+                                {% for i in (8..14) %}
+                                  {% if items_array[i] and items_array[i] != '' %}
+                                    {% assign item_data = items_array[i] | split: '|' %}
+                                    <a href="{{ item_data[1] }}" class="more-link">
+                                      {{ item_data[0] }}
+                                    </a>
+                                  {% endif %}
+                                {% endfor %}
+
+                                {% comment %} View More link {% endcomment %}
+                                <a href="{{ link.url }}" class="more-link more-view-more">
+                                  View More →
+                                </a>
+                              </div>
+                            </div>
+                          {% else %}
+                            <p style="color: #999; padding: 20px;">No subcategories available.</p>
+                          {% endif %}
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <!-- Member Pricing Banner at bottom of mega menu -->
+                    {% if show_member_promo %}
+                    {% unless customer %}
+                    <div class="mega-menu-member-promo">
+                      <a href="{{ routes.account_login_url }}?return_url={{ return_path | url_param_escape }}" class="member-promo-pill js-login-return">
+                        <svg class="promo-icon" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/>
+                        </svg>
+                        <span class="promo-text">{{ section.settings.member_promo_megamenu_text | default: 'Login to unlock exclusive member pricing on all products' }}</span>
+                        <span class="promo-arrow">→</span>
+                      </a>
+                    </div>
+                    {% endunless %}
+                    {% endif %}
+                  </div>
+                </div>
+              {% endif %}
+
+            {% when 'mega_menu' %}
+              {% if link.links.size > 0 %}
+                <div class="mega-menu mega-menu-{{ link.handle }}" data-menu-handle="{{ link.handle }}">
+                  <div class="mega-menu-container">
+                    <div class="mega-menu-grid">
+                      <!-- Left: Menu Content -->
+                      <div class="mega-menu-content">
+                        {% for child_link in link.links %}
+                          <div class="mega-menu-column">
+                            <h3>{{ child_link.title }}</h3>
+                            {% comment %} Check for custom L3 order override for this column {% endcomment %}
+                            {% assign col_key = 'l3_col_' | append: forloop.index %}
+                            {% assign l3_override = current_block.settings[col_key] %}
+                            {% if l3_override != blank %}
+                              <ul>
+                                {% assign l3_handles = l3_override | split: "\n" %}
+                                {% for l3_handle in l3_handles %}
+                                  {% assign l3_handle = l3_handle | strip %}
+                                  {% if l3_handle != blank %}
+                                    {% assign l3_col = collections[l3_handle] %}
+                                    <li>
+                                      <a href="/collections/{{ l3_handle }}">{{ l3_col.title | default: l3_handle }}</a>
+                                    </li>
+                                  {% endif %}
+                                {% endfor %}
+                              </ul>
+                            {% elsif child_link.links.size > 0 %}
+                              <ul>
+                                {% for grandchild_link in child_link.links %}
+                                  <li>
+                                    <a href="{{ grandchild_link.url }}">{{ grandchild_link.title }}</a>
+                                  </li>
+                                {% endfor %}
+                              </ul>
+                            {% else %}
+                              <a href="{{ child_link.url }}" class="view-all-link">View {{ child_link.title }} →</a>
+                            {% endif %}
+                          </div>
+                        {% endfor %}
+                      </div>
+
+                      <!-- Right: Promotional Image -->
+                      <div class="mega-menu-image" style="width: {{ current_block.settings.promo_image_width | default: 400 }}px; height: {{ current_block.settings.promo_image_height | default: 250 }}px; display: flex; align-items: {{ current_block.settings.image_position | default: 'center' }}; justify-content: center; {% if current_block.settings.image_rounded_corners %}border-radius: 12px; overflow: hidden;{% endif %} {% if current_block.settings.image_shadow %}box-shadow: 0 4px 12px rgba(0,0,0,0.1);{% endif %}">
+                        {% if current_block.settings.promo_image %}
+                          <img src="{{ current_block.settings.promo_image | image_url: width: current_block.settings.promo_image_width | default: 400 }}" alt="{{ current_block.settings.promo_title | default: 'Featured Equipment' }}" style="width: 100%; height: 100%; object-fit: {{ current_block.settings.image_fit | default: 'cover' }}; {% if current_block.settings.image_rounded_corners %}border-radius: 8px;{% endif %}">
+                        {% else %}
+                          <div class="placeholder-image" style="width: 100%; height: 100%; background: #f0f0f0; border: 2px dashed #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #999; font-size: 14px; text-align: center;">
+                            <div>
+                              <div>Add promo image</div>
+                              <div style="font-size: 12px; margin-top: 5px;">
+                                {{ current_block.settings.promo_image_width | default: 400 }}px × {{ current_block.settings.promo_image_height | default: 250 }}px
+                              </div>
+                            </div>
+                          </div>
+                        {% endif %}
+                      </div>
+                    </div>
+
+                    <!-- Member Pricing Banner at bottom of classic mega menu -->
+                    {% if show_member_promo %}
+                    {% unless customer %}
+                    <div class="mega-menu-member-promo">
+                      <a href="{{ routes.account_login_url }}?return_url={{ return_path | url_param_escape }}" class="member-promo-pill js-login-return">
+                        <svg class="promo-icon" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/>
+                        </svg>
+                        <span class="promo-text">{{ section.settings.member_promo_megamenu_text | default: 'Login to unlock exclusive member pricing on all products' }}</span>
+                        <span class="promo-arrow">→</span>
+                      </a>
+                    </div>
+                    {% endunless %}
+                    {% endif %}
+                  </div>
+                </div>
+              {% endif %}
+
+           {% when 'logo_grid' %}
+  <div class="mega-menu mega-menu-{{ link.handle }}" data-menu-handle="{{ link.handle }}">
+    <div class="mega-menu-container">
+      {% assign logo_items = section.blocks | where: 'type', 'logo_grid_item' %}
+
+      {% if logo_items.size > 0 %}
+        <div class="logo-grid" style="grid-template-columns: repeat({{ current_block.settings.logos_per_row | default: 8 }}, 1fr);">
+          {% for logo_item in logo_items %}
+            {% if logo_item.settings.parent_menu_title == link.title %}
+              <div class="logo-grid-item">
+                {% if logo_item.settings.brand_url != blank -%}
+                  <a href="{{ logo_item.settings.brand_url }}">
+                {%- endif %}
+                {% if logo_item.settings.brand_logo %}
+                  <img src="{{ logo_item.settings.brand_logo | image_url: width: 120 }}" alt="{{ logo_item.settings.brand_name }}">
+                {% else %}
+                  <span class="brand-name-text">{{ logo_item.settings.brand_name }}</span>
+                {% endif %}
+                {% if logo_item.settings.brand_url != blank %}</a>{% endif %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+        {% if current_block.settings.show_view_all and current_block.settings.view_all_url != blank %}
+          <div class="logo-grid-footer">
+            <a href="{{ current_block.settings.view_all_url }}" class="view-all-brands-btn">{{ current_block.settings.view_all_text | default: 'View All Brands' }}</a>
+          </div>
+        {% endif %}
+
+        <!-- Member Pricing Banner at bottom of logo grid menu -->
+        {% if show_member_promo %}
+        {% unless customer %}
+        <div class="mega-menu-member-promo">
+          <a href="{{ routes.account_login_url }}?return_url={{ return_path | url_param_escape }}" class="member-promo-pill js-login-return">
+            <svg class="promo-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/>
+            </svg>
+            <span class="promo-text">{{ section.settings.member_promo_megamenu_text | default: 'Login to unlock exclusive member pricing on all products' }}</span>
+            <span class="promo-arrow">→</span>
+          </a>
+        </div>
+        {% endunless %}
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+          {% endcase %}
+        {% endfor %}
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu (keeping existing structure) -->
+  <div class="mobile-menu-overlay" id="mobile-menu-overlay">
+    <div class="mobile-menu">
+      <div class="mobile-menu-header">
+        <div class="mobile-menu-top">
+          <div class="mobile-menu-logo">
+            {% if section.settings.logo %}
+              <img src="{{ section.settings.logo | image_url: width: 200 }}" alt="{{ shop.name }}" style="height: {{ section.settings.mobile_menu_logo_height | default: 50 }}px; width: auto;">
+            {% else %}
+              <span style="font-size: {{ section.settings.mobile_menu_logo_height | default: 50 | divided_by: 2 }}px; font-weight: bold;">{{ shop.name }}</span>
+            {% endif %}
+          </div>
+          <button class="mobile-menu-close" id="mobile-menu-close">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+          </button>
+        </div>
+        
+      <div class="mobile-search">
+  <form class="search-form" action="{{ routes.search_url }}" method="get" role="search">
+    <input
+      type="search"
+      name="q"
+      class="search-input"
+      id="mobile-search-input"
+      placeholder="Search products..."
+      value="{{ search.terms | escape }}"
+      autocomplete="off">
+    <input type="hidden" name="type" value="product">
+    <input type="hidden" name="options[prefix]" value="last">
+    <button type="submit" class="search-button">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+        <path d="M21.71 20.29L18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 7-7 7 7 0 0 1-7 7Z"/>
+      </svg>
+    </button>
+    <div class="search-autocomplete" id="mobile-autocomplete"></div>
+  </form>
+</div>
+
+        <div class="mobile-header-actions">
+          <div class="mobile-expert-section">
+            {% if section.settings.show_expert_help %}
+            <a href="tel:{{ section.settings.expert_help_phone }}" class="mobile-expert">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+              </svg>
+              {{ section.settings.expert_help_phone | default: "(408) 673-9999" }}
+            </a>
+            {% endif %}
+          </div>
+          
+          <div class="mobile-actions-right">
+            <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}?return_url={{ return_path | url_param_escape }}{% endif %}" class="mobile-icon-action{% unless customer %} js-login-return{% endunless %}">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+              </svg>
+            </a>
+            <a href="{{ routes.cart_url }}" class="mobile-icon-action cart-action">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+              </svg>
+              {% if cart.item_count > 0 %}
+                <span class="cart-count-badge">{{ cart.item_count }}</span>
+              {% endif %}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Navigation -->
+      <div class="mobile-nav">
+        {% for link in linklists[section.settings.main_menu].links %}
+          {% assign menu_type = 'regular' %}
+          {% assign menu_icon = '' %}
+
+          {% for block in section.blocks %}
+            {% if block.settings.menu_item_title == link.title %}
+              {% assign menu_type = block.type %}
+              {% assign menu_icon = block.settings.menu_icon %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+
+          <div class="mobile-nav-item">
+            {% if link.links.size > 0 %}
+              <button class="mobile-nav-toggle" data-target="mobile-submenu-{{ link.handle }}">
+                {% if menu_icon != blank %}
+                  <img src="{{ menu_icon | image_url: width: 20 }}" alt="" class="mobile-nav-icon">
+                {% endif %}
+                {{ link.title }}
+                <svg class="mobile-nav-arrow" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                  <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                </svg>
+              </button>
+
+              <div class="mobile-submenu" id="mobile-submenu-{{ link.handle }}">
+                {% for child_link in link.links %}
+                  {% if child_link.links.size > 0 %}
+                    <div class="mobile-submenu-section">
+                      <h4>{{ child_link.title }}</h4>
+                      {% for grandchild_link in child_link.links %}
+                        <a href="{{ grandchild_link.url }}">{{ grandchild_link.title }}</a>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    <a href="{{ child_link.url }}" class="mobile-submenu-link">{{ child_link.title }}</a>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% else %}
+              <a href="{{ link.url }}" class="mobile-nav-link">
+                {% if menu_icon != blank %}
+                  <img src="{{ menu_icon | image_url: width: 20 }}" alt="" class="mobile-nav-icon">
+                {% endif %}
+                {{ link.title }}
+              </a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript (keeping existing functionality) -->
+<!-- JavaScript -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // ============================================
+    // BUSINESS HOURS CHECKER - Bug Fix #5: Always link to contact page
+    // ============================================
+    function checkBusinessHours() {
+      const expertHelpBtn = document.getElementById('expert-help-btn');
+      const expertHelpLabel = document.getElementById('expert-help-label');
+      const expertHelpPhone = document.getElementById('expert-help-phone');
+      const expertHelpIcon = document.getElementById('expert-help-icon');
+
+      if (!expertHelpBtn) return;
+
+      // Get current time in PST/PDT
+      const now = new Date();
+      const pstTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+
+      const day = pstTime.getDay(); // 0 = Sunday, 6 = Saturday
+      const hour = pstTime.getHours();
+
+      // Business hours: Monday-Saturday, 9 AM - 6 PM PST
+      const isBusinessHours = (day >= 1 && day <= 6) && (hour >= 9 && hour < 18);
+
+      // Bug Fix #5: Always link to contact page, but show different content based on hours
+      expertHelpBtn.href = '/pages/contact-us';
+
+      if (isBusinessHours) {
+        // Online - Show Contact Us with phone number
+        expertHelpBtn.classList.remove('offline');
+        expertHelpLabel.textContent = '{{ section.settings.expert_help_label | default: "CONTACT US" }}';
+        expertHelpPhone.textContent = '{{ section.settings.expert_help_phone | default: "(408) 673-9999" }}';
+        expertHelpIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>';
+      } else {
+        // Offline - Show Leave a Message
+        expertHelpBtn.classList.add('offline');
+        expertHelpLabel.textContent = 'LEAVE US A MESSAGE';
+        expertHelpPhone.textContent = '';
+        expertHelpIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>';
+      }
+    }
+
+    // Check immediately and every minute
+    checkBusinessHours();
+    setInterval(checkBusinessHours, 60000);
+
+    // ============================================
+    // PREDICTIVE SEARCH
+    // ============================================
+    let searchTimeout;
+    
+   function initPredictiveSearch(inputId, autocompleteId) {
+  const searchInput = document.getElementById(inputId);
+  const autocompleteContainer = document.getElementById(autocompleteId);
+  
+  if (!searchInput || !autocompleteContainer) return;
+  
+  searchInput.addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    const query = this.value.trim();
+    
+    if (query.length < 2) {
+      autocompleteContainer.classList.remove('active');
+      autocompleteContainer.innerHTML = '';
+      return;
+    }
+    
+    autocompleteContainer.innerHTML = '<div class="autocomplete-loading">Searching...</div>';
+    autocompleteContainer.classList.add('active');
+    
+    searchTimeout = setTimeout(() => {
+      fetch(`/search/suggest.json?q=${encodeURIComponent(query)}&resources[type]=product&resources[limit]=5`)
+        .then(response => response.json())
+        .then(data => {
+          const products = data.resources.results.products || [];
+          
+          if (products.length === 0) {
+            autocompleteContainer.innerHTML = '<div class="autocomplete-no-results">No products found</div>';
+            return;
+          }
+          
+          let html = '';
+          const maxProducts = Math.min(products.length, 5);
+          
+         for (let i = 0; i < maxProducts; i++) {
+  const product = products[i];
+  let imageUrl = '';
+  
+  // Fix image URL - Shopify returns image object
+  if (product.image) {
+    imageUrl = product.image;
+  } else if (product.featured_image) {
+    imageUrl = product.featured_image;
+  }
+  
+  html += `
+    <a href="${product.url}" class="autocomplete-item">
+      ${imageUrl ? `<img src="${imageUrl}" alt="${product.title}" class="autocomplete-image" loading="lazy">` : '<div class="autocomplete-image"></div>'}
+      <div class="autocomplete-details">
+        <div class="autocomplete-title">${product.title}</div>
+      </div>
+    </a>
+  `;
+}
+          
+          html += `
+            <a href="/search?q=${encodeURIComponent(query)}&type=product&options%5Bprefix%5D=last" class="autocomplete-view-all">
+              View All Results →
+            </a>
+          `;
+          
+          autocompleteContainer.innerHTML = html;
+        })
+        .catch(error => {
+          console.error('Search error:', error);
+          autocompleteContainer.innerHTML = '<div class="autocomplete-no-results">Error loading results</div>';
+        });
+    }, 300);
+  });
+  
+  // Close autocomplete when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!searchInput.contains(e.target) && !autocompleteContainer.contains(e.target)) {
+      autocompleteContainer.classList.remove('active');
+    }
+  });
+  
+  // Close on ESC key
+  searchInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      autocompleteContainer.classList.remove('active');
+    }
+  });
+}
+    
+    // Initialize for desktop, mobile menu, and mobile bar search
+    initPredictiveSearch('desktop-search-input', 'desktop-autocomplete');
+    initPredictiveSearch('mobile-search-input', 'mobile-autocomplete');
+    initPredictiveSearch('mobile-bar-search-input', 'mobile-bar-autocomplete');
+
+    // ============================================
+    // EXISTING MOBILE MENU CODE
+    // ============================================
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    const mobileHbToggle = document.getElementById('mobile-hb-toggle');
+    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+    const body = document.body;
+
+    function openMobileMenu() {
+      mobileMenuOverlay.classList.add('active');
+      body.classList.add('mobile-menu-open');
+      if (mobileMenuToggle) mobileMenuToggle.classList.add('active');
+    }
+
+    function closeMobileMenu() {
+      mobileMenuOverlay.classList.remove('active');
+      body.classList.remove('mobile-menu-open');
+      if (mobileMenuToggle) mobileMenuToggle.classList.remove('active');
+    }
+
+    if (mobileMenuToggle) {
+      mobileMenuToggle.addEventListener('click', function () {
+        if (mobileMenuOverlay.classList.contains('active')) {
+          closeMobileMenu();
+        } else {
+          openMobileMenu();
+        }
+      });
+    }
+
+    if (mobileHbToggle) {
+      mobileHbToggle.addEventListener('click', function () {
+        openMobileMenu();
+      });
+    }
+
+    mobileMenuOverlay.addEventListener('click', function (e) {
+      if (e.target === this) {
+        closeMobileMenu();
+      }
+    });
+
+    const mobileMenuClose = document.getElementById('mobile-menu-close');
+    if (mobileMenuClose) {
+      mobileMenuClose.addEventListener('click', function() {
+        closeMobileMenu();
+      });
+    }
+
+    const mobileNavToggles = document.querySelectorAll('.mobile-nav-toggle');
+    mobileNavToggles.forEach((toggle) => {
+      toggle.addEventListener('click', function () {
+        const targetId = this.getAttribute('data-target');
+        const submenu = document.getElementById(targetId);
+        const arrow = this.querySelector('.mobile-nav-arrow');
+
+        document.querySelectorAll('.mobile-submenu').forEach((menu) => {
+          if (menu !== submenu) {
+            menu.classList.remove('active');
+          }
+        });
+
+        document.querySelectorAll('.mobile-nav-arrow').forEach((arr) => {
+          if (arr !== arrow) {
+            arr.style.transform = 'rotate(0deg)';
+          }
+        });
+
+        submenu.classList.toggle('active');
+        arrow.style.transform = submenu.classList.contains('active') ? 'rotate(90deg)' : 'rotate(0deg)';
+      });
+    });
+
+    window.addEventListener('scroll', function() {
+      const header = document.querySelector('.enhanced-header-wrapper');
+      if (window.scrollY > 100) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+
+    // ============================================
+    // EXISTING DESKTOP NAVIGATION CODE
+    // ============================================
+    const navItems = document.querySelectorAll('.nav-item');
+    const megaMenus = document.querySelectorAll('.mega-menu');
+    const simpleDropdowns = document.querySelectorAll('.simple-dropdown-menu');
+
+    megaMenus.forEach((menu) => {
+      menu.style.opacity = '0';
+      menu.style.visibility = 'hidden';
+    });
+
+    simpleDropdowns.forEach((dropdown) => {
+      dropdown.style.opacity = '0';
+      dropdown.style.visibility = 'hidden';
+    });
+
+    // Helper function to show mega menu
+    function showMegaMenu(menu) {
+      menu.style.opacity = '1';
+      menu.style.visibility = 'visible';
+      menu.style.pointerEvents = 'auto';
+      menu.classList.add('is-visible');
+    }
+
+    // Helper function to hide mega menu
+    function hideMegaMenu(menu) {
+      menu.style.opacity = '0';
+      menu.style.visibility = 'hidden';
+      menu.style.pointerEvents = 'none';
+      menu.classList.remove('is-visible');
+    }
+
+    // Helper function to hide all menus
+    function hideAllMenus() {
+      megaMenus.forEach((menu) => hideMegaMenu(menu));
+      simpleDropdowns.forEach((dropdown) => {
+        dropdown.style.opacity = '0';
+        dropdown.style.visibility = 'hidden';
+      });
+    }
+
+    navItems.forEach((navItem) => {
+      const menuHandle = navItem.dataset.menuHandle;
+      const menuType = navItem.dataset.menuType;
+      const correspondingMegaMenu = document.querySelector(`.mega-menu-${menuHandle}`);
+      const correspondingSimpleDropdown = navItem.querySelector('.simple-dropdown-menu');
+
+      if (correspondingMegaMenu && (menuType === 'mega_menu' || menuType === 'mega_menu_thumbnails')) {
+        navItem.addEventListener('mouseenter', () => {
+          hideAllMenus();
+          showMegaMenu(correspondingMegaMenu);
+        });
+
+        correspondingMegaMenu.addEventListener('mouseenter', () => {
+          showMegaMenu(correspondingMegaMenu);
+        });
+
+        navItem.addEventListener('mouseleave', () => {
+          setTimeout(() => {
+            if (!correspondingMegaMenu.matches(':hover') && !navItem.matches(':hover')) {
+              hideMegaMenu(correspondingMegaMenu);
+            }
+          }, 150);
+        });
+
+        correspondingMegaMenu.addEventListener('mouseleave', () => {
+          setTimeout(() => {
+            if (!correspondingMegaMenu.matches(':hover') && !navItem.matches(':hover')) {
+              hideMegaMenu(correspondingMegaMenu);
+            }
+          }, 150);
+        });
+      }
+
+      if (correspondingSimpleDropdown && menuType === 'simple_dropdown') {
+        navItem.addEventListener('mouseenter', () => {
+          megaMenus.forEach((menu) => {
+            menu.style.opacity = '0';
+            menu.style.visibility = 'hidden';
+          });
+          simpleDropdowns.forEach((dropdown) => {
+            dropdown.style.opacity = '0';
+            dropdown.style.visibility = 'hidden';
+          });
+
+          correspondingSimpleDropdown.style.opacity = '1';
+          correspondingSimpleDropdown.style.visibility = 'visible';
+        });
+
+        correspondingSimpleDropdown.addEventListener('mouseenter', () => {
+          correspondingSimpleDropdown.style.opacity = '1';
+          correspondingSimpleDropdown.style.visibility = 'visible';
+        });
+
+        navItem.addEventListener('mouseleave', () => {
+          setTimeout(() => {
+            if (!correspondingSimpleDropdown.matches(':hover') && !navItem.matches(':hover')) {
+              correspondingSimpleDropdown.style.opacity = '0';
+              correspondingSimpleDropdown.style.visibility = 'hidden';
+            }
+          }, 100);
+        });
+
+        correspondingSimpleDropdown.addEventListener('mouseleave', () => {
+          setTimeout(() => {
+            if (!correspondingSimpleDropdown.matches(':hover') && !navItem.matches(':hover')) {
+              correspondingSimpleDropdown.style.opacity = '0';
+              correspondingSimpleDropdown.style.visibility = 'hidden';
+            }
+          }, 100);
+        });
+      }
+
+      if (correspondingMegaMenu && menuType === 'logo_grid') {
+        navItem.addEventListener('mouseenter', () => {
+          hideAllMenus();
+          showMegaMenu(correspondingMegaMenu);
+        });
+
+        correspondingMegaMenu.addEventListener('mouseenter', () => {
+          showMegaMenu(correspondingMegaMenu);
+        });
+
+        navItem.addEventListener('mouseleave', () => {
+          setTimeout(() => {
+            if (!correspondingMegaMenu.matches(':hover') && !navItem.matches(':hover')) {
+              hideMegaMenu(correspondingMegaMenu);
+            }
+          }, 150);
+        });
+
+        correspondingMegaMenu.addEventListener('mouseleave', () => {
+          setTimeout(() => {
+            if (!correspondingMegaMenu.matches(':hover') && !navItem.matches(':hover')) {
+              hideMegaMenu(correspondingMegaMenu);
+            }
+          }, 150);
+        });
+      }
+    });
+
+    // ============================================
+    // STATIC L3 LIST - No hover interaction needed
+    // ============================================
+    // Removed dynamic hover JavaScript since L3 items now show statically
+  });
+</script>
+
+<script>
+// Fix header login links: Liquid request.query_string is unreliable in section context,
+// so use JS to update all .js-login-return links with the correct return_url.
+// Runs immediately so header Account link is updated before user can click it.
+(function() {
+  var returnPath = window.location.pathname + window.location.search;
+  var encoded = encodeURIComponent(returnPath);
+  document.querySelectorAll('a.js-login-return').forEach(function(link) {
+    link.href = '/account/login?return_url=' + encoded;
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Enhanced Header",
+  "class": "enhanced-header-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Top Bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_top_bar",
+      "label": "Enable top bar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "topbar_welcome_text",
+      "label": "Welcome message",
+      "default": "Welcome to Celebrate Festival — Your Partner in Foodservice Excellence"
+    },
+    {
+      "type": "text",
+      "id": "topbar_phone",
+      "label": "Phone number",
+      "default": "(408) 673-9999"
+    },
+    {
+      "type": "text",
+      "id": "topbar_hours",
+      "label": "Business hours",
+      "default": "Mon-Sat: 9AM-6PM PST"
+    },
+    {
+      "type": "header",
+      "content": "Top Bar Links"
+    },
+    {
+      "type": "text",
+      "id": "topbar_link_1_text",
+      "label": "Link 1 text",
+      "default": "Track Order"
+    },
+    {
+      "type": "url",
+      "id": "topbar_link_1_url",
+      "label": "Link 1 URL"
+    },
+    {
+      "type": "text",
+      "id": "topbar_link_2_text",
+      "label": "Link 2 text",
+      "default": "Financing"
+    },
+    {
+      "type": "url",
+      "id": "topbar_link_2_url",
+      "label": "Link 2 URL"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_live_chat",
+      "label": "Show Live Chat button",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "topbar_chat_text",
+      "label": "Live chat button text",
+      "default": "Live Chat"
+    },
+    {
+      "type": "url",
+      "id": "topbar_chat_url",
+      "label": "Live chat URL"
+    },
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo image"
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "label": "Logo height",
+      "min": 30,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 55
+    },
+    {
+      "type": "range",
+      "id": "logo_max_width",
+      "label": "Logo max width",
+      "min": 100,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "default": 180
+    },
+    {
+      "type": "range",
+      "id": "mobile_menu_logo_height",
+      "label": "Mobile menu logo height",
+      "min": 30,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Search"
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Search placeholder text",
+      "default": "Search 10,000+ products..."
+    },
+    {
+      "type": "header",
+      "content": "Expert Help"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_expert_help",
+      "label": "Show expert help",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "expert_help_label",
+      "label": "Expert help label",
+      "default": "EXPERT HELP"
+    },
+    {
+      "type": "text",
+      "id": "expert_help_phone",
+      "label": "Expert help phone",
+      "default": "(408) 673-9999"
+    },
+    {
+      "type": "header",
+      "content": "Member Pricing Promo"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_member_promo",
+      "label": "Show member pricing promo",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "member_promo_guest_text",
+      "label": "Text for guests (not logged in)",
+      "default": "Members Save More"
+    },
+    {
+      "type": "text",
+      "id": "member_promo_nonmember_text",
+      "label": "Text for logged-in non-members",
+      "default": "Unlock Member Pricing"
+    },
+    {
+      "type": "text",
+      "id": "member_promo_member_text",
+      "label": "Text for members",
+      "default": "Member Pricing Active"
+    },
+    {
+      "type": "text",
+      "id": "member_promo_megamenu_text",
+      "label": "Mega menu banner text",
+      "default": "Login to unlock exclusive member pricing on all products"
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "link_list",
+      "id": "main_menu",
+      "label": "Main navigation menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "range",
+      "id": "nav_icon_size",
+      "label": "Menu icon size",
+      "min": 16,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    }
+  ],
+  "blocks": [
+    {
+      "type": "mega_menu_thumbnails",
+      "name": "Mega Menu with Thumbnails",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item_title",
+          "label": "Menu item title",
+          "info": "Enter the exact title of the menu item from your navigation (case-sensitive)"
+        },
+        {
+          "type": "image_picker",
+          "id": "menu_icon",
+          "label": "Menu icon"
+        },
+        {
+          "type": "header",
+          "content": "More Items Section"
+        },
+        {
+          "type": "link_list",
+          "id": "more_items_menu",
+          "label": "Menu for 'More in [Category]' items",
+          "info": "Select a Shopify menu to populate the right sidebar with category links"
+        },
+        {
+          "type": "header",
+          "content": "Instructions"
+        },
+        {
+          "type": "paragraph",
+          "content": "1. Enter the exact menu item title above\n2. Select a menu for the 'More in [Category]' section\n3. Add 'Menu Thumbnail' blocks below for each submenu item with images"
+        }
+      ]
+    },
+    {
+      "type": "menu_thumbnail",
+      "name": "Menu Thumbnail",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item_title",
+          "label": "Submenu item title",
+          "info": "Enter the exact title of the submenu item (case-sensitive)"
+        },
+        {
+          "type": "image_picker",
+          "id": "thumbnail_image",
+          "label": "Thumbnail image",
+          "info": "Recommended size: 80x80px"
+        }
+      ]
+    },
+    {
+      "type": "mega_menu",
+      "name": "Mega Menu (Classic)",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item_title",
+          "label": "Menu item title",
+          "info": "Enter the exact title of the menu item from your navigation (case-sensitive)"
+        },
+        {
+          "type": "image_picker",
+          "id": "menu_icon",
+          "label": "Menu icon"
+        },
+        {
+          "type": "range",
+          "id": "columns",
+          "label": "Number of menu columns",
+          "min": 2,
+          "max": 4,
+          "step": 1,
+          "default": 3,
+          "info": "Number of columns for menu content (image is always 1 column on right)"
+        },
+        {
+          "type": "header",
+          "content": "Promotional Content (Right Side)"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image",
+          "label": "Promotional image"
+        },
+        {
+          "type": "range",
+          "id": "promo_image_width",
+          "label": "Image width",
+          "min": 200,
+          "max": 600,
+          "step": 50,
+          "unit": "px",
+          "default": 400
+        },
+        {
+          "type": "range",
+          "id": "promo_image_height",
+          "label": "Image height",
+          "min": 150,
+          "max": 500,
+          "step": 25,
+          "unit": "px",
+          "default": 250
+        },
+        {
+          "type": "select",
+          "id": "image_fit",
+          "label": "Image fit",
+          "options": [
+            { "value": "cover", "label": "Cover (fill entire area)" },
+            { "value": "contain", "label": "Contain (fit within area)" },
+            { "value": "fill", "label": "Fill (stretch to fit)" }
+          ],
+          "default": "cover"
+        },
+        {
+          "type": "text",
+          "id": "promo_title",
+          "label": "Promotional title",
+          "default": "Featured Equipment"
+        },
+        {
+          "type": "textarea",
+          "id": "promo_text",
+          "label": "Promotional text",
+          "default": "Discover our latest commercial equipment"
+        },
+        {
+          "type": "url",
+          "id": "promo_url",
+          "label": "Promotional link URL"
+        },
+        {
+          "type": "text",
+          "id": "promo_button_text",
+          "label": "Button text",
+          "default": "Shop Now"
+        },
+        {
+          "type": "header",
+          "content": "Image Styling Options"
+        },
+        {
+          "type": "checkbox",
+          "id": "image_rounded_corners",
+          "label": "Rounded corners",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "image_shadow",
+          "label": "Add shadow",
+          "default": true
+        },
+        {
+          "type": "select",
+          "id": "image_position",
+          "label": "Image position in container",
+          "options": [
+            { "value": "center", "label": "Center" },
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "header",
+          "content": "Custom L3 Item Order (Optional)"
+        },
+        {
+          "type": "paragraph",
+          "content": "Enter collection handles one per line to control which L3 links appear and in what order for each column. Leave blank to use the navigation order automatically."
+        },
+        {
+          "type": "textarea",
+          "id": "l3_col_1",
+          "label": "Column 1 — L3 handles (one per line)"
+        },
+        {
+          "type": "textarea",
+          "id": "l3_col_2",
+          "label": "Column 2 — L3 handles (one per line)"
+        },
+        {
+          "type": "textarea",
+          "id": "l3_col_3",
+          "label": "Column 3 — L3 handles (one per line)"
+        },
+        {
+          "type": "textarea",
+          "id": "l3_col_4",
+          "label": "Column 4 — L3 handles (one per line)"
+        }
+      ]
+    },
+    {
+      "type": "logo_grid",
+      "name": "Logo Grid Menu",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item_title",
+          "label": "Menu item title",
+          "info": "Enter the exact title of the menu item from your navigation (case-sensitive)"
+        },
+        {
+          "type": "image_picker",
+          "id": "menu_icon",
+          "label": "Menu icon"
+        },
+        {
+          "type": "range",
+          "id": "logos_per_row",
+          "label": "Logos per row",
+          "min": 4,
+          "max": 12,
+          "step": 1,
+          "default": 8
+        },
+        {
+          "type": "checkbox",
+          "id": "show_view_all",
+          "label": "Show 'View All' button",
+          "default": false
+        },
+        {
+          "type": "url",
+          "id": "view_all_url",
+          "label": "'View All' button URL"
+        },
+        {
+          "type": "text",
+          "id": "view_all_text",
+          "label": "'View All' button text",
+          "default": "View All Brands"
+        }
+      ]
+    },
+    {
+      "type": "logo_grid_item",
+      "name": "Brand Logo",
+      "settings": [
+        {
+          "type": "text",
+          "id": "parent_menu_title",
+          "label": "Parent menu item title",
+          "info": "Enter the exact title of the parent menu item (case-sensitive)"
+        },
+        {
+          "type": "text",
+          "id": "brand_name",
+          "label": "Brand name",
+          "info": "Name displayed under the logo"
+        },
+        {
+          "type": "image_picker",
+          "id": "brand_logo",
+          "label": "Brand logo image"
+        },
+        {
+          "type": "url",
+          "id": "brand_url",
+          "label": "Brand page URL"
+        }
+      ]
+    },
+    {
+      "type": "simple_dropdown",
+      "name": "Simple Dropdown Menu",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item_title",
+          "label": "Menu item title",
+          "info": "Enter the exact title of the menu item from your navigation (case-sensitive)"
+        },
+        {
+          "type": "image_picker",
+          "id": "menu_icon",
+          "label": "Menu icon"
+        }
+      ]
+    },
+    {
+      "type": "regular",
+      "name": "Regular Menu Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item_title",
+          "label": "Menu item title",
+          "info": "Enter the exact title of the menu item from your navigation (case-sensitive)"
+        },
+        {
+          "type": "image_picker",
+          "id": "menu_icon",
+          "label": "Menu icon"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Enhanced Header with Thumbnails",
+      "blocks": [
+        {
+          "type": "mega_menu_thumbnails",
+          "settings": {
+            "menu_item_title": "Restaurant Equipment"
+          }
+        },
+        {
+          "type": "mega_menu",
+          "settings": {
+            "menu_item_title": "Cookware"
+          }
+        },
+        {
+          "type": "logo_grid",
+          "settings": {
+            "menu_item_title": "Shop by Brands"
+          }
+        },
+        {
+          "type": "simple_dropdown",
+          "settings": {
+            "menu_item_title": "Dinnerware Tabletop"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

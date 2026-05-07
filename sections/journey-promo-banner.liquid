@@ -1,0 +1,364 @@
+{%- if section.settings.show_section -%}
+
+<section class="jpb-root" id="journey-promo-banner-{{ section.id }}">
+
+  {%- comment -%} Background image or gradient {%- endcomment -%}
+  <div class="jpb-bg">
+    {%- if section.settings.bg_image != blank -%}
+      <img
+        class="jpb-bg__img"
+        src="{{ section.settings.bg_image | image_url: width: 1800 }}"
+        alt=""
+        loading="lazy"
+        width="1800"
+        height="600"
+      >
+    {%- endif -%}
+    <div class="jpb-bg__overlay"></div>
+  </div>
+
+  <div class="jpb-inner">
+
+    {%- comment -%} Left: text content {%- endcomment -%}
+    <div class="jpb-content">
+      {%- if section.settings.tagline != blank -%}
+        <span class="jpb-tagline">{{ section.settings.tagline }}</span>
+      {%- endif -%}
+
+      <h2 class="jpb-title">
+        {{ section.settings.title_before }}
+        {%- if section.settings.title_highlight != blank -%}
+          <span class="jpb-highlight">{{ section.settings.title_highlight }}</span>
+        {%- endif -%}
+        {{ section.settings.title_after }}
+      </h2>
+
+      {%- if section.settings.subtitle != blank -%}
+        <p class="jpb-subtitle">{{ section.settings.subtitle }}</p>
+      {%- endif -%}
+
+      <div class="jpb-steps">
+        {%- for block in section.blocks -%}
+          <div class="jpb-step" {{ block.shopify_attributes }}>
+            <span class="jpb-step__num">{{ forloop.index }}</span>
+            <span class="jpb-step__label">{{ block.settings.label }}</span>
+          </div>
+          {%- unless forloop.last -%}
+            <span class="jpb-step__arrow">→</span>
+          {%- endunless -%}
+        {%- endfor -%}
+      </div>
+
+      <a href="{{ section.settings.cta_url | default: '/pages/journey' }}" class="jpb-cta">
+        {{ section.settings.cta_text | default: 'See Our Full-Service Journey' }}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+
+    {%- comment -%} Right: feature image {%- endcomment -%}
+    {%- if section.settings.feature_image != blank -%}
+      <div class="jpb-image-wrap">
+        <img
+          class="jpb-feature-img"
+          src="{{ section.settings.feature_image | image_url: width: 700 }}"
+          alt="{{ section.settings.title_highlight | default: 'Full Service Journey' }}"
+          loading="lazy"
+          width="700"
+          height="438"
+        >
+      </div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+<style>
+  .jpb-root {
+    position: relative;
+    overflow: hidden;
+    padding: 60px 40px;
+    background: var(--cf-deep-blue, #1a365d);
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Background */
+  .jpb-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .jpb-bg__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.18;
+  }
+  .jpb-bg__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(26,54,93,0.97) 0%, rgba(15,23,42,0.92) 60%, rgba(26,54,93,0.75) 100%);
+  }
+
+  /* Inner layout */
+  .jpb-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 60px;
+  }
+
+  .jpb-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Tagline */
+  .jpb-tagline {
+    display: inline-block;
+    background: rgba(255,107,107,0.18);
+    border: 1px solid rgba(255,107,107,0.4);
+    color: #ff6b6b;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+
+  /* Title */
+  .jpb-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(24px, 3vw, 36px);
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.2;
+    margin: 0 0 16px;
+  }
+  .jpb-highlight {
+    color: #ff6b6b;
+  }
+
+  /* Subtitle */
+  .jpb-subtitle {
+    font-size: 15px;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.6;
+    margin: 0 0 28px;
+    max-width: 520px;
+  }
+
+  /* Steps strip */
+  .jpb-steps {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 32px;
+  }
+  .jpb-step {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+    padding: 6px 12px;
+  }
+  .jpb-step__num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: #ff6b6b;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .jpb-step__label {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.88);
+    white-space: nowrap;
+  }
+  .jpb-step__arrow {
+    color: rgba(255,255,255,0.35);
+    font-size: 14px;
+  }
+
+  /* CTA button */
+  .jpb-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #ff6b6b;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 14px 28px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .jpb-cta:hover {
+    background: #e85555;
+    transform: translateY(-2px);
+    color: #fff;
+  }
+  .jpb-cta svg {
+    transition: transform 0.2s;
+  }
+  .jpb-cta:hover svg {
+    transform: translateX(4px);
+  }
+
+  /* Feature image */
+  .jpb-image-wrap {
+    flex-shrink: 0;
+    width: 420px;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+    border: 2px solid rgba(255,255,255,0.1);
+  }
+  .jpb-feature-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .jpb-image-wrap { width: 340px; }
+  }
+  @media (max-width: 768px) {
+    .jpb-root { padding: 40px 20px; }
+    .jpb-inner { flex-direction: column; gap: 32px; }
+    .jpb-image-wrap { width: 100%; max-height: 240px; }
+    .jpb-steps { gap: 4px; }
+    .jpb-step { padding: 5px 10px; }
+    .jpb-step__label { font-size: 11px; }
+    .jpb-step__arrow { display: none; }
+  }
+</style>
+
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Journey Promo Banner",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_section",
+      "label": "Show section",
+      "default": false,
+      "info": "Toggle to show or hide this section on the homepage."
+    },
+    {
+      "type": "header",
+      "content": "Background"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Background image (optional)",
+      "info": "Shown at low opacity behind the gradient."
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "tagline",
+      "label": "Tagline pill",
+      "default": "Full-Service Restaurant Solutions"
+    },
+    {
+      "type": "text",
+      "id": "title_before",
+      "label": "Title — before highlight",
+      "default": "Your Partner From"
+    },
+    {
+      "type": "text",
+      "id": "title_highlight",
+      "label": "Title — highlight word (coral)",
+      "default": "Design to Grand Opening"
+    },
+    {
+      "type": "text",
+      "id": "title_after",
+      "label": "Title — after highlight"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "We guide restaurant owners through every step — from initial kitchen design and equipment selection to installation, final inspection, and your grand opening day."
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "CTA link",
+      "info": "Defaults to /pages/journey if blank."
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "CTA button text",
+      "default": "See Our Full-Service Journey"
+    },
+    {
+      "type": "header",
+      "content": "Feature image (right side)"
+    },
+    {
+      "type": "image_picker",
+      "id": "feature_image",
+      "label": "Feature image"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Journey Step",
+      "limit": 7,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Step label",
+          "default": "Step"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Journey Promo Banner",
+      "blocks": [
+        { "type": "step", "settings": { "label": "Design" } },
+        { "type": "step", "settings": { "label": "Consult" } },
+        { "type": "step", "settings": { "label": "Pricing" } },
+        { "type": "step", "settings": { "label": "Delivery" } },
+        { "type": "step", "settings": { "label": "Install" } },
+        { "type": "step", "settings": { "label": "Inspection" } },
+        { "type": "step", "settings": { "label": "Grand Opening" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

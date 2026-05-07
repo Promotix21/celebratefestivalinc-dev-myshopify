@@ -1,0 +1,908 @@
+{%- comment -%}
+  Food Service Resources Hub
+  Pulls articles from a Shopify blog (default: "resources")
+  Uses tag-based filtering and type-prefixed tags for resource types
+{%- endcomment -%}
+
+{%- assign blog_handle = section.settings.blog_handle | default: 'resources' -%}
+{%- assign blog = blogs[blog_handle] -%}
+
+<style>
+  /* ── Reset & Base ── */
+  .res-hub * { box-sizing: border-box; }
+
+  .res-hub {
+    font-family: 'Inter', sans-serif;
+    color: #0f172a;
+    line-height: 1.6;
+  }
+
+  /* ── Hero Banner ── */
+  .res-hero {
+    background: #1a365d;
+    position: relative;
+    overflow: hidden;
+    padding: 56px 40px;
+    text-align: center;
+  }
+
+  .res-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.2;
+    pointer-events: none;
+  }
+
+  .res-hero__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .res-hero__title span {
+    color: #ff6b6b;
+  }
+
+  .res-hero__subtitle {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Two-column Layout ── */
+  .res-layout {
+    display: flex;
+    gap: 32px;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 40px;
+  }
+
+  .res-sidebar {
+    flex: 0 0 25%;
+    min-width: 0;
+  }
+
+  .res-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* ── Sidebar Panels ── */
+  .res-panel {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .res-panel__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a365d;
+    margin: 0 0 14px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ff6b6b;
+  }
+
+  /* ── Search Box ── */
+  .res-search {
+    display: flex;
+    margin-bottom: 20px;
+  }
+
+  .res-search__input {
+    flex: 1;
+    border: 1px solid #e2e8f0;
+    border-right: none;
+    border-radius: 6px 0 0 6px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .res-search__input:focus {
+    border-color: #2d5a87;
+  }
+
+  .res-search__btn {
+    background: #2d5a87;
+    color: #fff;
+    border: none;
+    border-radius: 0 6px 6px 0;
+    padding: 10px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .res-search__btn:hover {
+    background: #3d6a9f;
+  }
+
+  .res-search__btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* ── Topic / Resource Type Lists ── */
+  .res-tag-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .res-tag-list li {
+    margin-bottom: 2px;
+  }
+
+  .res-tag-list a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 10px;
+    font-size: 13px;
+    color: #475569;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+
+  .res-tag-list a:hover {
+    background: #e2e8f0;
+    color: #1a365d;
+  }
+
+  .res-tag-count {
+    background: #e2e8f0;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    min-width: 24px;
+    text-align: center;
+  }
+
+  .res-tag-list a:hover .res-tag-count {
+    background: #2d5a87;
+    color: #fff;
+  }
+
+  /* ── Mailing List Widget ── */
+  .res-mailing {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 24px 20px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .res-mailing__icon {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 12px;
+    color: #2d5a87;
+  }
+
+  .res-mailing__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a365d;
+    margin: 0 0 6px;
+  }
+
+  .res-mailing__text {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0 0 14px;
+  }
+
+  .res-mailing__input {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 10px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .res-mailing__input:focus {
+    border-color: #2d5a87;
+  }
+
+  .res-mailing__btn {
+    width: 100%;
+    background: #ff6b6b;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .res-mailing__btn:hover {
+    background: #e55a5a;
+  }
+
+  /* ── Promo Widget ── */
+  .res-promo {
+    border-radius: 10px;
+    padding: 24px 20px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .res-promo__icon {
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+
+  .res-promo__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a365d;
+    margin: 0 0 6px;
+  }
+
+  .res-promo__text {
+    font-size: 13px;
+    color: #475569;
+    margin: 0 0 14px;
+    line-height: 1.5;
+  }
+
+  .res-promo__link {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2d5a87;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .res-promo__link:hover {
+    color: #ff6b6b;
+  }
+
+  .res-promo__link::after {
+    content: ' \2192';
+  }
+
+  /* ── Article Section ── */
+  .res-section {
+    margin-bottom: 40px;
+  }
+
+  .res-section__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .res-section__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a365d;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .res-section__title::before {
+    content: '';
+    width: 4px;
+    height: 24px;
+    background: linear-gradient(180deg, #ff6b6b 0%, #2d5a87 100%);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .res-section__more {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ff6b6b;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+
+  .res-section__more:hover {
+    color: #e55a5a;
+  }
+
+  .res-section__more::after {
+    content: ' \2192';
+    transition: transform 0.2s;
+    display: inline-block;
+  }
+
+  .res-section__more:hover::after {
+    transform: translateX(3px);
+  }
+
+  /* ── Article Grid ── */
+  .res-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  /* ── Article Card ── */
+  .res-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: box-shadow 0.3s, transform 0.3s;
+  }
+
+  .res-card:hover {
+    box-shadow: 0 8px 24px rgba(26, 54, 93, 0.1);
+    transform: translateY(-3px);
+  }
+
+  .res-card__image-wrap {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  }
+
+  .res-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .res-card:hover .res-card__image {
+    transform: scale(1.06);
+  }
+
+  .res-card__body {
+    padding: 18px 20px 20px;
+  }
+
+  .res-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: 12px;
+  }
+
+  .res-card__tag {
+    background: rgba(45, 90, 135, 0.1);
+    color: #2d5a87;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .res-card__date {
+    color: #94a3b8;
+    font-size: 12px;
+  }
+
+  .res-card__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a365d;
+    margin: 0 0 8px;
+    line-height: 1.4;
+  }
+
+  .res-card__title a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .res-card__title a:hover {
+    color: #ff6b6b;
+  }
+
+  .res-card__excerpt {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* ── Empty State ── */
+  .res-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #94a3b8;
+    font-size: 14px;
+    grid-column: 1 / -1;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 992px) {
+    .res-layout {
+      flex-direction: column;
+      padding: 24px;
+    }
+
+    .res-sidebar {
+      flex: none;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .res-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .res-hero {
+      padding: 40px 24px;
+    }
+
+    .res-hero__title {
+      font-size: 26px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .res-sidebar {
+      grid-template-columns: 1fr;
+    }
+
+    .res-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .res-hero__title {
+      font-size: 22px;
+    }
+
+    .res-hero__subtitle {
+      font-size: 14px;
+    }
+
+    .res-layout {
+      padding: 16px;
+      gap: 24px;
+    }
+  }
+</style>
+
+<div class="res-hub">
+  {%- comment -%} ── Hero Banner ── {%- endcomment -%}
+  <div class="res-hero">
+    <h1 class="res-hero__title">
+      {{ section.settings.hero_title_prefix | default: 'FOOD SERVICE' }} <span>{{ section.settings.hero_title_highlight | default: 'RESOURCES' }}</span>
+    </h1>
+    {%- if section.settings.hero_subtitle != blank -%}
+      <p class="res-hero__subtitle">{{ section.settings.hero_subtitle }}</p>
+    {%- endif -%}
+  </div>
+
+  <div class="res-layout">
+    {%- comment -%} ── Sidebar ── {%- endcomment -%}
+    <aside class="res-sidebar">
+
+      {%- comment -%} Search Box {%- endcomment -%}
+      <form action="/search" method="get" class="res-search">
+        <input type="hidden" name="type" value="article">
+        <input type="hidden" name="options[prefix]" value="last">
+        <input
+          type="text"
+          name="q"
+          class="res-search__input"
+          placeholder="Search articles..."
+          aria-label="Search articles"
+        >
+        <button type="submit" class="res-search__btn" aria-label="Search">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+          </svg>
+        </button>
+      </form>
+
+      {%- comment -%} Topics Panel {%- endcomment -%}
+      {%- assign has_topics = false -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'topic' -%}
+          {%- assign has_topics = true -%}
+          {%- break -%}
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- if has_topics -%}
+        <div class="res-panel" id="res-topics">
+          <h3 class="res-panel__title">Topics</h3>
+          <ul class="res-tag-list">
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'topic' -%}
+                {%- assign topic_tag = block.settings.tag -%}
+                {%- assign topic_count = 0 -%}
+                {%- if blog -%}
+                  {%- for article in blog.articles -%}
+                    {%- if article.tags contains topic_tag -%}
+                      {%- assign topic_count = topic_count | plus: 1 -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- endif -%}
+                <li {{ block.shopify_attributes }}>
+                  <a href="/blogs/{{ blog_handle }}/tagged/{{ topic_tag | handleize }}">
+                    <span>{{ block.settings.label }}</span>
+                    <span class="res-tag-count">{{ topic_count }}</span>
+                  </a>
+                </li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} Resource Type Panel {%- endcomment -%}
+      {%- assign has_types = false -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'resource_type' -%}
+          {%- assign has_types = true -%}
+          {%- break -%}
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- if has_types -%}
+        <div class="res-panel" id="res-types">
+          <h3 class="res-panel__title">Resource Type</h3>
+          <ul class="res-tag-list">
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'resource_type' -%}
+                {%- assign type_tag = block.settings.tag -%}
+                {%- assign type_full_tag = 'type:' | append: type_tag -%}
+                {%- assign type_count = 0 -%}
+                {%- if blog -%}
+                  {%- for article in blog.articles -%}
+                    {%- if article.tags contains type_full_tag -%}
+                      {%- assign type_count = type_count | plus: 1 -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- endif -%}
+                <li {{ block.shopify_attributes }}>
+                  <a href="/blogs/{{ blog_handle }}/tagged/type-{{ type_tag | handleize }}">
+                    <span>{{ block.settings.label }}</span>
+                    <span class="res-tag-count">{{ type_count }}</span>
+                  </a>
+                </li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} Mailing List Widget {%- endcomment -%}
+      <div class="res-mailing">
+        <div class="res-mailing__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" width="40" height="40">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/>
+          </svg>
+        </div>
+        <h3 class="res-mailing__title">Join Our Mailing List</h3>
+        <p class="res-mailing__text">Get the latest tips and guides delivered to your inbox.</p>
+        {%- form 'customer', id: 'res-newsletter' -%}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <input
+            type="email"
+            name="contact[email]"
+            class="res-mailing__input"
+            placeholder="Your email address"
+            required
+            aria-label="Email address"
+            autocomplete="email"
+          >
+          <button type="submit" class="res-mailing__btn">Subscribe</button>
+        {%- endform -%}
+      </div>
+
+      {%- comment -%} Promo Widgets {%- endcomment -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'promo_widget' -%}
+          {%- assign promo_bg = block.settings.bg_color | default: '#f0f9ff' -%}
+          <div class="res-promo" style="background: {{ promo_bg }};" {{ block.shopify_attributes }}>
+            {%- if block.settings.icon != blank -%}
+              <div class="res-promo__icon">{{ block.settings.icon }}</div>
+            {%- endif -%}
+            <h3 class="res-promo__title">{{ block.settings.title }}</h3>
+            {%- if block.settings.description != blank -%}
+              <p class="res-promo__text">{{ block.settings.description }}</p>
+            {%- endif -%}
+            {%- if block.settings.link_url != blank and block.settings.link_text != blank -%}
+              <a href="{{ block.settings.link_url }}" class="res-promo__link">{{ block.settings.link_text }}</a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+
+    </aside>
+
+    {%- comment -%} ── Main Content ── {%- endcomment -%}
+    <main class="res-main">
+
+      {%- if blog == blank -%}
+        <div class="res-empty">
+          <p>The blog "{{ blog_handle }}" has not been created yet. Please create it in Shopify Admin under <strong>Online Store &gt; Blog posts</strong>.</p>
+        </div>
+      {%- else -%}
+
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'article_section' -%}
+            {%- assign section_tag = block.settings.tag -%}
+            {%- assign section_count = block.settings.count | default: 3 -%}
+            {%- assign section_title = block.settings.title | default: 'Articles' -%}
+
+            <div class="res-section" {{ block.shopify_attributes }}>
+              <div class="res-section__header">
+                <h2 class="res-section__title">{{ section_title }}</h2>
+                {%- if section_tag != blank -%}
+                  <a href="/blogs/{{ blog_handle }}/tagged/{{ section_tag | handleize }}" class="res-section__more">View More</a>
+                {%- else -%}
+                  <a href="/blogs/{{ blog_handle }}" class="res-section__more">View All</a>
+                {%- endif -%}
+              </div>
+
+              <div class="res-grid">
+                {%- assign shown = 0 -%}
+                {%- for article in blog.articles -%}
+                  {%- if shown >= section_count -%}
+                    {%- break -%}
+                  {%- endif -%}
+
+                  {%- if section_tag != blank -%}
+                    {%- unless article.tags contains section_tag -%}
+                      {%- continue -%}
+                    {%- endunless -%}
+                  {%- endif -%}
+
+                  <article class="res-card">
+                    <a href="{{ article.url }}" class="res-card__image-wrap" aria-label="{{ article.title }}">
+                      {%- if article.image -%}
+                        <img
+                          src="{{ article.image | image_url: width: 480 }}"
+                          alt="{{ article.image.alt | default: article.title | escape }}"
+                          class="res-card__image"
+                          loading="lazy"
+                          width="480"
+                          height="300"
+                        >
+                      {%- endif -%}
+                    </a>
+                    <div class="res-card__body">
+                      <div class="res-card__meta">
+                        {%- if article.tags.size > 0 -%}
+                          {%- for tag in article.tags -%}
+                            {%- unless tag contains 'type:' -%}
+                              <span class="res-card__tag">{{ tag }}</span>
+                              {%- break -%}
+                            {%- endunless -%}
+                          {%- endfor -%}
+                        {%- endif -%}
+                        <span class="res-card__date">{{ article.published_at | date: '%b %d, %Y' }}</span>
+                      </div>
+                      <h3 class="res-card__title">
+                        <a href="{{ article.url }}">{{ article.title }}</a>
+                      </h3>
+                      {%- if article.excerpt != blank -%}
+                        <p class="res-card__excerpt">{{ article.excerpt | strip_html }}</p>
+                      {%- elsif article.content != blank -%}
+                        <p class="res-card__excerpt">{{ article.content | strip_html | truncate: 160 }}</p>
+                      {%- endif -%}
+                    </div>
+                  </article>
+
+                  {%- assign shown = shown | plus: 1 -%}
+                {%- endfor -%}
+
+                {%- if shown == 0 -%}
+                  <div class="res-empty">No articles found{% if section_tag != blank %} tagged "{{ section_tag }}"{% endif %}. Check back soon!</div>
+                {%- endif -%}
+              </div>
+            </div>
+
+          {%- endif -%}
+        {%- endfor -%}
+
+      {%- endif -%}
+
+    </main>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Resources Hub",
+  "tag": "section",
+  "class": "resources-hub-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "hero_title_prefix",
+      "label": "Hero Title (first part)",
+      "default": "FOOD SERVICE"
+    },
+    {
+      "type": "text",
+      "id": "hero_title_highlight",
+      "label": "Hero Title (highlighted part)",
+      "default": "RESOURCES"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_subtitle",
+      "label": "Hero Subtitle",
+      "default": "Expert tips, buying guides, and industry insights for food service professionals."
+    },
+    {
+      "type": "text",
+      "id": "blog_handle",
+      "label": "Blog Handle",
+      "default": "resources",
+      "info": "The handle of the Shopify blog to pull articles from."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "topic",
+      "name": "Topic",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Topic Label"
+        },
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Tag",
+          "info": "The article tag to filter by (e.g. restaurant-management)."
+        }
+      ]
+    },
+    {
+      "type": "resource_type",
+      "name": "Resource Type",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Type Label"
+        },
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Tag Handle",
+          "info": "Articles should be tagged with 'type:{handle}'. Link goes to /blogs/.../tagged/type-{handle}."
+        }
+      ]
+    },
+    {
+      "type": "article_section",
+      "name": "Article Section",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Section Title",
+          "default": "Articles"
+        },
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Filter by Tag",
+          "info": "Leave blank to show most recent articles."
+        },
+        {
+          "type": "range",
+          "id": "count",
+          "label": "Number of Articles",
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "default": 3
+        }
+      ]
+    },
+    {
+      "type": "promo_widget",
+      "name": "Promo Widget",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon (emoji or text)",
+          "info": "e.g. a calculator emoji or short text"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description"
+        },
+        {
+          "type": "text",
+          "id": "link_text",
+          "label": "Link Text"
+        },
+        {
+          "type": "url",
+          "id": "link_url",
+          "label": "Link URL"
+        },
+        {
+          "type": "color",
+          "id": "bg_color",
+          "label": "Background Color",
+          "default": "#f0f9ff"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Resources Hub",
+      "blocks": [
+        { "type": "topic", "settings": { "label": "Restaurant Management", "tag": "restaurant-management" } },
+        { "type": "topic", "settings": { "label": "Bar Management", "tag": "bar-management" } },
+        { "type": "topic", "settings": { "label": "Bakery Management", "tag": "bakery-management" } },
+        { "type": "topic", "settings": { "label": "Food Trucks & Concessions", "tag": "food-trucks-concessions" } },
+        { "type": "topic", "settings": { "label": "Catering Tips", "tag": "catering-tips" } },
+        { "type": "topic", "settings": { "label": "Advertising & Marketing", "tag": "advertising-marketing" } },
+        { "type": "resource_type", "settings": { "label": "In-Depth Articles", "tag": "in-depth-articles" } },
+        { "type": "resource_type", "settings": { "label": "Buying Guides", "tag": "buying-guides" } },
+        { "type": "resource_type", "settings": { "label": "How-Tos", "tag": "how-tos" } },
+        { "type": "article_section", "settings": { "title": "Recently Published", "tag": "", "count": 3 } },
+        { "type": "article_section", "settings": { "title": "Restaurant Management", "tag": "restaurant-management", "count": 3 } }
+      ]
+    }
+  ]
+}
+{% endschema %}

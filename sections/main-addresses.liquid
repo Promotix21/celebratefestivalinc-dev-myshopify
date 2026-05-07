@@ -1,0 +1,267 @@
+{{ 'customer.css' | asset_url | stylesheet_tag }}
+{{ 'customer-accounts.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'customer.js' | asset_url }}" defer></script>
+
+<div class="cf-account-page">
+  <div class="cf-account-container">
+    <div class="cf-account-layout">
+      <!-- Sidebar -->
+      <aside class="cf-account-sidebar">
+        <ul class="cf-sidebar-nav">
+          <li><a href="{{ routes.account_url }}"><span class="icon">📊</span> Dashboard</a></li>
+          <li><a href="{{ routes.account_url }}#orders"><span class="icon">📦</span> Orders</a></li>
+          <li><a href="{{ routes.account_addresses_url }}" class="active"><span class="icon">📍</span> Addresses</a></li>
+        </ul>
+        <div class="cf-sidebar-logout">
+          <ul class="cf-sidebar-nav">
+            <li><a href="{{ routes.account_logout_url }}?return_to={{ request.path | url_param_escape }}"><span class="icon">🚪</span> Logout</a></li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="cf-account-content" data-customer-addresses>
+        <div class="cf-content-header">
+          <h2 class="cf-content-title">{{ 'customer.addresses.title' | t }}</h2>
+        </div>
+
+        <div class="cf-content-body">
+          <!-- Add New Address Form (Hidden by default) -->
+          <div id="AddAddress" class="cf-address-form-container" style="display: none; margin-bottom: 30px; padding: 24px; background: var(--cf-bg-light); border-radius: 12px;" data-address>
+            <h3 style="font-size: 16px; font-weight: 600; color: var(--cf-text-dark); margin-bottom: 20px;">{{ 'customer.addresses.add_new' | t }}</h3>
+            {%- form 'customer_address', customer.new_address -%}
+              <div class="cf-form-row">
+                <div class="cf-form-group">
+                  <label class="cf-form-label" for="AddressFirstNameNew">{{ 'customer.addresses.first_name' | t }}</label>
+                  <input type="text" class="cf-form-input" id="AddressFirstNameNew" name="address[first_name]" value="{{ form.first_name }}" autocomplete="given-name" placeholder="First name">
+                </div>
+                <div class="cf-form-group">
+                  <label class="cf-form-label" for="AddressLastNameNew">{{ 'customer.addresses.last_name' | t }}</label>
+                  <input type="text" class="cf-form-input" id="AddressLastNameNew" name="address[last_name]" value="{{ form.last_name }}" autocomplete="family-name" placeholder="Last name">
+                </div>
+              </div>
+
+              <div class="cf-form-group">
+                <label class="cf-form-label" for="AddressCompanyNew">{{ 'customer.addresses.company' | t }}</label>
+                <input type="text" class="cf-form-input" id="AddressCompanyNew" name="address[company]" value="{{ form.company }}" autocomplete="organization" placeholder="Company (optional)">
+              </div>
+
+              <div class="cf-form-group">
+                <label class="cf-form-label" for="AddressAddress1New">{{ 'customer.addresses.address1' | t }} <span class="required">*</span></label>
+                <input type="text" class="cf-form-input" id="AddressAddress1New" name="address[address1]" value="{{ form.address1 }}" autocomplete="address-line1" placeholder="Street address">
+              </div>
+
+              <div class="cf-form-group">
+                <label class="cf-form-label" for="AddressAddress2New">{{ 'customer.addresses.address2' | t }}</label>
+                <input type="text" class="cf-form-input" id="AddressAddress2New" name="address[address2]" value="{{ form.address2 }}" autocomplete="address-line2" placeholder="Apt, suite, unit, etc.">
+              </div>
+
+              <div class="cf-form-row">
+                <div class="cf-form-group">
+                  <label class="cf-form-label" for="AddressCityNew">{{ 'customer.addresses.city' | t }} <span class="required">*</span></label>
+                  <input type="text" class="cf-form-input" id="AddressCityNew" name="address[city]" value="{{ form.city }}" autocomplete="address-level2" placeholder="City">
+                </div>
+                <div class="cf-form-group">
+                  <label class="cf-form-label" for="AddressCountryNew">{{ 'customer.addresses.country' | t }}</label>
+                  <select class="cf-form-select" id="AddressCountryNew" name="address[country]" data-default="{{ form.country }}" autocomplete="country">
+                    {{ all_country_option_tags }}
+                  </select>
+                </div>
+              </div>
+
+              <div class="cf-form-row">
+                <div class="cf-form-group" id="AddressProvinceContainerNew" style="display: none">
+                  <label class="cf-form-label" for="AddressProvinceNew">{{ 'customer.addresses.province' | t }}</label>
+                  <select class="cf-form-select" id="AddressProvinceNew" name="address[province]" data-default="{{ form.province }}" autocomplete="address-level1"></select>
+                </div>
+                <div class="cf-form-group">
+                  <label class="cf-form-label" for="AddressZipNew">{{ 'customer.addresses.zip' | t }} <span class="required">*</span></label>
+                  <input type="text" class="cf-form-input" id="AddressZipNew" name="address[zip]" value="{{ form.zip }}" autocapitalize="characters" autocomplete="postal-code" placeholder="ZIP / Postal code">
+                </div>
+              </div>
+
+              <div class="cf-form-group">
+                <label class="cf-form-label" for="AddressPhoneNew">{{ 'customer.addresses.phone' | t }}</label>
+                <input type="tel" class="cf-form-input" id="AddressPhoneNew" name="address[phone]" value="{{ form.phone }}" autocomplete="tel" placeholder="(555) 555-5555">
+              </div>
+
+              <div class="cf-form-group">
+                <div class="cf-form-checkbox">
+                  {{ form.set_as_default_checkbox }}
+                  <label for="address_default_address_new">{{ 'customer.addresses.set_default' | t }}</label>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button type="submit" class="cf-btn cf-btn-primary" style="width: auto;">{{ 'customer.addresses.add' | t }}</button>
+                <button type="reset" class="cf-btn cf-btn-outline" style="width: auto;" onclick="toggleAddressForm('AddAddress')">{{ 'customer.addresses.cancel' | t }}</button>
+              </div>
+            {%- endform -%}
+          </div>
+
+          <!-- Address List -->
+          {%- paginate customer.addresses by 5 -%}
+            <div class="cf-address-grid">
+              {%- for address in customer.addresses -%}
+                <div class="cf-address-card {% if address == customer.default_address %}default{% endif %}" data-address>
+                  {%- if address == customer.default_address -%}
+                    <span class="cf-address-badge">Default</span>
+                  {%- endif -%}
+                  <div class="cf-address-name">{{ address.name }}</div>
+                  <div class="cf-address-details">
+                    {{ address | format_address }}
+                  </div>
+                  <div class="cf-address-actions">
+                    <button type="button" id="EditFormButton_{{ address.id }}" aria-label="{{ 'customer.addresses.edit_address' | t }}" aria-controls="EditAddress_{{ address.id }}" aria-expanded="false" data-address-id="{{ address.id }}" onclick="toggleAddressForm('EditAddress_{{ address.id }}')" class="cf-address-btn">
+                      {{ 'customer.addresses.edit' | t }}
+                    </button>
+                    {%- unless address == customer.default_address -%}
+                      <button type="button" aria-label="{{ 'customer.addresses.delete' | t }}" data-target="{{ address.url }}" data-confirm-message="{{ 'customer.addresses.delete_confirm' | t }}" class="cf-address-btn cf-address-btn-delete">
+                        {{ 'customer.addresses.delete' | t }}
+                      </button>
+                    {%- endunless -%}
+                  </div>
+
+                  <!-- Edit Form (Hidden) -->
+                  <div id="EditAddress_{{ address.id }}" style="display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--cf-border);">
+                    {%- form 'customer_address', address -%}
+                      <div class="cf-form-row">
+                        <div class="cf-form-group">
+                          <label class="cf-form-label" for="AddressFirstName_{{ form.id }}">{{ 'customer.addresses.first_name' | t }}</label>
+                          <input type="text" class="cf-form-input" id="AddressFirstName_{{ form.id }}" name="address[first_name]" value="{{ form.first_name }}" autocomplete="given-name">
+                        </div>
+                        <div class="cf-form-group">
+                          <label class="cf-form-label" for="AddressLastName_{{ form.id }}">{{ 'customer.addresses.last_name' | t }}</label>
+                          <input type="text" class="cf-form-input" id="AddressLastName_{{ form.id }}" name="address[last_name]" value="{{ form.last_name }}" autocomplete="family-name">
+                        </div>
+                      </div>
+
+                      <div class="cf-form-group">
+                        <label class="cf-form-label" for="AddressCompany_{{ form.id }}">{{ 'customer.addresses.company' | t }}</label>
+                        <input type="text" class="cf-form-input" id="AddressCompany_{{ form.id }}" name="address[company]" value="{{ form.company }}" autocomplete="organization">
+                      </div>
+
+                      <div class="cf-form-group">
+                        <label class="cf-form-label" for="AddressAddress1_{{ form.id }}">{{ 'customer.addresses.address1' | t }}</label>
+                        <input type="text" class="cf-form-input" id="AddressAddress1_{{ form.id }}" name="address[address1]" value="{{ form.address1 }}" autocomplete="address-line1">
+                      </div>
+
+                      <div class="cf-form-group">
+                        <label class="cf-form-label" for="AddressAddress2_{{ form.id }}">{{ 'customer.addresses.address2' | t }}</label>
+                        <input type="text" class="cf-form-input" id="AddressAddress2_{{ form.id }}" name="address[address2]" value="{{ form.address2 }}" autocomplete="address-line2">
+                      </div>
+
+                      <div class="cf-form-row">
+                        <div class="cf-form-group">
+                          <label class="cf-form-label" for="AddressCity_{{ form.id }}">{{ 'customer.addresses.city' | t }}</label>
+                          <input type="text" class="cf-form-input" id="AddressCity_{{ form.id }}" name="address[city]" value="{{ form.city }}" autocomplete="address-level2">
+                        </div>
+                        <div class="cf-form-group">
+                          <label class="cf-form-label" for="AddressCountry_{{ form.id }}">{{ 'customer.addresses.country' | t }}</label>
+                          <select class="cf-form-select" id="AddressCountry_{{ form.id }}" name="address[country]" data-address-country-select data-default="{{ form.country }}" data-form-id="{{ form.id }}" autocomplete="country">
+                            {{ all_country_option_tags }}
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="cf-form-row">
+                        <div class="cf-form-group" id="AddressProvinceContainer_{{ form.id }}" style="display:none;">
+                          <label class="cf-form-label" for="AddressProvince_{{ form.id }}">{{ 'customer.addresses.province' | t }}</label>
+                          <select class="cf-form-select" id="AddressProvince_{{ form.id }}" name="address[province]" data-default="{{ form.province }}" autocomplete="address-level1"></select>
+                        </div>
+                        <div class="cf-form-group">
+                          <label class="cf-form-label" for="AddressZip_{{ form.id }}">{{ 'customer.addresses.zip' | t }}</label>
+                          <input type="text" class="cf-form-input" id="AddressZip_{{ form.id }}" name="address[zip]" value="{{ form.zip }}" autocapitalize="characters" autocomplete="postal-code">
+                        </div>
+                      </div>
+
+                      <div class="cf-form-group">
+                        <label class="cf-form-label" for="AddressPhone_{{ form.id }}">{{ 'customer.addresses.phone' | t }}</label>
+                        <input type="tel" class="cf-form-input" id="AddressPhone_{{ form.id }}" name="address[phone]" value="{{ form.phone }}" autocomplete="tel">
+                      </div>
+
+                      <div class="cf-form-group">
+                        <div class="cf-form-checkbox">
+                          {{ form.set_as_default_checkbox }}
+                          <label for="address_default_address_{{ form.id }}">{{ 'customer.addresses.set_default' | t }}</label>
+                        </div>
+                      </div>
+
+                      <div style="display: flex; gap: 12px; margin-top: 20px;">
+                        <button type="submit" class="cf-btn cf-btn-primary" style="width: auto;">{{ 'customer.addresses.update' | t }}</button>
+                        <button type="reset" class="cf-btn cf-btn-outline" style="width: auto;" onclick="toggleAddressForm('EditAddress_{{ address.id }}')">{{ 'customer.addresses.cancel' | t }}</button>
+                      </div>
+                    {%- endform -%}
+                  </div>
+                </div>
+              {%- endfor -%}
+
+              <!-- Add New Address Card -->
+              <div class="cf-add-address-card" onclick="toggleAddressForm('AddAddress'); window.scrollTo({top: 0, behavior: 'smooth'});">
+                <span class="icon">➕</span>
+                <span>{{ 'customer.addresses.add_new' | t }}</span>
+              </div>
+            </div>
+
+            {%- if paginate.pages > 1 -%}
+              <nav class="cf-pagination" style="margin-top: 30px; display: flex; gap: 12px; justify-content: center;">
+                {%- if paginate.previous -%}
+                  <a href="{{ paginate.previous.url }}" class="cf-btn cf-btn-outline cf-btn-sm">Previous</a>
+                {%- endif -%}
+                {%- if paginate.next -%}
+                  <a href="{{ paginate.next.url }}" class="cf-btn cf-btn-outline cf-btn-sm">Next</a>
+                {%- endif -%}
+              </nav>
+            {%- endif -%}
+          {%- endpaginate -%}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleAddressForm(id) {
+    const form = document.getElementById(id);
+    if (form) {
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+  }
+
+  window.addEventListener('load', () => {
+    typeof CustomerAddresses !== 'undefined' && new CustomerAddresses();
+  });
+</script>
+
+{% schema %}
+{
+  "name": "t:sections.main-addresses.name",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 0
+    }
+  ]
+}
+{% endschema %}

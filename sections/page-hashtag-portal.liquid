@@ -1,0 +1,918 @@
+{% comment %}
+  Hashtag Portal Page — Hashtag Members
+  Hero: left text + right stacked collection cards.
+  Fallback: hardcoded default collections if blocks are empty/unconfigured.
+{% endcomment %}
+
+{%- assign is_htag = false -%}
+{%- if customer -%}
+  {%- for tag in customer.tags -%}
+    {%- assign tag_lower = tag | downcase -%}
+    {%- if tag_lower == 'hashtag' -%}
+      {%- assign is_htag = true -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{%- unless is_htag -%}
+<section class="htag-gate" style="min-height:60vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:60px 20px;">
+  <div>
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#1a365d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:24px;">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+    <h1 style="font-family:'Montserrat',sans-serif;font-size:28px;font-weight:700;color:#1a365d;margin:0 0 12px;">{{ section.settings.gate_title | default: 'Hashtag Members Only' }}</h1>
+    <p style="font-size:16px;color:#64748b;max-width:480px;margin:0 auto 24px;line-height:1.6;">{{ section.settings.gate_description | default: 'This page is exclusively available to our Hashtag members. Please log in with your account to access these curated collections.' }}</p>
+    <a href="{{ routes.account_login_url }}?return_url={{ request.path | url_param_escape }}" style="display:inline-block;padding:14px 32px;background:#1a365d;color:#fff;border-radius:8px;font-weight:600;font-size:14px;text-decoration:none;transition:background 0.2s;">{{ section.settings.gate_button | default: 'Log In' }}</a>
+  </div>
+</section>
+{%- else -%}
+
+{%- comment -%} Build collection list: try blocks first, fallback to hardcoded defaults {%- endcomment -%}
+{%- assign htag_collections_resolved = 0 -%}
+{%- for block in section.blocks -%}
+  {%- if block.type == 'collection' -%}
+    {%- if block.settings.collection_handle != blank -%}
+      {%- assign test_col = collections[block.settings.collection_handle] -%}
+      {%- if test_col.handle != blank -%}
+        {%- assign htag_collections_resolved = htag_collections_resolved | plus: 1 -%}
+      {%- endif -%}
+    {%- elsif block.settings.collection != blank -%}
+      {%- if block.settings.collection.handle != blank -%}
+        {%- assign htag_collections_resolved = htag_collections_resolved | plus: 1 -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- assign use_fallback = false -%}
+{%- if htag_collections_resolved == 0 -%}
+  {%- assign use_fallback = true -%}
+{%- endif -%}
+
+<style>
+  .htag-page { --htag-deep-blue:#1a365d; --htag-navy:#2d5a87; --htag-coral:#ff6b6b; --htag-gold:#d4af37; --htag-success:#10b981; --htag-text-dark:#0f172a; --htag-text-medium:#475569; --htag-text-light:#64748b; --htag-text-muted:#94a3b8; --htag-border:#e2e8f0; --htag-bg-light:#f8fafc; --htag-bg-white:#ffffff; }
+  .htag-page *, .htag-page *::before, .htag-page *::after { box-sizing: border-box; }
+  .htag-page { overflow-x: hidden; }
+
+  .htag-hero {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    padding: 70px 40px; overflow: hidden; background: var(--htag-deep-blue);
+  }
+  .htag-hero__mesh {
+    position: absolute; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 30%, rgba(45,90,135,0.7) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 80% at 80% 70%, rgba(45,90,135,0.5) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 50% at 50% 0%, rgba(212,175,55,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 70% at 70% 20%, rgba(255,107,107,0.08) 0%, transparent 50%),
+      linear-gradient(135deg, #1a365d 0%, #0f172a 100%);
+  }
+  .htag-hero__orb {
+    position: absolute; border-radius: 50%; filter: blur(80px);
+    opacity: 0; animation: htag-orb-drift 12s ease-in-out infinite, htag-orb-in 1.5s ease forwards;
+  }
+  .htag-hero__orb--1 { width:400px;height:400px;background:rgba(45,90,135,0.35);top:-10%;left:-5%; }
+  .htag-hero__orb--2 { width:300px;height:300px;background:rgba(212,175,55,0.12);top:20%;right:-5%;animation-delay:4s; }
+  .htag-hero__orb--3 { width:250px;height:250px;background:rgba(255,107,107,0.08);bottom:-10%;left:30%;animation-delay:8s; }
+  @keyframes htag-orb-drift { 0%,100%{transform:translate(0,0) scale(1);} 33%{transform:translate(30px,-20px) scale(1.05);} 66%{transform:translate(-20px,15px) scale(0.95);} }
+  @keyframes htag-orb-in { to{opacity:1;} }
+
+  .htag-hero__inner {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; gap: 60px;
+    width: 100%; max-width: 1280px;
+  }
+  .htag-hero__left { flex: 1; min-width: 0; }
+  .htag-hero__right {
+    width: 480px; flex-shrink: 0;
+    display: flex; flex-direction: column; gap: 20px;
+  }
+
+  .htag-hero__badge {
+    display:inline-flex;align-items:center;gap:8px;padding:8px 20px;
+    border:1px solid rgba(212,175,55,0.5);border-radius:50px;
+    background:rgba(212,175,55,0.1);color:var(--htag-gold);
+    font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+    margin-bottom:24px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  }
+  .htag-hero__badge svg { width:16px;height:16px;flex-shrink:0; }
+  .htag-hero__greeting {
+    font-family:'Inter',sans-serif;font-size:20px;color:rgba(255,255,255,0.9);
+    margin:0 0 10px;font-weight:600;letter-spacing:0.2px;
+  }
+  .htag-hero__greeting strong {
+    background:linear-gradient(135deg,var(--htag-coral) 0%,var(--htag-gold) 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    font-weight:700;
+  }
+  .htag-hero__title {
+    font-family:'Montserrat',sans-serif;font-size:clamp(28px,4vw,46px);font-weight:800;
+    color:#fff;margin:0 0 8px;line-height:1.15;letter-spacing:-0.5px;
+  }
+  .htag-hero__title span {
+    background:linear-gradient(135deg,var(--htag-coral) 0%,var(--htag-gold) 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  }
+  .htag-hero__subtitle { font-size:15px;color:rgba(255,255,255,0.55);margin:16px 0 0;line-height:1.7;max-width:520px; }
+
+  .htag-hero__scroll {
+    position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:2;
+    animation:htag-bounce 2s ease-in-out infinite;color:rgba(255,255,255,0.3);
+  }
+  @keyframes htag-bounce { 0%,100%{transform:translateX(-50%) translateY(0);} 50%{transform:translateX(-50%) translateY(8px);} }
+
+  .htag-card {
+    position:relative;border-radius:16px;overflow:hidden;text-decoration:none;display:block;
+    min-height:210px;
+    transition:transform 0.4s cubic-bezier(0.22,1,0.36,1),box-shadow 0.4s cubic-bezier(0.22,1,0.36,1);
+    opacity:0;transform:translateY(30px);
+  }
+  .htag-card.htag-visible {
+    opacity:1;transform:translateY(0);
+    transition:opacity 0.7s cubic-bezier(0.22,1,0.36,1),transform 0.7s cubic-bezier(0.22,1,0.36,1),box-shadow 0.4s ease;
+  }
+  .htag-card:hover {
+    transform:translateY(-4px);
+    box-shadow:0 20px 48px rgba(0,0,0,0.35),0 8px 20px rgba(0,0,0,0.2);
+  }
+
+  .htag-card__bg { position:absolute;top:0;left:0;width:100%;height:100%;z-index:0; }
+  .htag-card__bg img { width:100%;height:100%;object-fit:cover;transition:transform 8s cubic-bezier(0.22,1,0.36,1); }
+  .htag-card:hover .htag-card__bg img { transform:scale(1.06); }
+  .htag-card__bg-placeholder {
+    position:absolute;top:0;left:0;width:100%;height:100%;
+    background:linear-gradient(135deg,#1a365d 0%,#2d5a87 50%,#5a9ec9 100%);
+  }
+
+  .htag-card::before {
+    content:'';position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;
+    background:linear-gradient(135deg, rgba(26,54,93,0.88) 0%, rgba(45,90,135,0.82) 50%, rgba(96,165,220,0.75) 100%);
+    pointer-events:none;border-radius:inherit;
+  }
+
+  .htag-card__inner {
+    position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;
+    padding:28px 24px;gap:20px;min-height:210px;
+  }
+  .htag-card__text { flex:1;min-width:0; }
+  .htag-card__tag {
+    display:inline-flex;align-items:center;gap:6px;padding:4px 12px;
+    background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.3);border-radius:50px;
+    font-size:10px;font-weight:700;color:var(--htag-gold);
+    text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px;
+  }
+  .htag-card__tag svg { width:11px;height:11px; }
+  .htag-card__name {
+    font-family:'Montserrat',sans-serif;font-size:20px;font-weight:800;
+    color:#fff;margin:0 0 6px;line-height:1.2;letter-spacing:-0.3px;
+  }
+  .htag-card__count {
+    font-size:13px;color:rgba(255,255,255,0.5);margin:0 0 18px;font-weight:400;
+  }
+  .htag-card__cta {
+    display:inline-flex;align-items:center;gap:8px;padding:11px 22px;
+    background:var(--htag-coral);color:#fff;border-radius:8px;
+    font-size:13px;font-weight:700;letter-spacing:0.3px;
+    transition:all 0.3s ease;
+  }
+  .htag-card__cta svg { width:14px;height:14px;transition:transform 0.3s ease; }
+  .htag-card:hover .htag-card__cta { background:#ff5252;box-shadow:0 8px 24px rgba(255,107,107,0.3); }
+  .htag-card:hover .htag-card__cta svg { transform:translateX(4px); }
+
+  .htag-showcase {
+    width:160px;height:155px;flex-shrink:0;position:relative;
+    border-radius:12px;overflow:hidden;
+    border:1px solid rgba(255,255,255,0.12);
+    background:rgba(255,255,255,0.06);
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  }
+  .htag-showcase__slide {
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    padding:12px;opacity:0;transition:opacity 0.8s ease;
+  }
+  .htag-showcase__slide.htag-active { opacity:1; }
+  .htag-showcase__slide img {
+    max-width:100%;max-height:110px;object-fit:contain;
+    filter:drop-shadow(0 4px 16px rgba(0,0,0,0.3));
+  }
+  .htag-showcase__name {
+    position:absolute;bottom:0;left:0;right:0;padding:6px 10px;
+    background:linear-gradient(transparent,rgba(0,0,0,0.6));
+    font-size:10px;color:rgba(255,255,255,0.8);white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;text-align:center;
+  }
+  .htag-showcase__dots {
+    position:absolute;bottom:6px;left:50%;transform:translateX(-50%);
+    display:flex;gap:4px;z-index:3;
+  }
+  .htag-showcase__dot {
+    width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.3);
+    transition:background 0.3s ease,transform 0.3s ease;
+  }
+  .htag-showcase__dot.htag-dot-active { background:var(--htag-gold);transform:scale(1.3); }
+
+  .htag-card__shine {
+    position:absolute;inset:0;z-index:3;pointer-events:none;
+    background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,0.04) 45%,rgba(255,255,255,0.08) 50%,rgba(255,255,255,0.04) 55%,transparent 60%);
+    transform:translateX(-100%);transition:none;
+  }
+  .htag-card:hover .htag-card__shine { transform:translateX(100%);transition:transform 0.8s ease; }
+
+  .htag-stats {
+    display:grid;grid-template-columns:repeat(4,1fr);
+    background:var(--htag-bg-white);border-bottom:1px solid var(--htag-border);
+  }
+  .htag-stats__item { padding:28px 20px;text-align:center;position:relative;transition:background 0.3s ease; }
+  .htag-stats__item:not(:last-child)::after {
+    content:'';position:absolute;right:0;top:20%;height:60%;width:1px;background:var(--htag-border);
+  }
+  .htag-stats__item:hover { background:var(--htag-bg-light); }
+  .htag-stats__icon { width:40px;height:40px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:10px; }
+  .htag-stats__icon svg { width:20px;height:20px; }
+  .htag-stats__icon--blue { background:rgba(45,90,135,0.1);color:var(--htag-navy); }
+  .htag-stats__icon--coral { background:rgba(255,107,107,0.1);color:var(--htag-coral); }
+  .htag-stats__icon--gold { background:rgba(212,175,55,0.1);color:var(--htag-gold); }
+  .htag-stats__icon--green { background:rgba(16,185,129,0.1);color:var(--htag-success); }
+  .htag-stats__value { font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;color:var(--htag-deep-blue);margin:0 0 4px; }
+  .htag-stats__label { font-size:12px;color:var(--htag-text-light);font-weight:500;margin:0; }
+
+  .htag-stitle {
+    font-family:'Montserrat',sans-serif;font-size:30px;font-weight:800;
+    color:var(--htag-deep-blue);margin:0 0 12px;letter-spacing:-0.3px;text-align:center;
+  }
+  .htag-stitle em {
+    font-style:normal;
+    background:linear-gradient(135deg,var(--htag-coral) 0%,var(--htag-gold) 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  }
+  .htag-sdesc { font-size:15px;color:var(--htag-text-light);margin:0 0 40px;line-height:1.6;text-align:center; }
+
+  .htag-benefits { padding:60px 40px; background:var(--htag-bg-white); }
+  .htag-benefits__grid { display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1200px;margin:0 auto; }
+  .htag-benefits__card {
+    padding:32px 28px;border-radius:14px;border:1px solid var(--htag-border);
+    background:var(--htag-bg-white);transition:all 0.3s ease;position:relative;overflow:hidden;
+  }
+  .htag-benefits__card:hover {
+    transform:translateY(-4px);box-shadow:0 12px 40px rgba(26,54,93,0.08);border-color:var(--htag-navy);
+  }
+  .htag-benefits__icon { width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:18px; }
+  .htag-benefits__icon svg { width:24px;height:24px; }
+  .htag-benefits__card h3 { font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:var(--htag-deep-blue);margin:0 0 8px; }
+  .htag-benefits__card p { font-size:14px;color:var(--htag-text-light);line-height:1.6;margin:0; }
+
+  .htag-support { padding:60px 40px; background:var(--htag-bg-light); }
+  .htag-support__card {
+    max-width:800px;margin:0 auto;border-radius:16px;overflow:hidden;
+    border:1px solid var(--htag-border);background:var(--htag-bg-white);display:flex;align-items:stretch;
+  }
+  .htag-support__accent { width:6px;flex-shrink:0;background:linear-gradient(180deg,var(--htag-gold) 0%,var(--htag-coral) 100%); }
+  .htag-support__body { padding:36px 40px;flex:1; }
+  .htag-support__badge {
+    display:inline-flex;align-items:center;gap:6px;padding:4px 12px;
+    background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.25);
+    border-radius:4px;font-size:10px;font-weight:700;color:var(--htag-gold);
+    text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;
+  }
+  .htag-support__body h3 { font-family:'Montserrat',sans-serif;font-size:20px;font-weight:700;color:var(--htag-deep-blue);margin:0 0 10px; }
+  .htag-support__body > p { font-size:14px;color:var(--htag-text-light);line-height:1.6;margin:0 0 24px; }
+  .htag-support__phone {
+    display:inline-flex;align-items:center;gap:10px;padding:14px 28px;
+    background:var(--htag-deep-blue);color:#fff;border-radius:10px;
+    font-family:'Montserrat',sans-serif;font-size:18px;font-weight:700;
+    text-decoration:none;transition:all 0.3s ease;
+  }
+  .htag-support__phone:hover { background:var(--htag-navy);transform:translateY(-2px); }
+  .htag-support__phone svg { width:20px;height:20px; }
+
+  @media (max-width:1100px) {
+    .htag-hero__inner { gap:40px; }
+    .htag-hero__right { width:400px; }
+    .htag-hero__title { font-size:clamp(26px,3.5vw,40px); }
+  }
+  @media (max-width:992px) {
+    .htag-hero { padding:50px 24px; }
+    .htag-hero__inner { flex-direction:column; gap:40px; text-align:center; }
+    .htag-hero__left { max-width:600px; }
+    .htag-hero__subtitle { margin:16px auto 0; }
+    .htag-hero__right { width:100%;max-width:500px; }
+    .htag-benefits { padding:48px 24px; }
+    .htag-benefits__grid { grid-template-columns:1fr; }
+    .htag-support { padding:48px 24px; }
+    .htag-card__inner { padding:24px 20px;gap:16px;min-height:190px; }
+    .htag-card__name { font-size:18px; }
+    .htag-showcase { width:140px;height:135px; }
+    .htag-card__cta { width:100%;justify-content:center; }
+  }
+  @media (max-width:768px) {
+    .htag-hero { padding:40px 20px; }
+    .htag-stats { grid-template-columns:repeat(2,1fr); }
+    .htag-stats__item:nth-child(2)::after { display:none; }
+    .htag-card__inner { flex-direction:column;text-align:center;padding:28px 20px;gap:20px; }
+    .htag-card__text { order:2; }
+    .htag-showcase { order:1;width:160px;height:150px; }
+    .htag-card__cta { width:100%;justify-content:center; }
+    .htag-support__body { padding:28px 24px; }
+    .htag-support__phone { font-size:16px;padding:12px 22px; }
+  }
+  @media (max-width:576px) {
+    .htag-stitle { font-size:26px; }
+    .htag-card__name { font-size:17px; }
+    .htag-showcase { width:140px;height:130px; }
+    .htag-stats__value { font-size:18px; }
+  }
+</style>
+
+<div class="htag-page">
+
+  <section class="htag-hero">
+    <div class="htag-hero__mesh"></div>
+    <div class="htag-hero__orb htag-hero__orb--1"></div>
+    <div class="htag-hero__orb htag-hero__orb--2"></div>
+    <div class="htag-hero__orb htag-hero__orb--3"></div>
+
+    <div class="htag-hero__inner">
+      <div class="htag-hero__left">
+        <div class="htag-hero__badge">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+          {{ section.settings.hero_badge_text | default: 'Hashtag Member Portal' }}
+        </div>
+        <p class="htag-hero__greeting">{{ section.settings.hero_greeting | default: 'Welcome back,' }} <strong>{{ customer.first_name | default: 'Member' }}</strong></p>
+        <h1 class="htag-hero__title">{{ section.settings.hero_title | default: 'Your Hashtag<br><span>Equipment Hub</span>' }}</h1>
+        <p class="htag-hero__subtitle">{{ section.settings.hero_description | default: 'Your exclusive portal for Hashtag restaurant equipment. Browse curated collections at your member-only pricing.' }}</p>
+      </div>
+
+      <div class="htag-hero__right" id="htag-cards">
+
+        {%- if use_fallback -%}
+          {%- assign fallback_handles = 'hashtag-big-equipment,hashtag-smallwares' | split: ',' -%}
+          {%- assign fallback_titles = 'Hashtag - Big Equipment,Hashtag - Smallwares' | split: ',' -%}
+          {%- for fh in fallback_handles -%}
+            {%- assign col = collections[fh] -%}
+            {%- if col.handle == blank -%}{%- continue -%}{%- endif -%}
+            {%- assign card_title = fallback_titles[forloop.index0] | default: col.title -%}
+
+            {%- assign prod_images_json = '' -%}
+            {%- assign prod_names_json = '' -%}
+            {%- assign img_count = 0 -%}
+            {%- for product in col.products limit: 6 -%}
+              {%- if product.featured_image -%}
+                {%- if img_count > 0 -%}
+                  {%- assign prod_images_json = prod_images_json | append: '|||' -%}
+                  {%- assign prod_names_json = prod_names_json | append: '|||' -%}
+                {%- endif -%}
+                {%- assign img_url = product.featured_image | image_url: width: 400 -%}
+                {%- assign prod_images_json = prod_images_json | append: img_url -%}
+                {%- assign prod_names_json = prod_names_json | append: product.title -%}
+                {%- assign img_count = img_count | plus: 1 -%}
+              {%- endif -%}
+            {%- endfor -%}
+
+            <a href="{{ col.url }}" class="htag-card" data-images="{{ prod_images_json }}" data-names="{{ prod_names_json | escape }}">
+              <div class="htag-card__bg">
+                {% if col.image %}
+                  <img src="{{ col.image | image_url: width: 1400 }}" alt="" loading="lazy">
+                {% elsif col.products.first.featured_image %}
+                  <img src="{{ col.products.first.featured_image | image_url: width: 1400 }}" alt="" loading="lazy">
+                {% else %}
+                  <div class="htag-card__bg-placeholder"></div>
+                {% endif %}
+              </div>
+              <div class="htag-card__shine"></div>
+              <div class="htag-card__inner">
+                <div class="htag-card__text">
+                  <div class="htag-card__tag">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                    Exclusive
+                  </div>
+                  <h3 class="htag-card__name">{{ card_title }}</h3>
+                  <p class="htag-card__count">{{ col.products_count }} product{% if col.products_count != 1 %}s{% endif %} available</p>
+                  <div class="htag-card__cta">
+                    Shop Collection
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                  </div>
+                </div>
+                <div class="htag-showcase"></div>
+              </div>
+            </a>
+          {%- endfor -%}
+
+        {%- else -%}
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'collection' -%}
+              {%- assign col = blank -%}
+              {%- if block.settings.collection_handle != blank -%}
+                {%- assign col = collections[block.settings.collection_handle] -%}
+              {%- elsif block.settings.collection != blank -%}
+                {%- assign col = block.settings.collection -%}
+              {%- endif -%}
+              {%- if col == blank or col.handle == blank -%}{%- continue -%}{%- endif -%}
+              {%- assign card_title = block.settings.title | default: col.title -%}
+
+              {%- assign prod_images_json = '' -%}
+              {%- assign prod_names_json = '' -%}
+              {%- assign img_count = 0 -%}
+              {%- for product in col.products limit: 6 -%}
+                {%- if product.featured_image -%}
+                  {%- if img_count > 0 -%}
+                    {%- assign prod_images_json = prod_images_json | append: '|||' -%}
+                    {%- assign prod_names_json = prod_names_json | append: '|||' -%}
+                  {%- endif -%}
+                  {%- assign img_url = product.featured_image | image_url: width: 400 -%}
+                  {%- assign prod_images_json = prod_images_json | append: img_url -%}
+                  {%- assign prod_names_json = prod_names_json | append: product.title -%}
+                  {%- assign img_count = img_count | plus: 1 -%}
+                {%- endif -%}
+              {%- endfor -%}
+
+              <a href="{{ col.url }}" class="htag-card" data-images="{{ prod_images_json }}" data-names="{{ prod_names_json | escape }}" {{ block.shopify_attributes }}>
+                <div class="htag-card__bg">
+                  {% if col.image %}
+                    <img src="{{ col.image | image_url: width: 1400 }}" alt="" loading="lazy">
+                  {% elsif col.products.first.featured_image %}
+                    <img src="{{ col.products.first.featured_image | image_url: width: 1400 }}" alt="" loading="lazy">
+                  {% else %}
+                    <div class="htag-card__bg-placeholder"></div>
+                  {% endif %}
+                </div>
+                <div class="htag-card__shine"></div>
+                <div class="htag-card__inner">
+                  <div class="htag-card__text">
+                    <div class="htag-card__tag">
+                      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                      Exclusive
+                    </div>
+                    <h3 class="htag-card__name">{{ card_title }}</h3>
+                    <p class="htag-card__count">{{ col.products_count }} product{% if col.products_count != 1 %}s{% endif %} available</p>
+                    <div class="htag-card__cta">
+                      Shop Collection
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                    </div>
+                  </div>
+                  <div class="htag-showcase"></div>
+                </div>
+              </a>
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+
+      </div>
+    </div>
+
+    <div class="htag-hero__scroll">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13l5 5 5-5"/><path d="M7 6l5 5 5-5"/></svg>
+    </div>
+  </section>
+
+  <section class="htag-stats">
+    <div class="htag-stats__item">
+      <div class="htag-stats__icon htag-stats__icon--blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+      </div>
+      <p class="htag-stats__value">{{ section.settings.stat_1_value | default: '50+' }}</p>
+      <p class="htag-stats__label">{{ section.settings.stat_1_label | default: 'Premium Brands' }}</p>
+    </div>
+    <div class="htag-stats__item">
+      <div class="htag-stats__icon htag-stats__icon--coral">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+      </div>
+      <p class="htag-stats__value">{{ section.settings.stat_2_value | default: 'Exclusive' }}</p>
+      <p class="htag-stats__label">{{ section.settings.stat_2_label | default: 'Member-Only Pricing' }}</p>
+    </div>
+    <div class="htag-stats__item">
+      <div class="htag-stats__icon htag-stats__icon--green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/></svg>
+      </div>
+      <p class="htag-stats__value">{{ section.settings.stat_3_value | default: 'Free' }}</p>
+      <p class="htag-stats__label">{{ section.settings.stat_3_label | default: 'Shipping on Orders' }}</p>
+    </div>
+    <div class="htag-stats__item">
+      <div class="htag-stats__icon htag-stats__icon--gold">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      </div>
+      <p class="htag-stats__value">{{ section.settings.stat_4_value | default: 'Priority' }}</p>
+      <p class="htag-stats__label">{{ section.settings.stat_4_label | default: 'Dedicated Support Line' }}</p>
+    </div>
+  </section>
+
+  <section class="htag-benefits">
+    <h2 class="htag-stitle">{{ section.settings.benefits_title | default: 'Premium Member <em>Benefits</em>' }}</h2>
+    <p class="htag-sdesc">{{ section.settings.benefits_subtitle | default: 'Everything that comes with your Hashtag membership.' }}</p>
+    <div class="htag-benefits__grid">
+      {%- assign benefit_blocks_count = 0 -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'benefit' -%}
+          {%- assign benefit_blocks_count = benefit_blocks_count | plus: 1 -%}
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- if benefit_blocks_count > 0 -%}
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'benefit' -%}
+            <div class="htag-benefits__card" {{ block.shopify_attributes }}>
+              <div class="htag-benefits__icon" style="background:{{ block.settings.icon_bg | default: 'rgba(45,90,135,0.1)' }};color:{{ block.settings.icon_color | default: '#2d5a87' }};">
+                {%- case block.settings.icon -%}
+                  {%- when 'dollar' -%}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  {%- when 'shipping' -%}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/></svg>
+                  {%- when 'phone' -%}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  {%- when 'star' -%}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                  {%- when 'shield' -%}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  {%- when 'clock' -%}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  {%- else -%}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  {%- endcase -%}
+              </div>
+              <h3>{{ block.settings.title }}</h3>
+              <p>{{ block.settings.description }}</p>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- else -%}
+        <div class="htag-benefits__card">
+          <div class="htag-benefits__icon" style="background:rgba(45,90,135,0.1);color:var(--htag-navy);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <h3>Exclusive Member Pricing</h3>
+          <p>Access wholesale prices reserved exclusively for Hashtag members. Save significantly on every order with pricing not available to the general public.</p>
+        </div>
+        <div class="htag-benefits__card">
+          <div class="htag-benefits__icon" style="background:rgba(255,107,107,0.1);color:var(--htag-coral);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/></svg>
+          </div>
+          <h3>Priority Shipping</h3>
+          <p>Enjoy faster processing and priority shipping on all your orders. Your equipment gets to you when you need it most.</p>
+        </div>
+        <div class="htag-benefits__card">
+          <div class="htag-benefits__icon" style="background:rgba(212,175,55,0.1);color:var(--htag-gold);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <h3>Dedicated Support Line</h3>
+          <p>Get direct access to our premium support team for orders, quotes, and product inquiries. Your dedicated line for everything you need.</p>
+        </div>
+      {%- endif -%}
+    </div>
+  </section>
+
+  <section class="htag-support">
+    <h2 class="htag-stitle">{{ section.settings.support_heading | default: 'Your Dedicated <em>Premium Line</em>' }}</h2>
+    <p class="htag-sdesc">{{ section.settings.support_desc | default: 'As a Premium member, you have priority access to our dedicated support team for orders, quotes, and product inquiries.' }}</p>
+    <div class="htag-support__card">
+      <div class="htag-support__accent"></div>
+      <div class="htag-support__body">
+        <div class="htag-support__badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+          VIP Support
+        </div>
+        <h3>{{ section.settings.support_title | default: 'Your Dedicated Premium Line' }}</h3>
+        <p>{{ section.settings.support_desc | default: 'As a Premium member, you have priority access to our dedicated support team for orders, quotes, and product inquiries.' }}</p>
+        {%- assign support_phone = section.settings.support_phone | default: '4086739999' -%}
+        {%- assign support_display = section.settings.support_phone_display | default: '(408) 673-9999' -%}
+        <a href="tel:{{ support_phone }}" class="htag-support__phone">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          {{ support_display }}
+        </a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  function initScrollReveal() {
+    var cards = document.querySelectorAll('.htag-card');
+    if (!cards.length) return;
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          var card = entry.target;
+          var idx = parseInt(card.getAttribute('data-htag-idx'), 10) || 0;
+          setTimeout(function() { card.classList.add('htag-visible'); }, idx * 200);
+          observer.unobserve(card);
+        }
+      });
+    }, { threshold: 0.15 });
+    cards.forEach(function(card, i) { card.setAttribute('data-htag-idx', i); observer.observe(card); });
+  }
+
+  function initShowcaseRotators() {
+    var cards = document.querySelectorAll('.htag-card[data-images]');
+    cards.forEach(function(card) {
+      var imagesStr = card.getAttribute('data-images');
+      var namesStr = card.getAttribute('data-names') || '';
+      if (!imagesStr) return;
+
+      var images = imagesStr.split('|||');
+      var names = namesStr.split('|||');
+      if (images.length === 0 || (images.length === 1 && !images[0])) return;
+
+      var showcase = card.querySelector('.htag-showcase');
+      if (!showcase) return;
+
+      var dotsContainer = document.createElement('div');
+      dotsContainer.className = 'htag-showcase__dots';
+
+      images.forEach(function(src, i) {
+        var slide = document.createElement('div');
+        slide.className = 'htag-showcase__slide' + (i === 0 ? ' htag-active' : '');
+        var img = document.createElement('img');
+        img.src = src;
+        img.alt = names[i] || 'Product';
+        img.loading = 'lazy';
+        slide.appendChild(img);
+
+        if (names[i]) {
+          var nameEl = document.createElement('div');
+          nameEl.className = 'htag-showcase__name';
+          nameEl.textContent = names[i].length > 30 ? names[i].substring(0, 30) + '...' : names[i];
+          slide.appendChild(nameEl);
+        }
+        showcase.appendChild(slide);
+
+        var dot = document.createElement('div');
+        dot.className = 'htag-showcase__dot' + (i === 0 ? ' htag-dot-active' : '');
+        dotsContainer.appendChild(dot);
+      });
+
+      showcase.appendChild(dotsContainer);
+
+      if (images.length > 1) {
+        var current = 0;
+        var slides = showcase.querySelectorAll('.htag-showcase__slide');
+        var dots = showcase.querySelectorAll('.htag-showcase__dot');
+
+        setInterval(function() {
+          slides[current].classList.remove('htag-active');
+          dots[current].classList.remove('htag-dot-active');
+          current = (current + 1) % slides.length;
+          slides[current].classList.add('htag-active');
+          dots[current].classList.add('htag-dot-active');
+        }, 3000);
+      }
+    });
+  }
+
+  function init() {
+    initScrollReveal();
+    initShowcaseRotators();
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+
+{%- endunless -%}
+
+{% schema %}
+{
+  "name": "Hashtag Member Portal",
+  "tag": "section",
+  "class": "htag-portal-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Gate Page (non-members)"
+    },
+    {
+      "type": "text",
+      "id": "gate_title",
+      "label": "Gate Title",
+      "default": "Hashtag Members Only"
+    },
+    {
+      "type": "textarea",
+      "id": "gate_description",
+      "label": "Gate Description",
+      "default": "This page is exclusively available to our Hashtag members. Please log in with your account to access these curated collections."
+    },
+    {
+      "type": "text",
+      "id": "gate_button",
+      "label": "Gate Button Text",
+      "default": "Log In"
+    },
+    {
+      "type": "header",
+      "content": "Hero Banner"
+    },
+    {
+      "type": "text",
+      "id": "hero_badge_text",
+      "label": "Badge Text",
+      "default": "Hashtag Member Portal"
+    },
+    {
+      "type": "text",
+      "id": "hero_greeting",
+      "label": "Greeting Prefix",
+      "default": "Welcome back,"
+    },
+    {
+      "type": "html",
+      "id": "hero_title",
+      "label": "Hero Title (HTML — use <br> for line break, <span> for gradient)",
+      "default": "Your Hashtag<br><span>Equipment Hub</span>"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_description",
+      "label": "Hero Description",
+      "default": "Your exclusive portal for Hashtag restaurant equipment. Browse curated collections at your member-only pricing."
+    },
+    {
+      "type": "header",
+      "content": "Stats Bar"
+    },
+    {
+      "type": "text",
+      "id": "stat_1_value",
+      "label": "Stat 1 — Value",
+      "default": "50+"
+    },
+    {
+      "type": "text",
+      "id": "stat_1_label",
+      "label": "Stat 1 — Label",
+      "default": "Premium Brands"
+    },
+    {
+      "type": "text",
+      "id": "stat_2_value",
+      "label": "Stat 2 — Value",
+      "default": "Exclusive"
+    },
+    {
+      "type": "text",
+      "id": "stat_2_label",
+      "label": "Stat 2 — Label",
+      "default": "Member-Only Pricing"
+    },
+    {
+      "type": "text",
+      "id": "stat_3_value",
+      "label": "Stat 3 — Value",
+      "default": "Free"
+    },
+    {
+      "type": "text",
+      "id": "stat_3_label",
+      "label": "Stat 3 — Label",
+      "default": "Shipping on Orders"
+    },
+    {
+      "type": "text",
+      "id": "stat_4_value",
+      "label": "Stat 4 — Value",
+      "default": "Priority"
+    },
+    {
+      "type": "text",
+      "id": "stat_4_label",
+      "label": "Stat 4 — Label",
+      "default": "Dedicated Support Line"
+    },
+    {
+      "type": "header",
+      "content": "Benefits Section"
+    },
+    {
+      "type": "html",
+      "id": "benefits_title",
+      "label": "Benefits Title (HTML allowed for <em> styling)",
+      "default": "Premium Member <em>Benefits</em>"
+    },
+    {
+      "type": "text",
+      "id": "benefits_subtitle",
+      "label": "Benefits Subtitle",
+      "default": "Everything that comes with your Hashtag membership."
+    },
+    {
+      "type": "header",
+      "content": "VIP Support"
+    },
+    {
+      "type": "html",
+      "id": "support_heading",
+      "label": "Support Section Heading (HTML allowed)",
+      "default": "Your Dedicated <em>Premium Line</em>"
+    },
+    {
+      "type": "text",
+      "id": "support_title",
+      "label": "Support Card Title",
+      "default": "Your Dedicated Premium Line"
+    },
+    {
+      "type": "textarea",
+      "id": "support_desc",
+      "label": "Support Description",
+      "default": "As a Premium member, you have priority access to our dedicated support team for orders, quotes, and product inquiries."
+    },
+    {
+      "type": "text",
+      "id": "support_phone",
+      "label": "Support Phone (for tel: link)",
+      "default": "4086739999"
+    },
+    {
+      "type": "text",
+      "id": "support_phone_display",
+      "label": "Support Phone (display format)",
+      "default": "(408) 673-9999"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection Card",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection (picker)"
+        },
+        {
+          "type": "text",
+          "id": "collection_handle",
+          "label": "Collection Handle (alternative)",
+          "info": "Enter handle like 'hashtag-big-equipment'. Used when picker is empty."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Display Title (optional)",
+          "info": "Override the collection title"
+        },
+        {
+          "type": "checkbox",
+          "id": "featured",
+          "label": "Featured (large card)",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "benefit",
+      "name": "Benefit Card",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "default": "dollar",
+          "options": [
+            { "value": "dollar", "label": "Dollar Sign" },
+            { "value": "shipping", "label": "Shipping Box" },
+            { "value": "phone", "label": "Phone" },
+            { "value": "star", "label": "Star" },
+            { "value": "shield", "label": "Shield" },
+            { "value": "clock", "label": "Clock" }
+          ]
+        },
+        {
+          "type": "color",
+          "id": "icon_color",
+          "label": "Icon Color",
+          "default": "#2d5a87"
+        },
+        {
+          "type": "color_background",
+          "id": "icon_bg",
+          "label": "Icon Background",
+          "default": "rgba(45,90,135,0.1)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Benefit Title"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Describe this benefit for your premium members."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hashtag Member Portal",
+      "blocks": []
+    }
+  ]
+}
+{% endschema %}

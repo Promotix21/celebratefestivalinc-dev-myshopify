@@ -1,0 +1,569 @@
+{% comment %}
+  Ask a Question Page
+  Linked from the product page Q&A section.
+  Accepts ?product=HANDLE query param to pre-fill product context.
+{% endcomment %}
+
+{% assign contact_phone = "(408) 673-9999" %}
+{% assign contact_email = "sales@celebratefestivalinc.com" %}
+
+{% comment %} Capture product info from URL param {% endcomment %}
+{% assign product_handle = request.query_string | split: 'product=' | last | split: '&' | first %}
+{% assign qa_product = all_products[product_handle] %}
+
+<style>
+/* Ask a Question Page */
+.aq-page {
+  --aq-navy: #1a365d;
+  --aq-coral: #ff6b6b;
+  --aq-coral-hover: #e85a4f;
+  --aq-light: #f7fafc;
+  --aq-gray: #e2e8f0;
+  --aq-dark: #2d3748;
+  --aq-muted: #718096;
+  --aq-white: #ffffff;
+  --aq-teal: #4ecdc4;
+  --aq-radius: 8px;
+  --aq-radius-lg: 12px;
+  --aq-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Hero */
+.aq-hero {
+  background: linear-gradient(135deg, #1a365d 0%, #2d5a87 100%);
+  padding: 30px 0;
+  color: #fff;
+}
+.aq-hero .aq-container {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+.aq-hero-content { flex: 1; }
+.aq-hero-tagline {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+.aq-hero h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+}
+.aq-hero p {
+  font-size: 14px;
+  opacity: 0.9;
+  margin: 0;
+  line-height: 1.5;
+}
+.aq-hero-contact {
+  display: flex;
+  gap: 15px;
+  flex-shrink: 0;
+}
+.aq-hero-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--aq-radius);
+  padding: 12px 18px;
+  text-align: center;
+  font-size: 12px;
+  min-width: 120px;
+}
+.aq-hero-card strong {
+  display: block;
+  font-size: 11px;
+  margin-bottom: 4px;
+  opacity: 0.85;
+}
+.aq-hero-card a { color: #fff; text-decoration: none; }
+.aq-hero-card a:hover { text-decoration: underline; }
+
+/* Container */
+.aq-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Main layout */
+.aq-main {
+  padding: 40px 0 60px;
+  background: var(--aq-light);
+}
+.aq-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 40px;
+  align-items: start;
+}
+
+/* Product context card */
+.aq-product-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--aq-white);
+  border: 2px solid var(--aq-gray);
+  border-radius: var(--aq-radius-lg);
+  padding: 16px;
+  margin-bottom: 24px;
+}
+.aq-product-card img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  border-radius: var(--aq-radius);
+  background: var(--aq-light);
+  border: 1px solid var(--aq-gray);
+}
+.aq-product-info { flex: 1; }
+.aq-product-info h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--aq-navy);
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+}
+.aq-product-info .aq-product-vendor {
+  font-size: 12px;
+  color: var(--aq-muted);
+}
+.aq-product-info .aq-product-sku {
+  font-size: 11px;
+  color: var(--aq-muted);
+  margin-top: 2px;
+}
+
+/* Form card */
+.aq-form-card {
+  background: var(--aq-white);
+  border-radius: var(--aq-radius-lg);
+  box-shadow: var(--aq-shadow);
+  overflow: hidden;
+}
+.aq-form-header {
+  background: var(--aq-gray);
+  padding: 20px 28px;
+  border-bottom: 2px solid var(--aq-coral);
+}
+.aq-form-header h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--aq-navy);
+  margin: 0 0 4px 0;
+}
+.aq-form-header p {
+  font-size: 13px;
+  color: var(--aq-muted);
+  margin: 0;
+}
+.aq-form-body {
+  padding: 28px;
+}
+
+/* Form elements */
+.aq-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.aq-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.aq-form-group {
+  display: flex;
+  flex-direction: column;
+}
+.aq-form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--aq-dark);
+  margin-bottom: 6px;
+}
+.aq-form-group label .aq-req { color: var(--aq-coral); margin-left: 2px; }
+
+.aq-form-group input,
+.aq-form-group textarea,
+.aq-form-group select {
+  padding: 11px 14px;
+  border: 2px solid var(--aq-gray);
+  border-radius: var(--aq-radius);
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--aq-dark);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.aq-form-group input:focus,
+.aq-form-group textarea:focus,
+.aq-form-group select:focus {
+  outline: none;
+  border-color: var(--aq-coral);
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+}
+.aq-form-group textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+.aq-form-group select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%232d3748' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+.aq-form-group .aq-input-readonly {
+  background: var(--aq-light);
+  color: var(--aq-muted);
+  cursor: default;
+}
+
+.aq-submit-btn {
+  background: linear-gradient(135deg, #ff6b6b, #e85a4f);
+  color: #fff;
+  border: none;
+  padding: 14px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: var(--aq-radius);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 4px;
+}
+.aq-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+.aq-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Sidebar */
+.aq-sidebar { display: flex; flex-direction: column; gap: 20px; }
+
+.aq-sidebar-box {
+  background: var(--aq-white);
+  border-radius: var(--aq-radius-lg);
+  padding: 24px;
+  box-shadow: var(--aq-shadow);
+}
+.aq-sidebar-box h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--aq-navy);
+  margin: 0 0 16px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--aq-coral);
+}
+
+/* Tips list */
+.aq-tips-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.aq-tips-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--aq-light);
+  font-size: 13px;
+  color: var(--aq-dark);
+  line-height: 1.5;
+}
+.aq-tips-list li:last-child { border-bottom: none; }
+.aq-tips-list li .aq-tip-icon {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(135deg, #dbeafe, #eff6ff);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--aq-navy);
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+/* Contact sidebar */
+.aq-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--aq-light);
+  font-size: 13px;
+}
+.aq-contact-item:last-child { border-bottom: none; }
+.aq-contact-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #ff6b6b, #e85a4f);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.aq-contact-detail { color: var(--aq-dark); }
+.aq-contact-detail a { color: var(--aq-coral); text-decoration: none; font-weight: 600; }
+.aq-contact-detail a:hover { text-decoration: underline; }
+.aq-contact-detail small { display: block; color: var(--aq-muted); font-size: 11px; margin-top: 2px; }
+
+/* Back link */
+.aq-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--aq-navy);
+  text-decoration: none;
+  margin-bottom: 20px;
+  transition: color 0.2s;
+}
+.aq-back-link:hover { color: var(--aq-coral); }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .aq-layout { grid-template-columns: 1fr; }
+  .aq-hero .aq-container { flex-wrap: wrap; }
+  .aq-hero-contact { flex: 0 0 100%; }
+}
+@media (max-width: 600px) {
+  .aq-form-row { grid-template-columns: 1fr; }
+  .aq-hero h1 { font-size: 1.4rem; }
+  .aq-hero-contact { flex-direction: column; gap: 8px; }
+  .aq-product-card { flex-direction: column; text-align: center; }
+}
+</style>
+
+<div class="aq-page">
+  <!-- Hero -->
+  <section class="aq-hero">
+    <div class="aq-container">
+      <div class="aq-hero-content">
+        <div class="aq-hero-tagline">Product Q&A</div>
+        <h1>Ask a Question</h1>
+        <p>Have a question about a product? Our expert team typically responds within 24 hours.</p>
+      </div>
+      <div class="aq-hero-contact">
+        <div class="aq-hero-card">
+          <strong>Call Us</strong>
+          <a href="tel:+14086739999">{{ contact_phone }}</a>
+        </div>
+        <div class="aq-hero-card">
+          <strong>Email Us</strong>
+          <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <section class="aq-main">
+    <div class="aq-container">
+      <div class="aq-layout">
+        <!-- Left: Form -->
+        <div>
+          {% if qa_product %}
+            <a href="{{ qa_product.url }}" class="aq-back-link">&larr; Back to {{ qa_product.title }}</a>
+            <div class="aq-product-card">
+              {% if qa_product.featured_image %}
+                <img src="{{ qa_product.featured_image | image_url: width: 160 }}" alt="{{ qa_product.title | escape }}" loading="lazy">
+              {% endif %}
+              <div class="aq-product-info">
+                <h3>{{ qa_product.title }}</h3>
+                {% if qa_product.vendor != blank %}
+                  <div class="aq-product-vendor">{{ qa_product.vendor }}</div>
+                {% endif %}
+                {% if qa_product.variants.first.sku != blank %}
+                  <div class="aq-product-sku">SKU: {{ qa_product.variants.first.sku }}</div>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+
+          <div class="aq-form-card">
+            <div class="aq-form-header">
+              <h2>Submit Your Question</h2>
+              <p>Fill out the form below and we'll get back to you as soon as possible.</p>
+            </div>
+            <div class="aq-form-body">
+              {% form 'contact', class: 'aq-form' %}
+                {% if form.posted_successfully? %}
+                  <script>window.__aqFormSuccess = true;</script>
+                {% elsif form.errors %}
+                  <div style="padding: 12px 16px; background: rgba(220,53,69,0.08); border: 1px solid #dc3545; border-radius: 8px; color: #dc3545; font-size: 13px; margin-bottom: 8px;">
+                    Something went wrong. Please try again.
+                  </div>
+                {% endif %}
+
+                <input type="hidden" name="contact[inquiry_type]" value="Product Question">
+                {% if qa_product %}
+                  <input type="hidden" name="contact[product_title]" value="{{ qa_product.title | escape }}">
+                  <input type="hidden" name="contact[product_url]" value="{{ shop.url }}{{ qa_product.url }}">
+                  <input type="hidden" name="contact[product_sku]" value="{{ qa_product.variants.first.sku | escape }}">
+                {% endif %}
+
+                <div class="aq-form-row">
+                  <div class="aq-form-group">
+                    <label for="aq-name">Full Name <span class="aq-req">*</span></label>
+                    <input type="text" id="aq-name" name="contact[name]" required
+                      {% if customer %}value="{{ customer.name | escape }}"{% endif %}>
+                  </div>
+                  <div class="aq-form-group">
+                    <label for="aq-email">Email <span class="aq-req">*</span></label>
+                    <input type="email" id="aq-email" name="contact[email]" required
+                      {% if customer %}value="{{ customer.email | escape }}"{% endif %}>
+                  </div>
+                </div>
+
+                {% if qa_product %}
+                  <div class="aq-form-group">
+                    <label for="aq-product">Product</label>
+                    <input type="text" id="aq-product" value="{{ qa_product.title | escape }}" class="aq-input-readonly" readonly>
+                  </div>
+                {% else %}
+                  <div class="aq-form-group">
+                    <label for="aq-product-manual">Product Name or SKU <span class="aq-req">*</span></label>
+                    <input type="text" id="aq-product-manual" name="contact[product_name]" placeholder="e.g. Robot Coupe R301 or SKU number" required>
+                  </div>
+                {% endif %}
+
+                <div class="aq-form-group">
+                  <label for="aq-category">Question Category</label>
+                  <select id="aq-category" name="contact[question_category]">
+                    <option value="general">General Question</option>
+                    <option value="specs">Specifications & Features</option>
+                    <option value="compatibility">Compatibility & Sizing</option>
+                    <option value="shipping">Shipping & Delivery</option>
+                    <option value="warranty">Warranty & Returns</option>
+                    <option value="installation">Installation & Setup</option>
+                    <option value="pricing">Pricing & Availability</option>
+                  </select>
+                </div>
+
+                <div class="aq-form-group">
+                  <label for="aq-question">Your Question <span class="aq-req">*</span></label>
+                  <textarea id="aq-question" name="contact[body]" placeholder="Type your question here..." required></textarea>
+                </div>
+
+                <button type="submit" class="aq-submit-btn">Submit Question</button>
+              {% endform %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Sidebar -->
+        <div class="aq-sidebar">
+          <div class="aq-sidebar-box">
+            <h3>Tips for a Great Question</h3>
+            <ul class="aq-tips-list">
+              <li>
+                <span class="aq-tip-icon">1</span>
+                <span>Be specific about the product model or feature you're asking about</span>
+              </li>
+              <li>
+                <span class="aq-tip-icon">2</span>
+                <span>Include your intended use case — commercial kitchen, catering, etc.</span>
+              </li>
+              <li>
+                <span class="aq-tip-icon">3</span>
+                <span>Mention any space or electrical constraints for equipment questions</span>
+              </li>
+              <li>
+                <span class="aq-tip-icon">4</span>
+                <span>Check our <a href="/pages/faq" style="color: var(--aq-coral); font-weight: 600;">FAQ page</a> — your answer might already be there</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="aq-sidebar-box">
+            <h3>Need Faster Help?</h3>
+            <div class="aq-contact-item">
+              <div class="aq-contact-icon">&#9742;</div>
+              <div class="aq-contact-detail">
+                <a href="tel:+14086739999">{{ contact_phone }}</a>
+                <small>Mon-Fri, 9AM-6PM PST</small>
+              </div>
+            </div>
+            <div class="aq-contact-item">
+              <div class="aq-contact-icon">&#9993;</div>
+              <div class="aq-contact-detail">
+                <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>
+                <small>Response within 24 hours</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var aqForm = document.querySelector('.aq-form');
+  if (aqForm) {
+    aqForm.addEventListener('submit', function() {
+      if (typeof gtag === 'function') {
+        gtag('event', 'form_submit', {
+          event_category: 'Contact',
+          event_label: 'Ask a Question',
+          form_type: 'Ask a Question'
+        });
+      }
+      if (typeof window.lintrk === 'function') {
+        window.lintrk('track', { conversion_id: 25153836 });
+      }
+    });
+  }
+
+  if (window.__aqFormSuccess) {
+    var formCard = document.querySelector('.aq-form-body');
+    if (formCard) {
+      formCard.innerHTML = '<div style="text-align:center;padding:40px 20px;">' +
+        '<div style="font-size:48px;margin-bottom:16px;">&#10003;</div>' +
+        '<h3 style="font-family:Montserrat,sans-serif;font-size:1.3rem;color:#1a365d;margin:0 0 8px 0;">Question Submitted!</h3>' +
+        '<p style="color:#718096;font-size:14px;line-height:1.6;margin:0 0 20px 0;">Thank you for your question. Our team will review it and respond to your email within 24 hours.</p>' +
+        {% if qa_product %}'<a href="{{ qa_product.url }}" style="display:inline-block;background:linear-gradient(135deg,#ff6b6b,#e85a4f);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Back to Product</a>'{% else %}'<a href="/" style="display:inline-block;background:linear-gradient(135deg,#ff6b6b,#e85a4f);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Continue Shopping</a>'{% endif %} +
+        '</div>';
+    }
+  }
+});
+</script>
+
+{% schema %}
+{
+  "name": "Ask a Question",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Ask a Question",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

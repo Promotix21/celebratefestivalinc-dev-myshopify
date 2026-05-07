@@ -1,0 +1,147 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "level1_hub": {
+      "type": "collection-level1-hub",
+      "blocks": {
+        "brand_1": {
+          "type": "brand_logo",
+          "settings": {
+            "brand_name": "Atosa",
+            "brand_subtitle": "",
+            "brand_url": "/collections/vendors?q=atosa"
+          }
+        },
+        "brand_2": {
+          "type": "brand_logo",
+          "settings": {
+            "brand_name": "Howard McCray",
+            "brand_subtitle": "",
+            "brand_url": "/collections/vendors?q=Howard+McCray"
+          }
+        },
+        "brand_3": {
+          "type": "brand_logo",
+          "settings": {
+            "brand_name": "Imperial",
+            "brand_subtitle": "",
+            "brand_url": "/collections/vendors?q=imperial"
+          }
+        },
+        "brand_4": {
+          "type": "brand_logo",
+          "settings": {
+            "brand_name": "Rational",
+            "brand_subtitle": "",
+            "brand_url": "/collections/vendors?q=rational"
+          }
+        },
+        "brand_5": {
+          "type": "brand_logo",
+          "settings": {
+            "brand_name": "Robot Coupe",
+            "brand_subtitle": "",
+            "brand_url": "/collections/vendors?q=robot+coupe"
+          }
+        },
+        "brand_6": {
+          "type": "brand_logo",
+          "settings": {
+            "brand_name": "Dukers",
+            "brand_subtitle": "",
+            "brand_url": "/collections/vendors?q=dukers"
+          }
+        },
+        "brand_7": {
+          "type": "brand_logo",
+          "settings": {
+            "brand_name": "Turbo Air",
+            "brand_subtitle": "",
+            "brand_url": "/collections/vendors?q=Turbo+air"
+          }
+        },
+        "brand_8": {
+          "type": "brand_logo",
+          "settings": {
+            "brand_name": "Waring",
+            "brand_subtitle": "",
+            "brand_url": "/collections/vendors?q=waring"
+          }
+        },
+        "brand_9": {
+          "type": "brand_logo",
+          "settings": {
+            "brand_name": "Somerset",
+            "brand_subtitle": "",
+            "brand_url": "/collections/vendors?q=somerset"
+          }
+        },
+        "brand_10": {
+          "type": "brand_logo",
+          "settings": {
+            "brand_name": "Winco",
+            "brand_subtitle": "",
+            "brand_url": "/collections/vendors?q=winco"
+          }
+        },
+        "brand_11": {
+          "type": "brand_logo",
+          "settings": {
+            "brand_name": "Sammic",
+            "brand_subtitle": "",
+            "brand_url": "/collections/vendors?q=sammic"
+          }
+        },
+        "brand_12": {
+          "type": "brand_logo",
+          "settings": {
+            "brand_name": "True",
+            "brand_subtitle": "",
+            "brand_url": "/collections/vendors?q=true"
+          }
+        }
+      },
+      "block_order": [
+        "brand_1",
+        "brand_2",
+        "brand_3",
+        "brand_4",
+        "brand_5",
+        "brand_6",
+        "brand_7",
+        "brand_8",
+        "brand_9",
+        "brand_10",
+        "brand_11",
+        "brand_12"
+      ],
+      "settings": {
+        "menu": "cf-menu-31-12-2026",
+        "hero_tagline": "Professional Grade",
+        "main_categories_title": "Shop By Category",
+        "show_icon_row": true,
+        "show_secondary_categories": true,
+        "secondary_categories_title": "More Categories",
+        "show_brands_row": true,
+        "brands_title": "Trusted Brands We Carry",
+        "brands_view_all_text": "View All Brands",
+        "brands_view_all_url": "shopify://pages/brands-1",
+        "show_products": true,
+        "products_title": "Top Products",
+        "featured_collection": "",
+        "products_limit": 6
+      }
+    }
+  },
+  "order": [
+    "level1_hub"
+  ]
+}

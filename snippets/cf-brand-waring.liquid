@@ -1,0 +1,29 @@
+{% comment %} CF Brand: Waring {% endcomment %}
+
+{%- liquid
+  assign waring_categories = 'waring-blend,waring-prep,waring-cook,waring-brwe,waring-all' | split: ','
+  assign waring_titles = 'Blend,Prep,Cook,Brew,Waring - All' | split: ','
+  assign waring_images = 'waring-logo.jpg,waring-logo.jpg,waring-logo.jpg,waring-logo.jpg,waring-logo.jpg' | split: ','
+-%}
+
+<div class="cf-brand-hub__grid">
+  {%- for handle in waring_categories -%}
+    {%- assign idx = forloop.index0 -%}
+    {%- assign title = waring_titles[idx] -%}
+    {%- assign image_file = waring_images[idx] -%}
+    {%- assign cdn_url = 'https://celebratefestivalinc.com/cdn/shop/files/' | append: image_file | append: '?width=400&height=400&crop=center' -%}
+
+    <a href="/collections/{{ handle }}" class="cf-brand-hub__card">
+      <div class="cf-brand-hub__card-image">
+        <img src="{{ cdn_url }}" alt="{{ title }}" loading="lazy">
+        <div class="cf-brand-hub__card-overlay">
+          <span class="cf-brand-hub__card-overlay-text">{{ title }}</span>
+        </div>
+      </div>
+      <div class="cf-brand-hub__card-content">
+        <h3 class="cf-brand-hub__card-title">{{ title }}</h3>
+        <span class="cf-brand-hub__card-btn">Shop Now</span>
+      </div>
+    </a>
+  {%- endfor -%}
+</div>

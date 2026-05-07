@@ -1,0 +1,389 @@
+/* CF Apex_Forge mascot — large interactive variant.
+   1:1 rounded container with real inner padding (stage inset).
+   Proportions mirror the React ForgeMascot reference (w-64 / w-44 / w-28 on
+   a w-72 stage → 89% / 61% / 39%). Stacking order: ambient (back), casing
+   with grate spokes, rotating coils, thermostat (z 20, centre), gauge,
+   sparks (z 30, top). Colour palette is Celebrate Festival: deep-blue/navy
+   gradient that ties into the left sidebar, coral + gold accents. */
+
+.cf-apex {
+  /* CF brand palette */
+  --apex-heat:   #ff6b6b;   /* cf-coral — ignited */
+  --apex-amber:  #ff9e7a;   /* warm peach bridge */
+  --apex-gold:   #d4af37;   /* cf-gold — white-hot / responding */
+  --apex-cool:   #60a5fa;   /* light cool blue — standby digital readout */
+  --apex-navy:   #2d5a87;   /* cf-navy */
+  --apex-deepblue: #1a365d; /* cf-deep-blue */
+  --apex-metal:  #0b1830;
+  --apex-steel:  #1c2f4d;
+  --apex-deep:   #07122a;
+
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 18px;
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 8px),
+    linear-gradient(160deg, var(--apex-deepblue) 0%, #0e203b 55%, #081426 100%);
+  border: 1.5px solid rgba(255, 107, 107, 0.28);
+  box-shadow:
+    inset 0 0 70px rgba(0, 0, 0, 0.55),
+    0 10px 32px rgba(10, 25, 50, 0.35);
+  overflow: hidden;
+  cursor: crosshair;
+  perspective: 1400px;
+  user-select: none;
+  -webkit-user-select: none;
+  container-type: inline-size;
+}
+
+/* --- Top-left brand badge --- */
+.cf-apex__badge {
+  position: absolute;
+  top: 16px;
+  left: 18px;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font: 900 14px/1 Montserrat, sans-serif;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  pointer-events: none;
+}
+.cf-apex__badge svg {
+  width: 16px;
+  height: 16px;
+  color: var(--apex-heat);
+}
+.cf-apex__sublabel {
+  position: absolute;
+  top: 36px;
+  left: 18px;
+  z-index: 40;
+  font: 700 9px/1 'Courier New', ui-monospace, monospace;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  pointer-events: none;
+}
+
+/* --- Bottom-left system-online indicator --- */
+.cf-apex__status {
+  position: absolute;
+  bottom: 16px;
+  left: 18px;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 7px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 107, 107, 0.45);
+  font: 900 9px/1 'Courier New', ui-monospace, monospace;
+  color: var(--apex-heat);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  pointer-events: none;
+}
+.cf-apex__status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--apex-heat);
+  animation: cf-apex-pulse 1.8s ease-in-out infinite;
+}
+
+/* --- Bottom-right model tag --- */
+.cf-apex__model {
+  position: absolute;
+  bottom: 16px;
+  right: 18px;
+  z-index: 40;
+  padding: 3px 7px;
+  background: var(--apex-heat);
+  color: var(--apex-deepblue);
+  font: 900 9px/1 'Courier New', ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  pointer-events: none;
+}
+
+/* --- Central stage — inset gives the mascot visual breathing room inside
+   the rounded outer box (equivalent to ~6% inner padding on all sides).
+   2D stacking only (no preserve-3d) so z-index strictly decides which layer
+   paints above which — prevents spokes from tilting forward in front of coils
+   when the mouse parallax is active. --- */
+.cf-apex__stage {
+  position: absolute;
+  inset: 6%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* Ambient glow (behind everything — stacking context base) */
+.cf-apex__ambient {
+  position: absolute;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--apex-cool) 0%, transparent 70%);
+  filter: blur(60px);
+  opacity: .14;
+  z-index: 1;
+  transition: opacity .4s ease, background .4s ease, transform .4s ease;
+  will-change: opacity, transform;
+}
+.cf-apex.is-hovered .cf-apex__ambient {
+  opacity: .4;
+  background: radial-gradient(circle, var(--apex-heat) 0%, transparent 70%);
+  transform: scale(1.25);
+}
+.cf-apex.is-replying .cf-apex__ambient {
+  opacity: .5;
+  background: radial-gradient(circle, var(--apex-gold) 0%, var(--apex-heat) 40%, transparent 75%);
+  transform: scale(1.35);
+}
+
+/* Heavy outer casing — brushed steel ring with grate spokes.
+   Width matches React's w-64 on a w-72 stage (~89%). */
+.cf-apex__casing {
+  position: absolute;
+  width: 89%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  border: 7px solid transparent;
+  border-top-color: var(--apex-steel);
+  border-bottom-color: var(--apex-deep);
+  border-left-color: var(--apex-metal);
+  border-right-color: var(--apex-metal);
+  filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.55));
+  transition: transform .35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+  z-index: 2;
+}
+/* Grate spokes — intentionally muted (just a dark background detail) so
+   the rotating coils and central thermostat remain the visual foreground. */
+.cf-apex__spoke {
+  position: absolute;
+  top: -7px;
+  bottom: -7px;
+  left: 50%;
+  width: 4px;
+  margin-left: -2px;
+  background: linear-gradient(to bottom,
+    var(--apex-metal) 0%,
+    var(--apex-deep)  50%,
+    var(--apex-metal) 100%);
+  opacity: 0.75;
+}
+.cf-apex__spoke--45  { transform: rotate(45deg); }
+.cf-apex__spoke--90  { transform: rotate(90deg); }
+.cf-apex__spoke--135 { transform: rotate(135deg); }
+
+/* Induction coils — rotating SVG rings. Width matches React w-44/w-72 = ~61%.
+   Outer div gets JS transform, inner spins via CSS animation. */
+.cf-apex__coils {
+  position: absolute;
+  width: 61%;
+  aspect-ratio: 1 / 1;
+  z-index: 3;
+  transition: transform .35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+.cf-apex__coils-inner {
+  width: 100%;
+  height: 100%;
+  animation: cf-apex-spin 10s linear infinite;
+  will-change: transform;
+}
+.cf-apex__coil-svg { width: 100%; height: 100%; display: block; }
+.cf-apex__ring { transition: stroke .5s ease; }
+.cf-apex__ring--outer { stroke: #2e4469; }
+.cf-apex__ring--mid   { stroke: #263a5a; }
+.cf-apex__ring--inner { stroke: #1d2d49; }
+
+.cf-apex.is-hovered  .cf-apex__ring--outer { stroke: var(--apex-heat); }
+.cf-apex.is-hovered  .cf-apex__ring--mid   { stroke: var(--apex-amber); }
+.cf-apex.is-hovered  .cf-apex__ring--inner { stroke: var(--apex-gold); }
+.cf-apex.is-replying .cf-apex__ring--outer { stroke: #fff; }
+.cf-apex.is-replying .cf-apex__ring--mid   { stroke: var(--apex-gold); }
+.cf-apex.is-replying .cf-apex__ring--inner { stroke: var(--apex-heat); }
+
+/* Central thermostat display — React's w-28 on w-72 = ~39%. z-20 in React. */
+.cf-apex__thermostat {
+  position: absolute;
+  width: 39%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: var(--apex-deep);
+  border: 4px solid var(--apex-steel);
+  box-shadow:
+    0 0 20px rgba(0, 0, 0, 0.85),
+    inset 0 0 15px rgba(0, 0, 0, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  transition: transform .35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+.cf-apex__screen {
+  position: relative;
+  width: 70%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: #050b16;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.95);
+}
+.cf-apex__flame {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 50%;
+  background: var(--apex-heat);
+  filter: blur(15px);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .35s ease, transform .35s ease;
+}
+.cf-apex.is-hovered  .cf-apex__flame { opacity: .55; transform: translateY(0); }
+.cf-apex.is-replying .cf-apex__flame { opacity: .85; transform: translateY(-8px); }
+
+.cf-apex__temp {
+  position: relative;
+  z-index: 10;
+  font: 900 clamp(18px, 9cqw, 30px)/1 'Courier New', ui-monospace, monospace;
+  color: var(--apex-cool);
+  letter-spacing: -0.04em;
+  filter: drop-shadow(0 0 8px currentColor);
+  transition: color .4s ease;
+}
+.cf-apex.is-hovered  .cf-apex__temp { color: var(--apex-heat); }
+.cf-apex.is-replying .cf-apex__temp { color: #fff; }
+
+.cf-apex__label {
+  position: relative;
+  z-index: 10;
+  margin-top: 4px;
+  font: 900 clamp(7px, 2.6cqw, 10px)/1 'Courier New', ui-monospace, monospace;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+/* Peripheral BTU gauge — React places it at left:-20 top:40 on the stage,
+   i.e. offset off the casing's left. z comes from DOM order. */
+.cf-apex__gauge {
+  position: absolute;
+  top: 14%;
+  left: 4%;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  transition: transform .35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+.cf-apex__bars {
+  display: flex;
+  gap: 2px;
+  align-items: flex-end;
+  height: 28px;
+}
+.cf-apex__bars span {
+  width: 4px;
+  height: 12%;
+  background: var(--apex-heat);
+  border-radius: 1px 1px 0 0;
+  transition: height .2s ease;
+}
+.cf-apex.is-hovered .cf-apex__bars span,
+.cf-apex.is-replying .cf-apex__bars span {
+  animation: cf-apex-bar .4s ease-in-out infinite alternate;
+}
+.cf-apex__bars span:nth-child(1) { animation-delay:   0ms; }
+.cf-apex__bars span:nth-child(2) { animation-delay:  80ms; }
+.cf-apex__bars span:nth-child(3) { animation-delay: 160ms; }
+.cf-apex__bars span:nth-child(4) { animation-delay:  40ms; }
+.cf-apex__bars span:nth-child(5) { animation-delay: 120ms; }
+.cf-apex__gauge-label {
+  padding: 2px 5px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 107, 107, 0.35);
+  color: var(--apex-heat);
+  font: 900 8px/1 'Courier New', ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  box-shadow: 0 0 8px rgba(255, 107, 107, 0.35);
+}
+
+/* Sparks layer — always on top of the mechanical stage */
+.cf-apex__sparks {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+.cf-apex__spark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: var(--apex-gold);
+  box-shadow: 0 0 4px var(--apex-heat);
+  animation: cf-apex-spark var(--spark-dur, 1100ms) ease-out forwards;
+}
+@keyframes cf-apex-spark {
+  0%   { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--dx, 0), var(--dy, -120px)) scale(0.25); }
+}
+
+/* Chat-engine-driven state (thinking / responding) */
+.cf-apex--thinking  .cf-apex__coils-inner { animation-duration: 4s; }
+.cf-apex--responding .cf-apex__coils-inner { animation-duration: 2.2s; }
+.cf-apex--thinking  .cf-apex__ring--outer,
+.cf-apex--responding .cf-apex__ring--outer { stroke: var(--apex-heat); }
+.cf-apex--thinking  .cf-apex__ring--mid,
+.cf-apex--responding .cf-apex__ring--mid   { stroke: var(--apex-amber); }
+.cf-apex--thinking  .cf-apex__ring--inner,
+.cf-apex--responding .cf-apex__ring--inner { stroke: var(--apex-gold); }
+.cf-apex--thinking  .cf-apex__temp { color: var(--apex-amber); }
+.cf-apex--responding .cf-apex__temp { color: #fff; }
+.cf-apex--thinking  .cf-apex__flame { opacity: .5; }
+.cf-apex--responding .cf-apex__flame { opacity: .8; transform: translateY(-8px); }
+.cf-apex--responding .cf-apex__ambient {
+  opacity: .5;
+  background: radial-gradient(circle, var(--apex-gold) 0%, var(--apex-heat) 45%, transparent 75%);
+}
+
+/* Animations */
+@keyframes cf-apex-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes cf-apex-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.3; }
+}
+@keyframes cf-apex-bar {
+  0%   { height: 20%; }
+  100% { height: 85%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf-apex__coils-inner { animation: none; }
+  .cf-apex__bars span { animation: none !important; }
+  .cf-apex__spark { display: none; }
+}

@@ -1,0 +1,58 @@
+{
+  "sections": {
+    "main": {
+      "type": "page-hashtag-portal",
+      "blocks": {
+        "collection_1": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "collection_handle": "hashtag-big-equipment",
+            "title": "Hashtag - Big Equipment",
+            "featured": true
+          }
+        },
+        "collection_2": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "collection_handle": "hashtag-smallwares",
+            "title": "Hashtag - Smallwares",
+            "featured": true
+          }
+        }
+      },
+      "block_order": [
+        "collection_1",
+        "collection_2"
+      ],
+      "settings": {
+        "gate_title": "Hashtag Members Only",
+        "gate_description": "This page is exclusively available to our Hashtag members. Please log in with your account to access these curated collections.",
+        "gate_button": "Log In",
+        "hero_badge_text": "Hashtag Member Portal",
+        "hero_greeting": "Welcome back,",
+        "hero_title": "Your Hashtag<br><span>Equipment Hub</span>",
+        "hero_description": "Your exclusive portal for Hashtag restaurant equipment. Browse curated collections at your member-only pricing.",
+        "stat_1_value": "50+",
+        "stat_1_label": "Premium Brands",
+        "stat_2_value": "Exclusive",
+        "stat_2_label": "Member-Only Pricing",
+        "stat_3_value": "Free",
+        "stat_3_label": "Shipping on Orders",
+        "stat_4_value": "Priority",
+        "stat_4_label": "Dedicated Support Line",
+        "benefits_title": "Premium Member <em>Benefits</em>",
+        "benefits_subtitle": "Everything that comes with your Hashtag membership.",
+        "support_heading": "Your Dedicated <em>Premium Line</em>",
+        "support_title": "Your Dedicated Premium Line",
+        "support_desc": "As a Premium member, you have priority access to our dedicated support team for orders, quotes, and product inquiries.",
+        "support_phone": "4086739999",
+        "support_phone_display": "(408) 673-9999"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

@@ -1,0 +1,232 @@
+{{ 'customer.css' | asset_url | stylesheet_tag }}
+{{ 'customer-accounts.css' | asset_url | stylesheet_tag }}
+
+<div class="cf-account-page">
+  <!-- Account Header -->
+  <div class="cf-account-header">
+    <div class="cf-account-header-content">
+      <div class="cf-account-welcome">
+        <div class="cf-account-avatar">
+          {{ customer.first_name | slice: 0 }}{{ customer.last_name | slice: 0 }}
+        </div>
+        <div class="cf-account-welcome-text">
+          <h1>Welcome back, {{ customer.first_name }}!</h1>
+          <p>{{ customer.email }} &bull; Member since {{ customer.created_at | date: '%B %Y' }}</p>
+        </div>
+      </div>
+      <div class="cf-account-actions">
+        <a href="{{ routes.all_products_collection_url }}" class="cf-btn cf-btn-coral cf-btn-sm">Continue Shopping</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="cf-account-container">
+    <div class="cf-account-layout">
+      <!-- Sidebar -->
+      <aside class="cf-account-sidebar">
+        <ul class="cf-sidebar-nav">
+          <li><a href="{{ routes.account_url }}" class="active"><span class="icon">📊</span> Dashboard</a></li>
+          <li>
+            <a href="{{ routes.account_url }}#orders">
+              <span class="icon">📦</span> Orders
+              {% if customer.orders.size > 0 %}<span class="badge">{{ customer.orders.size }}</span>{% endif %}
+            </a>
+          </li>
+          <li><a href="{{ routes.account_addresses_url }}"><span class="icon">📍</span> Addresses</a></li>
+          <li><a href="#" id="cf-change-pw-link"><span class="icon">🔒</span> Change Password</a></li>
+        </ul>
+        <div class="cf-sidebar-logout">
+          <ul class="cf-sidebar-nav">
+            <li>
+              <a href="{{ routes.account_logout_url }}" class="logout-link" onclick="sessionStorage.setItem('logout_return', window.location.pathname);"><span class="icon">🚪</span> Logout</a>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="cf-account-content">
+        <div class="cf-content-header">
+          <h2 class="cf-content-title">Account Overview</h2>
+        </div>
+        <div class="cf-content-body">
+          <!-- Quick Stats -->
+          <div class="cf-dashboard-grid">
+            <div class="cf-dashboard-card">
+              <div class="cf-dashboard-card-icon">📦</div>
+              <h3>Total Orders</h3>
+              <p>{{ customer.orders.size }} orders placed</p>
+              <a href="#orders">View All Orders →</a>
+            </div>
+            <div class="cf-dashboard-card">
+              <div class="cf-dashboard-card-icon">📍</div>
+              <h3>Saved Addresses</h3>
+              <p>{{ customer.addresses_count }} addresses saved</p>
+              <a href="{{ routes.account_addresses_url }}">Manage Addresses →</a>
+            </div>
+            <div class="cf-dashboard-card">
+              <div class="cf-dashboard-card-icon">👤</div>
+              <h3>Account Details</h3>
+              <p>{{ customer.email }}</p>
+              <a href="{{ routes.account_addresses_url }}">Edit Profile →</a>
+            </div>
+          </div>
+
+          <!-- Recent Orders -->
+          <div class="cf-recent-orders" id="orders">
+            <div class="cf-section-title">
+              {{ 'customer.orders.title' | t }}
+              {% if customer.orders.size > 5 %}
+                <a href="#">View All</a>
+              {% endif %}
+            </div>
+
+            {% paginate customer.orders by 20 %}
+              {%- if customer.orders.size > 0 -%}
+                <table class="cf-orders-table">
+                  <thead>
+                    <tr>
+                      <th>{{ 'customer.orders.order_number' | t }}</th>
+                      <th>{{ 'customer.orders.date' | t }}</th>
+                      <th>{{ 'customer.orders.payment_status' | t }}</th>
+                      <th>{{ 'customer.orders.fulfillment_status' | t }}</th>
+                      <th>{{ 'customer.orders.total' | t }}</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {%- for order in customer.orders -%}
+                      <tr>
+                        <td data-label="{{ 'customer.orders.order_number' | t }}">
+                          <a href="{{ order.customer_url }}" class="cf-order-number">{{ order.name }}</a>
+                        </td>
+                        <td data-label="{{ 'customer.orders.date' | t }}">
+                          {{ order.created_at | date: '%b %d, %Y' }}
+                        </td>
+                        <td data-label="{{ 'customer.orders.payment_status' | t }}">
+                          <span class="cf-order-status cf-status-{% if order.financial_status == 'paid' %}fulfilled{% elsif order.financial_status == 'pending' %}processing{% else %}processing{% endif %}">
+                            {{ order.financial_status_label }}
+                          </span>
+                        </td>
+                        <td data-label="{{ 'customer.orders.fulfillment_status' | t }}">
+                          <span class="cf-order-status cf-status-{% if order.fulfillment_status == 'fulfilled' %}fulfilled{% elsif order.fulfillment_status == 'partial' %}shipped{% else %}processing{% endif %}">
+                            {{ order.fulfillment_status_label }}
+                          </span>
+                        </td>
+                        <td data-label="{{ 'customer.orders.total' | t }}" class="cf-order-total">
+                          {{ order.total_net_amount | money_with_currency }}
+                        </td>
+                        <td>
+                          <a href="{{ order.customer_url }}" style="color: var(--cf-navy); font-weight: 600;">View</a>
+                        </td>
+                      </tr>
+                    {%- endfor -%}
+                  </tbody>
+                </table>
+
+                {%- if paginate.pages > 1 -%}
+                  <nav class="cf-pagination" role="navigation" aria-label="{{ 'general.pagination.label' | t }}">
+                    {%- if paginate.previous -%}
+                      <a href="{{ paginate.previous.url }}" class="cf-btn cf-btn-outline cf-btn-sm">Previous</a>
+                    {%- endif -%}
+                    {%- if paginate.next -%}
+                      <a href="{{ paginate.next.url }}" class="cf-btn cf-btn-outline cf-btn-sm">Next</a>
+                    {%- endif -%}
+                  </nav>
+                {%- endif -%}
+              {%- else -%}
+                <div class="cf-empty-state">
+                  <div class="cf-empty-state-icon">📦</div>
+                  <h3>No Orders Yet</h3>
+                  <p>You haven't placed any orders yet. Start shopping to see your orders here.</p>
+                  <a href="{{ routes.all_products_collection_url }}" class="cf-btn cf-btn-primary" style="width: auto;">Start Shopping</a>
+                </div>
+              {%- endif -%}
+            {% endpaginate %}
+          </div>
+
+          <!-- Default Address -->
+          {% if customer.default_address %}
+            <div style="margin-top: 30px;">
+              <div class="cf-section-title">
+                {{ 'customer.account.details' | t }}
+                <a href="{{ routes.account_addresses_url }}">{{ 'customer.account.view_addresses' | t }} ({{ customer.addresses_count }})</a>
+              </div>
+              <div class="cf-address-card default" style="max-width: 400px;">
+                <span class="cf-address-badge">Default</span>
+                <div class="cf-address-name">{{ customer.default_address.name }}</div>
+                <div class="cf-address-details">
+                  {{ customer.default_address | format_address }}
+                </div>
+                <div class="cf-address-actions">
+                  <a href="{{ routes.account_addresses_url }}">Edit</a>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+          <!-- Change Password -->
+          <div class="cf-change-password" id="change-password" style="margin-top: 30px;">
+            <div class="cf-section-title">Change Password</div>
+            <div class="cf-password-card" style="max-width:500px;padding:28px;border:1px solid var(--cf-border, #e2e8f0);border-radius:12px;background:#fff;">
+              <p style="font-size:14px;color:#64748b;line-height:1.6;margin:0 0 20px;">
+                To change your password, click the button below. You'll be taken to Shopify's password recovery page where a reset link will be sent to <strong>{{ customer.email }}</strong>.
+              </p>
+
+              <a href="/account/login#recover" id="cf-reset-pw-btn" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:#1a365d;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.2s;text-decoration:none;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Reset Password
+              </a>
+              <p style="font-size:12px;color:#94a3b8;margin:12px 0 0;">You'll be logged out and redirected to the password reset page.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var sidebarLink = document.getElementById('cf-change-pw-link');
+  if (sidebarLink) {
+    sidebarLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      var el = document.getElementById('change-password');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "t:sections.main-account.name",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 0
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,1250 @@
+{% comment %}
+  Service Journey Landing Page
+  - Hero with customizable background
+  - 7-step zigzag timeline
+  - 4-column features grid
+  - CTA section
+{% endcomment %}
+
+{% style %}
+  /* ============================================
+     SERVICE JOURNEY — SECTION STYLES
+     ============================================ */
+
+  .sj-root {
+    --sj-deep-blue: #1a365d;
+    --sj-navy: #2d5a87;
+    --sj-coral: #ff6b6b;
+    --sj-gold: #d4af37;
+    --sj-success: #10b981;
+    --sj-text-dark: #0f172a;
+    --sj-text-medium: #475569;
+    --sj-text-light: #64748b;
+    --sj-text-muted: #94a3b8;
+    --sj-border: #e2e8f0;
+    --sj-bg-light: #f8fafc;
+    --sj-bg-white: #ffffff;
+    --sj-font-heading: 'Montserrat', sans-serif;
+    --sj-font-body: 'Inter', sans-serif;
+  }
+
+  .sj-root *, .sj-root *::before, .sj-root *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* ---------- HERO ---------- */
+
+  .sj-hero {
+    position: relative;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: var(--sj-deep-blue);
+  }
+
+  .sj-hero__bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.3;
+  }
+
+  .sj-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(26, 54, 93, 0.92) 0%, rgba(15, 23, 42, 0.88) 100%);
+  }
+
+  /* Floating blobs */
+  .sj-hero__blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.18;
+    animation: sj-blob-float 12s ease-in-out infinite alternate;
+  }
+
+  .sj-hero__blob--1 {
+    width: 500px;
+    height: 500px;
+    background: var(--sj-coral);
+    top: -10%;
+    right: -5%;
+  }
+
+  .sj-hero__blob--2 {
+    width: 400px;
+    height: 400px;
+    background: var(--sj-gold);
+    bottom: -15%;
+    left: -8%;
+    animation-delay: -4s;
+  }
+
+  .sj-hero__blob--3 {
+    width: 300px;
+    height: 300px;
+    background: var(--sj-navy);
+    top: 40%;
+    left: 50%;
+    animation-delay: -8s;
+  }
+
+  @keyframes sj-blob-float {
+    0%   { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, -20px) scale(1.08); }
+  }
+
+  .sj-hero__content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 960px;
+    padding: 40px 24px;
+  }
+
+  .sj-hero__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 999px;
+    padding: 8px 20px;
+    font-family: var(--sj-font-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 28px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .sj-hero__pill svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  .sj-hero__title {
+    font-family: var(--sj-font-heading);
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.15;
+    margin-bottom: 20px;
+  }
+
+  .sj-hero__title .sj-grad-coral {
+    background: linear-gradient(135deg, var(--sj-coral), #ee5a24);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .sj-hero__title .sj-grad-gold {
+    background: linear-gradient(135deg, var(--sj-gold), #f7dc6f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .sj-hero__subtitle {
+    font-family: var(--sj-font-body);
+    font-size: 18px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 620px;
+    margin: 0 auto 36px;
+  }
+
+  .sj-hero__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--sj-coral);
+    color: #ffffff;
+    font-family: var(--sj-font-heading);
+    font-size: 16px;
+    font-weight: 600;
+    padding: 16px 36px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 4px 20px rgba(255, 107, 107, 0.35);
+  }
+
+  .sj-hero__cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255, 107, 107, 0.45);
+    color: #ffffff;
+  }
+
+  .sj-hero__cta svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* ---------- TIMELINE ---------- */
+
+  .sj-timeline {
+    padding: 50px 40px;
+    background: var(--sj-bg-light);
+  }
+
+  .sj-timeline__header {
+    text-align: center;
+    max-width: 620px;
+    margin: 0 auto 36px;
+  }
+
+  .sj-timeline__title {
+    font-family: var(--sj-font-heading);
+    font-size: clamp(22px, 3vw, 30px);
+    font-weight: 700;
+    color: var(--sj-deep-blue);
+    margin-bottom: 10px;
+  }
+
+  .sj-timeline__subtitle {
+    font-family: var(--sj-font-body);
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--sj-text-medium);
+  }
+
+  .sj-timeline__track {
+    position: relative;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* Central vertical line (desktop) */
+  .sj-timeline__line {
+    display: none;
+  }
+
+  @media (min-width: 769px) {
+    .sj-timeline__line {
+      display: block;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 3px;
+      transform: translateX(-50%);
+      background: var(--sj-border);
+    }
+
+    .sj-timeline__line-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 0%;
+      background: linear-gradient(180deg, var(--sj-coral), var(--sj-gold));
+      border-radius: 2px;
+      transition: height 0.1s linear;
+    }
+  }
+
+  /* Step row */
+  .sj-step {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 28px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .sj-step.sj-step--visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .sj-step:last-child {
+    margin-bottom: 0;
+  }
+
+  .sj-step__text {
+    flex: 1;
+  }
+
+  .sj-step__image-wrap {
+    flex: 1;
+  }
+
+  /* Desktop zigzag */
+  @media (min-width: 769px) {
+    .sj-step {
+      position: relative;
+    }
+
+    .sj-step--left .sj-step__text {
+      order: 1;
+      text-align: right;
+      padding-right: 36px;
+    }
+
+    .sj-step--left .sj-step__node {
+      order: 2;
+    }
+
+    .sj-step--left .sj-step__image-wrap {
+      order: 3;
+      padding-left: 36px;
+    }
+
+    .sj-step--right .sj-step__image-wrap {
+      order: 1;
+      padding-right: 36px;
+    }
+
+    .sj-step--right .sj-step__node {
+      order: 2;
+    }
+
+    .sj-step--right .sj-step__text {
+      order: 3;
+      text-align: left;
+      padding-left: 36px;
+    }
+  }
+
+  .sj-step__node {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--sj-coral);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.2);
+    z-index: 2;
+    position: relative;
+  }
+
+  .sj-step__node svg {
+    width: 20px;
+    height: 20px;
+    stroke: #ffffff;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+  }
+
+  .sj-step__number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--sj-deep-blue);
+    color: #ffffff;
+    font-family: var(--sj-font-heading);
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  @media (min-width: 769px) {
+    .sj-step--left .sj-step__number {
+      margin-left: auto;
+    }
+  }
+
+  .sj-step__label {
+    font-family: var(--sj-font-heading);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--sj-text-dark);
+    margin-bottom: 4px;
+  }
+
+  .sj-step__tag {
+    font-family: var(--sj-font-body);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--sj-coral);
+    margin-bottom: 8px;
+  }
+
+  .sj-step__desc {
+    font-family: var(--sj-font-body);
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--sj-text-medium);
+  }
+
+  .sj-step__img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 10px;
+    display: block;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  .sj-step__img-placeholder {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--sj-text-muted);
+    font-family: var(--sj-font-body);
+    font-size: 14px;
+  }
+
+  /* Mobile: single column */
+  @media (max-width: 768px) {
+    .sj-timeline {
+      padding: 36px 18px;
+    }
+
+    .sj-step {
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .sj-step__text {
+      text-align: left !important;
+      padding: 0 !important;
+    }
+
+    .sj-step__image-wrap {
+      padding: 0 !important;
+    }
+
+    .sj-step__node {
+      width: 48px;
+      height: 48px;
+    }
+
+    .sj-step__node svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .sj-step--left .sj-step__number,
+    .sj-step--right .sj-step__number {
+      margin-left: 0;
+    }
+  }
+
+  /* ---------- FEATURES ---------- */
+
+  .sj-features {
+    padding: 80px 40px;
+    background: var(--sj-bg-white);
+  }
+
+  .sj-features__header {
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto 48px;
+  }
+
+  .sj-features__title {
+    font-family: var(--sj-font-heading);
+    font-size: clamp(24px, 3vw, 34px);
+    font-weight: 700;
+    color: var(--sj-deep-blue);
+    margin-bottom: 16px;
+  }
+
+  .sj-features__divider {
+    width: 60px;
+    height: 4px;
+    background: var(--sj-coral);
+    border-radius: 2px;
+    margin: 0 auto;
+  }
+
+  .sj-features__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .sj-feature-card {
+    background: var(--sj-bg-white);
+    border: 1px solid var(--sj-border);
+    border-top: 4px solid var(--sj-deep-blue);
+    border-radius: 12px;
+    padding: 32px 24px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .sj-feature-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  }
+
+  .sj-feature-card__icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(26, 54, 93, 0.08), rgba(45, 90, 135, 0.12));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .sj-feature-card__icon svg {
+    width: 24px;
+    height: 24px;
+    stroke: var(--sj-deep-blue);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+  }
+
+  .sj-feature-card__title {
+    font-family: var(--sj-font-heading);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--sj-text-dark);
+    margin-bottom: 10px;
+  }
+
+  .sj-feature-card__desc {
+    font-family: var(--sj-font-body);
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--sj-text-medium);
+  }
+
+  @media (max-width: 992px) {
+    .sj-features__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 576px) {
+    .sj-features { padding: 60px 20px; }
+    .sj-features__grid { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- CTA ---------- */
+
+  .sj-cta {
+    position: relative;
+    padding: 80px 40px;
+    background: var(--sj-deep-blue);
+    overflow: hidden;
+  }
+
+  .sj-cta__bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.12;
+  }
+
+  .sj-cta__content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .sj-cta__title {
+    font-family: var(--sj-font-heading);
+    font-size: clamp(26px, 3.5vw, 38px);
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 16px;
+  }
+
+  .sj-cta__text {
+    font-family: var(--sj-font-body);
+    font-size: 16px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 36px;
+  }
+
+  .sj-cta__buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .sj-cta__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--sj-font-heading);
+    font-size: 15px;
+    font-weight: 600;
+    padding: 14px 32px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .sj-cta__btn--primary {
+    background: var(--sj-coral);
+    color: #ffffff;
+    box-shadow: 0 4px 20px rgba(255, 107, 107, 0.35);
+  }
+
+  .sj-cta__btn--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255, 107, 107, 0.45);
+    color: #ffffff;
+  }
+
+  .sj-cta__btn--secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  .sj-cta__btn--secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    color: #ffffff;
+  }
+
+  @media (max-width: 576px) {
+    .sj-cta { padding: 60px 20px; }
+    .sj-cta__buttons { flex-direction: column; }
+    .sj-cta__btn { width: 100%; justify-content: center; }
+  }
+
+  /* ---------- SCROLL REVEAL ---------- */
+
+  .sj-reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .sj-reveal--visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+{% endstyle %}
+
+<div class="sj-root">
+
+  {%- comment -%} ===== HERO ===== {%- endcomment -%}
+  <section class="sj-hero">
+    {%- if section.settings.hero_image != blank -%}
+      <div class="sj-hero__bg" style="background-image: url('{{ section.settings.hero_image | image_url: width: 1920 }}');"></div>
+    {%- endif -%}
+    <div class="sj-hero__overlay"></div>
+
+    <div class="sj-hero__blob sj-hero__blob--1"></div>
+    <div class="sj-hero__blob sj-hero__blob--2"></div>
+    <div class="sj-hero__blob sj-hero__blob--3"></div>
+
+    <div class="sj-hero__content">
+      {%- if section.settings.hero_tagline != blank -%}
+        <div class="sj-hero__pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6z"/><line x1="6" y1="17" x2="18" y2="17"/></svg>
+          {{ section.settings.hero_tagline }}
+        </div>
+      {%- endif -%}
+
+      <h1 class="sj-hero__title">
+        {{ section.settings.hero_title_before }}
+        <span class="sj-grad-coral">{{ section.settings.hero_title_highlight_1 }}</span>
+        {{ section.settings.hero_title_middle }}
+        <span class="sj-grad-gold">{{ section.settings.hero_title_highlight_2 }}</span>
+      </h1>
+
+      {%- if section.settings.hero_subtitle != blank -%}
+        <p class="sj-hero__subtitle">{{ section.settings.hero_subtitle }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.hero_cta_text != blank -%}
+        <a href="{{ section.settings.hero_cta_url }}" class="sj-hero__cta">
+          {{ section.settings.hero_cta_text }}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+        </a>
+      {%- endif -%}
+    </div>
+  </section>
+
+  {%- comment -%} ===== TIMELINE ===== {%- endcomment -%}
+  {%- assign step_blocks = section.blocks | where: 'type', 'step' -%}
+  {%- if step_blocks.size > 0 -%}
+    <section class="sj-timeline">
+      <div class="sj-timeline__header sj-reveal">
+        <h2 class="sj-timeline__title">{{ section.settings.timeline_title | default: 'The 7-Step Journey' }}</h2>
+        {%- if section.settings.timeline_subtitle != blank -%}
+          <p class="sj-timeline__subtitle">{{ section.settings.timeline_subtitle }}</p>
+        {%- endif -%}
+      </div>
+
+      <div class="sj-timeline__track" id="sj-timeline-track">
+        <div class="sj-timeline__line">
+          <div class="sj-timeline__line-fill" id="sj-line-fill"></div>
+        </div>
+
+        {%- for block in step_blocks -%}
+          {%- assign step_num = forloop.index -%}
+          {%- assign is_odd = step_num | modulo: 2 -%}
+          <div class="sj-step {% if is_odd == 1 %}sj-step--left{% else %}sj-step--right{% endif %}" {{ block.shopify_attributes }}>
+            <div class="sj-step__text">
+              <div class="sj-step__number">{{ step_num }}</div>
+              <h3 class="sj-step__label">{{ block.settings.title }}</h3>
+              {%- if block.settings.subtitle != blank -%}
+                <p class="sj-step__tag">{{ block.settings.subtitle }}</p>
+              {%- endif -%}
+              {%- if block.settings.description != blank -%}
+                <p class="sj-step__desc">{{ block.settings.description }}</p>
+              {%- endif -%}
+            </div>
+
+            <div class="sj-step__node">
+              {%- case block.settings.icon -%}
+                {%- when 'pentool' -%}
+                  <svg viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+                {%- when 'users' -%}
+                  <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                {%- when 'dollar' -%}
+                  <svg viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                {%- when 'truck' -%}
+                  <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                {%- when 'wrench' -%}
+                  <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                {%- when 'clipboard' -%}
+                  <svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 14l2 2 4-4"/></svg>
+                {%- when 'party' -%}
+                  <svg viewBox="0 0 24 24"><path d="M5.8 11.3L2 22l10.7-3.79"/><path d="M4 3h.01"/><path d="M22 8h.01"/><path d="M15 2h.01"/><path d="M22 20h.01"/><path d="M22 2l-2.24.75a1 1 0 0 0-.48.4l-1.93 3.23a1 1 0 0 1-.73.5l-3.2.52a1 1 0 0 0-.72.58L11 12l4.87 3.42a1 1 0 0 0 .73.14l3.19-.8a1 1 0 0 1 .79.15l2.77 2.09"/></svg>
+                {%- when 'shield' -%}
+                  <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                {%- when 'tag' -%}
+                  <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                {%- when 'handshake' -%}
+                  <svg viewBox="0 0 24 24"><path d="M11 17a1 1 0 0 1-1 1H6l-4-4 3-3 4 4h2m4-4l4 4-3 3-4-4"/><path d="M14 7a1 1 0 0 1 1-1h4l4 4-3 3-4-4h-2"/></svg>
+                {%- else -%}
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg>
+              {%- endcase -%}
+            </div>
+
+            <div class="sj-step__image-wrap">
+              {%- if block.settings.image != blank -%}
+                <img
+                  class="sj-step__img"
+                  src="{{ block.settings.image | image_url: width: 700 }}"
+                  alt="{{ block.settings.title | escape }}"
+                  loading="lazy"
+                  width="700"
+                  height="438"
+                >
+              {%- elsif block.settings.default_image_url != blank -%}
+                <img
+                  class="sj-step__img"
+                  src="{{ block.settings.default_image_url }}"
+                  alt="{{ block.settings.title | escape }}"
+                  loading="lazy"
+                  width="700"
+                  height="438"
+                >
+              {%- else -%}
+                <div class="sj-step__img-placeholder">
+                  {{ block.settings.title | default: 'Step image' }}
+                </div>
+              {%- endif -%}
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+    </section>
+  {%- endif -%}
+
+  {%- comment -%} ===== FEATURES ===== {%- endcomment -%}
+  {%- assign feature_blocks = section.blocks | where: 'type', 'feature' -%}
+  {%- if feature_blocks.size > 0 -%}
+    <section class="sj-features">
+      <div class="sj-features__header sj-reveal">
+        <h2 class="sj-features__title">{{ section.settings.features_title | default: 'Building Successful Restaurants Together!' }}</h2>
+        <div class="sj-features__divider"></div>
+      </div>
+
+      <div class="sj-features__grid">
+        {%- for block in feature_blocks -%}
+          <div class="sj-feature-card sj-reveal" {{ block.shopify_attributes }}>
+            <div class="sj-feature-card__icon">
+              {%- case block.settings.icon -%}
+                {%- when 'shield' -%}
+                  <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                {%- when 'truck' -%}
+                  <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                {%- when 'tag' -%}
+                  <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                {%- when 'handshake' -%}
+                  <svg viewBox="0 0 24 24"><path d="M11 17a1 1 0 0 1-1 1H6l-4-4 3-3 4 4h2m4-4l4 4-3 3-4-4"/><path d="M14 7a1 1 0 0 1 1-1h4l4 4-3 3-4-4h-2"/></svg>
+                {%- when 'pentool' -%}
+                  <svg viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+                {%- when 'users' -%}
+                  <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                {%- when 'dollar' -%}
+                  <svg viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                {%- when 'wrench' -%}
+                  <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                {%- when 'clipboard' -%}
+                  <svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 14l2 2 4-4"/></svg>
+                {%- when 'party' -%}
+                  <svg viewBox="0 0 24 24"><path d="M5.8 11.3L2 22l10.7-3.79"/><path d="M4 3h.01"/><path d="M22 8h.01"/><path d="M15 2h.01"/><path d="M22 20h.01"/><path d="M22 2l-2.24.75a1 1 0 0 0-.48.4l-1.93 3.23a1 1 0 0 1-.73.5l-3.2.52a1 1 0 0 0-.72.58L11 12l4.87 3.42a1 1 0 0 0 .73.14l3.19-.8a1 1 0 0 1 .79.15l2.77 2.09"/></svg>
+                {%- else -%}
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg>
+              {%- endcase -%}
+            </div>
+            <h3 class="sj-feature-card__title">{{ block.settings.title }}</h3>
+            <p class="sj-feature-card__desc">{{ block.settings.description }}</p>
+          </div>
+        {%- endfor -%}
+      </div>
+    </section>
+  {%- endif -%}
+
+  {%- comment -%} ===== CTA ===== {%- endcomment -%}
+  <section class="sj-cta">
+    {%- if section.settings.cta_bg_image != blank -%}
+      <div class="sj-cta__bg" style="background-image: url('{{ section.settings.cta_bg_image | image_url: width: 1920 }}');"></div>
+    {%- endif -%}
+
+    <div class="sj-cta__content sj-reveal">
+      <h2 class="sj-cta__title">{{ section.settings.cta_title | default: 'Ready to Build Your Dream Kitchen?' }}</h2>
+      {%- if section.settings.cta_text != blank -%}
+        <p class="sj-cta__text">{{ section.settings.cta_text }}</p>
+      {%- endif -%}
+
+      <div class="sj-cta__buttons">
+        {%- if section.settings.cta_primary_text != blank -%}
+          <a href="{{ section.settings.cta_primary_url }}" class="sj-cta__btn sj-cta__btn--primary">
+            {{ section.settings.cta_primary_text }}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+          </a>
+        {%- endif -%}
+        {%- if section.settings.cta_secondary_text != blank -%}
+          <a href="{{ section.settings.cta_secondary_url }}" class="sj-cta__btn sj-cta__btn--secondary">
+            {{ section.settings.cta_secondary_text }}
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+  </section>
+
+</div>
+
+{%- comment -%} ===== JAVASCRIPT — Scroll reveal + timeline progress ===== {%- endcomment -%}
+<script>
+  (function() {
+    /* Scroll reveal for .sj-reveal elements */
+    var revealEls = document.querySelectorAll('.sj-reveal');
+    var stepEls = document.querySelectorAll('.sj-step');
+
+    if ('IntersectionObserver' in window) {
+      var revealObs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('sj-reveal--visible');
+            revealObs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+
+      revealEls.forEach(function(el) { revealObs.observe(el); });
+
+      var stepObs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('sj-step--visible');
+            stepObs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.2 });
+
+      stepEls.forEach(function(el) { stepObs.observe(el); });
+    } else {
+      /* Fallback: show everything */
+      revealEls.forEach(function(el) { el.classList.add('sj-reveal--visible'); });
+      stepEls.forEach(function(el) { el.classList.add('sj-step--visible'); });
+    }
+
+    /* Timeline line fill on scroll */
+    var track = document.getElementById('sj-timeline-track');
+    var fill  = document.getElementById('sj-line-fill');
+    if (track && fill) {
+      var ticking = false;
+      function updateLine() {
+        var rect = track.getBoundingClientRect();
+        var viewH = window.innerHeight;
+        /* How far into the track the viewport center has progressed */
+        var scrolled = (viewH * 0.6) - rect.top;
+        var pct = Math.min(Math.max(scrolled / rect.height * 100, 0), 100);
+        fill.style.height = pct + '%';
+        ticking = false;
+      }
+      window.addEventListener('scroll', function() {
+        if (!ticking) {
+          requestAnimationFrame(updateLine);
+          ticking = true;
+        }
+      }, { passive: true });
+      updateLine();
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Service Journey",
+  "tag": "section",
+  "class": "sj-section-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Hero"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero Background Image"
+    },
+    {
+      "type": "text",
+      "id": "hero_tagline",
+      "label": "Tagline Pill",
+      "default": "Restaurant Equipment Solutions"
+    },
+    {
+      "type": "text",
+      "id": "hero_title_before",
+      "label": "Title — Before Highlight 1",
+      "default": "Your Partner From"
+    },
+    {
+      "type": "text",
+      "id": "hero_title_highlight_1",
+      "label": "Title — Highlight 1 (coral gradient)",
+      "default": "Design"
+    },
+    {
+      "type": "text",
+      "id": "hero_title_middle",
+      "label": "Title — Between Highlights",
+      "default": "to"
+    },
+    {
+      "type": "text",
+      "id": "hero_title_highlight_2",
+      "label": "Title — Highlight 2 (gold gradient)",
+      "default": "Grand Opening"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_subtitle",
+      "label": "Subtitle",
+      "default": "We guide restaurant owners through every step — from initial design and equipment selection to installation, inspection, and your grand opening day."
+    },
+    {
+      "type": "text",
+      "id": "hero_cta_text",
+      "label": "CTA Button Text",
+      "default": "Start Your Journey"
+    },
+    {
+      "type": "url",
+      "id": "hero_cta_url",
+      "label": "CTA Button URL"
+    },
+    {
+      "type": "header",
+      "content": "Timeline"
+    },
+    {
+      "type": "text",
+      "id": "timeline_title",
+      "label": "Timeline Section Title",
+      "default": "The 7-Step Journey"
+    },
+    {
+      "type": "textarea",
+      "id": "timeline_subtitle",
+      "label": "Timeline Section Subtitle",
+      "default": "From concept to grand opening, we walk with you through every critical phase of building your restaurant."
+    },
+    {
+      "type": "header",
+      "content": "Features"
+    },
+    {
+      "type": "text",
+      "id": "features_title",
+      "label": "Features Section Title",
+      "default": "Building Successful Restaurants Together!"
+    },
+    {
+      "type": "header",
+      "content": "Bottom CTA"
+    },
+    {
+      "type": "image_picker",
+      "id": "cta_bg_image",
+      "label": "CTA Background Image"
+    },
+    {
+      "type": "text",
+      "id": "cta_title",
+      "label": "CTA Headline",
+      "default": "Ready to Build Your Dream Kitchen?"
+    },
+    {
+      "type": "textarea",
+      "id": "cta_text",
+      "label": "CTA Subtitle",
+      "default": "Let our team of experts guide you from the very first blueprint to your grand opening day. Your success is our mission."
+    },
+    {
+      "type": "text",
+      "id": "cta_primary_text",
+      "label": "Primary Button Text",
+      "default": "Get Started Today"
+    },
+    {
+      "type": "url",
+      "id": "cta_primary_url",
+      "label": "Primary Button URL"
+    },
+    {
+      "type": "text",
+      "id": "cta_secondary_text",
+      "label": "Secondary Button Text",
+      "default": "View Our Portfolio"
+    },
+    {
+      "type": "url",
+      "id": "cta_secondary_url",
+      "label": "Secondary Button URL"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Journey Step",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Step Title",
+          "default": "Step Title"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Step Subtitle (uppercase tag)",
+          "default": "Subtitle Tag"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Step Description",
+          "default": "Description text for this step."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Step Image (16:10 recommended)"
+        },
+        {
+          "type": "url",
+          "id": "default_image_url",
+          "label": "Default Image URL (fallback if no image uploaded)"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Timeline Icon",
+          "default": "pentool",
+          "options": [
+            { "value": "pentool", "label": "Pen Tool (Design)" },
+            { "value": "users", "label": "Users (Consult)" },
+            { "value": "dollar", "label": "Dollar (Pricing)" },
+            { "value": "truck", "label": "Truck (Delivery)" },
+            { "value": "wrench", "label": "Wrench (Install)" },
+            { "value": "clipboard", "label": "Clipboard (Inspect)" },
+            { "value": "party", "label": "Party (Opening)" },
+            { "value": "shield", "label": "Shield" },
+            { "value": "tag", "label": "Tag" },
+            { "value": "handshake", "label": "Handshake" }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "feature",
+      "name": "Feature Card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Feature Title",
+          "default": "Feature Title"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Feature Description",
+          "default": "Feature description text."
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "default": "shield",
+          "options": [
+            { "value": "shield", "label": "Shield (Quality)" },
+            { "value": "truck", "label": "Truck (Delivery)" },
+            { "value": "tag", "label": "Tag (Pricing)" },
+            { "value": "handshake", "label": "Handshake (Support)" },
+            { "value": "pentool", "label": "Pen Tool" },
+            { "value": "users", "label": "Users" },
+            { "value": "dollar", "label": "Dollar" },
+            { "value": "wrench", "label": "Wrench" },
+            { "value": "clipboard", "label": "Clipboard" },
+            { "value": "party", "label": "Party" }
+          ]
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Service Journey",
+      "blocks": [
+        {
+          "type": "step",
+          "settings": {
+            "title": "Design & Planning",
+            "subtitle": "Kitchen Layout \u2022 Workflow \u2022 Budgeting",
+            "description": "We start with a comprehensive analysis of your space. Our experts create optimized kitchen layouts that maximize workflow efficiency while strictly adhering to your budgetary requirements.",
+            "icon": "pentool"
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Consult & Select Right Products",
+            "subtitle": "Expert Guidance \u2022 Custom Solutions",
+            "description": "Navigate our extensive catalog with expert guidance. We help you select the perfect commercial-grade equipment tailored to your specific menu, volume, and operational needs.",
+            "icon": "users"
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Best Pricing & Order Placement",
+            "subtitle": "Competitive Pricing \u2022 Bulk Sourcing",
+            "description": "Leverage our industry relationships and bulk sourcing capabilities. We ensure you get the most competitive pricing on top-tier restaurant equipment.",
+            "icon": "dollar"
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Equipment Delivery",
+            "subtitle": "(On Schedule)",
+            "description": "Time is money. We coordinate precise, on-schedule deliveries to your location, ensuring your equipment arrives safely and exactly when your project timeline demands it.",
+            "icon": "truck"
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Installation & Setup",
+            "subtitle": "Professional Installation & Testing",
+            "description": "Our certified professionals handle the heavy lifting. We provide complete installation, calibration, and rigorous testing of all equipment to ensure peak performance from day one.",
+            "icon": "wrench"
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Final Inspection & Approvals",
+            "subtitle": "Compliance \u2022 Health \u2022 Fire Safety",
+            "description": "We stand by you through the red tape. Our team assists with final compliance checks, ensuring your kitchen meets all health, safety, and fire department regulations.",
+            "icon": "clipboard"
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Grand Opening & Serving Customers",
+            "subtitle": "Your Kitchen is Ready to Serve!",
+            "description": "The moment of truth. With a fully equipped, optimized, and approved kitchen, you are ready to open your doors and celebrate your success.",
+            "icon": "party"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "title": "Quality Products",
+            "description": "We source only top-tier, commercial-grade equipment built to withstand the rigorous demands of a professional kitchen environment.",
+            "icon": "shield"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "title": "On-Time Delivery",
+            "description": "Your opening schedule is our priority. We coordinate logistics meticulously to ensure your equipment arrives exactly when needed.",
+            "icon": "truck"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "title": "Best Pricing",
+            "description": "Through our extensive network and bulk purchasing power, we secure the most competitive rates in the industry for your project.",
+            "icon": "tag"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "title": "Full Project Support",
+            "description": "From the first blueprint to the final health inspection, you have a dedicated team of experts ensuring your success.",
+            "icon": "handshake"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

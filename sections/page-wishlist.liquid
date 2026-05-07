@@ -1,0 +1,1030 @@
+{% comment %}
+  Celebrate Festival - Professional Wishlist Page
+  Matches the cart page design aesthetic with CF brand styling
+{% endcomment %}
+
+{{ 'wishlist.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'wishlist.js' | asset_url }}" defer></script>
+
+{%- style -%}
+  /* CF Brand Colors */
+  :root {
+    --cf-deep-blue: #1a365d;
+    --cf-navy: #2d5a87;
+    --cf-coral: #ff6b6b;
+    --cf-gold: #d4af37;
+    --cf-success: #10b981;
+    --cf-text-dark: #0f172a;
+    --cf-text-medium: #475569;
+    --cf-text-light: #64748b;
+    --cf-text-muted: #94a3b8;
+    --cf-border: #e2e8f0;
+    --cf-bg-light: #f8fafc;
+    --cf-bg-white: #ffffff;
+    --cf-navy-hover: #3d6a9f;
+  }
+
+  /* Wishlist Page Container */
+  .cf-wishlist-page {
+    background: var(--cf-bg-light);
+    min-height: 60vh;
+    padding: 0 0 60px;
+  }
+
+  .cf-wishlist-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* Breadcrumb */
+  .cf-wishlist-breadcrumb {
+    padding: 16px 0;
+    font-size: 13px;
+    color: var(--cf-text-light);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cf-wishlist-breadcrumb a {
+    color: var(--cf-navy);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .cf-wishlist-breadcrumb a:hover {
+    color: var(--cf-coral);
+  }
+
+  .cf-wishlist-breadcrumb span {
+    color: var(--cf-text-muted);
+  }
+
+  /* Page Header */
+  .cf-wishlist-header {
+    background: linear-gradient(135deg, var(--cf-deep-blue) 0%, #0f172a 100%);
+    padding: 40px;
+    border-radius: 16px;
+    margin-bottom: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cf-wishlist-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,107,107,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cf-wishlist-header::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: 20%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(45,90,135,0.2) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cf-wishlist-header-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .cf-wishlist-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 0 0 8px;
+  }
+
+  .cf-wishlist-title svg {
+    color: var(--cf-coral);
+    filter: drop-shadow(0 2px 4px rgba(255,107,107,0.3));
+  }
+
+  .cf-wishlist-count-badge {
+    background: var(--cf-coral);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    margin-left: 8px;
+  }
+
+  .cf-wishlist-subtitle {
+    color: rgba(255,255,255,0.7);
+    font-size: 15px;
+    margin: 0;
+  }
+
+  .cf-wishlist-header-actions {
+    display: flex;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cf-wishlist-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    border: none;
+  }
+
+  .cf-wishlist-btn-primary {
+    background: var(--cf-coral);
+    color: white;
+  }
+
+  .cf-wishlist-btn-primary:hover {
+    background: #ff5252;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255,107,107,0.4);
+  }
+
+  .cf-wishlist-btn-outline {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: 2px solid rgba(255,255,255,0.3);
+  }
+
+  .cf-wishlist-btn-outline:hover {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.5);
+  }
+
+  /* Stats Bar */
+  .cf-wishlist-stats {
+    display: flex;
+    gap: 32px;
+    margin-bottom: 24px;
+    padding: 20px 24px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid var(--cf-border);
+  }
+
+  .cf-wishlist-stat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .cf-wishlist-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }
+
+  .cf-wishlist-stat-icon.items {
+    background: linear-gradient(135deg, var(--cf-coral) 0%, #ff5252 100%);
+  }
+
+  .cf-wishlist-stat-icon.value {
+    background: linear-gradient(135deg, var(--cf-navy) 0%, var(--cf-deep-blue) 100%);
+  }
+
+  .cf-wishlist-stat-icon.savings {
+    background: linear-gradient(135deg, var(--cf-success) 0%, #059669 100%);
+  }
+
+  .cf-wishlist-stat-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cf-wishlist-stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--cf-text-dark);
+    line-height: 1.2;
+  }
+
+  .cf-wishlist-stat-label {
+    font-size: 12px;
+    color: var(--cf-text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Grid Layout */
+  .cf-wishlist-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .cf-wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+  /* Product Card */
+  .cf-wishlist-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--cf-border);
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .cf-wishlist-card:hover {
+    border-color: var(--cf-navy);
+    box-shadow: 0 12px 32px rgba(26,54,93,0.12);
+    transform: translateY(-4px);
+  }
+
+  .cf-wishlist-card-image {
+    position: relative;
+    aspect-ratio: 1;
+    background: var(--cf-bg-light);
+    overflow: hidden;
+  }
+
+  .cf-wishlist-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 16px;
+    transition: transform 0.4s ease;
+  }
+
+  .cf-wishlist-card:hover .cf-wishlist-card-image img {
+    transform: scale(1.05);
+  }
+
+  .cf-wishlist-card-remove {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+    color: var(--cf-text-light);
+    z-index: 2;
+  }
+
+  .cf-wishlist-card-remove:hover {
+    background: #fee2e2;
+    color: #ef4444;
+    transform: scale(1.1);
+  }
+
+  .cf-wishlist-card-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: var(--cf-coral);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 2;
+  }
+
+  .cf-wishlist-card-content {
+    padding: 20px;
+  }
+
+  .cf-wishlist-card-vendor {
+    font-size: 11px;
+    color: var(--cf-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+
+  .cf-wishlist-card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--cf-deep-blue);
+    margin: 0 0 12px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 42px;
+  }
+
+  .cf-wishlist-card-title a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .cf-wishlist-card-title a:hover {
+    color: var(--cf-coral);
+  }
+
+  /* Price Box */
+  .cf-wishlist-card-price {
+    background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+    border: 1px solid rgba(45,90,135,0.15);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  .cf-wishlist-card-price-label {
+    font-size: 11px;
+    color: var(--cf-navy);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .cf-wishlist-card-price-current {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--cf-coral);
+    display: block;
+  }
+
+  .cf-wishlist-card-price-compare {
+    font-size: 13px;
+    color: var(--cf-text-muted);
+    text-decoration: line-through;
+    margin-top: 2px;
+  }
+
+  .cf-wishlist-card-savings {
+    display: inline-block;
+    background: rgba(16,185,129,0.1);
+    color: var(--cf-success);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-top: 6px;
+  }
+
+  /* Financing Section */
+  .cf-wishlist-card-financing {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+
+  .cf-wishlist-card-financing-icon {
+    width: 20px;
+    height: 20px;
+    color: #b45309;
+    flex-shrink: 0;
+  }
+
+  .cf-wishlist-card-financing-text {
+    font-size: 11px;
+    color: #92400e;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .cf-wishlist-card-financing-badge {
+    background: #b45309;
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  /* Card Actions */
+  .cf-wishlist-card-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .cf-wishlist-card-view {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--cf-navy);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .cf-wishlist-card-view:hover {
+    background: var(--cf-deep-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(45,90,135,0.3);
+  }
+
+  .cf-wishlist-card-cart {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--cf-coral);
+    color: white;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .cf-wishlist-card-cart:hover {
+    background: #ff5252;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255,107,107,0.3);
+  }
+
+  /* Empty State */
+  .cf-wishlist-empty {
+    background: white;
+    border-radius: 16px;
+    padding: 80px 40px;
+    text-align: center;
+    border: 1px solid var(--cf-border);
+  }
+
+  .cf-wishlist-empty-icon {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 24px;
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--cf-coral);
+  }
+
+  .cf-wishlist-empty-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--cf-deep-blue);
+    margin: 0 0 12px;
+  }
+
+  .cf-wishlist-empty-text {
+    font-size: 16px;
+    color: var(--cf-text-light);
+    max-width: 400px;
+    margin: 0 auto 32px;
+    line-height: 1.6;
+  }
+
+  .cf-wishlist-empty-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .cf-wishlist-empty-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .cf-wishlist-empty-btn-primary {
+    background: var(--cf-coral);
+    color: white;
+  }
+
+  .cf-wishlist-empty-btn-primary:hover {
+    background: #ff5252;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255,107,107,0.4);
+  }
+
+  .cf-wishlist-empty-btn-secondary {
+    background: var(--cf-bg-light);
+    color: var(--cf-navy);
+    border: 1px solid var(--cf-border);
+  }
+
+  .cf-wishlist-empty-btn-secondary:hover {
+    background: white;
+    border-color: var(--cf-navy);
+  }
+
+  /* Recently Viewed Section */
+  .cf-wishlist-recently {
+    margin-top: 48px;
+    padding-top: 48px;
+    border-top: 1px solid var(--cf-border);
+  }
+
+  .cf-wishlist-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .cf-wishlist-section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--cf-deep-blue);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+  }
+
+  .cf-wishlist-section-title::before {
+    content: '';
+    width: 4px;
+    height: 28px;
+    background: linear-gradient(180deg, var(--cf-coral) 0%, var(--cf-navy) 100%);
+    border-radius: 2px;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .cf-wishlist-container {
+      padding: 0 24px;
+    }
+
+    .cf-wishlist-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 32px;
+    }
+
+    .cf-wishlist-stats {
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .cf-wishlist-grid {
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .cf-wishlist-container {
+      padding: 0 16px;
+    }
+
+    .cf-wishlist-header {
+      padding: 24px;
+      border-radius: 12px;
+    }
+
+    .cf-wishlist-title {
+      font-size: 26px;
+    }
+
+    .cf-wishlist-header-actions {
+      width: 100%;
+      flex-direction: column;
+    }
+
+    .cf-wishlist-btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .cf-wishlist-stats {
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .cf-wishlist-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .cf-wishlist-card-content {
+      padding: 14px;
+    }
+
+    .cf-wishlist-card-title {
+      font-size: 13px;
+      min-height: 36px;
+    }
+
+    .cf-wishlist-card-price {
+      padding: 10px;
+    }
+
+    .cf-wishlist-card-price-current {
+      font-size: 18px;
+    }
+
+    .cf-wishlist-card-actions {
+      flex-direction: column;
+    }
+
+    .cf-wishlist-card-cart {
+      width: 100%;
+    }
+
+    .cf-wishlist-empty {
+      padding: 48px 20px;
+    }
+
+    .cf-wishlist-empty-actions {
+      flex-direction: column;
+    }
+  }
+{%- endstyle -%}
+
+<div class="cf-wishlist-page">
+  <div class="cf-wishlist-container">
+    <!-- Breadcrumb -->
+    <nav class="cf-wishlist-breadcrumb">
+      <a href="/">Home</a>
+      <span>›</span>
+      <span>My Wishlist</span>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="cf-wishlist-header">
+      <div class="cf-wishlist-header-content">
+        <h1 class="cf-wishlist-title">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+          My Wishlist
+          <span class="cf-wishlist-count-badge" data-wishlist-count>0</span>
+        </h1>
+        <p class="cf-wishlist-subtitle">{{ section.settings.subtitle | default: "Products you've saved for later" }}</p>
+      </div>
+      <div class="cf-wishlist-header-actions">
+        <a href="/collections/all" class="cf-wishlist-btn cf-wishlist-btn-outline">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Continue Shopping
+        </a>
+        <button type="button" class="cf-wishlist-btn cf-wishlist-btn-primary" onclick="CelebrateFestivalWishlist.clearWishlist()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Clear All
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="cf-wishlist-stats" id="wishlist-stats" style="display: none;">
+      <div class="cf-wishlist-stat">
+        <div class="cf-wishlist-stat-icon items">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        </div>
+        <div class="cf-wishlist-stat-content">
+          <span class="cf-wishlist-stat-value" id="stat-items">0</span>
+          <span class="cf-wishlist-stat-label">Saved Items</span>
+        </div>
+      </div>
+      <div class="cf-wishlist-stat">
+        <div class="cf-wishlist-stat-icon value">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
+        <div class="cf-wishlist-stat-content">
+          <span class="cf-wishlist-stat-value" id="stat-value">$0.00</span>
+          <span class="cf-wishlist-stat-label">Total Value</span>
+        </div>
+      </div>
+      <div class="cf-wishlist-stat">
+        <div class="cf-wishlist-stat-icon savings">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+          </svg>
+        </div>
+        <div class="cf-wishlist-stat-content">
+          <span class="cf-wishlist-stat-value" id="stat-savings">$0.00</span>
+          <span class="cf-wishlist-stat-label">Potential Savings</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wishlist Content -->
+    <div class="cf-wishlist-content">
+      <!-- Wishlist Grid (populated by JavaScript) -->
+      <div id="wishlist-grid" class="cf-wishlist-grid"></div>
+
+      <!-- Empty State -->
+      <div id="wishlist-empty" class="cf-wishlist-empty" style="display: none;">
+        <div class="cf-wishlist-empty-icon">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+        </div>
+        <h2 class="cf-wishlist-empty-title">{{ section.settings.empty_title | default: "Your Wishlist is Empty" }}</h2>
+        <p class="cf-wishlist-empty-text">{{ section.settings.empty_text | default: "Start adding products you love by clicking the heart icon on any product. They'll be saved here for you to purchase later." }}</p>
+        <div class="cf-wishlist-empty-actions">
+          <a href="{{ section.settings.empty_button_link | default: '/collections/all' }}" class="cf-wishlist-empty-btn cf-wishlist-empty-btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            {{ section.settings.empty_button_text | default: "Start Shopping" }}
+          </a>
+          <a href="/collections" class="cf-wishlist-empty-btn cf-wishlist-empty-btn-secondary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            Browse Collections
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  renderWishlist();
+
+  // Re-render on storage change
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'cf_wishlist') {
+      renderWishlist();
+    }
+  });
+
+  // Get WSH bridge price cache
+  function getWshPriceCache() {
+    try {
+      var data = sessionStorage.getItem('wpd_bridge_prices');
+      return data ? JSON.parse(data) : {};
+    } catch (e) { return {}; }
+  }
+
+  // Format price with commas
+  function formatPrice(cents) {
+    var dollars = (cents / 100).toFixed(2);
+    return '$' + dollars.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  function renderWishlist() {
+    const wishlist = CelebrateFestivalWishlist.getWishlist();
+    const grid = document.getElementById('wishlist-grid');
+    const empty = document.getElementById('wishlist-empty');
+    const stats = document.getElementById('wishlist-stats');
+    const statItems = document.getElementById('stat-items');
+    const statValue = document.getElementById('stat-value');
+    const statSavings = document.getElementById('stat-savings');
+
+    // Update count badges
+    document.querySelectorAll('[data-wishlist-count]').forEach(el => {
+      el.textContent = wishlist.length;
+    });
+
+    if (wishlist.length === 0) {
+      grid.style.display = 'none';
+      empty.style.display = 'block';
+      stats.style.display = 'none';
+      return;
+    }
+
+    grid.style.display = 'grid';
+    empty.style.display = 'none';
+    stats.style.display = 'flex';
+
+    // Get WSH price cache for corrections
+    const wshCache = getWshPriceCache();
+
+    let totalValue = 0;
+    let totalSavings = 0;
+
+    const cards = wishlist.map(item => {
+      // Check if we have a cached WSH price for this item's variant
+      let memberPrice = null;
+      let retailPrice = null;
+      let hasWshPrice = false;
+
+      // Try to find cached price by variantId
+      if (item.variantId && wshCache[item.variantId]) {
+        const cached = wshCache[item.variantId];
+        memberPrice = cached.m;
+        retailPrice = cached.r;
+        hasWshPrice = true;
+      }
+
+      // Fallback to stored prices
+      if (!hasWshPrice) {
+        memberPrice = item.price || 0;
+        retailPrice = (item.comparePrice && item.comparePrice > item.price) ? item.comparePrice : null;
+      }
+
+      // Calculate stats
+      totalValue += memberPrice;
+      if (retailPrice && retailPrice > memberPrice) {
+        totalSavings += (retailPrice - memberPrice);
+      }
+
+      // Build price HTML
+      let priceHtml = '';
+      let savingsHtml = '';
+
+      if (retailPrice && retailPrice > memberPrice) {
+        const savings = retailPrice - memberPrice;
+        priceHtml = `
+          <span class="cf-wishlist-card-price-label">Member Price</span>
+          <span class="cf-wishlist-card-price-current">${formatPrice(memberPrice)}</span>
+          <span class="cf-wishlist-card-price-compare">Was ${formatPrice(retailPrice)}</span>
+          <span class="cf-wishlist-card-savings">Save ${formatPrice(savings)}</span>
+        `;
+      } else {
+        priceHtml = `
+          <span class="cf-wishlist-card-price-label">Price</span>
+          <span class="cf-wishlist-card-price-current">${formatPrice(memberPrice)}</span>
+        `;
+      }
+
+      return `
+        <div class="cf-wishlist-card" data-product-id="${item.id}" data-variant-id="${item.variantId || ''}">
+          <div class="cf-wishlist-card-image">
+            ${hasWshPrice ? '<span class="cf-wishlist-card-badge">Member Price</span>' : ''}
+            <button
+              type="button"
+              class="cf-wishlist-card-remove"
+              onclick="CelebrateFestivalWishlist.removeFromWishlist(${item.id}); renderWishlist();"
+              aria-label="Remove from wishlist"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+            <img src="${item.image || '/cdn/shop/t/1/assets/placeholder.svg'}"
+                 alt="${item.title}"
+                 loading="lazy">
+          </div>
+          <div class="cf-wishlist-card-content">
+            <h3 class="cf-wishlist-card-title">
+              <a href="${item.url}">${item.title}</a>
+            </h3>
+            <div class="cf-wishlist-card-price">
+              ${priceHtml}
+            </div>
+            <div class="cf-wishlist-card-financing">
+              <svg class="cf-wishlist-card-financing-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                <line x1="1" y1="10" x2="23" y2="10"></line>
+              </svg>
+              <span class="cf-wishlist-card-financing-text">Financing Available</span>
+              <span class="cf-wishlist-card-financing-badge">Coming Soon</span>
+            </div>
+            <div class="cf-wishlist-card-actions">
+              <a href="${item.url}" class="cf-wishlist-card-view">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                View Product
+              </a>
+              <button type="button" class="cf-wishlist-card-cart" onclick="window.location.href='${item.url}'" aria-label="Add to cart">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="9" cy="21" r="1"></circle>
+                  <circle cx="20" cy="21" r="1"></circle>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    grid.innerHTML = cards;
+
+    // Update stats
+    statItems.textContent = wishlist.length;
+    statValue.textContent = formatPrice(totalValue);
+    statSavings.textContent = formatPrice(totalSavings);
+  }
+
+  // Make renderWishlist available globally
+  window.renderWishlist = renderWishlist;
+});
+</script>
+
+{% schema %}
+{
+  "name": "Wishlist Page",
+  "class": "cf-wishlist-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Page Content"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Products you've saved for later"
+    },
+    {
+      "type": "header",
+      "content": "Empty State"
+    },
+    {
+      "type": "text",
+      "id": "empty_title",
+      "label": "Empty Title",
+      "default": "Your Wishlist is Empty"
+    },
+    {
+      "type": "textarea",
+      "id": "empty_text",
+      "label": "Empty Description",
+      "default": "Start adding products you love by clicking the heart icon on any product. They'll be saved here for you to purchase later."
+    },
+    {
+      "type": "text",
+      "id": "empty_button_text",
+      "label": "Empty Button Text",
+      "default": "Start Shopping"
+    },
+    {
+      "type": "url",
+      "id": "empty_button_link",
+      "label": "Empty Button Link",
+      "default": "/collections/all"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Wishlist Page"
+    }
+  ]
+}
+{% endschema %}

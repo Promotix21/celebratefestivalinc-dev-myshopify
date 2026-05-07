@@ -1,0 +1,101 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "page-cph-premium",
+      "blocks": {
+        "collection_1": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "collection_handle": "",
+            "title": "",
+            "featured": true
+          }
+        },
+        "collection_2": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "collection_handle": "",
+            "title": "",
+            "featured": false
+          }
+        },
+        "collection_3": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "collection_handle": "",
+            "title": "",
+            "featured": false
+          }
+        },
+        "collection_4": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "collection_handle": "",
+            "title": "",
+            "featured": false
+          }
+        },
+        "collection_5": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "collection_handle": "",
+            "title": "",
+            "featured": false
+          }
+        },
+        "collection_6": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "collection_handle": "",
+            "title": "",
+            "featured": false
+          }
+        }
+      },
+      "block_order": [
+        "collection_1",
+        "collection_2",
+        "collection_3",
+        "collection_4",
+        "collection_5",
+        "collection_6"
+      ],
+      "settings": {
+        "hero_title": "Your Premium<br><span>Equipment Hub</span>",
+        "hero_description": "Your exclusive portal for premium restaurant equipment. Browse curated collections at your member-only pricing.",
+        "hero_badge_text": "Premium Member Portal",
+        "hero_greeting": "Welcome back,",
+        "stat_1_value": "50+",
+        "stat_1_label": "Premium Brands",
+        "stat_2_value": "Exclusive",
+        "stat_2_label": "Member-Only Pricing",
+        "stat_3_value": "Free",
+        "stat_3_label": "Shipping on Orders",
+        "stat_4_value": "Priority",
+        "stat_4_label": "Dedicated Support Line",
+        "support_title": "Your Dedicated Premium Line",
+        "support_desc": "As a Premium member, you have priority access to our dedicated support team for orders, quotes, and product inquiries.",
+        "support_phone": "4086739999",
+        "support_phone_display": "(408) 673-9999"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

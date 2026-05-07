@@ -1,0 +1,199 @@
+{
+  "sections": {
+    "main": {
+      "type": "page-resources-hub",
+      "settings": {
+        "hero_title_prefix": "FOOD SERVICE",
+        "hero_title_highlight": "RESOURCES",
+        "hero_subtitle": "Expert tips, buying guides, and industry insights for food service professionals.",
+        "blog_handle": "resources"
+      },
+      "blocks": {
+        "topic_1": {
+          "type": "topic",
+          "settings": {
+            "label": "Restaurant Management",
+            "tag": "restaurant-management"
+          }
+        },
+        "topic_2": {
+          "type": "topic",
+          "settings": {
+            "label": "Bar Management",
+            "tag": "bar-management"
+          }
+        },
+        "topic_3": {
+          "type": "topic",
+          "settings": {
+            "label": "Bakery Management",
+            "tag": "bakery-management"
+          }
+        },
+        "topic_4": {
+          "type": "topic",
+          "settings": {
+            "label": "Food Trucks & Concessions",
+            "tag": "food-trucks-concessions"
+          }
+        },
+        "topic_5": {
+          "type": "topic",
+          "settings": {
+            "label": "Catering Tips",
+            "tag": "catering-tips"
+          }
+        },
+        "topic_6": {
+          "type": "topic",
+          "settings": {
+            "label": "Advertising & Marketing",
+            "tag": "advertising-marketing"
+          }
+        },
+        "topic_7": {
+          "type": "topic",
+          "settings": {
+            "label": "Eco-Friendly Tips",
+            "tag": "eco-friendly-tips"
+          }
+        },
+        "topic_8": {
+          "type": "topic",
+          "settings": {
+            "label": "Facility Layout & Design",
+            "tag": "facility-layout-design"
+          }
+        },
+        "topic_9": {
+          "type": "topic",
+          "settings": {
+            "label": "Industrial",
+            "tag": "industrial"
+          }
+        },
+        "topic_10": {
+          "type": "topic",
+          "settings": {
+            "label": "Troubleshooting Guides",
+            "tag": "troubleshooting-guides"
+          }
+        },
+        "type_1": {
+          "type": "resource_type",
+          "settings": {
+            "label": "In-Depth Articles",
+            "tag": "in-depth-articles"
+          }
+        },
+        "type_2": {
+          "type": "resource_type",
+          "settings": {
+            "label": "Buying Guides",
+            "tag": "buying-guides"
+          }
+        },
+        "type_3": {
+          "type": "resource_type",
+          "settings": {
+            "label": "How-Tos",
+            "tag": "how-tos"
+          }
+        },
+        "type_4": {
+          "type": "resource_type",
+          "settings": {
+            "label": "Product Reviews",
+            "tag": "product-reviews"
+          }
+        },
+        "type_5": {
+          "type": "resource_type",
+          "settings": {
+            "label": "Troubleshooting",
+            "tag": "troubleshooting"
+          }
+        },
+        "type_6": {
+          "type": "resource_type",
+          "settings": {
+            "label": "Parts and Accessories",
+            "tag": "parts-and-accessories"
+          }
+        },
+        "section_1": {
+          "type": "article_section",
+          "settings": {
+            "title": "Recently Published",
+            "tag": "",
+            "count": 3
+          }
+        },
+        "section_2": {
+          "type": "article_section",
+          "settings": {
+            "title": "Restaurant Management",
+            "tag": "restaurant-management",
+            "count": 3
+          }
+        },
+        "section_3": {
+          "type": "article_section",
+          "settings": {
+            "title": "Coffee Shop Tips",
+            "tag": "coffee-shop-tips",
+            "count": 3
+          }
+        },
+        "promo_1": {
+          "type": "promo_widget",
+          "settings": {
+            "icon": "\ud83e\uddee",
+            "title": "Recipe Converter",
+            "description": "Scale your recipes up or down with our free recipe conversion calculator.",
+            "link_text": "Try the Calculator",
+            "link_url": "/pages/recipe-converter",
+            "bg_color": "#f0f9ff"
+          }
+        },
+        "promo_2": {
+          "type": "promo_widget",
+          "settings": {
+            "icon": "\ud83d\udcdd",
+            "title": "Blog",
+            "description": "Stay up to date with the latest food service industry news and trends.",
+            "link_text": "Visit the Blog",
+            "link_url": "/blogs/resources",
+            "bg_color": "#fef3f2"
+          }
+        }
+      },
+      "block_order": [
+        "topic_1",
+        "topic_2",
+        "topic_3",
+        "topic_4",
+        "topic_5",
+        "topic_6",
+        "topic_7",
+        "topic_8",
+        "topic_9",
+        "topic_10",
+        "type_1",
+        "type_2",
+        "type_3",
+        "type_4",
+        "type_5",
+        "type_6",
+        "section_1",
+        "section_2",
+        "section_3",
+        "promo_1",
+        "promo_2"
+      ]
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

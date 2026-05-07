@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your order {{ order.name }} has shipped!</title>
+  <style>
+    @media only screen and (max-width: 600px) {
+      .email-container { width: 100% !important; }
+      .col-half { display: block !important; width: 100% !important; padding: 0 !important; border: none !important; }
+      .col-half + .col-half { border-top: 1px solid #e2e8f0 !important; padding-top: 16px !important; margin-top: 16px !important; }
+      .step-cell { width: 18% !important; }
+      .step-arrow { display: none !important; }
+      .btn-group td { display: block !important; padding: 6px 0 !important; text-align: center !important; }
+      .product-action { display: none !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',Arial,sans-serif;color:#0f172a;">
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f8fafc;padding:24px 0;">
+<tr><td align="center">
+
+<!-- ═══════════════════════════════════════════
+     EMAIL CONTAINER  (max 600px)
+═══════════════════════════════════════════ -->
+<table class="email-container" width="600" cellpadding="0" cellspacing="0" border="0"
+  style="background-color:#ffffff;border-radius:10px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.10);">
+
+
+<!-- ─────────────────────────────────────────
+     HEADER
+───────────────────────────────────────── -->
+<tr>
+  <td style="background:linear-gradient(135deg,#1a365d 0%,#0f172a 100%);padding:28px 40px;text-align:center;">
+    {% if shop.email_logo_url %}
+      <img src="{{ shop.email_logo_url }}" alt="{{ shop.name }}" height="52"
+        style="display:inline-block;margin-bottom:10px;">
+    {% else %}
+      <div style="font-family:'Montserrat',-apple-system,sans-serif;font-size:22px;font-weight:800;
+        color:#ffffff;letter-spacing:0.5px;margin-bottom:4px;">CELEBRATE FESTIVAL INC</div>
+    {% endif %}
+    <div style="font-size:11px;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;">
+      Restaurant Equipment &amp; Supplies
+    </div>
+  </td>
+</tr>
+
+
+<!-- ─────────────────────────────────────────
+     HERO — "Your equipment has shipped!"
+───────────────────────────────────────── -->
+<tr>
+  <td style="background:linear-gradient(135deg,#1a365d 0%,#2d5a87 100%);
+    padding:32px 40px 28px;text-align:center;border-bottom:4px solid #ff6b6b;">
+    <div style="font-size:12px;font-weight:700;color:#ff6b6b;letter-spacing:2px;
+      text-transform:uppercase;margin-bottom:8px;">&#128666;&nbsp; Order {{ order.name }}</div>
+    <div style="font-family:'Montserrat',-apple-system,sans-serif;font-size:28px;font-weight:800;
+      color:#ffffff;margin-bottom:8px;line-height:1.2;">Your equipment has shipped!</div>
+    <div style="font-size:14px;color:#94a3b8;">
+      Placed on {{ order.created_at | date: "%B %d, %Y" }}
+    </div>
+  </td>
+</tr>
+
+
+<!-- ─────────────────────────────────────────
+     DELIVERY STEPS
+───────────────────────────────────────── -->
+<tr>
+  <td style="background-color:#f8fafc;padding:28px 40px 20px;">
+    <div style="font-family:'Montserrat',-apple-system,sans-serif;font-size:11px;font-weight:700;
+      color:#1a365d;text-transform:uppercase;letter-spacing:1.5px;text-align:center;margin-bottom:20px;">
+      When your delivery arrives — what to do next
+    </div>
+
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+
+        <!-- Step 1 — Unpack -->
+        <td class="step-cell" style="text-align:center;padding:0 4px;vertical-align:top;width:19%;">
+          <div style="width:52px;height:52px;background-color:#1a365d;border-radius:50%;
+            margin:0 auto 8px;line-height:52px;text-align:center;font-size:22px;">&#128230;</div>
+          <div style="font-size:10px;font-weight:700;color:#1a365d;text-transform:uppercase;
+            letter-spacing:0.5px;">Unpack</div>
+        </td>
+
+        <!-- Arrow -->
+        <td class="step-arrow" style="color:#cbd5e1;font-size:16px;vertical-align:middle;
+          text-align:center;width:4%;">&#9658;</td>
+
+        <!-- Step 2 — Inspect -->
+        <td class="step-cell" style="text-align:center;padding:0 4px;vertical-align:top;width:19%;">
+          <div style="width:52px;height:52px;background-color:#2d5a87;border-radius:50%;
+            margin:0 auto 8px;line-height:52px;text-align:center;font-size:22px;">&#128269;</div>
+          <div style="font-size:10px;font-weight:700;color:#1a365d;text-transform:uppercase;
+            letter-spacing:0.5px;">Inspect</div>
+        </td>
+
+        <!-- Arrow -->
+        <td class="step-arrow" style="color:#cbd5e1;font-size:16px;vertical-align:middle;
+          text-align:center;width:4%;">&#9658;</td>
+
+        <!-- Step 3 — Take Notes -->
+        <td class="step-cell" style="text-align:center;padding:0 4px;vertical-align:top;width:19%;">
+          <div style="width:52px;height:52px;background-color:#d4af37;border-radius:50%;
+            margin:0 auto 8px;line-height:52px;text-align:center;font-size:22px;">&#128221;</div>
+          <div style="font-size:10px;font-weight:700;color:#1a365d;text-transform:uppercase;
+            letter-spacing:0.5px;">Take Notes</div>
+        </td>
+
+        <!-- Arrow -->
+        <td class="step-arrow" style="color:#cbd5e1;font-size:16px;vertical-align:middle;
+          text-align:center;width:4%;">&#9658;</td>
+
+        <!-- Step 4 — Accept -->
+        <td class="step-cell" style="text-align:center;padding:0 4px;vertical-align:top;width:19%;">
+          <div style="width:52px;height:52px;background-color:#10b981;border-radius:50%;
+            margin:0 auto 8px;line-height:52px;text-align:center;font-size:22px;">&#9989;</div>
+          <div style="font-size:10px;font-weight:700;color:#1a365d;text-transform:uppercase;
+            letter-spacing:0.5px;">Accept</div>
+        </td>
+
+        <!-- Arrow -->
+        <td class="step-arrow" style="color:#cbd5e1;font-size:16px;vertical-align:middle;
+          text-align:center;width:4%;">&#9658;</td>
+
+        <!-- Step 5 — Sign Off -->
+        <td class="step-cell" style="text-align:center;padding:0 4px;vertical-align:top;width:19%;">
+          <div style="width:52px;height:52px;background-color:#ff6b6b;border-radius:50%;
+            margin:0 auto 8px;line-height:52px;text-align:center;font-size:22px;">&#9997;</div>
+          <div style="font-size:10px;font-weight:700;color:#1a365d;text-transform:uppercase;
+            letter-spacing:0.5px;">Sign Off</div>
+        </td>
+
+      </tr>
+    </table>
+  </td>
+</tr>
+
+
+<!-- ─────────────────────────────────────────
+     DELIVERY INSTRUCTIONS
+───────────────────────────────────────── -->
+<tr>
+  <td style="padding:0 40px 28px;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0"
+      style="background-color:#fffbeb;border:1px solid rgba(212,175,55,0.35);border-radius:8px;">
+      <tr>
+        <td style="padding:18px 20px;">
+          <div style="font-size:13px;color:#475569;line-height:1.7;margin-bottom:10px;">
+            Before the Delivery Driver leaves your driveway please do the following:
+          </div>
+          <table cellpadding="0" cellspacing="0" border="0" width="100%">
+            <tr>
+              <td style="padding-bottom:8px;vertical-align:top;width:18px;">
+                <div style="width:18px;height:18px;background-color:#1a365d;border-radius:50%;
+                  text-align:center;line-height:18px;color:#fff;font-size:10px;font-weight:700;">1</div>
+              </td>
+              <td style="padding-bottom:8px;padding-left:10px;font-size:13px;color:#475569;line-height:1.6;">
+                <strong style="color:#0f172a;">Unpack</strong> everything. Keep all original packaging materials.
+              </td>
+            </tr>
+            <tr>
+              <td style="padding-bottom:8px;vertical-align:top;">
+                <div style="width:18px;height:18px;background-color:#1a365d;border-radius:50%;
+                  text-align:center;line-height:18px;color:#fff;font-size:10px;font-weight:700;">2</div>
+              </td>
+              <td style="padding-bottom:8px;padding-left:10px;font-size:13px;color:#475569;line-height:1.6;">
+                <strong style="color:#0f172a;">Inspect</strong> the entire piece of equipment — top to bottom.
+              </td>
+            </tr>
+            <tr>
+              <td style="padding-bottom:8px;vertical-align:top;">
+                <div style="width:18px;height:18px;background-color:#1a365d;border-radius:50%;
+                  text-align:center;line-height:18px;color:#fff;font-size:10px;font-weight:700;">3</div>
+              </td>
+              <td style="padding-bottom:8px;padding-left:10px;font-size:13px;color:#475569;line-height:1.6;">
+                Make <strong style="color:#ff6b6b;">note</strong> of all damage you see.
+                Take <strong style="color:#ff6b6b;">pictures</strong> if you can.
+              </td>
+            </tr>
+            <tr>
+              <td style="vertical-align:top;">
+                <div style="width:18px;height:18px;background-color:#1a365d;border-radius:50%;
+                  text-align:center;line-height:18px;color:#fff;font-size:10px;font-weight:700;">4</div>
+              </td>
+              <td style="padding-left:10px;font-size:13px;color:#475569;line-height:1.7;">
+                You have <strong style="color:#ff6b6b;">2 options:</strong><br>
+                &nbsp;&nbsp;&#8226; <strong style="color:#0f172a;">NO damage</strong> — Accept the shipment and sign off.<br>
+                &nbsp;&nbsp;&#8226; <strong style="color:#0f172a;">Slightly damaged</strong> — Accept but note damage on the acceptance form.<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#ff6b6b;font-weight:700;">REFUSE</span>
+                only if the equipment is <strong>completely damaged</strong> beyond repair.
+              </td>
+            </tr>
+          </table>
+
+          <div style="margin-top:14px;padding:10px 14px;background-color:#ffffff;
+            border-left:3px solid #ff6b6b;border-radius:0 6px 6px 0;
+            font-size:12px;color:#475569;line-height:1.7;">
+            If freight damage occurs we are here to help. Call us at
+            <strong style="color:#1a365d;">(408) 673-9999</strong>
+            Monday–Friday, 8:30am–5:30pm Pacific Time.
+          </div>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>
+
+
+<!-- ─────────────────────────────────────────
+     DIVIDER
+───────────────────────────────────────── -->
+<tr><td style="padding:0 40px;"><div style="height:1px;background-color:#e2e8f0;"></div></td></tr>
+
+
+<!-- ─────────────────────────────────────────
+     ORDER DETAILS + BILLED TO
+───────────────────────────────────────── -->
+<tr>
+  <td style="padding:28px 40px;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+
+        <!-- Order Details -->
+        <td class="col-half" style="vertical-align:top;width:50%;padding-right:20px;">
+          <div style="font-family:'Montserrat',-apple-system,sans-serif;font-size:11px;font-weight:700;
+            color:#1a365d;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;">Order Details</div>
+          <table cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td style="font-size:11px;color:#64748b;padding-bottom:7px;padding-right:12px;
+                white-space:nowrap;vertical-align:top;">Order&nbsp;Number</td>
+              <td style="font-size:12px;font-weight:700;color:#1a365d;padding-bottom:7px;">
+                {{ order.name }}
+              </td>
+            </tr>
+            <tr>
+              <td style="font-size:11px;color:#64748b;padding-bottom:7px;padding-right:12px;
+                white-space:nowrap;vertical-align:top;">Date</td>
+              <td style="font-size:12px;color:#475569;padding-bottom:7px;">
+                {{ order.created_at | date: "%B %d, %Y" }}
+              </td>
+            </tr>
+            <tr>
+              <td style="font-size:11px;color:#64748b;padding-right:12px;vertical-align:top;">Ship To</td>
+              <td style="font-size:12px;color:#475569;line-height:1.7;">
+                {{ order.shipping_address.name }}<br>
+                {{ order.shipping_address.address1 }}<br>
+                {% if order.shipping_address.address2 != blank %}
+                  {{ order.shipping_address.address2 }}<br>
+                {% endif %}
+                {{ order.shipping_address.city }},
+                {{ order.shipping_address.province_code }}
+                {{ order.shipping_address.zip }}
+              </td>
+            </tr>
+          </table>
+        </td>
+
+        <!-- Billed To -->
+        <td class="col-half" style="vertical-align:top;width:50%;padding-left:20px;
+          border-left:1px solid #e2e8f0;">
+          <div style="font-family:'Montserrat',-apple-system,sans-serif;font-size:11px;font-weight:700;
+            color:#1a365d;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;">Billed To</div>
+          <div style="font-size:12px;color:#475569;line-height:1.7;margin-bottom:16px;">
+            {{ order.billing_address.name }}<br>
+            {% if order.billing_address.company != blank %}
+              {{ order.billing_address.company }}<br>
+            {% endif %}
+            {{ order.billing_address.address1 }}<br>
+            {% if order.billing_address.address2 != blank %}
+              {{ order.billing_address.address2 }}<br>
+            {% endif %}
+            {{ order.billing_address.city }},
+            {{ order.billing_address.province_code }}
+            {{ order.billing_address.zip }}
+          </div>
+          <a href="{{ order.order_status_url }}"
+            style="display:inline-block;background-color:#1a365d;color:#ffffff;font-size:12px;
+              font-weight:700;padding:9px 18px;border-radius:7px;text-decoration:none;
+              letter-spacing:0.3px;">
+            View Order Status &#8594;
+          </a>
+        </td>
+
+      </tr>
+    </table>
+  </td>
+</tr>
+
+
+<!-- ─────────────────────────────────────────
+     DIVIDER
+───────────────────────────────────────── -->
+<tr><td style="padding:0 40px;"><div style="height:1px;background-color:#e2e8f0;"></div></td></tr>
+
+
+<!-- ─────────────────────────────────────────
+     SHIPMENT TRACKING
+───────────────────────────────────────── -->
+<tr>
+  <td style="padding:28px 40px 20px;">
+    <div style="font-family:'Montserrat',-apple-system,sans-serif;font-size:13px;font-weight:700;
+      color:#1a365d;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">
+      &#128666;&nbsp; Shipment Summary
+    </div>
+
+    <table width="100%" cellpadding="0" cellspacing="0" border="0"
+      style="background:linear-gradient(135deg,#dbeafe 0%,#eff6ff 100%);
+        border:1px solid rgba(45,90,135,0.2);border-radius:10px;">
+      <tr>
+        <td style="padding:18px 22px;">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td style="vertical-align:middle;">
+                {% if fulfillment.tracking_number %}
+                  <div style="font-size:11px;color:#64748b;margin-bottom:3px;text-transform:uppercase;
+                    letter-spacing:0.5px;">Tracking Number</div>
+                  <div style="font-size:16px;font-weight:800;color:#1a365d;
+                    letter-spacing:0.5px;margin-bottom:3px;">{{ fulfillment.tracking_number }}</div>
+                  {% if fulfillment.tracking_company %}
+                    <div style="font-size:12px;color:#475569;">
+                      Carrier: <strong>{{ fulfillment.tracking_company }}</strong>
+                    </div>
+                  {% endif %}
+                {% else %}
+                  <div style="font-size:13px;color:#475569;">
+                    Tracking information will be available shortly.
+                  </div>
+                {% endif %}
+              </td>
+              <td style="text-align:right;vertical-align:middle;padding-left:16px;white-space:nowrap;">
+                {% if fulfillment.tracking_url %}
+                  <a href="{{ fulfillment.tracking_url }}"
+                    style="display:inline-block;background-color:#ff6b6b;color:#ffffff;
+                      font-size:13px;font-weight:800;padding:12px 22px;border-radius:8px;
+                      text-decoration:none;letter-spacing:0.5px;">
+                    &#128269;&nbsp; Track Order
+                  </a>
+                {% endif %}
+                <div style="margin-top:8px;text-align:center;">
+                  <a href="{{ order.order_status_url }}"
+                    style="font-size:11px;color:#2d5a87;text-decoration:underline;">
+                    Order Status Page
+                  </a>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>
+
+
+<!-- ─────────────────────────────────────────
+     ITEMS SHIPPED
+───────────────────────────────────────── -->
+<tr>
+  <td style="padding:8px 40px 28px;">
+    <div style="font-family:'Montserrat',-apple-system,sans-serif;font-size:13px;font-weight:700;
+      color:#1a365d;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;
+      padding-bottom:10px;border-bottom:2px solid #ff6b6b;display:inline-block;">
+      Items in This Shipment
+    </div>
+
+    {% for line in fulfillment.fulfillment_line_items %}
+      {% assign item = line.line_item %}
+      <table width="100%" cellpadding="0" cellspacing="0" border="0"
+        style="margin-bottom:10px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">
+        <tr>
+
+          <!-- Product Image -->
+          <td style="width:88px;padding:12px;vertical-align:top;">
+            {% if item.image %}
+              <img src="{{ item.image | img_url: '88x88', crop: 'center' }}"
+                alt="{{ item.title | escape }}" width="88" height="88"
+                style="display:block;border-radius:6px;border:1px solid #e2e8f0;
+                  object-fit:cover;">
+            {% else %}
+              <div style="width:88px;height:88px;background:linear-gradient(135deg,#f1f5f9,#e2e8f0);
+                border-radius:6px;text-align:center;line-height:88px;font-size:32px;">&#127869;</div>
+            {% endif %}
+          </td>
+
+          <!-- Product Info -->
+          <td style="padding:12px 8px 12px 0;vertical-align:middle;">
+            <div style="font-size:14px;font-weight:600;color:#1a365d;
+              margin-bottom:4px;line-height:1.4;">{{ item.title }}</div>
+            {% if item.variant_title and item.variant_title != 'Default Title' %}
+              <div style="font-size:12px;color:#64748b;margin-bottom:6px;">
+                {{ item.variant_title }}
+              </div>
+            {% endif %}
+            <div style="font-size:12px;color:#475569;">
+              Qty:&nbsp;<strong>{{ item.quantity }}</strong>
+              &nbsp;&#183;&nbsp;
+              <strong style="color:#1a365d;">{{ item.final_price | money }}</strong> each
+            </div>
+          </td>
+
+          <!-- Buy Again CTA -->
+          <td class="product-action" style="padding:12px;vertical-align:middle;
+            text-align:right;white-space:nowrap;">
+            <a href="{{ shop.url }}/products/{{ item.product.handle }}"
+              style="display:inline-block;background-color:#1a365d;color:#ffffff;
+                font-size:11px;font-weight:700;padding:8px 14px;border-radius:6px;
+                text-decoration:none;letter-spacing:0.3px;">
+              Buy Again
+            </a>
+          </td>
+
+        </tr>
+      </table>
+    {% endfor %}
+  </td>
+</tr>
+
+
+<!-- ─────────────────────────────────────────
+     SHIPPING SOON (remaining unfulfilled items)
+───────────────────────────────────────── -->
+{% assign unfulfilled_count = 0 %}
+{% for item in order.line_items %}
+  {% if item.fulfillment_status == blank %}
+    {% assign unfulfilled_count = unfulfilled_count | plus: 1 %}
+  {% endif %}
+{% endfor %}
+
+{% if unfulfilled_count > 0 %}
+<tr>
+  <td style="padding:0 40px 28px;">
+    <div style="font-family:'Montserrat',-apple-system,sans-serif;font-size:13px;font-weight:700;
+      color:#1a365d;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;
+      padding-bottom:10px;border-bottom:2px solid #d4af37;display:inline-block;">
+      &#128664;&nbsp; Shipping Soon
+    </div>
+
+    {% for item in order.line_items %}
+      {% if item.fulfillment_status == blank %}
+        <table width="100%" cellpadding="0" cellspacing="0" border="0"
+          style="margin-bottom:10px;border:1px solid #e2e8f0;border-radius:8px;
+            background-color:#fafafa;overflow:hidden;">
+          <tr>
+            <td style="width:88px;padding:12px;vertical-align:top;">
+              {% if item.image %}
+                <img src="{{ item.image | img_url: '88x88', crop: 'center' }}"
+                  alt="{{ item.title | escape }}" width="88" height="88"
+                  style="display:block;border-radius:6px;border:1px solid #e2e8f0;opacity:0.75;">
+              {% else %}
+                <div style="width:88px;height:88px;background:linear-gradient(135deg,#f1f5f9,#e2e8f0);
+                  border-radius:6px;text-align:center;line-height:88px;font-size:32px;
+                  opacity:0.7;">&#127869;</div>
+              {% endif %}
+            </td>
+            <td style="padding:12px 12px 12px 0;vertical-align:middle;">
+              <div style="display:inline-block;background-color:#fffbeb;
+                border:1px solid rgba(212,175,55,0.4);color:#b8941f;font-size:10px;
+                font-weight:700;padding:3px 8px;border-radius:4px;margin-bottom:7px;
+                letter-spacing:0.5px;text-transform:uppercase;">
+                Shipping Soon
+              </div>
+              <div style="font-size:14px;font-weight:600;color:#1a365d;
+                margin-bottom:4px;line-height:1.4;">{{ item.title }}</div>
+              {% if item.variant_title and item.variant_title != 'Default Title' %}
+                <div style="font-size:12px;color:#64748b;margin-bottom:4px;">
+                  {{ item.variant_title }}
+                </div>
+              {% endif %}
+              <div style="font-size:12px;color:#475569;">
+                Qty:&nbsp;<strong>{{ item.quantity }}</strong>
+              </div>
+            </td>
+          </tr>
+        </table>
+      {% endif %}
+    {% endfor %}
+  </td>
+</tr>
+{% endif %}
+
+
+<!-- ─────────────────────────────────────────
+     DIVIDER
+───────────────────────────────────────── -->
+<tr><td style="padding:0 40px;"><div style="height:1px;background-color:#e2e8f0;"></div></td></tr>
+
+
+<!-- ─────────────────────────────────────────
+     HELP / CONTACT BANNER
+───────────────────────────────────────── -->
+<tr>
+  <td style="padding:28px 40px;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0"
+      style="background:linear-gradient(135deg,#1a365d 0%,#2d5a87 100%);border-radius:10px;">
+      <tr>
+        <td style="padding:26px 28px;text-align:center;">
+          <div style="font-family:'Montserrat',-apple-system,sans-serif;font-size:17px;
+            font-weight:800;color:#ffffff;margin-bottom:6px;">Need Help?</div>
+          <div style="font-size:13px;color:#94a3b8;margin-bottom:18px;">
+            Our team is available Monday–Friday, 8:30am–5:30pm Pacific Time
+          </div>
+          <table class="btn-group" cellpadding="0" cellspacing="0" border="0" align="center">
+            <tr>
+              <td style="padding:0 6px;">
+                <a href="tel:4086739999"
+                  style="display:inline-block;background-color:#ff6b6b;color:#ffffff;
+                    font-size:13px;font-weight:700;padding:11px 22px;border-radius:8px;
+                    text-decoration:none;letter-spacing:0.3px;">
+                  &#128222;&nbsp; (408) 673-9999
+                </a>
+              </td>
+              <td style="padding:0 6px;">
+                <a href="mailto:{{ shop.email }}"
+                  style="display:inline-block;background-color:rgba(255,255,255,0.10);
+                    color:#ffffff;font-size:13px;font-weight:700;padding:11px 22px;
+                    border-radius:8px;text-decoration:none;letter-spacing:0.3px;
+                    border:1px solid rgba(255,255,255,0.25);">
+                  &#9993;&nbsp; Email Us
+                </a>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>
+
+
+<!-- ─────────────────────────────────────────
+     FOOTER
+───────────────────────────────────────── -->
+<tr>
+  <td style="background-color:#0f172a;padding:24px 40px;text-align:center;">
+    <div style="font-size:13px;font-weight:800;color:#ffffff;
+      letter-spacing:0.5px;margin-bottom:8px;">CELEBRATE FESTIVAL INC</div>
+    <div style="font-size:11px;color:#64748b;line-height:1.8;margin-bottom:14px;">
+      {{ shop.address.address1 }}
+      {% if shop.address.address2 != blank %}, {{ shop.address.address2 }}{% endif %}<br>
+      {{ shop.address.city }}, {{ shop.address.province }} {{ shop.address.zip }}<br>
+      <a href="tel:{{ shop.phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' }}"
+        style="color:#94a3b8;text-decoration:none;">{{ shop.phone }}</a>
+      &nbsp;&#183;&nbsp;
+      <a href="{{ shop.url }}" style="color:#94a3b8;text-decoration:none;">{{ shop.url | remove: 'https://' }}</a>
+    </div>
+    <div style="font-size:10px;color:#334155;border-top:1px solid #1e293b;padding-top:14px;line-height:1.7;">
+      You are receiving this email because you placed an order at
+      <a href="{{ shop.url }}" style="color:#2d5a87;text-decoration:none;">{{ shop.name }}</a>.<br>
+      &copy; {{ 'now' | date: "%Y" }} {{ shop.name }}. All rights reserved.
+    </div>
+  </td>
+</tr>
+
+
+</table>
+<!-- /Email Container -->
+
+</td></tr>
+</table>
+
+</body>
+</html>

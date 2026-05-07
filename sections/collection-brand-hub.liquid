@@ -1,0 +1,617 @@
+{% comment %}
+  Brand Collection Hub Section
+  Displays brand logo, description, subcategories, and products
+{% endcomment %}
+
+{%- liquid
+  assign brand_name = collection.title | remove: ' PRODUCT COLLECTION' | remove: ' Product Collection'
+  assign brand_handle = collection.handle | remove: '-product-collection'
+  assign menu_handle = section.settings.menu_handle | default: 'cf-menu-31-12-2026'
+  assign menu = linklists[menu_handle]
+-%}
+
+<style>
+.brand-hub {
+  --cf-deep-blue: #1a365d;
+  --cf-navy: #2d5a87;
+  --cf-coral: #ff6b6b;
+  --cf-text-dark: #0f172a;
+  --cf-text-medium: #475569;
+  --cf-text-light: #64748b;
+  --cf-border: #e2e8f0;
+  --cf-bg-light: #f8fafc;
+}
+
+/* Breadcrumb */
+.brand-breadcrumb {
+  padding: 16px 40px;
+  background: var(--cf-bg-light);
+  border-bottom: 1px solid var(--cf-border);
+}
+.brand-breadcrumb nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--cf-text-medium);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.brand-breadcrumb a {
+  color: var(--cf-navy);
+  text-decoration: none;
+}
+.brand-breadcrumb a:hover {
+  color: var(--cf-coral);
+}
+
+/* Hero Section */
+.brand-hero {
+  background: linear-gradient(135deg, var(--cf-deep-blue) 0%, #0f172a 100%);
+  padding: 60px 40px;
+  position: relative;
+  overflow: hidden;
+}
+.brand-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.5;
+}
+.brand-hero-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  position: relative;
+  z-index: 1;
+}
+.brand-logo-box {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.brand-logo-box img {
+  max-width: 150px;
+  max-height: 80px;
+  object-fit: contain;
+}
+.brand-logo-text {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--cf-deep-blue);
+}
+.brand-info h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  color: white;
+  margin: 0 0 12px;
+}
+.brand-info p {
+  font-size: 16px;
+  color: rgba(255,255,255,0.8);
+  margin: 0;
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .brand-hero { padding: 40px 20px; }
+  .brand-hero-content { flex-direction: column; text-align: center; }
+  .brand-info h1 { font-size: 28px; }
+  .brand-breadcrumb { padding: 12px 20px; }
+}
+
+/* Categories Section */
+.brand-categories {
+  padding: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.brand-section-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+  margin: 0 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand-section-title::before {
+  content: '';
+  width: 4px;
+  height: 28px;
+  background: linear-gradient(180deg, var(--cf-coral) 0%, var(--cf-navy) 100%);
+  border-radius: 2px;
+}
+.brand-categories-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+@media (max-width: 1200px) {
+  .brand-categories-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+  .brand-categories-grid { grid-template-columns: repeat(2, 1fr); }
+  .brand-categories { padding: 24px 20px; }
+}
+@media (max-width: 480px) {
+  .brand-categories-grid { grid-template-columns: 1fr; }
+}
+
+.brand-category-card {
+  background: white;
+  border: 1px solid var(--cf-border);
+  border-radius: 12px;
+  overflow: hidden;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.brand-category-card:hover {
+  border-color: var(--cf-navy);
+  box-shadow: 0 8px 24px rgba(26, 54, 93, 0.12);
+  transform: translateY(-4px);
+}
+.brand-category-image {
+  aspect-ratio: 16 / 9;
+  background: var(--cf-bg-light);
+  overflow: hidden;
+}
+.brand-category-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.brand-category-card:hover .brand-category-image img {
+  transform: scale(1.05);
+}
+.brand-category-content {
+  padding: 16px;
+}
+.brand-category-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cf-deep-blue);
+  margin: 0 0 4px;
+}
+.brand-category-count {
+  font-size: 12px;
+  color: var(--cf-coral);
+  font-weight: 600;
+}
+
+.brand-category-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--cf-navy);
+  opacity: 0.5;
+}
+
+/* Products Section */
+.brand-products {
+  padding: 40px;
+  background: var(--cf-bg-light);
+}
+.brand-products-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.brand-products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+@media (max-width: 1200px) {
+  .brand-products-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+  .brand-products-grid { grid-template-columns: repeat(2, 1fr); }
+  .brand-products { padding: 24px 20px; }
+}
+
+.brand-product-card {
+  background: white;
+  border: 1px solid var(--cf-border);
+  border-radius: 12px;
+  overflow: hidden;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.brand-product-card:hover {
+  border-color: var(--cf-navy);
+  box-shadow: 0 8px 24px rgba(26, 54, 93, 0.12);
+  transform: translateY(-4px);
+}
+.brand-product-image {
+  aspect-ratio: 1 / 1;
+  background: white;
+  padding: 16px;
+}
+.brand-product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.brand-product-content {
+  padding: 16px;
+  border-top: 1px solid var(--cf-border);
+}
+.brand-product-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cf-text-dark);
+  margin: 0 0 8px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.brand-product-price {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--cf-coral);
+}
+
+/* View All Link */
+.brand-view-all {
+  text-align: center;
+  margin-top: 30px;
+}
+.brand-view-all a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 32px;
+  background: var(--cf-deep-blue);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+.brand-view-all a:hover {
+  background: var(--cf-navy);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(26, 54, 93, 0.2);
+}
+</style>
+
+<div class="brand-hub">
+  <!-- Breadcrumb -->
+  <section class="brand-breadcrumb">
+    <nav aria-label="breadcrumbs">
+      <a href="{{ routes.root_url }}">Home</a>
+      <span>›</span>
+      <a href="/collections">Brands</a>
+      <span>›</span>
+      <span>{{ brand_name }}</span>
+    </nav>
+  </section>
+
+  <!-- Hero Section -->
+  <section class="brand-hero">
+    <div class="brand-hero-content">
+      <a href="{{ collection.url }}" class="brand-logo-box" style="text-decoration:none;">
+        {%- assign brand_name_handle = brand_name | handleize -%}
+        {%- assign logo_file = 'brand-logo-' | append: brand_name_handle | append: '.png' -%}
+        <img src="{{ logo_file | asset_url }}"
+             alt="{{ brand_name }} logo"
+             onerror="this.outerHTML='<span class=brand-logo-text>{{ brand_name | escape }}</span>'">
+      </a>
+      <div class="brand-info">
+        <h1>{{ brand_name }}</h1>
+        <p>
+          {%- if collection.description != blank -%}
+            {{ collection.description | strip_html }}
+          {%- else -%}
+            Browse our complete selection of {{ brand_name }} products. Professional-grade equipment and supplies for your commercial kitchen.
+          {%- endif -%}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  {%- comment %}
+    For YANCO: Collections are named yanco-melamine-{pattern}
+    We fetch all collections that start with the brand handle prefix
+  {% endcomment -%}
+
+  {%- assign yanco_collections = 'yanco-melamine-accessories,yanco-melamine-bamboo-style,yanco-melamine-bay-shell,yanco-melamine-birmingham,yanco-melamine-birmingham-green,yanco-melamine-birmingham-teal,yanco-melamine-black-pearl-1,yanco-melamine-black-red,yanco-melamine-catering,yanco-melamine-compartment,yanco-melamine-coupe-pattern,yanco-melamine-deli-collection,yanco-melamine-discover,yanco-melamine-gn-pan-collection,yanco-melamine-honda,yanco-melamine-houston,yanco-melamine-japanese,yanco-melamine-longevity-chinese-style,yanco-melamine-mexico,yanco-melamine-milando,yanco-melamine-mile-stone,yanco-melamine-moderne,yanco-melamine-nessico,yanco-melamine-olive,yanco-melamine-orchis,yanco-melamine-osaka,yanco-melamine-peony-chinese-style,yanco-melamine-pine-tree,yanco-melamine-rome,yanco-melamine-serving-trays,yanco-melamine-sesame,yanco-melamine-soul,yanco-melamine-venice,yanco-melamineware-collection,yanco-melamine-wood-bamboo,yanco-melamine-wooden-tray-1,yanco-melamine-wooden-tray-2,yanco-melamine-woodland,yanco-melamine-yoto' | split: ',' -%}
+
+  {%- comment %} Check if this is a Yanco collection {% endcomment -%}
+  {%- assign is_yanco = false -%}
+  {%- if collection.handle contains 'yanco' -%}
+    {%- assign is_yanco = true -%}
+  {%- endif -%}
+
+  {%- if is_yanco -%}
+  <section class="brand-categories">
+    <h2 class="brand-section-title">{{ brand_name }} Collections</h2>
+    <div class="brand-categories-grid">
+      {%- for handle in yanco_collections -%}
+        {%- assign cat_collection = collections[handle] -%}
+        {%- if cat_collection.products_count > 0 -%}
+          {%- assign cat_title = cat_collection.title | remove: 'Yanco Melamine ' | remove: 'yanco-melamine-' | capitalize -%}
+
+          {%- comment %} Yanco collection image mapping from live theme {% endcomment -%}
+          {%- assign yanco_image = nil -%}
+          {%- case handle -%}
+            {%- when 'yanco-melamine-rome' -%}
+              {%- assign yanco_image = '1_bbc0c9a6-bc8c-4816-b0ea-1bbc17144e73.jpg' -%}
+            {%- when 'yanco-melamine-coupe-pattern' -%}
+              {%- assign yanco_image = '1_750de5f9-6579-46a1-b3c0-4447b22f82a5.jpg' -%}
+            {%- when 'yanco-melamine-catering' -%}
+              {%- assign yanco_image = '1_eeed3f51-410d-4cef-9e87-a3d5806b85f7.jpg' -%}
+            {%- when 'yanco-melamine-houston' -%}
+              {%- assign yanco_image = '1_37df3a9b-f8b1-4d13-8177-1a472ff8adcb.jpg' -%}
+            {%- when 'yanco-melamine-sesame' -%}
+              {%- assign yanco_image = '1_7a6da887-fbea-4bd0-9044-2b5e5915d07f.jpg' -%}
+            {%- when 'yanco-melamine-pine-tree' -%}
+              {%- assign yanco_image = '1_30a2288a-055b-4f67-ab6d-55fabb827a45.jpg' -%}
+            {%- when 'yanco-melamine-nessico' -%}
+              {%- assign yanco_image = '1_44eaa28a-75f4-4990-8b59-ff1679bf1706.jpg' -%}
+            {%- when 'yanco-melamine-mile-stone' -%}
+              {%- assign yanco_image = '1_65e91158-75a8-4fc9-8943-19614a49f136.jpg' -%}
+            {%- when 'yanco-melamine-accessories' -%}
+              {%- assign yanco_image = '1_bac962f9-9206-4c30-8427-881316bdc362.jpg' -%}
+            {%- when 'yanco-melamine-compartment' -%}
+              {%- assign yanco_image = '1_6135b527-341c-40c4-8264-1245258cb83a.jpg' -%}
+            {%- when 'yanco-melamine-longevity-chinese-style' -%}
+              {%- assign yanco_image = '1_a56012b1-3d7c-4ade-b2fa-9cabd37dbe9d.jpg' -%}
+            {%- when 'yanco-melamine-peony-chinese-style' -%}
+              {%- assign yanco_image = '1_55ff2663-3014-48ad-8b01-2237d8d668d9.jpg' -%}
+            {%- when 'yanco-melamine-bay-shell' -%}
+              {%- assign yanco_image = '1_3cf3b686-fbf8-4048-af69-ac8aa3ce4f5c.jpg' -%}
+            {%- when 'yanco-melamine-honda' -%}
+              {%- assign yanco_image = '1_4b674deb-eb71-4201-914b-9491192a3c78.jpg' -%}
+            {%- when 'yanco-melamine-orchis' -%}
+              {%- assign yanco_image = '1_6a17c253-6f8b-4d14-b14d-2276dcb9b0f6.jpg' -%}
+            {%- when 'yanco-melamine-japanese' -%}
+              {%- assign yanco_image = '1_3ef1bd4a-6049-44fd-9b78-2f4afe8d4e5d.jpg' -%}
+            {%- when 'yanco-melamine-gn-pan-collection' -%}
+              {%- assign yanco_image = '1_470cb6f4-c67a-4558-beb4-361656b6f0b9.jpg' -%}
+            {%- when 'yanco-melamine-wood-bamboo' -%}
+              {%- assign yanco_image = '1_b9b13194-def4-490c-a2ae-d0fcdd3e7aee.jpg' -%}
+            {%- when 'yanco-melamine-serving-trays' -%}
+              {%- assign yanco_image = '1_8f858706-5f6b-41a1-bc01-848c7bd4f710.jpg' -%}
+            {%- when 'yanco-melamine-bamboo-style' -%}
+              {%- assign yanco_image = '1_6411ed8a-b47c-44bb-b926-8e65619713e5.jpg' -%}
+            {%- when 'yanco-melamine-olive' -%}
+              {%- assign yanco_image = '1_261e8839-b79c-43a0-8e89-aba883b4d31b.jpg' -%}
+            {%- when 'yanco-melamine-birmingham' -%}
+              {%- assign yanco_image = 'Yanco-BIRM-_1.png' -%}
+            {%- when 'yanco-melamine-birmingham-green' -%}
+              {%- assign yanco_image = 'Yanco-BIRM_-_2.png' -%}
+            {%- when 'yanco-melamine-birmingham-teal' -%}
+              {%- assign yanco_image = 'Yanco-BIRM_Teal-_2.png' -%}
+            {%- when 'yanco-melamine-woodland' -%}
+              {%- assign yanco_image = '1_01af016a-aa22-49ef-9b92-a6e1e9a3ae80.png' -%}
+            {%- when 'yanco-melamine-discover' -%}
+              {%- assign yanco_image = '1_0b05ab0d-3009-4e22-8931-49a170da1e73.png' -%}
+            {%- when 'yanco-melamine-yoto' -%}
+              {%- assign yanco_image = '1_7e63e653-5fe1-4f6d-8c23-129df3aec88b.jpg' -%}
+            {%- when 'yanco-melamine-moderne' -%}
+              {%- assign yanco_image = '1_f93f1594-c679-4582-8e48-bf102a1fa06c.png' -%}
+            {%- when 'yanco-melamine-deli-collection' -%}
+              {%- assign yanco_image = '1_c2a3d97e-fe32-4e6c-b1dd-d5c48482c41b.jpg' -%}
+            {%- when 'yanco-melamine-wooden-tray-1' -%}
+              {%- assign yanco_image = '1_f4c19849-2f51-40d3-a47d-5677c31826d3.jpg' -%}
+            {%- when 'yanco-melamine-wooden-tray-2' -%}
+              {%- assign yanco_image = '1_6226b285-73ab-4ed8-a83f-ecfc1438891d.jpg' -%}
+            {%- when 'yanco-melamine-black-pearl-1' -%}
+              {%- assign yanco_image = '1_2e757f0a-1932-4437-b40a-68e6de32cb09.jpg' -%}
+            {%- when 'yanco-melamine-soul' -%}
+              {%- assign yanco_image = '1_558dbb77-39f9-4d50-8a1a-bbd09b77e5da.jpg' -%}
+            {%- when 'yanco-melamine-venice' -%}
+              {%- assign yanco_image = '1_0dbc9215-0def-4413-991b-91ec39679fd7.jpg' -%}
+            {%- when 'yanco-melamine-osaka' -%}
+              {%- assign yanco_image = '1_02cf40da-5f79-499d-99ef-8283d5d69f30.jpg' -%}
+            {%- when 'yanco-melamine-mexico' -%}
+              {%- assign yanco_image = '1_e89c95eb-f38e-49d1-972f-6a8a33c82d82.jpg' -%}
+            {%- when 'yanco-melamine-black-red' -%}
+              {%- assign yanco_image = '1_ef4a318e-981c-44c2-bf95-af4299ab87f2.jpg' -%}
+            {%- when 'yanco-melamine-milando' -%}
+              {%- assign yanco_image = '1_db800df8-b96b-4cce-a5c9-8e7a84a1989b.jpg' -%}
+            {%- when 'yanco-melamineware-collection' -%}
+              {%- assign yanco_image = '1_94962a6d-c843-4b44-be06-c524846d7170.jpg' -%}
+          {%- endcase -%}
+
+          <a href="{{ cat_collection.url }}" class="brand-category-card">
+            <div class="brand-category-image">
+              {%- if yanco_image -%}
+                <img src="https://celebratefestivalinc.com/cdn/shop/files/{{ yanco_image }}?width=600&height=340&crop=center"
+                     alt="{{ cat_title }}"
+                     loading="lazy">
+              {%- elsif cat_collection.image -%}
+                <img src="{{ cat_collection.image | image_url: width: 600, height: 340, crop: 'center' }}"
+                     alt="{{ cat_title }}"
+                     loading="lazy">
+              {%- elsif cat_collection.products.first.featured_image -%}
+                <img src="{{ cat_collection.products.first.featured_image | image_url: width: 600, height: 340, crop: 'center' }}"
+                     alt="{{ cat_title }}"
+                     loading="lazy">
+              {%- else -%}
+                <div class="brand-category-placeholder">
+                  <span>{{ cat_title | slice: 0 }}</span>
+                </div>
+              {%- endif -%}
+            </div>
+            <div class="brand-category-content">
+              <h3 class="brand-category-name">{{ cat_title }}</h3>
+              <span class="brand-category-count">{{ cat_collection.products_count }} Products</span>
+            </div>
+          </a>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </section>
+
+  {%- else -%}
+  {%- comment %} Fallback: Try to find subcategories from menu {% endcomment -%}
+  {%- assign brand_categories = '' | split: '' -%}
+  {%- for link in menu.links -%}
+    {%- for child in link.links -%}
+      {%- assign child_handle = child.url | split: '/' | last | split: '?' | first -%}
+      {%- if child_handle == collection.handle or child.title contains brand_name -%}
+        {%- if child.links.size > 0 -%}
+          {%- assign brand_categories = child.links -%}
+          {%- break -%}
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- if brand_categories.size > 0 -%}{%- break -%}{%- endif -%}
+  {%- endfor -%}
+
+  {%- if brand_categories.size > 0 -%}
+  <section class="brand-categories">
+    <h2 class="brand-section-title">{{ brand_name }} Categories</h2>
+    <div class="brand-categories-grid">
+      {%- for cat_link in brand_categories -%}
+        {%- assign cat_handle = cat_link.url | split: '/' | last | split: '?' | first -%}
+        {%- assign cat_collection = collections[cat_handle] -%}
+        {%- assign cat_title = cat_link.title | remove: 'New Theme - ' | remove: 'New Theme- ' -%}
+
+        <a href="{{ cat_link.url }}" class="brand-category-card">
+          <div class="brand-category-image">
+            {%- if cat_collection.image -%}
+              <img src="{{ cat_collection.image | image_url: width: 600, height: 340, crop: 'center' }}"
+                   alt="{{ cat_title }}"
+                   loading="lazy">
+            {%- elsif cat_collection.products.first.featured_image -%}
+              <img src="{{ cat_collection.products.first.featured_image | image_url: width: 600, height: 340, crop: 'center' }}"
+                   alt="{{ cat_title }}"
+                   loading="lazy">
+            {%- endif -%}
+          </div>
+          <div class="brand-category-content">
+            <h3 class="brand-category-name">{{ cat_title }}</h3>
+            <span class="brand-category-count">{{ cat_collection.products_count | default: 0 }} Products</span>
+          </div>
+        </a>
+      {%- endfor -%}
+    </div>
+  </section>
+  {%- endif -%}
+  {%- endif -%}
+
+  <!-- Products Section -->
+  <section class="brand-products">
+    <div class="brand-products-container">
+      <h2 class="brand-section-title">{{ brand_name }} Products</h2>
+
+      {%- if collection.products.size > 0 -%}
+        <div class="brand-products-grid">
+          {%- for product in collection.products limit: 12 -%}
+            <a href="{{ product.url }}" class="brand-product-card">
+              <div class="brand-product-image">
+                {%- if product.featured_image -%}
+                  <img src="{{ product.featured_image | image_url: width: 400 }}"
+                       alt="{{ product.title | escape }}"
+                       loading="lazy">
+                {%- endif -%}
+              </div>
+              <div class="brand-product-content">
+                <h3 class="brand-product-title">{{ product.title }}</h3>
+                <div class="brand-product-price">{{ product.price | money }}</div>
+              </div>
+            </a>
+          {%- endfor -%}
+        </div>
+
+        {%- if collection.products.size > 12 -%}
+        <div class="brand-view-all">
+          <a href="{{ collection.url }}?view=products">
+            View All {{ collection.products_count }} Products
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+        {%- endif -%}
+
+      {%- else -%}
+        {%- comment %} No direct products - aggregate from subcategories {% endcomment -%}
+        {%- assign aggregated_products = '' | split: '' -%}
+
+        {%- for cat_link in brand_categories limit: 4 -%}
+          {%- assign cat_handle = cat_link.url | split: '/' | last | split: '?' | first -%}
+          {%- assign cat_collection = collections[cat_handle] -%}
+          {%- for product in cat_collection.products limit: 3 -%}
+            {%- assign aggregated_products = aggregated_products | concat: product -%}
+          {%- endfor -%}
+        {%- endfor -%}
+
+        {%- if aggregated_products.size > 0 -%}
+        <div class="brand-products-grid">
+          {%- for product in aggregated_products limit: 12 -%}
+            <a href="{{ product.url }}" class="brand-product-card">
+              <div class="brand-product-image">
+                {%- if product.featured_image -%}
+                  <img src="{{ product.featured_image | image_url: width: 400 }}"
+                       alt="{{ product.title | escape }}"
+                       loading="lazy">
+                {%- endif -%}
+              </div>
+              <div class="brand-product-content">
+                <h3 class="brand-product-title">{{ product.title }}</h3>
+                <div class="brand-product-price">{{ product.price | money }}</div>
+              </div>
+            </a>
+          {%- endfor -%}
+        </div>
+        {%- else -%}
+        <p style="text-align: center; color: var(--cf-text-medium); padding: 40px;">
+          Browse the categories above to explore {{ brand_name }} products.
+        </p>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+  </section>
+</div>
+
+{% schema %}
+{
+  "name": "Brand Collection Hub",
+  "tag": "section",
+  "class": "section-brand-hub",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu_handle",
+      "label": "Navigation menu",
+      "info": "Menu to find brand subcategories"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Brand Collection Hub"
+    }
+  ]
+}
+{% endschema %}

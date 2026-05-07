@@ -1,0 +1,3508 @@
+{% comment %}
+  Collection Level 2 Hub - Product Listing Page (PLP)
+  Same design as Level 3, but with L3 subcategory filter pills at top
+{% endcomment %}
+
+{% comment %} ========================================
+   COLLECTION HANDLE FALLBACK LOGIC
+   Menu URLs may point to empty collections.
+   Try: original -> new-theme-{handle} -> special mappings
+======================================== {% endcomment %}
+
+{% assign menu_handle = section.settings.menu | default: 'main-menu' %}
+{% assign l3_children = blank %}
+{% assign found_in_menu = false %}
+
+{% comment %} Find current collection in menu and get L3 children {% endcomment %}
+{% for link in linklists[menu_handle].links %}
+  {% for l2_link in link.links %}
+    {% assign l2_handle = l2_link.url | split: '/' | last | split: '?' | first %}
+    {% if l2_handle == collection.handle %}
+      {% assign l3_children = l2_link.links %}
+      {% assign found_in_menu = true %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+  {% if found_in_menu %}{% break %}{% endif %}
+{% endfor %}
+
+{% comment %} Collect L3 collection handles with fallback {% endcomment %}
+{% comment %} FIXED: Menu is source of truth - show ALL items from menu, not just collections with products {% endcomment %}
+{% assign l3_collection_handles = '' %}
+{% assign l3_menu_titles = '' %}
+{% assign handle_mappings = 'meat-processing-equipment:new-theme-meat-process-equipment,vegetable-slicers-and-cutters-2:new-theme-vegetable-slicers-and-cutters,rice-cooker:new-theme-rice-cooker,commercial-can-openers:new-theme-commercial-can-openers,stainless-steel-work-tables-with-undershelves-1:new-theme-stainless-steel-work-tables-with-undershelves,stainless-steel-enclosed-base-work-tables-1:new-theme-stainless-steel-work-tables-with-undershelves,open-base-work-tables:new-theme-stainless-steel-work-tables-with-undershelves,equipment-stands-mixer-tables:new-theme-equipment-stands,work-table-preparation-stations:new-theme-preparation-stations' %}
+
+{% if l3_children.size > 0 %}
+  {% for child_link in l3_children %}
+    {% assign child_handle = child_link.url | split: '/' | last | split: '?' | first %}
+    {% assign menu_title = child_link.title %}
+    {% assign child_coll = collections[child_handle] %}
+    {% assign used_handle = child_handle %}
+
+    {% assign new_theme_handle = 'new-theme-' | append: child_handle %}
+    {% assign new_theme_coll = collections[new_theme_handle] %}
+
+    {% assign orig_count = child_coll.products_count | default: 0 | plus: 0 %}
+    {% assign new_count = new_theme_coll.products_count | default: 0 | plus: 0 %}
+
+    {% comment %} Try to find best collection handle for filtering {% endcomment %}
+    {% if new_theme_coll and new_count > 0 %}
+      {% assign used_handle = new_theme_handle %}
+    {% elsif orig_count == 0 %}
+      {% assign mappings_array = handle_mappings | split: ',' %}
+      {% for mapping in mappings_array %}
+        {% assign mapping_parts = mapping | split: ':' %}
+        {% assign map_from = mapping_parts[0] %}
+        {% assign map_to = mapping_parts[1] %}
+        {% if map_from == child_handle %}
+          {% assign mapped_coll = collections[map_to] %}
+          {% assign map_count = mapped_coll.products_count | default: 0 | plus: 0 %}
+          {% if mapped_coll and map_count > 0 %}
+            {% assign used_handle = map_to %}
+          {% endif %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    {% comment %} ALWAYS add to array - menu is source of truth (no product count check) {% endcomment %}
+    {% if l3_collection_handles == '' %}
+      {% assign l3_collection_handles = used_handle %}
+      {% assign l3_menu_titles = menu_title %}
+    {% else %}
+      {% assign l3_collection_handles = l3_collection_handles | append: '|||' | append: used_handle %}
+      {% assign l3_menu_titles = l3_menu_titles | append: '|||' | append: menu_title %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{% assign l3_handle_array = l3_collection_handles | split: '|||' %}
+{% assign l3_title_array = l3_menu_titles | split: '|||' %}
+
+{% comment %} Calculate totals {% endcomment %}
+{% assign total_l3_products = 0 %}
+{% for handle in l3_handle_array %}
+  {% assign handle_clean = handle | strip %}
+  {% if handle_clean != blank %}
+    {% assign coll = collections[handle_clean] %}
+    {% if coll %}
+      {% assign total_l3_products = total_l3_products | plus: coll.products_count %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
+{% comment %} L2 collection fallback {% endcomment %}
+{% assign l2_collection = collection %}
+{% if collection.products_count == 0 %}
+  {% assign l2_new_theme_handle = 'new-theme-' | append: collection.handle %}
+  {% assign l2_new_theme_coll = collections[l2_new_theme_handle] %}
+  {% if l2_new_theme_coll and l2_new_theme_coll.products_count > 0 %}
+    {% assign l2_collection = l2_new_theme_coll %}
+  {% endif %}
+{% endif %}
+
+{% assign grand_total_products = l2_collection.products_count | plus: total_l3_products %}
+
+<style>
+/* ========================================
+   LEVEL 2/3 PLP STYLES - Matching Mockup
+   ======================================== */
+
+/* Color Variables */
+.cf-plp {
+  --deep-blue: #1a3a5c;
+  --primary-blue: #2563eb;
+  --medium-blue: #3b82f6;
+  --light-blue: #60a5fa;
+  --pale-blue: #dbeafe;
+  --sky-blue: #e0f2fe;
+  --deep-red: #991b1b;
+  --primary-red: #dc2626;
+  --bright-red: #ef4444;
+  --text-dark: #0f172a;
+  --text-medium: #475569;
+  --text-light: #64748b;
+  --text-muted: #94a3b8;
+  --border-color: #e2e8f0;
+  --bg-light: #f8fafc;
+  --bg-white: #ffffff;
+  --rating-gold: #f59e0b;
+  --success-green: #10b981;
+}
+
+.cf-plp {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-white);
+}
+
+/* ========================================
+   COMPACT HEADER ROW 1 - Breadcrumb (left) | Title (right)
+   ======================================== */
+.cf-plp__header-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 40px;
+  background: var(--bg-white);
+  border-bottom: 1px solid var(--border-color);
+  gap: 20px;
+}
+
+/* Inline Breadcrumb (left side) */
+.cf-plp__breadcrumb-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  margin: 0;
+}
+
+.cf-plp__breadcrumb-inline a {
+  color: var(--primary-blue);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.cf-plp__breadcrumb-inline a:hover {
+  color: var(--primary-red);
+}
+
+.cf-plp__breadcrumb-sep {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.cf-plp__breadcrumb-current {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* Compact Title (right side) */
+.cf-plp__title-compact {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--deep-blue);
+  margin: 0;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* ========================================
+   COMPACT TOOLBAR ROW 2 - Filters (left) | View+Sort (right)
+   ======================================== */
+.cf-plp__toolbar-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 40px;
+  background: var(--bg-light);
+  border-bottom: 1px solid var(--border-color);
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.cf-plp__toolbar-compact__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cf-plp__toolbar-compact__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cf-plp__active-filters-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cf-plp__active-filters-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-medium);
+}
+
+.cf-plp__active-filters-list {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cf-plp__clear-all {
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary-blue);
+  cursor: pointer;
+  padding: 0;
+  margin-left: 8px;
+}
+
+.cf-plp__clear-all:hover {
+  color: var(--primary-red);
+}
+
+.cf-plp__results-count {
+  font-size: 13px;
+  color: var(--text-medium);
+}
+
+/* Legacy classes for backwards compatibility */
+.cf-plp__title-inline {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--deep-blue);
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+
+.cf-plp__subtitle-inline {
+  font-size: 13px;
+  color: var(--text-light);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .cf-plp__header-compact {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 20px;
+  }
+
+  .cf-plp__title-compact {
+    font-size: 18px;
+    white-space: normal;
+  }
+
+  .cf-plp__breadcrumb-inline a:not(:first-child),
+  .cf-plp__breadcrumb-inline .cf-plp__breadcrumb-sep:not(:first-of-type),
+  .cf-plp__breadcrumb-current {
+    display: none;
+  }
+
+  .cf-plp__breadcrumb-inline a:first-child::before {
+    content: '🏠';
+    margin-right: 4px;
+  }
+
+  .cf-plp__toolbar-compact {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px 20px;
+  }
+
+  .cf-plp__toolbar-compact__left {
+    justify-content: flex-start;
+  }
+
+  .cf-plp__toolbar-compact__right {
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+/* L3 Filter Pills (L2 only) */
+.cf-plp__pills {
+  padding: 14px 40px;
+  background: var(--bg-light);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cf-plp__pills-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-medium);
+}
+
+.cf-plp__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 25px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cf-plp__pill:hover {
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+}
+
+.cf-plp__pill.active {
+  background: var(--deep-blue);
+  border-color: var(--deep-blue);
+  color: white;
+}
+
+.cf-plp__pill-count {
+  background: rgba(0,0,0,0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.cf-plp__pill.active .cf-plp__pill-count {
+  background: rgba(255,255,255,0.2);
+}
+
+/* Pill Link (navigates to another page instead of filtering) */
+.cf-plp__pill--link {
+  text-decoration: none;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+  border-color: var(--primary-red);
+  color: var(--primary-red);
+}
+
+.cf-plp__pill--link:hover {
+  background: var(--primary-red);
+  border-color: var(--primary-red);
+  color: white;
+  text-decoration: none;
+}
+
+/* Main Container */
+.cf-plp__container {
+  display: flex;
+  background: var(--bg-white);
+  min-height: 800px;
+}
+
+/* Filters Sidebar */
+.cf-plp__sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  padding: 24px;
+  border-right: 1px solid var(--border-color);
+  background: var(--bg-light);
+}
+
+.cf-plp__filters-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--deep-blue);
+  margin: 0 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cf-plp__filters-title::before {
+  content: '';
+  width: 3px;
+  height: 18px;
+  background: var(--primary-red);
+  border-radius: 2px;
+}
+
+.cf-plp__filter-group {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cf-plp__filter-group:last-child {
+  border-bottom: none;
+}
+
+.cf-plp__filter-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--deep-blue);
+  margin: 0 0 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.cf-plp__filter-title::after {
+  content: '−';
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+.cf-plp__filter-options {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cf-plp__filter-options li {
+  margin-bottom: 10px;
+}
+
+.cf-plp__filter-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-medium);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.cf-plp__filter-option:hover {
+  color: var(--deep-blue);
+}
+
+.cf-plp__filter-option input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary-blue);
+  cursor: pointer;
+}
+
+.cf-plp__filter-count {
+  color: var(--text-muted);
+  margin-left: auto;
+  font-size: 12px;
+}
+
+/* Range Slider Styles */
+.cf-plp__range-filter {
+  margin-top: 10px;
+}
+
+.cf-plp__range-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+
+.cf-plp__range-min-val,
+.cf-plp__range-max-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--deep-blue);
+}
+
+.cf-plp__range-sep {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.cf-plp__range-slider-wrap {
+  position: relative;
+  height: 24px;
+  margin: 0 8px;
+}
+
+.cf-plp__range-slider {
+  position: absolute;
+  width: 100%;
+  height: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  -webkit-appearance: none;
+  pointer-events: none;
+}
+
+.cf-plp__range-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  background: linear-gradient(to right, var(--pale-blue) 0%, var(--primary-blue) 50%, var(--pale-blue) 100%);
+  border-radius: 3px;
+}
+
+.cf-plp__range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--primary-blue);
+  border: 3px solid var(--bg-white);
+  border-radius: 50%;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+  margin-top: -7px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cf-plp__range-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.4);
+}
+
+.cf-plp__range-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: var(--primary-blue);
+  border: 3px solid var(--bg-white);
+  border-radius: 50%;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+}
+
+.cf-plp__range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+/* Quick Select Buttons */
+.cf-plp__quick-select {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.cf-plp__quick-btn {
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  color: var(--text-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cf-plp__quick-btn:hover {
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+}
+
+.cf-plp__quick-btn.active {
+  background: var(--primary-blue);
+  border-color: var(--primary-blue);
+  color: white;
+}
+
+/* Show More Button */
+.cf-plp__show-more {
+  margin-top: 6px;
+}
+
+.cf-plp__show-more-btn {
+  background: transparent;
+  border: none;
+  color: var(--primary-blue);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.cf-plp__show-more-btn:hover {
+  color: var(--primary-red);
+  text-decoration: underline;
+}
+
+.cf-plp__suggested-brand {
+  font-size: 10px;
+  color: var(--primary-red);
+  font-weight: 700;
+  display: block;
+  margin-left: 26px;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Products Area */
+.cf-plp__products {
+  flex: 1;
+  padding: 20px 30px;
+}
+
+/* Toolbar */
+.cf-plp__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.cf-plp__view-toggle {
+  display: flex;
+  gap: 0;
+}
+
+.cf-plp__view-btn {
+  padding: 10px 16px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-white);
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-medium);
+  transition: all 0.2s ease;
+}
+
+.cf-plp__view-btn:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.cf-plp__view-btn:last-child {
+  border-radius: 0 6px 6px 0;
+  border-left: none;
+}
+
+.cf-plp__view-btn.active {
+  background: var(--deep-blue);
+  color: white;
+  border-color: var(--deep-blue);
+}
+
+.cf-plp__sort {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cf-plp__sort label {
+  font-size: 13px;
+  color: var(--text-medium);
+}
+
+.cf-plp__sort select {
+  padding: 10px 36px 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 13px;
+  background: var(--bg-white);
+  cursor: pointer;
+}
+
+.cf-plp__results-count {
+  font-size: 13px;
+  color: var(--text-medium);
+}
+
+/* Active Filters Display */
+.cf-plp__active-filters {
+  padding: 16px 0;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cf-plp__active-filters-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.cf-plp__active-filters-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.cf-plp__clear-all {
+  padding: 6px 12px;
+  background: var(--primary-red);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cf-plp__clear-all:hover {
+  background: var(--deep-red);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+.cf-plp__active-filters-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cf-plp__filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--pale-blue);
+  border: 1px solid var(--primary-blue);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--deep-blue);
+}
+
+.cf-plp__filter-chip-remove {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-blue);
+  color: white;
+  border-radius: 50%;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cf-plp__filter-chip-remove:hover {
+  background: var(--primary-red);
+  transform: scale(1.1);
+}
+
+/* Product Grid */
+.cf-plp__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 1200px) {
+  .cf-plp__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .cf-plp__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .cf-plp__sidebar {
+    display: none;
+  }
+}
+
+/* List View */
+.cf-plp__grid.list-view {
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.cf-plp__grid.list-view .cf-plp__card {
+  display: flex;
+  flex-direction: row;
+  padding: 16px;
+  gap: 24px;
+}
+
+.cf-plp__grid.list-view .cf-plp__card-image-wrap {
+  width: 180px;
+  height: 180px;
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+
+.cf-plp__grid.list-view .cf-plp__card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.cf-plp__grid.list-view .cf-plp__card-category {
+  margin-bottom: 8px;
+}
+
+.cf-plp__grid.list-view .cf-plp__card-title {
+  font-size: 16px;
+  min-height: auto;
+  margin-bottom: 8px;
+}
+
+.cf-plp__grid.list-view .cf-plp__card-rating {
+  margin-bottom: 8px;
+}
+
+.cf-plp__grid.list-view .cf-plp__card-sku {
+  margin-bottom: 4px;
+}
+
+.cf-plp__grid.list-view .cf-plp__card-variants {
+  margin-bottom: 12px;
+}
+
+.cf-plp__grid.list-view .cf-plp__price-box {
+  max-width: 200px;
+  margin-bottom: 12px;
+}
+
+.cf-plp__grid.list-view .cf-plp__cart-row {
+  max-width: 280px;
+}
+
+.cf-plp__grid.list-view .cf-plp__card-badge {
+  top: 12px;
+  left: 12px;
+}
+
+/* Product Card */
+.cf-plp__card {
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.cf-plp__card:hover {
+  border-color: var(--primary-blue);
+  box-shadow: 0 12px 40px rgba(37, 99, 235, 0.12);
+  transform: translateY(-4px);
+}
+
+.cf-plp__card-badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: var(--deep-blue);
+  color: white;
+  font-size: 10px;
+  padding: 4px 10px;
+  font-weight: 700;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 2;
+}
+
+.cf-plp__card-image-wrap {
+  display: block;
+  width: 100%;
+  height: 160px;
+  margin-bottom: 16px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.cf-plp__card-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.cf-plp__card:hover .cf-plp__card-image {
+  filter: brightness(1.08);
+  transform: scale(1.02);
+}
+
+/* Shine Sweep Effect */
+.cf-plp__card-image-wrap::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0) 20%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0) 80%,
+    transparent 100%
+  );
+  transform: skewX(-25deg);
+  z-index: 1;
+  transition: left 0.7s ease;
+  pointer-events: none;
+}
+
+.cf-plp__card:hover .cf-plp__card-image-wrap::before {
+  left: 150%;
+}
+
+.cf-plp__card-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  background: var(--sky-blue);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.cf-plp__card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--deep-blue);
+  text-decoration: none;
+  line-height: 1.4;
+  display: block;
+  margin-bottom: 8px;
+  transition: color 0.2s ease;
+}
+
+.cf-plp__card-title:hover {
+  color: var(--primary-blue);
+}
+
+.cf-plp__card-rating {
+  display: none; /* Hidden on L2 - matches L3 design without static stars */
+}
+
+.cf-plp__plus-badge {
+  display: none; /* Hidden on L2 pages per client request */
+}
+
+.cf-plp__stars {
+  display: none; /* Hidden - unnecessary static stars */
+}
+
+.cf-plp__card-sku {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+/* Variants Badge (on image) */
+.cf-plp__variants-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--deep-blue);
+  color: white;
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  z-index: 5;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.cf-plp__variants-text {
+  display: block;
+}
+
+.cf-plp__variants-tooltip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--deep-blue);
+  color: white;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  min-width: 180px;
+  max-width: 280px;
+  white-space: normal;
+  text-align: left;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.cf-plp__variants-tooltip::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: 12px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid var(--deep-blue);
+}
+
+.cf-plp__variants-badge:hover {
+  background: var(--primary-blue);
+}
+
+.cf-plp__variants-badge:hover .cf-plp__variants-tooltip {
+  display: block;
+}
+
+/* Price Box - matches L3 design */
+.cf-plp__price-box {
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border: 1px solid #e2e8f0;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  text-align: center;
+  border-radius: 6px;
+}
+
+.cf-plp__price-label {
+  font-size: 10px;
+  color: var(--primary-blue);
+  font-weight: 700;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cf-plp__price-main {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary-red);
+}
+
+.cf-plp__price-unit {
+  font-size: 12px;
+  color: var(--text-medium);
+  font-weight: 400;
+}
+
+.cf-plp__price-regular {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-decoration: line-through;
+  margin-top: 4px;
+}
+
+/* Sale price strikethrough (compare_at_price) for everyone */
+.cf-plp__price-original {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.cf-plp__price-original s {
+  text-decoration: line-through;
+}
+
+.cf-plp__sale-savings {
+  font-size: 11px;
+  color: #10b981;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* Login Prompt */
+.cf-plp__login-prompt {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(26, 58, 92, 0.1) 100%);
+  border: 1px dashed var(--primary-blue);
+  border-radius: 6px;
+  color: var(--primary-blue);
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.cf-plp__login-prompt:hover {
+  background: var(--primary-blue);
+  color: white;
+  border-style: solid;
+}
+
+/* Call for Details Prompt - MAP Compliance for non-CF vendors */
+.cf-plp__call-prompt {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--deep-blue);
+  font-size: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.cf-plp__call-prompt:hover {
+  background: linear-gradient(135deg, var(--deep-blue) 0%, var(--primary-blue) 100%);
+  color: white;
+  border-color: var(--deep-blue);
+}
+
+/* Shipping Badge */
+.cf-plp__shipping {
+  display: inline-block;
+  font-size: 10px;
+  padding: 5px 12px;
+  font-weight: 700;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.cf-plp__shipping--free {
+  background: linear-gradient(135deg, var(--success-green) 0%, #059669 100%);
+  color: white;
+}
+
+.cf-plp__shipping--quick {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--deep-blue) 100%);
+  color: white;
+}
+
+.cf-plp__shipping--regular {
+  background: var(--bg-light);
+  color: var(--text-medium);
+}
+
+/* Add to Cart Row */
+.cf-plp__cart-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.cf-plp__qty-input {
+  width: 50px;
+  height: 38px;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.cf-plp__qty-input:focus {
+  outline: none;
+  border-color: #2d5a87;
+}
+
+.cf-plp__add-btn {
+  flex: 1;
+  height: 38px;
+  background: linear-gradient(135deg, #2d5a87 0%, #1a365d 100%);
+  color: #ffffff;
+  border: none;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cf-plp__add-btn:hover {
+  background: linear-gradient(135deg, #3d6a9f 0%, #2d5a87 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(45, 90, 135, 0.3);
+}
+
+/* No Products */
+.cf-plp__no-products {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-light);
+}
+
+/* Pagination */
+.cf-plp__pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 30px 0;
+  margin-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.cf-plp__page-btn {
+  padding: 10px 20px;
+  border: 1px solid var(--border-color);
+  background: white;
+  color: var(--text-dark);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cf-plp__page-btn:hover:not(:disabled) {
+  border-color: var(--primary-navy);
+  color: var(--primary-navy);
+  background: var(--bg-light);
+}
+
+.cf-plp__page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cf-plp__page-numbers {
+  display: flex;
+  gap: 4px;
+}
+
+.cf-plp__page-num {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  background: white;
+  color: var(--text-dark);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cf-plp__page-num:hover {
+  border-color: var(--primary-navy);
+  color: var(--primary-navy);
+}
+
+.cf-plp__page-num.active {
+  background: var(--primary-navy);
+  border-color: var(--primary-navy);
+  color: white;
+}
+
+/* ========================================
+   ABOUT THIS CATEGORY - Collapsible Section
+   ======================================== */
+.cf-plp__about-category {
+  margin-top: 40px;
+  padding: 0 0 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.cf-plp__about-category-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 16px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.cf-plp__about-category-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--deep-blue);
+}
+
+.cf-plp__about-category-icon {
+  transition: transform 0.3s ease;
+  color: var(--text-medium);
+}
+
+.cf-plp__about-category-toggle.expanded .cf-plp__about-category-icon {
+  transform: rotate(180deg);
+}
+
+.cf-plp__about-category-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-medium);
+}
+
+.cf-plp__about-category-content[aria-hidden="false"] {
+  padding-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+  .cf-plp__about-category {
+    margin-top: 30px;
+    padding: 0 0 15px;
+  }
+
+  .cf-plp__about-category-title {
+    font-size: 14px;
+  }
+}
+
+.cf-plp__page-ellipsis {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+/* ============================================
+   COMPACT MODE - 5 Columns (Scaled Down)
+   ============================================ */
+.cf-plp--compact .cf-plp__pills {
+  padding: 10px 30px;
+  gap: 8px;
+}
+
+.cf-plp--compact .cf-plp__pills-label {
+  font-size: 11px;
+}
+
+.cf-plp--compact .cf-plp__pill {
+  padding: 6px 12px;
+  font-size: 11px;
+  border-radius: 20px;
+}
+
+.cf-plp--compact .cf-plp__container {
+  gap: 20px;
+}
+
+.cf-plp--compact .cf-plp__sidebar {
+  width: 220px;
+  padding: 16px;
+}
+
+.cf-plp--compact .cf-plp__filters-title {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.cf-plp--compact .cf-plp__filter-group {
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+}
+
+.cf-plp--compact .cf-plp__filter-title {
+  font-size: 11px;
+  padding: 0;
+  margin: 0 0 6px;
+}
+
+.cf-plp--compact .cf-plp__filter-options li {
+  margin-bottom: 4px;
+}
+
+.cf-plp--compact .cf-plp__filter-option {
+  font-size: 11px;
+  padding: 2px 0;
+  gap: 6px;
+}
+
+.cf-plp--compact .cf-plp__filter-option input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+}
+
+.cf-plp--compact .cf-plp__products-area {
+  padding: 16px 20px;
+}
+
+.cf-plp--compact .cf-plp__grid {
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+
+.cf-plp--compact .cf-plp__card {
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.cf-plp--compact .cf-plp__card-badge {
+  top: 10px;
+  left: 10px;
+  font-size: 9px;
+  padding: 3px 8px;
+}
+
+.cf-plp--compact .cf-plp__card-image-wrap {
+  height: 120px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+}
+
+.cf-plp--compact .cf-plp__card-category {
+  font-size: 9px;
+  padding: 3px 8px;
+  margin-bottom: 6px;
+}
+
+.cf-plp--compact .cf-plp__card-title {
+  font-size: 11px;
+  margin-bottom: 6px;
+  line-height: 1.35;
+  min-height: calc(11px * 1.35 * 2);
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cf-plp--compact .cf-plp__card-sku {
+  font-size: 9px;
+  margin-bottom: 4px;
+}
+
+.cf-plp--compact .cf-plp__price-box {
+  padding: 8px 6px;
+  border-radius: 6px;
+}
+
+.cf-plp--compact .cf-plp__price-label {
+  font-size: 9px;
+  margin-bottom: 2px;
+}
+
+.cf-plp--compact .cf-plp__price-main {
+  font-size: 15px;
+}
+
+.cf-plp--compact .cf-plp__price-regular {
+  font-size: 10px;
+}
+
+.cf-plp--compact .cf-plp__shipping {
+  font-size: 9px;
+  padding: 4px 8px;
+  margin-top: 6px;
+}
+
+.cf-plp--compact .cf-plp__cart-row {
+  margin-top: 8px;
+  gap: 6px;
+}
+
+.cf-plp--compact .cf-plp__qty-input {
+  width: 50px;
+  padding: 6px 4px;
+  font-size: 11px;
+}
+
+.cf-plp--compact .cf-plp__add-btn {
+  padding: 8px 10px;
+  font-size: 10px;
+}
+
+.cf-plp--compact .cf-plp__variants-badge {
+  padding: 3px 8px;
+  font-size: 9px;
+}
+
+/* Compact toolbar */
+.cf-plp--compact .cf-plp__toolbar-compact {
+  padding: 10px 20px;
+}
+
+.cf-plp--compact .cf-plp__toolbar-compact__left {
+  flex: 1;
+  min-width: 0;
+}
+
+.cf-plp--compact .cf-plp__active-filters-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cf-plp--compact .cf-plp__active-filters-label {
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.cf-plp--compact .cf-plp__active-filters-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.cf-plp--compact .cf-plp__clear-all {
+  padding: 4px 8px;
+  font-size: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.cf-plp--compact .cf-plp__filter-chip {
+  padding: 3px 8px;
+  font-size: 10px;
+  gap: 4px;
+  border-radius: 12px;
+}
+
+.cf-plp--compact .cf-plp__filter-chip-remove {
+  width: 12px;
+  height: 12px;
+  font-size: 8px;
+}
+
+.cf-plp--compact .cf-plp__results-count {
+  font-size: 12px;
+}
+
+.cf-plp--compact .cf-plp__sort label {
+  display: none;
+}
+
+.cf-plp--compact .cf-plp__sort select {
+  font-size: 11px;
+  padding: 6px 10px;
+}
+
+/* View toggle - icons only in compact mode */
+.cf-plp--compact .cf-plp__view-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  justify-content: center;
+}
+
+.cf-plp--compact .cf-plp__view-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Hide text in view toggle buttons */
+.cf-plp--compact .cf-plp__view-btn {
+  font-size: 0;
+  gap: 0;
+}
+
+/* Compact pagination */
+.cf-plp--compact .cf-plp__pagination {
+  padding: 16px;
+  gap: 6px;
+}
+
+.cf-plp--compact .cf-plp__page-btn {
+  width: 32px;
+  height: 32px;
+  font-size: 12px;
+}
+
+/* Mobile Filter Button */
+.cf-plp__mobile-filter-btn {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--deep-blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cf-plp__mobile-filter-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Mobile Filter Drawer */
+.cf-plp__mobile-filter-drawer {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+}
+
+.cf-plp__mobile-filter-drawer.active {
+  display: block;
+}
+
+.cf-plp__mobile-filter-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+}
+
+.cf-plp__mobile-filter-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 280px;
+  max-width: 85%;
+  height: 100%;
+  background: white;
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.cf-plp__mobile-filter-drawer.active .cf-plp__mobile-filter-panel {
+  transform: translateX(0);
+}
+
+.cf-plp__mobile-filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--deep-blue);
+  color: white;
+}
+
+.cf-plp__mobile-filter-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cf-plp__mobile-filter-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.cf-plp__mobile-filter-content {
+  padding: 12px 16px;
+}
+
+.cf-plp__mobile-filter-apply {
+  position: sticky;
+  bottom: 0;
+  padding: 12px 16px;
+  background: white;
+  border-top: 1px solid var(--border-color);
+}
+
+.cf-plp__mobile-filter-apply button {
+  width: 100%;
+  padding: 12px;
+  background: var(--primary-red);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Compact responsive adjustments */
+@media (max-width: 1400px) {
+  .cf-plp--compact .cf-plp__grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 1100px) {
+  .cf-plp--compact .cf-plp__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .cf-plp--compact .cf-plp__sidebar {
+    display: none;
+  }
+  .cf-plp--compact .cf-plp__mobile-filter-btn {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 768px) {
+  .cf-plp--compact .cf-plp__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .cf-plp--compact .cf-plp__card {
+    padding: 10px;
+  }
+  .cf-plp--compact .cf-plp__card-image-wrap {
+    height: 100px;
+  }
+}
+</style>
+
+<div class="cf-plp{% if section.settings.compact_mode %} cf-plp--compact{% endif %}" data-section-id="{{ section.id }}">
+
+  {% comment %} Compact Header Row 1: Breadcrumb (left) | Title (right) {% endcomment %}
+  <header class="cf-plp__header-compact">
+    <nav class="cf-plp__breadcrumb-inline" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span class="cf-plp__breadcrumb-sep">›</span>
+      {% assign breadcrumb_found = false %}
+      {% for link in linklists[menu_handle].links %}
+        {% unless breadcrumb_found %}
+          {% for l2_link in link.links %}
+            {% assign l2_handle = l2_link.url | split: '/' | last | split: '?' | first %}
+            {% if l2_handle == collection.handle %}
+              <a href="{{ link.url }}">{{ link.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</a>
+              <span class="cf-plp__breadcrumb-sep">›</span>
+              {% assign breadcrumb_found = true %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+        {% endunless %}
+      {% endfor %}
+      <span class="cf-plp__breadcrumb-current">{{ collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</span>
+    </nav>
+    <h1 class="cf-plp__title-compact">{{ collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</h1>
+  </header>
+
+  {% comment %} L3 Filter Pills (L2 only) - Menu is source of truth {% endcomment %}
+  {% if l3_handle_array.size > 0 %}
+    <nav class="cf-plp__pills" aria-label="Filter by category">
+      <span class="cf-plp__pills-label">Subcategory:</span>
+
+      <button type="button" class="cf-plp__pill active" data-filter="all">
+        All Products
+      </button>
+
+      {% for handle in l3_handle_array %}
+        {% assign handle_clean = handle | strip %}
+        {% assign pill_index = forloop.index0 %}
+        {% assign pill_title = l3_title_array[pill_index] | default: handle_clean %}
+        {% if handle_clean != blank %}
+          {% comment %} Special case: Indian Specialty pills link to L1 page instead of filtering {% endcomment %}
+          {% assign pill_title_lower = pill_title | downcase %}
+          {% if pill_title_lower contains 'indian specialty' %}
+            <a href="/collections/indian-specialty" class="cf-plp__pill cf-plp__pill--link">
+              {{ pill_title }}
+            </a>
+          {% elsif pill_title_lower contains 'food holding' %}
+            <a href="/collections/food-holding-and-warming-equipment" class="cf-plp__pill cf-plp__pill--link">
+              {{ pill_title }}
+            </a>
+          {% elsif pill_title_lower contains 'storage racks' %}
+            <a href="/collections/chrome" class="cf-plp__pill cf-plp__pill--link">
+              {{ pill_title }}
+            </a>
+          {% else %}
+            <button type="button" class="cf-plp__pill" data-filter="{{ handle_clean }}">
+              {{ pill_title }}
+            </button>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </nav>
+  {% endif %}
+
+  {% comment %} Main Container {% endcomment %}
+  <div class="cf-plp__container">
+
+    {% comment %} Filters Sidebar {% endcomment %}
+    <aside class="cf-plp__sidebar">
+      <h2 class="cf-plp__filters-title">Filters</h2>
+
+      {% comment %} ========================================
+         PRIORITY FILTERS: Brand and Product Type
+         ======================================== {% endcomment %}
+
+      {% comment %} 1. Brand Filter - Collect unique vendors {% endcomment %}
+      <div class="cf-plp__filter-group">
+        <h3 class="cf-plp__filter-title">Brand</h3>
+        <ul class="cf-plp__filter-options">
+          {% assign brand_string = '' %}
+          {% for handle in l3_handle_array limit: 5 %}
+            {% assign handle_clean = handle | strip %}
+            {% if handle_clean != blank %}
+              {% assign coll = collections[handle_clean] %}
+              {% for product in coll.products limit: 15 %}
+                {% if product.vendor != blank %}
+                  {% unless brand_string contains product.vendor %}
+                    {% if brand_string == '' %}
+                      {% assign brand_string = product.vendor %}
+                    {% else %}
+                      {% assign brand_string = brand_string | append: '|||' | append: product.vendor %}
+                    {% endif %}
+                  {% endunless %}
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+          {% assign brands_array = brand_string | split: '|||' %}
+          {% for brand in brands_array limit: 10 %}
+            {% if brand != blank %}
+              <li>
+                <label class="cf-plp__filter-option">
+                  <input type="checkbox" name="brand" value="{{ brand | handleize }}">
+                  {{ brand }}
+                </label>
+              </li>
+            {% endif %}
+          {% endfor %}
+          {% if brands_array.size == 0 %}
+            <li><span style="color: var(--text-muted); font-size: 12px;">No brands found</span></li>
+          {% endif %}
+        </ul>
+      </div>
+
+      {% comment %} 2. Product Type Filter - Extract from product tags/types {% endcomment %}
+      <div class="cf-plp__filter-group">
+        <h3 class="cf-plp__filter-title">Product Type</h3>
+        <ul class="cf-plp__filter-options">
+          {% assign type_string = '' %}
+          {% for handle in l3_handle_array limit: 5 %}
+            {% assign handle_clean = handle | strip %}
+            {% if handle_clean != blank %}
+              {% assign coll = collections[handle_clean] %}
+              {% for product in coll.products limit: 15 %}
+                {% if product.type != blank %}
+                  {% unless type_string contains product.type %}
+                    {% if type_string == '' %}
+                      {% assign type_string = product.type %}
+                    {% else %}
+                      {% assign type_string = type_string | append: '|||' | append: product.type %}
+                    {% endif %}
+                  {% endunless %}
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+          {% assign types_array = type_string | split: '|||' %}
+          {% for product_type in types_array limit: 10 %}
+            {% if product_type != blank %}
+              <li>
+                <label class="cf-plp__filter-option">
+                  <input type="checkbox" name="product-type" value="{{ product_type | handleize }}">
+                  {{ product_type }}
+                </label>
+              </li>
+            {% endif %}
+          {% endfor %}
+          {% if types_array.size == 0 %}
+            <li><span style="color: var(--text-muted); font-size: 12px;">No product types found</span></li>
+          {% endif %}
+        </ul>
+      </div>
+
+      {% comment %} Quick Ship Filter {% endcomment %}
+      <div class="cf-plp__filter-group">
+        <h3 class="cf-plp__filter-title">Quick Ship</h3>
+        <ul class="cf-plp__filter-options">
+          <li>
+            <label class="cf-plp__filter-option">
+              <input type="checkbox" name="quickship">
+              ⚡ Quick Shipping
+            </label>
+          </li>
+        </ul>
+      </div>
+
+      {% comment %} Membership Filter {% endcomment %}
+      <div class="cf-plp__filter-group">
+        <h3 class="cf-plp__filter-title">Membership</h3>
+        <ul class="cf-plp__filter-options">
+          <li>
+            <label class="cf-plp__filter-option">
+              <input type="checkbox" name="plus">
+              <span class="cf-plp__plus-badge">Plus</span> Eligible
+            </label>
+          </li>
+        </ul>
+      </div>
+
+      {% comment %} Price Range Filter {% endcomment %}
+      <div class="cf-plp__filter-group">
+        <h3 class="cf-plp__filter-title">Price Range</h3>
+        <ul class="cf-plp__filter-options">
+          <li>
+            <label class="cf-plp__filter-option">
+              <input type="checkbox" name="price" value="0-500">
+              Under $500
+            </label>
+          </li>
+          <li>
+            <label class="cf-plp__filter-option">
+              <input type="checkbox" name="price" value="500-1000">
+              $500 - $1,000
+            </label>
+          </li>
+          <li>
+            <label class="cf-plp__filter-option">
+              <input type="checkbox" name="price" value="1000-2500">
+              $1,000 - $2,500
+            </label>
+          </li>
+          <li>
+            <label class="cf-plp__filter-option">
+              <input type="checkbox" name="price" value="2500+">
+              $2,500+
+            </label>
+          </li>
+        </ul>
+      </div>
+
+      {% comment %} ========================================
+         VARIATION FILTERS (Width, Depth, Height, etc.)
+         Collect from product options and display as range/checkbox
+      ======================================== {% endcomment %}
+      {% assign variation_options = '' %}
+      {% assign all_option_values = '' %}
+
+      {% comment %} Collect all unique options from products (excluding Shopify default "Title") {% endcomment %}
+      {% for handle in l3_handle_array limit: 5 %}
+        {% assign handle_clean = handle | strip %}
+        {% if handle_clean != blank %}
+          {% assign coll = collections[handle_clean] %}
+          {% for product in coll.products limit: 20 %}
+            {% for option in product.options_with_values %}
+              {% assign opt_name = option.name %}
+              {% assign opt_name_lower = opt_name | downcase %}
+              {% comment %} Skip Shopify's default "Title" option (for single-variant products) {% endcomment %}
+              {% unless opt_name_lower == 'title' %}
+                {% unless variation_options contains opt_name %}
+                  {% if variation_options == '' %}
+                    {% assign variation_options = opt_name %}
+                  {% else %}
+                    {% assign variation_options = variation_options | append: '|||' | append: opt_name %}
+                  {% endif %}
+                {% endunless %}
+              {% endunless %}
+            {% endfor %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+
+      {% assign option_names_array = variation_options | split: '|||' %}
+
+      {% comment %} Render each option type as a filter {% endcomment %}
+      {% for opt_name in option_names_array limit: 5 %}
+        {% assign option_values = '' %}
+        {% assign numeric_values = '' %}
+        {% assign is_numeric = false %}
+
+        {% comment %} Collect all values for this option {% endcomment %}
+        {% for handle in l3_handle_array limit: 5 %}
+          {% assign handle_clean = handle | strip %}
+          {% if handle_clean != blank %}
+            {% assign coll = collections[handle_clean] %}
+            {% for product in coll.products limit: 20 %}
+              {% for option in product.options_with_values %}
+                {% if option.name == opt_name %}
+                  {% for val in option.values %}
+                    {% unless option_values contains val %}
+                      {% if option_values == '' %}
+                        {% assign option_values = val %}
+                      {% else %}
+                        {% assign option_values = option_values | append: '|||' | append: val %}
+                      {% endif %}
+                    {% endunless %}
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+
+        {% assign values_array = option_values | split: '|||' %}
+
+        {% comment %} Check if values are numeric (contain numbers like 24", 36", etc.) {% endcomment %}
+        {% assign numeric_count = 0 %}
+        {% assign min_numeric = 99999 %}
+        {% assign max_numeric = 0 %}
+        {% for val in values_array %}
+          {% assign clean_val = val | remove: '"' | remove: "'" | remove: ' inch' | remove: 'inch' | remove: ' in' | remove: 'in' | remove: ' ' %}
+          {% assign num_val = clean_val | plus: 0 %}
+          {% if num_val > 0 %}
+            {% assign numeric_count = numeric_count | plus: 1 %}
+            {% if num_val < min_numeric %}
+              {% assign min_numeric = num_val %}
+            {% endif %}
+            {% if num_val > max_numeric %}
+              {% assign max_numeric = num_val %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+
+        {% if numeric_count > 2 and values_array.size > 2 %}
+          {% assign is_numeric = true %}
+        {% endif %}
+
+        {% if values_array.size > 0 %}
+          <div class="cf-plp__filter-group">
+            <h3 class="cf-plp__filter-title">{{ opt_name }}</h3>
+
+            {% if is_numeric %}
+              {% comment %} Range Slider for Numeric Options {% endcomment %}
+              <div class="cf-plp__range-filter" data-option="{{ opt_name | handleize }}">
+                <div class="cf-plp__range-display">
+                  <span class="cf-plp__range-min-val">{{ min_numeric }}"</span>
+                  <span class="cf-plp__range-sep">to</span>
+                  <span class="cf-plp__range-max-val">{{ max_numeric }}"</span>
+                </div>
+                <div class="cf-plp__range-slider-wrap">
+                  <input type="range"
+                         class="cf-plp__range-slider cf-plp__range-min"
+                         min="{{ min_numeric }}"
+                         max="{{ max_numeric }}"
+                         value="{{ min_numeric }}"
+                         data-option="{{ opt_name | handleize }}">
+                  <input type="range"
+                         class="cf-plp__range-slider cf-plp__range-max"
+                         min="{{ min_numeric }}"
+                         max="{{ max_numeric }}"
+                         value="{{ max_numeric }}"
+                         data-option="{{ opt_name | handleize }}">
+                </div>
+                <div class="cf-plp__range-labels">
+                  <span>{{ min_numeric }}"</span>
+                  <span>{{ max_numeric }}"</span>
+                </div>
+              </div>
+
+              {% comment %} Also show quick select buttons {% endcomment %}
+              <div class="cf-plp__quick-select">
+                {% for val in values_array limit: 6 %}
+                  <button type="button" class="cf-plp__quick-btn" data-option="{{ opt_name | handleize }}" data-value="{{ val }}">
+                    {{ val }}
+                  </button>
+                {% endfor %}
+              </div>
+            {% else %}
+              {% comment %} Checkboxes for Non-Numeric Options {% endcomment %}
+              <ul class="cf-plp__filter-options">
+                {% for val in values_array limit: 10 %}
+                  <li>
+                    <label class="cf-plp__filter-option">
+                      <input type="checkbox" name="option_{{ opt_name | handleize }}" value="{{ val | handleize }}" data-option-handle="{{ opt_name | handleize }}" data-value="{{ val }}">
+                      {{ val }}
+                    </label>
+                  </li>
+                {% endfor %}
+                {% if values_array.size > 10 %}
+                  <li class="cf-plp__show-more">
+                    <button type="button" class="cf-plp__show-more-btn" data-target="option_{{ opt_name | handleize }}">
+                      + {{ values_array.size | minus: 10 }} more
+                    </button>
+                  </li>
+                {% endif %}
+              </ul>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </aside>
+
+    {% comment %} Products Area {% endcomment %}
+    <main class="cf-plp__products">
+
+      {% comment %} Compact Toolbar Row 2: Filters/Count (left) | View Toggle + Sort (right) {% endcomment %}
+      <div class="cf-plp__toolbar-compact">
+        <!-- Left Side: Active Filters or Product Count -->
+        <div class="cf-plp__toolbar-compact__left">
+          <div class="cf-plp__active-filters-inline" id="active-filters" style="display: none;">
+            <span class="cf-plp__active-filters-label">Active Filters:</span>
+            <div class="cf-plp__active-filters-list" id="active-filters-list">
+              <!-- Dynamically populated by JavaScript -->
+            </div>
+            <button type="button" class="cf-plp__clear-all" id="clear-all-filters">Clear All</button>
+          </div>
+          <div class="cf-plp__results-count" id="results-count-display">
+            <strong id="filtered-count">{{ grand_total_products }}</strong> products
+          </div>
+        </div>
+
+        <!-- Right Side: Mobile Filter + View Toggle + Sort -->
+        <div class="cf-plp__toolbar-compact__right">
+          <button type="button" class="cf-plp__mobile-filter-btn" id="mobile-filter-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="4" y1="6" x2="20" y2="6"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+              <line x1="11" y1="18" x2="13" y2="18"></line>
+            </svg>
+            Filters
+          </button>
+          <div class="cf-plp__view-toggle">
+            <button class="cf-plp__view-btn active" data-view="grid">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                <rect x="0" y="0" width="7" height="7" rx="1"/>
+                <rect x="9" y="0" width="7" height="7" rx="1"/>
+                <rect x="0" y="9" width="7" height="7" rx="1"/>
+                <rect x="9" y="9" width="7" height="7" rx="1"/>
+              </svg>
+              Grid
+            </button>
+            <button class="cf-plp__view-btn" data-view="list">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                <rect x="0" y="1" width="16" height="3" rx="1"/>
+                <rect x="0" y="6" width="16" height="3" rx="1"/>
+                <rect x="0" y="11" width="16" height="3" rx="1"/>
+              </svg>
+              List
+            </button>
+          </div>
+
+          <div class="cf-plp__sort">
+            <label for="plp-sort">Sort by</label>
+            <select id="plp-sort" onchange="handleSort(this.value)">
+              <option value="best-selling">Most Popular</option>
+              <option value="price-ascending">Price: Low to High</option>
+              <option value="price-descending">Price: High to Low</option>
+              <option value="title-ascending">Name: A-Z</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {% comment %} Product Grid {% endcomment %}
+      <div class="cf-plp__grid" id="product-grid">
+        {% assign products_shown = 0 %}
+        {% assign products_limit = 500 %}
+        {% comment %} Render products from all L3 collections for client-side filtering (balanced for performance and pagination) {% endcomment %}
+
+        {% for handle in l3_handle_array %}
+          {% assign handle_clean = handle | strip %}
+          {% if handle_clean != blank %}
+            {% assign l3_coll = collections[handle_clean] %}
+            {% assign l3_category = l3_coll.title | remove: 'New Theme - ' | remove: 'New Theme- ' %}
+            {% for product in l3_coll.products limit: 100 %}
+              {% if product.price == 0 %}{% continue %}{% endif %}
+              {% if products_shown < products_limit %}
+                {% assign products_shown = products_shown | plus: 1 %}
+                {% assign shipment_text = product.metafields.custom.shipment_text %}
+                {% assign shipping_class = 'cf-plp__shipping--regular' %}
+                {% if shipment_text contains 'Free' %}
+                  {% assign shipping_class = 'cf-plp__shipping--free' %}
+                {% elsif shipment_text contains 'Quick' %}
+                  {% assign shipping_class = 'cf-plp__shipping--quick' %}
+                {% endif %}
+
+                {% comment %} Collect variant options for filtering {% endcomment %}
+                {% assign variant_options_data = '' %}
+                {% for option in product.options_with_values %}
+                  {% assign opt_name_handle = option.name | handleize %}
+                  {% assign opt_values_joined = option.values | join: ',' %}
+                  {% if variant_options_data == '' %}
+                    {% assign variant_options_data = opt_name_handle | append: ':' | append: opt_values_joined %}
+                  {% else %}
+                    {% assign variant_options_data = variant_options_data | append: '|' | append: opt_name_handle | append: ':' | append: opt_values_joined %}
+                  {% endif %}
+                {% endfor %}
+
+                <div class="cf-plp__card" data-category="{{ handle_clean }}" data-vendor="{{ product.vendor | handleize }}" data-type="{{ product.type | handleize }}" data-price="{{ product.price }}" data-title="{{ product.title | escape }}" data-index="{{ products_shown }}" data-options="{{ variant_options_data }}">
+                  <span class="wpd-bridge" data-wpd-product-handle="{{ product.handle }}" data-wpd-product-id="{{ product.id }}" data-wpd-variant-id="{{ product.variants.first.id }}" data-wpd-variant-price="{{ product.price }}"></span>
+                  {% if product.tags contains 'best-seller' or product.tags contains 'featured' %}
+                    <span class="cf-plp__card-badge">Best Seller</span>
+                  {% elsif product.compare_at_price > product.price %}
+                    <span class="cf-plp__card-badge">Sale</span>
+                  {% endif %}
+
+                  <a href="{{ product.url }}?variant={{ product.variants.first.id }}" class="cf-plp__card-image-wrap">
+                    {% if product.featured_image %}
+                      <img src="{{ product.featured_image | image_url: width: 320 }}"
+                           alt="{{ product.title }}"
+                           class="cf-plp__card-image"
+                           loading="lazy">
+                    {% else %}
+                      <div class="cf-plp__card-image" style="display:flex;align-items:center;justify-content:center;font-size:40px;color:#94a3b8;">📦</div>
+                    {% endif %}
+                    {% if product.variants.size > 1 %}
+                      {% comment %} Build variation options list for tooltip {% endcomment %}
+                      {% assign variation_list = '' %}
+                      {% for option in product.options_with_values %}
+                        {% assign opt_values = option.values | join: ', ' %}
+                        {% if variation_list == '' %}
+                          {% assign variation_list = option.name | append: ': ' | append: opt_values %}
+                        {% else %}
+                          {% assign variation_list = variation_list | append: ' | ' | append: option.name | append: ': ' | append: opt_values %}
+                        {% endif %}
+                      {% endfor %}
+                      <span class="cf-plp__variants-badge" data-variants="{{ product.variants.size }}">
+                        <span class="cf-plp__variants-text">{{ product.variants.size }} Variations</span>
+                        <span class="cf-plp__variants-tooltip">{{ variation_list | truncate: 150 }}</span>
+                      </span>
+                    {% endif %}
+                  </a>
+
+                  <div class="cf-plp__card-content">
+                    <span class="cf-plp__card-category">{{ l3_category | truncate: 25 }}</span>
+
+                    <a href="{{ product.url }}?variant={{ product.variants.first.id }}" class="cf-plp__card-title" title="{{ product.title | escape }}">
+                      {{ product.title }}
+                    </a>
+
+                    <div class="cf-plp__card-rating">
+                      <span class="cf-plp__plus-badge">Plus</span>
+                      <span class="cf-plp__stars">★★★★☆</span>
+                    </div>
+
+                    {% if product.variants.first.sku %}
+                      <div class="cf-plp__card-sku">#{{ product.variants.first.sku }}</div>
+                    {% endif %}
+
+                    <div class="cf-plp__price-box">
+                      {%- liquid
+                        comment
+                          Check if user is a member
+                        endcomment
+                        assign is_member = false
+                        if customer
+                          for tag in customer.tags
+                            assign tag_lower = tag | downcase
+                            if tag_lower contains 'wholesale' or tag_lower contains 'plus' or tag_lower contains 'member' or tag_lower contains 'cph' or tag_lower contains 'rou' or tag_lower contains 'margin'
+                              assign is_member = true
+                              break
+                            endif
+                          endfor
+                        endif
+
+                        assign member_price_badge = 'Member Price'
+
+                        comment
+                          Config-driven vendor detection
+                        endcomment
+                        assign is_own_brand = false
+                        assign own_brands = settings.own_brand_vendors | downcase | split: ','
+                        assign vendor_check = product.vendor | downcase | strip
+                        for brand in own_brands
+                          assign brand_check = brand | strip
+                          if vendor_check == brand_check
+                            assign is_own_brand = true
+                            break
+                          endif
+                        endfor
+                      -%}
+
+                      {% comment %} WSH pricing call {% endcomment %}
+                      {%- capture wcp_output -%}
+                        {%- render 'wcp_discount', wcp_discount: product, wpd_is_render: 'yes' -%}
+                      {%- endcapture -%}
+
+                      {%- liquid
+                        assign wcp_price = wcp_output | strip | split: '|' | first | plus: 0
+
+                        comment
+                          Variant capability scanning
+                        endcomment
+                        assign any_variant_has_compare_at = false
+                        for variant in product.variants
+                          if variant.compare_at_price != blank and variant.compare_at_price > variant.price
+                            assign any_variant_has_compare_at = true
+                            break
+                          endif
+                        endfor
+
+                        assign any_variant_has_wsh = false
+                        if wcp_price > 0 and wcp_price < product.price
+                          assign any_variant_has_wsh = true
+                        endif
+
+                        assign original_price = product.compare_at_price
+                        assign sale_price = product.price
+                        assign member_price = wcp_price
+                        assign retail_price = product.price
+
+                        assign savings_amount = 0
+                        if any_variant_has_wsh and retail_price > member_price
+                          assign savings_amount = retail_price | minus: member_price
+                        endif
+
+                        comment
+                          Variant price range detection (independent of WSH/compare_at/login)
+                        endcomment
+                        assign price_varies = false
+                        if product.price_min != product.price_max
+                          assign price_varies = true
+                        endif
+                      -%}
+
+                      {% if price_varies %}
+                        <!-- PRICE RANGE - Multiple variants with different prices -->
+                        <div class="cf-plp__price-label">Price</div>
+                        <div class="cf-plp__price-main">{{ product.price_min | money }} – {{ product.price_max | money }}</div>
+                      {% elsif is_member and any_variant_has_wsh %}
+                        {% comment %} Member with WSH pricing {% endcomment %}
+                        <div class="cf-plp__price-label">{{ member_price_badge }}</div>
+                        <div class="cf-plp__price-main">
+                          {{ member_price | money }}<span class="cf-plp__price-unit">/Each</span>
+                        </div>
+                        <div class="cf-plp__price-regular">Was: <s>{{ retail_price | money }}</s></div>
+                        {% if savings_amount > 0 %}
+                          <div class="cf-plp__sale-savings">You Save {{ savings_amount | money }}</div>
+                        {% endif %}
+                      {% elsif is_member %}
+                        {% comment %} Member without WSH - NOT "Member Price" label {% endcomment %}
+                        <div class="cf-plp__price-label">{% if any_variant_has_compare_at %}Sale Price{% else %}Price{% endif %}</div>
+                        <div class="cf-plp__price-main">
+                          {{ sale_price | money }}<span class="cf-plp__price-unit">/Each</span>
+                        </div>
+                        {% if any_variant_has_compare_at %}
+                          <div class="cf-plp__price-original"><s>{{ original_price | money }}</s></div>
+                        {% endif %}
+                      {% else %}
+                        {% comment %} Non-member view {% endcomment %}
+                        {% if any_variant_has_compare_at %}
+                          <div class="cf-plp__price-original"><s>{{ original_price | money }}</s></div>
+                          <div class="cf-plp__price-label">Sale Price</div>
+                        {% else %}
+                          <div class="cf-plp__price-label">Price</div>
+                        {% endif %}
+                        <div class="cf-plp__price-main">
+                          {{ sale_price | money }}<span class="cf-plp__price-unit">/Each</span>
+                        </div>
+                        {% if any_variant_has_compare_at %}
+                          {%- assign sale_savings = original_price | minus: sale_price -%}
+                          <div class="cf-plp__sale-savings">Save {{ sale_savings | money }}</div>
+                        {% endif %}
+                        {% comment %} CTA: own brand → Login, non-own-brand + WSH → Call, else nothing {% endcomment %}
+                        {% if is_own_brand %}
+                          <a href="/account/login?return_url={{ request.path }}{% if request.query_string != blank %}%3F{{ request.query_string | url_param_escape }}{% endif %}" class="cf-plp__login-prompt">
+                            🔒 Login for member pricing
+                          </a>
+                        {% else %}
+                          <a href="tel:+14086739999" class="cf-plp__call-prompt">
+                            📞 Call for More Details - (408) 673-9999
+                          </a>
+                        {% endif %}
+                      {% endif %}
+                    </div>
+
+                    {% if shipment_text != blank %}
+                      <div class="cf-plp__shipping {{ shipping_class }}">
+                        {% if shipment_text contains 'Free' %}
+                          🚚 Free Shipping
+                        {% elsif shipment_text contains 'Quick' %}
+                          ⚡ Quick Ship
+                        {% else %}
+                          📦 {{ shipment_text | truncate: 20 }}
+                        {% endif %}
+                      </div>
+                    {% endif %}
+
+                    <div class="cf-plp__cart-row">
+                      <input type="number" class="cf-plp__qty-input" value="1" min="1" aria-label="Quantity">
+                      <button type="button" class="cf-plp__add-btn" data-variant-id="{{ product.variants.first.id }}">
+                        Add to Cart
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+
+        {% comment %} Fallback: Show L2 products if no L3 products {% endcomment %}
+        {% if products_shown == 0 %}
+          {% for product in l2_collection.products limit: products_limit %}
+            {% if product.price == 0 %}{% continue %}{% endif %}
+            {% assign shipment_text = product.metafields.custom.shipment_text %}
+            {% assign shipping_class = 'cf-plp__shipping--regular' %}
+            {% if shipment_text contains 'Free' %}
+              {% assign shipping_class = 'cf-plp__shipping--free' %}
+            {% elsif shipment_text contains 'Quick' %}
+              {% assign shipping_class = 'cf-plp__shipping--quick' %}
+            {% endif %}
+
+            <div class="cf-plp__card" data-category="all" data-vendor="{{ product.vendor | handleize }}" data-type="{{ product.type | handleize }}" data-price="{{ product.price }}" data-title="{{ product.title | escape }}">
+              <span class="wpd-bridge" data-wpd-product-handle="{{ product.handle }}" data-wpd-product-id="{{ product.id }}" data-wpd-variant-id="{{ product.variants.first.id }}" data-wpd-variant-price="{{ product.price }}"></span>
+              {% if product.compare_at_price > product.price %}
+                <span class="cf-plp__card-badge">Sale</span>
+              {% endif %}
+
+              <a href="{{ product.url }}?variant={{ product.variants.first.id }}" class="cf-plp__card-image-wrap">
+                {% if product.featured_image %}
+                  <img src="{{ product.featured_image | image_url: width: 320 }}"
+                       alt="{{ product.title }}"
+                       class="cf-plp__card-image"
+                       loading="lazy">
+                {% else %}
+                  <div class="cf-plp__card-image" style="display:flex;align-items:center;justify-content:center;font-size:40px;color:#94a3b8;">📦</div>
+                {% endif %}
+                {% if product.variants.size > 1 %}
+                  <span class="cf-plp__variants-badge" data-variants="{{ product.variants.size }}">
+                    <span class="cf-plp__variants-count">{{ product.variants.size }}</span>
+                    <span class="cf-plp__variants-tooltip">{{ product.variants.size }} variations available</span>
+                  </span>
+                {% endif %}
+              </a>
+
+              <div class="cf-plp__card-content">
+                <a href="{{ product.url }}?variant={{ product.variants.first.id }}" class="cf-plp__card-title" title="{{ product.title | escape }}">
+                  {{ product.title }}
+                </a>
+
+                <div class="cf-plp__card-rating">
+                  <span class="cf-plp__plus-badge">Plus</span>
+                  <span class="cf-plp__stars">★★★★☆</span>
+                </div>
+
+                {% if product.variants.first.sku %}
+                  <div class="cf-plp__card-sku">#{{ product.variants.first.sku }}</div>
+                {% endif %}
+
+                <div class="cf-plp__price-box">
+                  {%- liquid
+                    comment
+                      Check if user is a member
+                    endcomment
+                    assign is_member = false
+                    if customer
+                      for tag in customer.tags
+                        assign tag_lower = tag | downcase
+                        if tag_lower contains 'wholesale' or tag_lower contains 'plus' or tag_lower contains 'member' or tag_lower contains 'cph' or tag_lower contains 'rou' or tag_lower contains 'margin'
+                          assign is_member = true
+                          break
+                        endif
+                      endfor
+                    endif
+
+                    assign member_price_badge = 'Member Price'
+
+                    comment
+                      Config-driven vendor detection
+                    endcomment
+                    assign is_own_brand = false
+                    assign own_brands = settings.own_brand_vendors | downcase | split: ','
+                    assign vendor_check = product.vendor | downcase | strip
+                    for brand in own_brands
+                      assign brand_check = brand | strip
+                      if vendor_check == brand_check
+                        assign is_own_brand = true
+                        break
+                      endif
+                    endfor
+                  -%}
+
+                  {% comment %} WSH pricing call {% endcomment %}
+                  {%- capture wcp_output -%}
+                    {%- render 'wcp_discount', wcp_discount: product, wpd_is_render: 'yes' -%}
+                  {%- endcapture -%}
+
+                  {%- liquid
+                    assign wcp_price = wcp_output | strip | split: '|' | first | plus: 0
+
+                    comment
+                      Variant capability scanning
+                    endcomment
+                    assign any_variant_has_compare_at = false
+                    for variant in product.variants
+                      if variant.compare_at_price != blank and variant.compare_at_price > variant.price
+                        assign any_variant_has_compare_at = true
+                        break
+                      endif
+                    endfor
+
+                    assign any_variant_has_wsh = false
+                    if wcp_price > 0 and wcp_price < product.price
+                      assign any_variant_has_wsh = true
+                    endif
+
+                    assign original_price = product.compare_at_price
+                    assign sale_price = product.price
+                    assign member_price = wcp_price
+                    assign retail_price = product.price
+
+                    assign savings_amount = 0
+                    if any_variant_has_wsh and retail_price > member_price
+                      assign savings_amount = retail_price | minus: member_price
+                    endif
+
+                    comment
+                      Variant price range detection (independent of WSH/compare_at/login)
+                    endcomment
+                    assign price_varies = false
+                    if product.price_min != product.price_max
+                      assign price_varies = true
+                    endif
+                  -%}
+
+                  {% if price_varies %}
+                    <!-- PRICE RANGE - Multiple variants with different prices -->
+                    <div class="cf-plp__price-label">Price</div>
+                    <div class="cf-plp__price-main">{{ product.price_min | money }} – {{ product.price_max | money }}</div>
+                  {% elsif is_member and any_variant_has_wsh %}
+                    {% comment %} Member with WSH pricing {% endcomment %}
+                    <div class="cf-plp__price-label">{{ member_price_badge }}</div>
+                    <div class="cf-plp__price-main">
+                      {{ member_price | money }}<span class="cf-plp__price-unit">/Each</span>
+                    </div>
+                    <div class="cf-plp__price-regular">Was: <s>{{ retail_price | money }}</s></div>
+                    {% if savings_amount > 0 %}
+                      <div class="cf-plp__sale-savings">You Save {{ savings_amount | money }}</div>
+                    {% endif %}
+                  {% elsif is_member %}
+                    {% comment %} Member without WSH - NOT "Member Price" label {% endcomment %}
+                    <div class="cf-plp__price-label">{% if any_variant_has_compare_at %}Sale Price{% else %}Price{% endif %}</div>
+                    <div class="cf-plp__price-main">
+                      {{ sale_price | money }}<span class="cf-plp__price-unit">/Each</span>
+                    </div>
+                    {% if any_variant_has_compare_at %}
+                      <div class="cf-plp__price-original"><s>{{ original_price | money }}</s></div>
+                    {% endif %}
+                  {% else %}
+                    {% comment %} Non-member view {% endcomment %}
+                    {% if any_variant_has_compare_at %}
+                      <div class="cf-plp__price-original"><s>{{ original_price | money }}</s></div>
+                      <div class="cf-plp__price-label">Sale Price</div>
+                    {% else %}
+                      <div class="cf-plp__price-label">Price</div>
+                    {% endif %}
+                    <div class="cf-plp__price-main">
+                      {{ sale_price | money }}<span class="cf-plp__price-unit">/Each</span>
+                    </div>
+                    {% if any_variant_has_compare_at %}
+                      {%- assign sale_savings = original_price | minus: sale_price -%}
+                      <div class="cf-plp__sale-savings">Save {{ sale_savings | money }}</div>
+                    {% endif %}
+                    {% comment %} CTA: own brand → Login, non-own-brand + WSH → Call, else nothing {% endcomment %}
+                    {% if is_own_brand %}
+                      <a href="/account/login?return_url={{ request.path }}{% if request.query_string != blank %}%3F{{ request.query_string | url_param_escape }}{% endif %}" class="cf-plp__login-prompt">
+                        🔒 Login for member pricing
+                      </a>
+                    {% else %}
+                      <a href="tel:+14086739999" class="cf-plp__call-prompt">
+                        📞 Call for More Details - (408) 673-9999
+                      </a>
+                    {% endif %}
+                  {% endif %}
+                </div>
+
+                {% if shipment_text != blank %}
+                  <div class="cf-plp__shipping {{ shipping_class }}">
+                    {% if shipment_text contains 'Free' %}
+                      🚚 Free Shipping
+                    {% elsif shipment_text contains 'Quick' %}
+                      ⚡ Quick Ship
+                    {% else %}
+                      📦 {{ shipment_text | truncate: 20 }}
+                    {% endif %}
+                  </div>
+                {% endif %}
+
+                <div class="cf-plp__cart-row">
+                  <input type="number" class="cf-plp__qty-input" value="1" min="1" aria-label="Quantity">
+                  <button type="button" class="cf-plp__add-btn" data-variant-id="{{ product.variants.first.id }}">
+                    Add to Cart
+                  </button>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        {% if products_shown == 0 and l2_collection.products_count == 0 %}
+          <div class="cf-plp__no-products">
+            <p>No products found in this category.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      {% comment %} Pagination {% endcomment %}
+      <div class="cf-plp__pagination" id="pagination">
+        <button type="button" class="cf-plp__page-btn cf-plp__page-prev" id="prev-page" disabled>
+          ← Previous
+        </button>
+        <div class="cf-plp__page-numbers" id="page-numbers">
+          <!-- Generated by JavaScript -->
+        </div>
+        <button type="button" class="cf-plp__page-btn cf-plp__page-next" id="next-page">
+          Next →
+        </button>
+      </div>
+
+      {% comment %} About This Category (SEO Description - Collapsible) {% endcomment %}
+      {% if collection.description != blank %}
+        <div class="cf-plp__about-category">
+          <button class="cf-plp__about-category-toggle" onclick="toggleAboutCategory(this)" aria-expanded="false">
+            <span class="cf-plp__about-category-title">About {{ collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</span>
+            <svg class="cf-plp__about-category-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="cf-plp__about-category-content" aria-hidden="true">
+            {{ collection.description }}
+          </div>
+        </div>
+      {% endif %}
+
+    </main>
+  </div>
+
+  <!-- Mobile Filter Drawer -->
+  <div class="cf-plp__mobile-filter-drawer" id="mobile-filter-drawer">
+    <div class="cf-plp__mobile-filter-overlay" onclick="closeMobileFilters()"></div>
+    <div class="cf-plp__mobile-filter-panel">
+      <div class="cf-plp__mobile-filter-header">
+        <h3>Filters</h3>
+        <button type="button" class="cf-plp__mobile-filter-close" onclick="closeMobileFilters()">&times;</button>
+      </div>
+      <div class="cf-plp__mobile-filter-content" id="mobile-filter-content">
+        <!-- Filters will be cloned here via JavaScript -->
+      </div>
+      <div class="cf-plp__mobile-filter-apply">
+        <button type="button" onclick="closeMobileFilters()">Apply Filters</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Toggle About Category section (global function for onclick)
+function toggleAboutCategory(btn) {
+  const content = btn.nextElementSibling;
+  const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+
+  btn.setAttribute('aria-expanded', !isExpanded);
+  content.setAttribute('aria-hidden', isExpanded);
+  btn.classList.toggle('expanded', !isExpanded);
+
+  if (!isExpanded) {
+    content.style.maxHeight = content.scrollHeight + 'px';
+  } else {
+    content.style.maxHeight = '0';
+  }
+}
+
+// Mobile Filter Drawer Functions
+function openMobileFilters() {
+  const drawer = document.getElementById('mobile-filter-drawer');
+  const content = document.getElementById('mobile-filter-content');
+  const sidebar = document.querySelector('.cf-plp__sidebar');
+
+  if (drawer && sidebar && content) {
+    // Clone sidebar content if not already done
+    if (!content.hasChildNodes()) {
+      const clone = sidebar.cloneNode(true);
+      clone.style.display = 'block';
+      clone.style.width = '100%';
+      clone.style.padding = '0';
+      clone.style.background = 'transparent';
+      content.appendChild(clone);
+
+      // Sync checkbox states from original to clone
+      syncFilterStates(sidebar, clone);
+
+      // Add change listeners to cloned checkboxes
+      clone.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', function() {
+          // Find matching checkbox in original sidebar and trigger change
+          const name = this.getAttribute('name');
+          const value = this.getAttribute('value');
+          const original = sidebar.querySelector(`input[name="${name}"][value="${value}"]`);
+          if (original && original.checked !== this.checked) {
+            original.checked = this.checked;
+            original.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        });
+      });
+    } else {
+      // Sync states before showing
+      syncFilterStates(sidebar, content.firstChild);
+    }
+
+    drawer.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeMobileFilters() {
+  const drawer = document.getElementById('mobile-filter-drawer');
+  if (drawer) {
+    drawer.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+}
+
+function syncFilterStates(source, target) {
+  source.querySelectorAll('input[type="checkbox"]').forEach(sourceCb => {
+    const name = sourceCb.getAttribute('name');
+    const value = sourceCb.getAttribute('value');
+    const targetCb = target.querySelector(`input[name="${name}"][value="${value}"]`);
+    if (targetCb) {
+      targetCb.checked = sourceCb.checked;
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  'use strict';
+
+  // Filter State
+  const filterState = {
+    category: 'all',
+    brands: [],
+    productTypes: [],
+    priceRanges: [],
+    options: {},
+    optionRanges: {}
+  };
+
+  // Pagination State
+  const paginationState = {
+    currentPage: 1,
+    itemsPerPage: {{ section.settings.products_per_page | default: 48 }},
+    totalPages: 1,
+    filteredCards: []
+  };
+
+  // Product Data Cache (Optimization)
+  let productData = [];
+
+  const resultsCount = document.querySelector('.cf-plp__results-count strong');
+  const paginationContainer = document.getElementById('pagination');
+  const pageNumbersContainer = document.getElementById('page-numbers');
+  const prevBtn = document.getElementById('prev-page');
+  const nextBtn = document.getElementById('next-page');
+  const activeFiltersContainer = document.getElementById('active-filters');
+  const activeFiltersList = document.getElementById('active-filters-list');
+  const clearAllBtn = document.getElementById('clear-all-filters');
+
+  // Initialize Data Cache
+  function initProductData() {
+    const cards = document.querySelectorAll('.cf-plp__card');
+    productData = Array.from(cards).map((card, idx) => {
+      // Pre-parse price to avoid parsing in loop
+      const priceRaw = card.dataset.price;
+      const price = priceRaw ? (parseInt(priceRaw) / 100) : 0;
+
+      return {
+        element: card,
+        category: card.dataset.category,
+        vendor: card.dataset.vendor, // handleized
+        productType: card.dataset.type, // handleized
+        price: price,
+        title: (card.dataset.title || '').toLowerCase(),
+        originalIndex: idx,
+        optionsStr: card.dataset.options,
+        // Lazy-loaded options cache
+        _options: null
+      };
+    });
+    console.log('CF-PLP: Data initialized for', productData.length, 'products');
+  }
+
+  // Get parsed options (Lazy Load)
+  function getProductOptions(product) {
+    if (product._options) return product._options;
+    
+    if (!product.optionsStr) {
+      product._options = {};
+      return product._options;
+    }
+
+    const result = {};
+    // Format: "color:red,blue|size:small,medium"
+    product.optionsStr.split('|').forEach(optGroup => {
+      const [name, values] = optGroup.split(':');
+      if (name && values) {
+        // Store both handled values for matching
+        result[name] = values.split(',').map(v => v.trim());
+      }
+    });
+    product._options = result;
+    return result;
+  }
+
+  // Extract numeric value from string (e.g., "24"" -> 24)
+  function extractNumeric(val) {
+    const cleaned = val.replace(/[^\d.]/g, '');
+    return parseFloat(cleaned) || 0;
+  }
+
+  // Update active filters display
+  function updateActiveFiltersDisplay() {
+    if (!activeFiltersContainer) return;
+    
+    const activeChips = [];
+
+    // Category filter (skip if 'all')
+    if (filterState.category !== 'all') {
+      const categoryPill = document.querySelector(`.cf-plp__pill[data-filter="${filterState.category}"]`);
+      const categoryName = categoryPill ? categoryPill.textContent.trim() : filterState.category;
+      activeChips.push({
+        type: 'category',
+        label: `Category: ${categoryName}`,
+        value: filterState.category
+      });
+    }
+
+    // Brand filters
+    filterState.brands.forEach(brand => {
+      const brandCheckbox = document.querySelector(`input[name="brand"][value="${brand}"]`);
+      const brandLabel = brandCheckbox ? brandCheckbox.parentElement.textContent.trim() : brand;
+      activeChips.push({
+        type: 'brand',
+        label: `Brand: ${brandLabel}`,
+        value: brand
+      });
+    });
+
+    // Product Type filters
+    filterState.productTypes.forEach(type => {
+      const typeCheckbox = document.querySelector(`input[name="product-type"][value="${type}"]`);
+      const typeLabel = typeCheckbox ? typeCheckbox.parentElement.textContent.trim() : type;
+      activeChips.push({
+        type: 'productType',
+        label: `Type: ${typeLabel}`,
+        value: type
+      });
+    });
+
+    // Price range filters
+    filterState.priceRanges.forEach(range => {
+      let rangeLabel = '';
+      if (range === '0-500') rangeLabel = 'Under $500';
+      else if (range === '500-1000') rangeLabel = '$500 - $1,000';
+      else if (range === '1000-2500') rangeLabel = '$1,000 - $2,500';
+      else if (range === '2500+') rangeLabel = '$2,500+';
+
+      activeChips.push({
+        type: 'price',
+        label: `Price: ${rangeLabel}`,
+        value: range
+      });
+    });
+
+    // Option filters
+    for (const [optName, selectedVals] of Object.entries(filterState.options)) {
+      if (selectedVals.length > 0) {
+        selectedVals.forEach(val => {
+          activeChips.push({
+            type: 'option',
+            label: `${optName}: ${val}`,
+            value: val,
+            optName: optName
+          });
+        });
+      }
+    }
+
+    // Option range filters
+    for (const [optName, range] of Object.entries(filterState.optionRanges)) {
+      activeChips.push({
+        type: 'range',
+        label: `${optName}: ${range.min}" - ${range.max}"`,
+        value: optName
+      });
+    }
+
+    // Show/hide active filters section
+    if (activeChips.length > 0) {
+      activeFiltersContainer.style.display = 'block';
+      // Render chips
+      if (activeFiltersList) {
+        activeFiltersList.innerHTML = activeChips.map(chip => `
+          <div class="cf-plp__filter-chip" data-type="${chip.type}" data-value="${chip.value}" ${chip.optName ? `data-opt-name="${chip.optName}"` : ''}>
+            <span>${chip.label}</span>
+            <span class="cf-plp__filter-chip-remove" onclick="removeFilter('${chip.type}', '${chip.value}', '${chip.optName || ''}')">×</span>
+          </div>
+        `).join('');
+      }
+    } else {
+      activeFiltersContainer.style.display = 'none';
+    }
+  }
+
+  // Remove individual filter (Global for onclick access)
+  window.removeFilter = function(type, value, optName) {
+    if (type === 'category') {
+      filterState.category = 'all';
+      document.querySelectorAll('.cf-plp__pill').forEach(p => p.classList.remove('active'));
+      const allPill = document.querySelector('.cf-plp__pill[data-filter="all"]');
+      if (allPill) allPill.classList.add('active');
+    } else if (type === 'brand') {
+      filterState.brands = filterState.brands.filter(b => b !== value);
+      const checkbox = document.querySelector(`input[name="brand"][value="${value}"]`);
+      if (checkbox) checkbox.checked = false;
+    } else if (type === 'productType') {
+      filterState.productTypes = filterState.productTypes.filter(t => t !== value);
+      const checkbox = document.querySelector(`input[name="product-type"][value="${value}"]`);
+      if (checkbox) checkbox.checked = false;
+    } else if (type === 'price') {
+      filterState.priceRanges = filterState.priceRanges.filter(p => p !== value);
+      const checkbox = document.querySelector(`input[name="price"][value="${value}"]`);
+      if (checkbox) checkbox.checked = false;
+    } else if (type === 'option') {
+      if (filterState.options[optName]) {
+        filterState.options[optName] = filterState.options[optName].filter(v => v !== value);
+      }
+      const checkbox = document.querySelector(`input[data-option="${optName}"][value="${value}"]`);
+      if (checkbox) checkbox.checked = false;
+    } else if (type === 'range') {
+      delete filterState.optionRanges[value];
+      // Reset sliders
+      const rangeWrap = document.querySelector(`.cf-plp__range-filter[data-option="${value}"]`);
+      if (rangeWrap) {
+        const minSlider = rangeWrap.querySelector('.cf-plp__range-min');
+        const maxSlider = rangeWrap.querySelector('.cf-plp__range-max');
+        if (minSlider) minSlider.value = minSlider.min;
+        if (maxSlider) maxSlider.value = maxSlider.max;
+      }
+      // Deactivate quick buttons
+      document.querySelectorAll(`.cf-plp__quick-btn[data-option="${value}"]`).forEach(btn => {
+        btn.classList.remove('active');
+      });
+    }
+
+    applyFilters();
+  };
+
+  // Clear all filters
+  if (clearAllBtn) {
+    clearAllBtn.addEventListener('click', function() {
+      // Reset filter state
+      filterState.category = 'all';
+      filterState.brands = [];
+      filterState.productTypes = [];
+      filterState.priceRanges = [];
+      filterState.options = {};
+      filterState.optionRanges = {};
+
+      // Reset UI
+      document.querySelectorAll('.cf-plp__pill').forEach(p => p.classList.remove('active'));
+      const allPill = document.querySelector('.cf-plp__pill[data-filter="all"]');
+      if (allPill) allPill.classList.add('active');
+      
+      document.querySelectorAll('.cf-plp__sidebar input[type="checkbox"]').forEach(cb => cb.checked = false);
+      document.querySelectorAll('.cf-plp__quick-btn').forEach(btn => btn.classList.remove('active'));
+
+      // Reset sliders
+      document.querySelectorAll('.cf-plp__range-filter').forEach(rangeWrap => {
+        const minSlider = rangeWrap.querySelector('.cf-plp__range-min');
+        const maxSlider = rangeWrap.querySelector('.cf-plp__range-max');
+        const minDisplay = rangeWrap.querySelector('.cf-plp__range-min-val');
+        const maxDisplay = rangeWrap.querySelector('.cf-plp__range-max-val');
+        if (minSlider) {
+          minSlider.value = minSlider.min;
+          if (minDisplay) minDisplay.textContent = minSlider.min + '"';
+        }
+        if (maxSlider) {
+          maxSlider.value = maxSlider.max;
+          if (maxDisplay) maxDisplay.textContent = maxSlider.max + '"';
+        }
+      });
+
+      applyFilters();
+    });
+  }
+
+  // Apply all filters (Optimized for Speed)
+  function applyFilters(resetPage = true) {
+    paginationState.filteredCards = [];
+    
+    // Check if filters are active
+    const hasCategory = filterState.category !== 'all';
+    const hasBrands = filterState.brands.length > 0;
+    const hasProductTypes = filterState.productTypes.length > 0;
+    const hasPrices = filterState.priceRanges.length > 0;
+    const hasOptions = Object.keys(filterState.options).length > 0;
+    const hasRanges = Object.keys(filterState.optionRanges).length > 0;
+
+    // Use fast iteration over cached data
+    for (let i = 0; i < productData.length; i++) {
+      const p = productData[i];
+      let visible = true;
+
+      // Category
+      if (hasCategory && p.category !== filterState.category) visible = false;
+
+      // Brand
+      if (visible && hasBrands && !filterState.brands.includes(p.vendor)) visible = false;
+
+      // Product Type
+      if (visible && hasProductTypes && !filterState.productTypes.includes(p.productType)) visible = false;
+
+      // Price
+      if (visible && hasPrices) {
+        let priceMatch = false;
+        for (const range of filterState.priceRanges) {
+          if (range === '0-500' && p.price < 500) { priceMatch = true; break; }
+          if (range === '500-1000' && p.price >= 500 && p.price < 1000) { priceMatch = true; break; }
+          if (range === '1000-2500' && p.price >= 1000 && p.price < 2500) { priceMatch = true; break; }
+          if (range === '2500+' && p.price >= 2500) { priceMatch = true; break; }
+        }
+        if (!priceMatch) visible = false;
+      }
+
+      // Options
+      if (visible && hasOptions) {
+        const opts = getProductOptions(p);
+        for (const [optName, selectedVals] of Object.entries(filterState.options)) {
+          if (selectedVals.length > 0) {
+            const productVals = opts[optName] || [];
+            // Values are strings, need flexible matching (case insensitive, handleized)
+            const pValsHandled = productVals.map(v => v.toLowerCase().replace(/[^a-z0-9]/g, '-'));
+            let optMatch = false;
+            for (const selVal of selectedVals) {
+              const selValHandled = selVal.toLowerCase().replace(/[^a-z0-9]/g, '-');
+              if (pValsHandled.some(pv => pv.includes(selValHandled) || selValHandled.includes(pv))) {
+                optMatch = true;
+                break;
+              }
+            }
+            if (!optMatch) { visible = false; break; }
+          }
+        }
+      }
+
+      // Ranges
+      if (visible && hasRanges) {
+        const opts = getProductOptions(p);
+        for (const [optName, range] of Object.entries(filterState.optionRanges)) {
+          const productVals = opts[optName] || [];
+          let rangeMatch = false;
+          for (const val of productVals) {
+            const num = extractNumeric(val);
+            if (num >= range.min && num <= range.max) {
+              rangeMatch = true;
+              break;
+            }
+          }
+          if (!rangeMatch) { visible = false; break; }
+        }
+      }
+
+      if (visible) {
+        paginationState.filteredCards.push(p.element);
+      } else {
+        // Hide immediately to be safe, though pagination handles display
+        p.element.style.display = 'none';
+      }
+    }
+
+    if (resetPage) {
+      paginationState.currentPage = 1;
+    }
+
+    updateActiveFiltersDisplay();
+    applyPagination();
+  }
+
+  // Apply pagination to filtered cards
+  function applyPagination() {
+    const { filteredCards, currentPage, itemsPerPage } = paginationState;
+    const totalItems = filteredCards.length;
+    paginationState.totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    // Update results count
+    if (resultsCount) resultsCount.textContent = totalItems;
+
+    // Show only current page items
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
+    // Batch DOM updates using requestAnimationFrame for smoothness
+    requestAnimationFrame(() => {
+      // Hide all first (already done in filter loop, but safety check for previous page)
+      // Actually, filteredCards contains ALL visible items.
+      // We need to show the slice and hide the rest of filteredCards.
+      // Items NOT in filteredCards are already hidden.
+      
+      for (let i = 0; i < filteredCards.length; i++) {
+        if (i >= startIndex && i < endIndex) {
+          filteredCards[i].style.display = '';
+        } else {
+          filteredCards[i].style.display = 'none';
+        }
+      }
+    });
+
+    renderPagination();
+  }
+
+  // Render pagination buttons
+  function renderPagination() {
+    if (!paginationContainer) return;
+    const { currentPage, totalPages } = paginationState;
+
+    if (totalPages <= 1) {
+      paginationContainer.style.display = 'none';
+      return;
+    }
+    paginationContainer.style.display = 'flex';
+
+    if (prevBtn) prevBtn.disabled = currentPage === 1;
+    if (nextBtn) nextBtn.disabled = currentPage === totalPages;
+
+    if (pageNumbersContainer) {
+      pageNumbersContainer.innerHTML = '';
+      const maxVisible = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+      if (endPage - startPage < maxVisible - 1) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
+      }
+
+      if (startPage > 1) {
+        pageNumbersContainer.appendChild(createPageButton(1));
+        if (startPage > 2) {
+          const ellipsis = document.createElement('span');
+          ellipsis.className = 'cf-plp__page-ellipsis';
+          ellipsis.textContent = '...';
+          pageNumbersContainer.appendChild(ellipsis);
+        }
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbersContainer.appendChild(createPageButton(i));
+      }
+
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          const ellipsis = document.createElement('span');
+          ellipsis.className = 'cf-plp__page-ellipsis';
+          ellipsis.textContent = '...';
+          pageNumbersContainer.appendChild(ellipsis);
+        }
+        pageNumbersContainer.appendChild(createPageButton(totalPages));
+      }
+    }
+  }
+
+  function createPageButton(pageNum) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'cf-plp__page-num' + (pageNum === paginationState.currentPage ? ' active' : '');
+    btn.textContent = pageNum;
+    btn.addEventListener('click', () => goToPage(pageNum));
+    return btn;
+  }
+
+  function goToPage(pageNum) {
+    paginationState.currentPage = pageNum;
+    applyPagination();
+    const productsContainer = document.querySelector('.cf-plp__products');
+    if (productsContainer) {
+      productsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (paginationState.currentPage > 1) goToPage(paginationState.currentPage - 1);
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (paginationState.currentPage < paginationState.totalPages) goToPage(paginationState.currentPage + 1);
+    });
+  }
+
+  // View Toggle (Grid/List)
+  const productGrid = document.getElementById('product-grid');
+  document.querySelectorAll('.cf-plp__view-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.cf-plp__view-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+
+      const viewType = this.dataset.view;
+      if (viewType === 'list' && productGrid) {
+        productGrid.classList.add('list-view');
+      } else if (productGrid) {
+        productGrid.classList.remove('list-view');
+      }
+    });
+  });
+
+  // Category Pills (skip link pills - they navigate to another page)
+  document.querySelectorAll('.cf-plp__pill:not(.cf-plp__pill--link)').forEach(pill => {
+    pill.addEventListener('click', function() {
+      document.querySelectorAll('.cf-plp__pill').forEach(p => p.classList.remove('active'));
+      this.classList.add('active');
+      filterState.category = this.dataset.filter;
+      applyFilters();
+    });
+  });
+
+  // Brand Checkboxes
+  document.querySelectorAll('input[name="brand"]').forEach(cb => {
+    cb.addEventListener('change', function() {
+      if (this.checked) {
+        filterState.brands.push(this.value);
+      } else {
+        filterState.brands = filterState.brands.filter(b => b !== this.value);
+      }
+      applyFilters();
+    });
+  });
+
+  // Product Type Checkboxes
+  document.querySelectorAll('input[name="product-type"]').forEach(cb => {
+    cb.addEventListener('change', function() {
+      if (this.checked) {
+        filterState.productTypes.push(this.value);
+      } else {
+        filterState.productTypes = filterState.productTypes.filter(t => t !== this.value);
+      }
+      applyFilters();
+    });
+  });
+
+  // Price Range Checkboxes
+  document.querySelectorAll('input[name="price"]').forEach(cb => {
+    cb.addEventListener('change', function() {
+      if (this.checked) {
+        filterState.priceRanges.push(this.value);
+      } else {
+        filterState.priceRanges = filterState.priceRanges.filter(p => p !== this.value);
+      }
+      applyFilters();
+    });
+  });
+
+  // Option Checkboxes (variation filters)
+  document.querySelectorAll('.cf-plp__filter-options input[type="checkbox"][data-option-handle]').forEach(cb => {
+    cb.addEventListener('change', function() {
+      const optName = this.dataset.optionHandle;
+      if (!filterState.options[optName]) filterState.options[optName] = [];
+
+      if (this.checked) {
+        filterState.options[optName].push(this.value);
+      } else {
+        filterState.options[optName] = filterState.options[optName].filter(v => v !== this.value);
+      }
+      applyFilters();
+    });
+  });
+
+  // Range Sliders
+  document.querySelectorAll('.cf-plp__range-filter').forEach(rangeWrap => {
+    const optName = rangeWrap.dataset.option;
+    const minSlider = rangeWrap.querySelector('.cf-plp__range-min');
+    const maxSlider = rangeWrap.querySelector('.cf-plp__range-max');
+    const minDisplay = rangeWrap.querySelector('.cf-plp__range-min-val');
+    const maxDisplay = rangeWrap.querySelector('.cf-plp__range-max-val');
+
+    if (minSlider && maxSlider) {
+      const updateRange = () => {
+        let minVal = parseInt(minSlider.value);
+        let maxVal = parseInt(maxSlider.value);
+
+        // Prevent crossover
+        if (minVal > maxVal) {
+          [minVal, maxVal] = [maxVal, minVal];
+        }
+
+        if (minDisplay) minDisplay.textContent = minVal + '"';
+        if (maxDisplay) maxDisplay.textContent = maxVal + '"';
+
+        filterState.optionRanges[optName] = { min: minVal, max: maxVal };
+        applyFilters(); // Note: for smoother sliders, might want to debounce this
+      };
+
+      minSlider.addEventListener('input', updateRange);
+      maxSlider.addEventListener('input', updateRange);
+    }
+  });
+
+  // Quick Select Buttons
+  document.querySelectorAll('.cf-plp__quick-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const optName = this.dataset.option;
+      
+      // Toggle active state
+      this.classList.toggle('active');
+
+      // Update range slider if exists
+      const rangeWrap = document.querySelector(`.cf-plp__range-filter[data-option="${optName}"]`);
+      if (rangeWrap) {
+        const minSlider = rangeWrap.querySelector('.cf-plp__range-min');
+        const maxSlider = rangeWrap.querySelector('.cf-plp__range-max');
+        const minDisplay = rangeWrap.querySelector('.cf-plp__range-min-val');
+        const maxDisplay = rangeWrap.querySelector('.cf-plp__range-max-val');
+
+        // If button is active, set both to same value
+        const activeButtons = document.querySelectorAll(`.cf-plp__quick-btn[data-option="${optName}"].active`);
+        if (activeButtons.length > 0) {
+          const activeVals = Array.from(activeButtons).map(b => extractNumeric(b.dataset.value));
+          const minActive = Math.min(...activeVals);
+          const maxActive = Math.max(...activeVals);
+
+          if (minSlider) minSlider.value = minActive;
+          if (maxSlider) maxSlider.value = maxActive;
+          if (minDisplay) minDisplay.textContent = minActive + '"';
+          if (maxDisplay) maxDisplay.textContent = maxActive + '"';
+
+          filterState.optionRanges[optName] = { min: minActive, max: maxActive };
+        } else {
+          // Reset to full range
+          if (minSlider) minSlider.value = minSlider.min;
+          if (maxSlider) maxSlider.value = maxSlider.max;
+          if (minDisplay) minDisplay.textContent = minSlider.min + '"';
+          if (maxDisplay) maxDisplay.textContent = maxSlider.max + '"';
+          delete filterState.optionRanges[optName];
+        }
+      }
+
+      applyFilters();
+    });
+  });
+
+  // Add to Cart - triggers cart drawer/notification
+  document.querySelectorAll('.cf-plp__add-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const variantId = this.dataset.variantId;
+      const card = this.closest('.cf-plp__card');
+      const qty = card ? parseInt(card.querySelector('.cf-plp__qty-input').value) || 1 : 1;
+      const button = this;
+
+      button.disabled = true;
+      button.textContent = 'Adding...';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: parseInt(variantId), quantity: qty })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Add to cart failed');
+        return res.json();
+      })
+      .then(data => {
+        button.textContent = 'Added!';
+        button.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+
+        // Update cart count in header
+        if (window.updateCartCount) window.updateCartCount();
+        else {
+           fetch('/cart.js').then(r => r.json()).then(cart => {
+            const countEls = document.querySelectorAll('.cart-count-bubble span, .cart-count, [data-cart-count]');
+            countEls.forEach(el => el.textContent = cart.item_count);
+          });
+        }
+
+        // Show toast notification instead of cart drawer
+        if (typeof window.cfShowCartToast === 'function') {
+          window.cfShowCartToast(data, qty);
+        }
+
+        setTimeout(() => {
+          button.textContent = 'Add to Cart';
+          button.style.background = '';
+          button.disabled = false;
+        }, 2000);
+      })
+      .catch(err => {
+        console.error('Cart error:', err);
+        button.textContent = 'Error';
+        button.style.background = '#ef4444';
+        setTimeout(() => {
+          button.textContent = 'Add to Cart';
+          button.style.background = '';
+          button.disabled = false;
+        }, 2000);
+      });
+    });
+  });
+
+  // Sort Handler — client-side sort (products are from multiple L3 collections)
+  window.handleSort = function(value) {
+    const grid = document.getElementById('product-grid');
+    if (!grid) return;
+
+    productData.sort((a, b) => {
+      switch (value) {
+        case 'price-ascending':
+          return a.price - b.price;
+        case 'price-descending':
+          return b.price - a.price;
+        case 'title-ascending':
+          return a.title.localeCompare(b.title);
+        case 'best-selling':
+        default:
+          return a.originalIndex - b.originalIndex;
+      }
+    });
+
+    // Re-append cards in sorted order
+    for (const item of productData) {
+      grid.appendChild(item.element);
+    }
+
+    // Re-apply filters + pagination with new order
+    applyFilters();
+  };
+
+  // Mobile Filter Button
+  const mobileFilterBtn = document.getElementById('mobile-filter-btn');
+  if (mobileFilterBtn) {
+    mobileFilterBtn.addEventListener('click', openMobileFilters);
+  }
+
+  // Initialize
+  initProductData();
+  applyFilters();
+
+  console.log('CF-PLP: Optimized JS loaded, data cached for', productData.length, 'products');
+});
+</script>
+
+{% schema %}
+{
+  "name": "L2 Collection Hub",
+  "tag": "section",
+  "class": "section-collection-level2",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Navigation Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 24,
+      "max": 480,
+      "step": 24,
+      "default": 48,
+      "label": "Products per page"
+    },
+    {
+      "type": "checkbox",
+      "id": "compact_mode",
+      "label": "Compact Mode (5 columns)",
+      "default": true,
+      "info": "Show 5 products per row with smaller cards"
+    }
+  ],
+  "presets": [
+    {
+      "name": "L2 Collection Hub"
+    }
+  ]
+}
+{% endschema %}

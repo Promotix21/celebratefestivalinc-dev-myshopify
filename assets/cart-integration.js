@@ -1,0 +1,591 @@
+/**
+ * Cart Integration Script
+ * Connects header cart button to quick cart drawer
+ * Handles add to cart from collection page
+ */
+
+(function() {
+  'use strict';
+
+  // Initialize on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeCart);
+  } else {
+    initializeCart();
+  }
+
+  function initializeCart() {
+    // Track last browsed page for "Continue Shopping" functionality
+    trackLastBrowsedPage();
+
+    // Bind header cart button
+    bindCartButtons();
+
+    // Initialize add to cart buttons
+    initializeAddToCartButtons();
+
+    // Update cart count on page load
+    updateCartCount();
+
+    // Bind continue shopping buttons
+    bindContinueShoppingButtons();
+  }
+
+  /**
+   * Track the last browsed collection or product page
+   * Used by "Continue Shopping" button to return users to their last browsed location
+   */
+  function trackLastBrowsedPage() {
+    const currentPath = window.location.pathname;
+
+    // Save current page URL if on a collection or product page
+    if (currentPath.includes('/collections/') || currentPath.includes('/products/')) {
+      sessionStorage.setItem('lastBrowsedPage', window.location.href);
+    }
+  }
+
+  /**
+   * Get the last browsed page URL with fallback
+   */
+  function getLastBrowsedPage() {
+    return sessionStorage.getItem('lastBrowsedPage') || '/collections/all';
+  }
+
+  /**
+   * Bind continue shopping buttons to redirect to last browsed page
+   */
+  function bindContinueShoppingButtons() {
+    const continueShoppingBtn = document.getElementById('continueShoppingBtn');
+    const continueShoppingFooterBtn = document.getElementById('continueShoppingFooterBtn');
+
+    if (continueShoppingBtn) {
+      continueShoppingBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        closeCartDrawer();
+        window.location.href = getLastBrowsedPage();
+      });
+    }
+
+    if (continueShoppingFooterBtn) {
+      continueShoppingFooterBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        closeCartDrawer();
+        window.location.href = getLastBrowsedPage();
+      });
+    }
+  }
+
+  /**
+   * Bind all cart buttons in header to open drawer
+   */
+  function bindCartButtons() {
+    // Don't bind cart drawer on the cart page itself - let users interact directly
+    const isCartPage = window.location.pathname === '/cart' || window.location.pathname.startsWith('/cart/');
+    if (isCartPage) return;
+
+    // Main cart button
+    const cartButton = document.querySelector('.cart-link');
+    if (cartButton) {
+      cartButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        openCartDrawer();
+      });
+    }
+
+    // Any other cart links (but NOT login links with return_url containing /cart)
+    const cartLinks = document.querySelectorAll('a[href="/cart"], a[href*="/cart"]');
+    cartLinks.forEach(link => {
+      // Skip checkout links
+      if (link.href.includes('/checkout')) return;
+      // Skip login/account links that have /cart in return_url parameter
+      if (link.href.includes('/account/')) return;
+      // Skip links that only have /cart in query parameters, not the path
+      const url = new URL(link.href, window.location.origin);
+      if (url.pathname !== '/cart' && !url.pathname.startsWith('/cart/')) return;
+
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        openCartDrawer();
+      });
+    });
+  }
+
+  /**
+   * Initialize all add to cart buttons on the page
+   */
+  function initializeAddToCartButtons() {
+    // Collection page add to cart buttons
+    const addToCartButtons = document.querySelectorAll('.btn-primary:not(.btn-checkout)');
+    
+    addToCartButtons.forEach(button => {
+      // Only bind if it's not already bound and has cart icon
+      if (button.innerHTML.includes('fa-shopping-cart') && !button.dataset.bound) {
+        button.dataset.bound = 'true';
+        
+        button.addEventListener('click', function(e) {
+          const productCard = this.closest('.product-card');
+          const productUrl = productCard.querySelector('.product-title-link').href;
+          
+          // Check if it's a single variant product
+          if (this.classList.contains('quick-add-btn')) {
+            e.preventDefault();
+            const variantId = this.dataset.variantId;
+            addToCart(variantId, 1, this);
+          } else if (!productUrl.includes('/products/')) {
+            // It's a direct add to cart button
+            e.preventDefault();
+            // Extract variant ID from product card or button
+            const variantId = this.dataset.variantId || productCard.dataset.variantId;
+            if (variantId) {
+              addToCart(variantId, 1, this);
+            }
+          }
+          // Otherwise let it navigate to product page
+        });
+      }
+    });
+
+    // Quick add buttons specifically
+    const quickAddButtons = document.querySelectorAll('.quick-add-btn');
+    quickAddButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const variantId = this.dataset.variantId;
+        const quantity = 1;
+        addToCart(variantId, quantity, this);
+      });
+    });
+  }
+
+  /**
+   * Add item to cart via AJAX
+   */
+  function addToCart(variantId, quantity, button) {
+    // Show loading state
+    const originalHTML = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+    // Prepare form data
+    const formData = {
+      items: [{
+        id: variantId,
+        quantity: quantity
+      }]
+    };
+
+    // Make AJAX request
+    fetch('/cart/add.js', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to add to cart');
+      }
+      return response.json();
+    })
+    .then(data => {
+      // Success - show success state
+      button.innerHTML = '<i class="fas fa-check"></i> Added!';
+      button.style.background = 'var(--success-green)';
+
+      // Update cart count
+      updateCartCount();
+
+      // Show toast notification instead of opening cart drawer
+      if (typeof window.cfShowCartToast === 'function') {
+        // data.items contains the added items array
+        const addedItem = data.items ? data.items[0] : data;
+        window.cfShowCartToast(addedItem, quantity);
+      }
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalHTML;
+        button.style.background = '';
+        button.disabled = false;
+      }, 2000);
+    })
+    .catch(error => {
+      console.error('Error adding to cart:', error);
+      
+      // Show error state
+      button.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
+      button.style.background = '#dc2626';
+      
+      // Reset button
+      setTimeout(() => {
+        button.innerHTML = originalHTML;
+        button.style.background = '';
+        button.disabled = false;
+      }, 2000);
+      
+      // Show error notification
+      showNotification('Unable to add item to cart. Please try again.', 'error');
+    });
+  }
+
+  /**
+   * Update cart count in header
+   */
+  function updateCartCount() {
+    fetch('/cart.js')
+      .then(response => response.json())
+      .then(cart => {
+        // Update all cart count elements
+        const cartCounts = document.querySelectorAll('.cart-count');
+        cartCounts.forEach(element => {
+          if (cart.item_count > 0) {
+            element.textContent = cart.item_count;
+            element.style.display = 'flex';
+          } else {
+            element.style.display = 'none';
+          }
+        });
+
+        // Update cart drawer count if open
+        const drawerCount = document.getElementById('cartItemCount');
+        if (drawerCount) {
+          drawerCount.textContent = cart.item_count > 0 ? `(${cart.item_count})` : '';
+        }
+
+        // Trigger custom event for other scripts
+        document.dispatchEvent(new CustomEvent('cart:updated', {
+          detail: { cart: cart }
+        }));
+      })
+      .catch(error => {
+        console.error('Error updating cart count:', error);
+      });
+  }
+
+  /**
+   * Open cart drawer
+   */
+  function openCartDrawer() {
+    const cartDrawer = document.getElementById('cartDrawer');
+    if (cartDrawer) {
+      // Ensure overlay is properly set up before showing
+      const overlay = cartDrawer.querySelector('.cart-drawer-overlay');
+      if (overlay && !overlay.dataset.bound) {
+        overlay.dataset.bound = 'true';
+        overlay.addEventListener('click', function(e) {
+          if (e.target === overlay) {
+            closeCartDrawer();
+          }
+        });
+      }
+
+      cartDrawer.classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      // Refresh cart contents
+      refreshCartDrawer();
+    }
+  }
+
+  /**
+   * Close cart drawer
+   */
+  window.closeCartDrawer = function() {
+    const cartDrawer = document.getElementById('cartDrawer');
+    if (cartDrawer) {
+      cartDrawer.classList.remove('active');
+      document.body.style.overflow = '';
+
+      // Blur any active inputs (fixes order notes staying selected)
+      const activeElement = document.activeElement;
+      if (activeElement && (activeElement.tagName === 'TEXTAREA' || activeElement.tagName === 'INPUT')) {
+        activeElement.blur();
+      }
+    }
+  };
+
+  /**
+   * Refresh cart drawer contents
+   */
+  function refreshCartDrawer() {
+    fetch('/cart?view=drawer')
+      .then(response => response.text())
+      .then(html => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        // Update cart body
+        const newBody = doc.querySelector('#cartDrawerBody');
+        const currentBody = document.getElementById('cartDrawerBody');
+        if (newBody && currentBody) {
+          currentBody.innerHTML = newBody.innerHTML;
+        }
+        
+        // Update cart footer
+        const newFooter = doc.querySelector('.cart-drawer-footer');
+        const currentFooter = document.querySelector('.cart-drawer-footer');
+        if (newFooter && currentFooter) {
+          currentFooter.innerHTML = newFooter.innerHTML;
+        }
+        
+        // Re-bind events after refresh
+        bindCartItemEvents();
+        if (typeof initShippingEstimator === 'function') initShippingEstimator();
+
+        updateCartCount();
+      })
+      .catch(error => {
+        console.error('Error refreshing cart:', error);
+      });
+  }
+
+  /**
+   * Bind events to cart items (quantity, remove, etc.)
+   */
+  function bindCartItemEvents() {
+    // These functions are defined in quick-cart.liquid
+    // This ensures they work after AJAX refresh
+    
+    // Quantity buttons
+    const qtyButtons = document.querySelectorAll('.qty-btn');
+    qtyButtons.forEach(button => {
+      if (!button.dataset.bound) {
+        button.dataset.bound = 'true';
+        button.addEventListener('click', function(e) {
+          e.preventDefault();
+        });
+      }
+    });
+
+    // Remove buttons
+    const removeButtons = document.querySelectorAll('.cart-item-remove');
+    removeButtons.forEach(button => {
+      if (!button.dataset.bound) {
+        button.dataset.bound = 'true';
+      }
+    });
+  }
+
+  /**
+   * Show notification message
+   */
+  function showNotification(message, type = 'success') {
+    // Remove existing notification if any
+    const existing = document.querySelector('.cart-notification');
+    if (existing) {
+      existing.remove();
+    }
+
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `cart-notification cart-notification-${type}`;
+    notification.innerHTML = `
+      <div class="cart-notification-content">
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+        <span>${message}</span>
+      </div>
+    `;
+
+    // Add styles
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: ${type === 'success' ? '#10b981' : '#dc2626'};
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 10000;
+      animation: slideInRight 0.3s ease;
+      max-width: 400px;
+    `;
+
+    document.body.appendChild(notification);
+
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+      notification.style.animation = 'slideOutRight 0.3s ease';
+      setTimeout(() => {
+        notification.remove();
+      }, 300);
+    }, 3000);
+  }
+
+  /**
+   * Handle "Continue Shopping" from empty cart
+   */
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.cart-empty .btn')) {
+      closeCartDrawer();
+    }
+  });
+
+  /**
+   * Close cart on overlay click
+   * Note: This is a backup handler. Primary handler is bound in openCartDrawer()
+   */
+  document.addEventListener('click', function(e) {
+    // Check if clicked element is the overlay (not a child element)
+    if (e.target.classList.contains('cart-drawer-overlay') && e.target === e.currentTarget) {
+      closeCartDrawer();
+    }
+  });
+
+  /**
+   * Close cart on ESC key
+   */
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const cartDrawer = document.getElementById('cartDrawer');
+      if (cartDrawer && cartDrawer.classList.contains('active')) {
+        closeCartDrawer();
+      }
+    }
+  });
+
+  /**
+   * Expose functions globally for use in Liquid templates
+   */
+  window.openCartDrawer = openCartDrawer;
+  window.updateCartCount = updateCartCount;
+  window.addToCart = addToCart;
+  window.refreshCartDrawer = refreshCartDrawer;
+
+})();
+
+// Add notification animations
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes slideInRight {
+    from {
+      transform: translateX(400px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOutRight {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(400px);
+      opacity: 0;
+    }
+  }
+
+  .cart-notification-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .cart-notification-content i {
+    font-size: 18px;
+  }
+`;
+document.head.appendChild(style);
+/* ================================================================== */
+/*  COMPACT SPP — SOLD-OUT STICKY SYNC + MAIN FORM AJAX + TOAST       */
+/* ================================================================== */
+(function() {
+  function initCompactSPPFixes() {
+    var stickyBtn  = document.getElementById('compact-sticky-add-btn');
+    var mainAtcBtn = document.querySelector('.compact-product .compact-atc-btn');
+    if (!stickyBtn || !mainAtcBtn) return;
+
+    /* 1 ── Mirror sold-out / disabled state to sticky bar button ── */
+    function syncStickyState() {
+      var isSoldOut = mainAtcBtn.disabled && /sold.?out/i.test(mainAtcBtn.textContent);
+      var isContact = mainAtcBtn.disabled && /contact/i.test(mainAtcBtn.textContent);
+
+      stickyBtn.disabled = mainAtcBtn.disabled;
+
+      if (isSoldOut) {
+        stickyBtn.textContent    = 'Sold Out';
+        stickyBtn.style.opacity  = '0.5';
+        stickyBtn.style.cursor   = 'not-allowed';
+      } else if (isContact) {
+        stickyBtn.textContent    = 'Contact Us';
+        stickyBtn.style.opacity  = '0.5';
+        stickyBtn.style.cursor   = 'not-allowed';
+      } else {
+        if (stickyBtn.textContent === 'Sold Out' || stickyBtn.textContent === 'Contact Us') {
+          stickyBtn.textContent  = 'Add to Cart';
+        }
+        stickyBtn.style.opacity  = '';
+        stickyBtn.style.cursor   = '';
+      }
+    }
+
+    syncStickyState();
+    new MutationObserver(syncStickyState).observe(mainAtcBtn, {
+      attributes: true, childList: true, characterData: true, subtree: true
+    });
+
+    /* 2 ── Intercept main price-box form → AJAX + toast notification ── */
+    var form = document.querySelector('.compact-product form.compact-cart-row');
+    if (!form) return;
+
+    form.addEventListener('submit', function(e) {
+      if (mainAtcBtn && mainAtcBtn.disabled) { e.preventDefault(); return; }
+      e.preventDefault();
+
+      var vidInput = form.querySelector('input[name="id"]');
+      var qtyInput = form.querySelector('input[name="quantity"]');
+      if (!vidInput) return;
+
+      var vid = parseInt(vidInput.value);
+      var qty = qtyInput ? (parseInt(qtyInput.value) || 1) : 1;
+      var btn = mainAtcBtn;
+      if (btn) btn.disabled = true;
+
+      fetch('/cart/add.js', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ id: vid, quantity: qty })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.status && data.status !== 200) throw new Error(data.description || 'Error');
+
+        fetch('/cart.js').then(function(r) { return r.json(); }).then(function(cart) {
+          document.querySelectorAll('.cart-count-bubble span, [data-cart-count]').forEach(function(el) {
+            el.textContent = cart.item_count;
+          });
+        });
+
+        if (typeof window.cfShowCartToast === 'function') window.cfShowCartToast(data, qty);
+
+        if (btn) {
+          var origHtml = btn.innerHTML;
+          btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Added!';
+          btn.style.background = '#10b981';
+          setTimeout(function() { btn.innerHTML = origHtml; btn.style.background = ''; btn.disabled = false; }, 2000);
+        }
+      })
+      .catch(function() {
+        if (btn) {
+          var origHtml = btn.innerHTML;
+          btn.innerHTML = 'Error — Try Again';
+          setTimeout(function() { btn.innerHTML = origHtml; btn.disabled = false; }, 2500);
+        }
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCompactSPPFixes);
+  } else {
+    initCompactSPPFixes();
+  }
+})();

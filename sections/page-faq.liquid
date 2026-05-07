@@ -1,0 +1,762 @@
+{% comment %}
+  FAQ Page Section - Celebrate Festival Inc
+  Collapsible accordion FAQ page with professional styling
+{% endcomment %}
+
+<style>
+  /* FAQ Page Styles */
+  .faq-page {
+    --cf-deep-blue: #1a365d;
+    --cf-navy: #2d5a87;
+    --cf-coral: #ff6b6b;
+    --cf-gold: #d4af37;
+    --cf-success: #10b981;
+    --cf-text-dark: #0f172a;
+    --cf-text-medium: #475569;
+    --cf-text-light: #64748b;
+    --cf-text-muted: #94a3b8;
+    --cf-border: #e2e8f0;
+    --cf-bg-light: #f8fafc;
+    --cf-bg-white: #ffffff;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  /* Hero Section */
+  .faq-hero {
+    background: linear-gradient(135deg, var(--cf-deep-blue) 0%, #0f172a 100%);
+    padding: 60px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .faq-hero__shapes {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .faq-hero .shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    background: white;
+  }
+
+  .faq-hero .shape--1 {
+    width: 300px;
+    height: 300px;
+    top: -100px;
+    right: -50px;
+  }
+
+  .faq-hero .shape--2 {
+    width: 200px;
+    height: 200px;
+    bottom: -80px;
+    left: 10%;
+  }
+
+  .faq-hero__content {
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .faq-hero__tagline {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  .faq-hero__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 16px;
+  }
+
+  .faq-hero__subtitle {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* Search Box */
+  .faq-search {
+    background: var(--cf-bg-light);
+    padding: 30px 40px;
+    border-bottom: 1px solid var(--cf-border);
+  }
+
+  .faq-search__container {
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .faq-search__input {
+    width: 100%;
+    padding: 14px 20px 14px 50px;
+    border: 2px solid var(--cf-border);
+    border-radius: 10px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    background: white;
+  }
+
+  .faq-search__input:focus {
+    outline: none;
+    border-color: var(--cf-navy);
+    box-shadow: 0 4px 12px rgba(45, 90, 135, 0.15);
+  }
+
+  .faq-search__icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--cf-text-muted);
+  }
+
+  /* FAQ Content */
+  .faq-content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 50px 40px;
+  }
+
+  /* Category Sections */
+  .faq-category {
+    margin-bottom: 40px;
+  }
+
+  .faq-category__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--cf-border);
+  }
+
+  .faq-category__icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--cf-deep-blue) 0%, var(--cf-navy) 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+  }
+
+  .faq-category__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--cf-deep-blue);
+    margin: 0;
+  }
+
+  /* Accordion Items */
+  .faq-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .faq-item {
+    background: white;
+    border: 1px solid var(--cf-border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .faq-item:hover {
+    border-color: var(--cf-navy);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  .faq-item.active {
+    border-color: var(--cf-navy);
+    box-shadow: 0 4px 16px rgba(45, 90, 135, 0.15);
+  }
+
+  .faq-question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    gap: 16px;
+  }
+
+  .faq-question:hover {
+    background: var(--cf-bg-light);
+  }
+
+  .faq-question__text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--cf-text-dark);
+    flex: 1;
+  }
+
+  .faq-question__icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--cf-bg-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .faq-question__icon svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.3s ease;
+    color: var(--cf-navy);
+  }
+
+  .faq-item.active .faq-question__icon {
+    background: var(--cf-coral);
+  }
+
+  .faq-item.active .faq-question__icon svg {
+    transform: rotate(180deg);
+    color: white;
+  }
+
+  .faq-answer {
+    display: none;
+    padding: 0 20px 20px;
+    color: var(--cf-text-medium);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .faq-item.active .faq-answer {
+    display: block;
+  }
+
+  .faq-answer p {
+    margin: 0 0 12px;
+  }
+
+  .faq-answer p:last-child {
+    margin-bottom: 0;
+  }
+
+  .faq-answer ul,
+  .faq-answer ol {
+    margin: 12px 0;
+    padding-left: 20px;
+  }
+
+  .faq-answer li {
+    margin-bottom: 6px;
+  }
+
+  /* Contact CTA */
+  .faq-contact {
+    background: var(--cf-bg-light);
+    padding: 50px 40px;
+    text-align: center;
+  }
+
+  .faq-contact__inner {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .faq-contact__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--cf-deep-blue);
+    margin: 0 0 12px;
+  }
+
+  .faq-contact__text {
+    font-size: 15px;
+    color: var(--cf-text-medium);
+    margin: 0 0 24px;
+  }
+
+  .faq-contact__buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .faq-contact__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .faq-contact__btn--primary {
+    background: var(--cf-coral);
+    color: white;
+  }
+
+  .faq-contact__btn--primary:hover {
+    background: #ff5252;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+  }
+
+  .faq-contact__btn--secondary {
+    background: white;
+    color: var(--cf-navy);
+    border: 2px solid var(--cf-navy);
+  }
+
+  .faq-contact__btn--secondary:hover {
+    background: var(--cf-navy);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  /* No Results */
+  .faq-no-results {
+    text-align: center;
+    padding: 40px;
+    display: none;
+  }
+
+  .faq-no-results.visible {
+    display: block;
+  }
+
+  .faq-no-results__icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  .faq-no-results__text {
+    color: var(--cf-text-medium);
+    font-size: 15px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .faq-hero {
+      padding: 40px 20px;
+    }
+
+    .faq-hero__title {
+      font-size: 28px;
+    }
+
+    .faq-search {
+      padding: 20px;
+    }
+
+    .faq-content {
+      padding: 30px 20px;
+    }
+
+    .faq-contact {
+      padding: 40px 20px;
+    }
+
+    .faq-contact__buttons {
+      flex-direction: column;
+    }
+
+    .faq-contact__btn {
+      justify-content: center;
+    }
+  }
+</style>
+
+<div class="faq-page">
+  <!-- Hero Section -->
+  <section class="faq-hero">
+    <div class="faq-hero__shapes">
+      <div class="shape shape--1"></div>
+      <div class="shape shape--2"></div>
+    </div>
+    <div class="faq-hero__content">
+      <span class="faq-hero__tagline">{{ section.settings.hero_tagline | default: 'Help Center' }}</span>
+      <h1 class="faq-hero__title">{{ section.settings.hero_title | default: 'Frequently Asked Questions' }}</h1>
+      <p class="faq-hero__subtitle">{{ section.settings.hero_subtitle | default: 'Find answers to common questions about our products, shipping, and services.' }}</p>
+    </div>
+  </section>
+
+  <!-- Search Section -->
+  {% if section.settings.show_search %}
+  <section class="faq-search">
+    <div class="faq-search__container">
+      <span class="faq-search__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="M21 21l-4.35-4.35"/>
+        </svg>
+      </span>
+      <input type="text" class="faq-search__input" id="faq-search" placeholder="{{ section.settings.search_placeholder | default: 'Search for answers...' }}">
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- FAQ Content -->
+  <section class="faq-content">
+    <div class="faq-no-results" id="faq-no-results">
+      <div class="faq-no-results__icon">?</div>
+      <p class="faq-no-results__text">No matching questions found. Try a different search term.</p>
+    </div>
+
+    {% assign current_category = '' %}
+    {% for block in section.blocks %}
+      {% if block.type == 'category' %}
+        {% if current_category != '' %}
+          </div><!-- Close previous accordion -->
+          </div><!-- Close previous category -->
+        {% endif %}
+        {% assign current_category = block.settings.category_name %}
+        <div class="faq-category" data-category="{{ block.settings.category_name | handleize }}" {{ block.shopify_attributes }}>
+          <div class="faq-category__header">
+            <div class="faq-category__icon">
+              {% case block.settings.category_icon %}
+                {% when 'shipping' %}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                {% when 'payment' %}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                {% when 'product' %}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                {% when 'returns' %}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                {% when 'account' %}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                {% when 'support' %}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                {% else %}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              {% endcase %}
+            </div>
+            <h2 class="faq-category__title">{{ block.settings.category_name }}</h2>
+          </div>
+          <div class="faq-accordion">
+      {% elsif block.type == 'faq_item' %}
+        <div class="faq-item" data-searchable="{{ block.settings.question | downcase }} {{ block.settings.answer | downcase }}" {{ block.shopify_attributes }}>
+          <button class="faq-question" type="button" aria-expanded="false">
+            <span class="faq-question__text">{{ block.settings.question }}</span>
+            <span class="faq-question__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </span>
+          </button>
+          <div class="faq-answer">
+            {{ block.settings.answer }}
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+
+    {% if current_category != '' %}
+      </div><!-- Close last accordion -->
+      </div><!-- Close last category -->
+    {% endif %}
+  </section>
+
+  <!-- Contact CTA -->
+  {% if section.settings.show_contact_cta %}
+  <section class="faq-contact">
+    <div class="faq-contact__inner">
+      <h2 class="faq-contact__title">{{ section.settings.contact_title | default: "Still have questions?" }}</h2>
+      <p class="faq-contact__text">{{ section.settings.contact_text | default: "Can't find the answer you're looking for? Our team is here to help." }}</p>
+      <div class="faq-contact__buttons">
+        {% if section.settings.contact_phone != blank %}
+        <a href="tel:{{ section.settings.contact_phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' }}" class="faq-contact__btn faq-contact__btn--primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          {{ section.settings.contact_phone }}
+        </a>
+        {% endif %}
+        {% if section.settings.contact_email != blank %}
+        <a href="mailto:{{ section.settings.contact_email }}" class="faq-contact__btn faq-contact__btn--secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Email Us
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Accordion functionality
+  const faqItems = document.querySelectorAll('.faq-item');
+  faqItems.forEach(item => {
+    const question = item.querySelector('.faq-question');
+    question.addEventListener('click', () => {
+      const isActive = item.classList.contains('active');
+
+      // Close all other items (optional - remove for multi-open)
+      // faqItems.forEach(i => i.classList.remove('active'));
+
+      item.classList.toggle('active');
+      question.setAttribute('aria-expanded', !isActive);
+    });
+  });
+
+  // Search functionality
+  const searchInput = document.getElementById('faq-search');
+  const noResults = document.getElementById('faq-no-results');
+  const categories = document.querySelectorAll('.faq-category');
+
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase().trim();
+      let hasResults = false;
+
+      faqItems.forEach(item => {
+        const searchable = item.dataset.searchable || '';
+        const matches = searchable.includes(searchTerm);
+        item.style.display = matches || searchTerm === '' ? '' : 'none';
+        if (matches || searchTerm === '') hasResults = true;
+      });
+
+      // Show/hide categories based on visible items
+      categories.forEach(category => {
+        const visibleItems = category.querySelectorAll('.faq-item[style=""]').length;
+        const allItems = category.querySelectorAll('.faq-item').length;
+        const hiddenItems = category.querySelectorAll('.faq-item[style="display: none;"]').length;
+        category.style.display = (allItems > hiddenItems) || searchTerm === '' ? '' : 'none';
+      });
+
+      noResults.classList.toggle('visible', !hasResults && searchTerm !== '');
+    });
+  }
+});
+</script>
+
+{% schema %}
+{
+  "name": "FAQ Page",
+  "tag": "section",
+  "class": "section-faq-page",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Hero Section"
+    },
+    {
+      "type": "text",
+      "id": "hero_tagline",
+      "label": "Hero Tagline",
+      "default": "Help Center"
+    },
+    {
+      "type": "text",
+      "id": "hero_title",
+      "label": "Hero Title",
+      "default": "Frequently Asked Questions"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_subtitle",
+      "label": "Hero Subtitle",
+      "default": "Find answers to common questions about our products, shipping, and services."
+    },
+    {
+      "type": "header",
+      "content": "Search"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show Search Box",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Search Placeholder",
+      "default": "Search for answers..."
+    },
+    {
+      "type": "header",
+      "content": "Contact CTA"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_contact_cta",
+      "label": "Show Contact Section",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "contact_title",
+      "label": "Contact Title",
+      "default": "Still have questions?"
+    },
+    {
+      "type": "textarea",
+      "id": "contact_text",
+      "label": "Contact Text",
+      "default": "Can't find the answer you're looking for? Our team is here to help."
+    },
+    {
+      "type": "text",
+      "id": "contact_phone",
+      "label": "Contact Phone",
+      "default": "(408) 673-9999"
+    },
+    {
+      "type": "text",
+      "id": "contact_email",
+      "label": "Contact Email",
+      "default": "sales@celebratefestivalinc.com"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "FAQ Category",
+      "settings": [
+        {
+          "type": "text",
+          "id": "category_name",
+          "label": "Category Name",
+          "default": "General Questions"
+        },
+        {
+          "type": "select",
+          "id": "category_icon",
+          "label": "Category Icon",
+          "options": [
+            { "value": "general", "label": "General (Question Mark)" },
+            { "value": "shipping", "label": "Shipping (Truck)" },
+            { "value": "payment", "label": "Payment (Card)" },
+            { "value": "product", "label": "Product (Shopping Bag)" },
+            { "value": "returns", "label": "Returns (Refresh)" },
+            { "value": "account", "label": "Account (User)" },
+            { "value": "support", "label": "Support (Chat)" }
+          ],
+          "default": "general"
+        }
+      ]
+    },
+    {
+      "type": "faq_item",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "What is your return policy?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>We offer a 30-day return policy on most items. Products must be unused and in original packaging. Please contact our support team to initiate a return.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ Page",
+      "blocks": [
+        {
+          "type": "category",
+          "settings": {
+            "category_name": "Ordering & Shipping",
+            "category_icon": "shipping"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "How long does shipping take?",
+            "answer": "<p>Standard shipping typically takes 5-7 business days. Expedited shipping options are available at checkout for faster delivery.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Do you offer free shipping?",
+            "answer": "<p>Yes! We offer free shipping on orders over $500. For orders under $500, shipping is calculated at checkout based on your location and order weight.</p>"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "category_name": "Products & Warranty",
+            "category_icon": "product"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "What warranty do your products have?",
+            "answer": "<p>Most of our equipment comes with a manufacturer's warranty ranging from 1-5 years depending on the product. Extended warranties are available for purchase on select items.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Are your products NSF certified?",
+            "answer": "<p>Yes, many of our commercial kitchen equipment products are NSF certified, ensuring they meet strict public health and safety standards.</p>"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "category_name": "Returns & Support",
+            "category_icon": "returns"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "What is your return policy?",
+            "answer": "<p>We offer a 30-day return policy on most items. Products must be unused and in original packaging. Some items like custom orders or perishables may not be eligible for return. Please contact our support team to initiate a return.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "How do I contact customer support?",
+            "answer": "<p>You can reach our customer support team by phone at (408) 673-9999 or by email at sales@celebratefestivalinc.com. Our team is available Monday-Friday, 9am-5pm PST.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

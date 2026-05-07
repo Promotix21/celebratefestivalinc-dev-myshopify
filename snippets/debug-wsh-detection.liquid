@@ -1,0 +1,132 @@
+{% comment %}
+  WSH Wholesale Plugin Detection Debug Tool
+  Add this snippet to your product page to see all metafields
+{% endcomment %}
+
+<div style="background: #f8f9fa; border: 2px solid #e74c3c; padding: 20px; margin: 20px 0; border-radius: 8px; font-family: monospace; font-size: 12px;">
+  <h3 style="margin: 0 0 15px 0; color: #e74c3c; font-family: sans-serif;">🔍 WSH Detection Debug Panel</h3>
+
+  <div style="background: white; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+    <strong style="color: #2c3e50;">Customer Info:</strong><br>
+    {% if customer %}
+      ✅ Logged In: <code>{{ customer.email }}</code><br>
+      Tags: <code>{{ customer.tags | join: ', ' }}</code><br>
+      {% if customer.tags contains 'plus-member' or customer.tags contains 'wholesale' or customer.tags contains 'member' %}
+        ✅ <span style="color: green; font-weight: bold;">MEMBER DETECTED</span>
+      {% else %}
+        ❌ <span style="color: red; font-weight: bold;">NOT A MEMBER</span> (needs tag: 'plus-member', 'wholesale', or 'member')
+      {% endif %}
+    {% else %}
+      ❌ Not Logged In
+    {% endif %}
+  </div>
+
+  <div style="background: white; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+    <strong style="color: #2c3e50;">Product Pricing:</strong><br>
+    Regular Price: <code>{{ product.price | money }}</code><br>
+    Compare At Price: <code>{{ product.compare_at_price | money }}</code><br>
+  </div>
+
+  <div style="background: white; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+    <strong style="color: #2c3e50;">WSH Plugin Detection Attempts:</strong><br>
+
+    <div style="margin-left: 20px; margin-top: 10px;">
+      <strong>1. product.metafields.wsh.wholesale_price:</strong><br>
+      {% if product.metafields.wsh.wholesale_price %}
+        ✅ <span style="color: green; font-weight: bold;">FOUND!</span> Value: <code>{{ product.metafields.wsh.wholesale_price | money }}</code>
+      {% else %}
+        ❌ <span style="color: red;">Not found</span>
+      {% endif %}
+      <br><br>
+
+      <strong>2. product.metafields.wholesale.price:</strong><br>
+      {% if product.metafields.wholesale.price %}
+        ✅ <span style="color: green; font-weight: bold;">FOUND!</span> Value: <code>{{ product.metafields.wholesale.price | money }}</code>
+      {% else %}
+        ❌ <span style="color: red;">Not found</span>
+      {% endif %}
+      <br><br>
+
+      <strong>3. product.metafields.custom.wholesale_price:</strong><br>
+      {% if product.metafields.custom.wholesale_price %}
+        ✅ <span style="color: green; font-weight: bold;">FOUND!</span> Value: <code>{{ product.metafields.custom.wholesale_price | money }}</code>
+      {% else %}
+        ❌ <span style="color: red;">Not found</span>
+      {% endif %}
+      <br><br>
+
+      <strong>4. Using Compare At Price (if lower than regular):</strong><br>
+      {% if product.compare_at_price and product.compare_at_price < product.price %}
+        ✅ <span style="color: green; font-weight: bold;">AVAILABLE!</span> Value: <code>{{ product.compare_at_price | money }}</code>
+      {% else %}
+        ❌ <span style="color: red;">Not applicable</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div style="background: white; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+    <strong style="color: #2c3e50;">ALL Product Metafields:</strong><br>
+    <div style="margin-left: 20px; margin-top: 10px; max-height: 200px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 4px;">
+      {% if product.metafields.size > 0 %}
+        {% for metafield in product.metafields %}
+          <div style="margin-bottom: 8px; padding: 8px; background: white; border-radius: 3px;">
+            <strong style="color: #3498db;">{{ metafield[0] }}:</strong><br>
+            <code style="color: #e74c3c;">{{ metafield[1] | json }}</code>
+          </div>
+        {% endfor %}
+      {% else %}
+        <em style="color: #7f8c8d;">No metafields found on this product</em>
+      {% endif %}
+    </div>
+  </div>
+
+  <div style="background: white; padding: 15px; border-radius: 4px;">
+    <strong style="color: #2c3e50;">Current Detection Result:</strong><br>
+
+    {% assign test_member_price = nil %}
+    {% assign test_price_source = 'none' %}
+
+    {% if product.metafields.wsh.wholesale_price %}
+      {% assign test_member_price = product.metafields.wsh.wholesale_price %}
+      {% assign test_price_source = 'wsh-plugin' %}
+    {% elsif product.metafields.wholesale.price %}
+      {% assign test_member_price = product.metafields.wholesale.price %}
+      {% assign test_price_source = 'wholesale-plugin' %}
+    {% elsif product.metafields.custom.wholesale_price %}
+      {% assign test_member_price = product.metafields.custom.wholesale_price %}
+      {% assign test_price_source = 'custom-plugin' %}
+    {% elsif product.compare_at_price and product.compare_at_price < product.price %}
+      {% assign test_member_price = product.compare_at_price %}
+      {% assign test_price_source = 'compare-price' %}
+    {% else %}
+      {% assign discount_multiplier = 98 | divided_by: 100.0 %}
+      {% assign test_member_price = product.price | times: discount_multiplier %}
+      {% assign test_price_source = 'manual-calculation' %}
+    {% endif %}
+
+    <div style="margin-top: 10px; padding: 15px; background: {% if test_price_source == 'wsh-plugin' or test_price_source == 'wholesale-plugin' or test_price_source == 'custom-plugin' %}#d4edda{% else %}#fff3cd{% endif %}; border-radius: 4px; border: 2px solid {% if test_price_source == 'wsh-plugin' or test_price_source == 'wholesale-plugin' or test_price_source == 'custom-plugin' %}#28a745{% else %}#ffc107{% endif %};">
+      <strong style="font-size: 14px;">Price Source:</strong>
+      <code style="font-size: 16px; color: {% if test_price_source == 'wsh-plugin' or test_price_source == 'wholesale-plugin' or test_price_source == 'custom-plugin' %}#28a745{% else %}#ff6b6b{% endif %}; font-weight: bold;">{{ test_price_source }}</code><br>
+      <strong style="font-size: 14px;">Member Price:</strong> <code style="font-size: 16px; font-weight: bold;">{{ test_member_price | money }}</code><br>
+      <strong style="font-size: 14px;">Savings:</strong> <code style="font-size: 16px; color: #28a745; font-weight: bold;">{{ product.price | minus: test_member_price | money }}</code>
+    </div>
+
+    {% if test_price_source == 'manual-calculation' %}
+      <div style="margin-top: 15px; padding: 12px; background: #fff3cd; border-left: 4px solid #ffc107; color: #856404;">
+        ⚠️ <strong>Warning:</strong> WSH plugin not detected! Using fallback calculation (2% discount).
+        <br><br>
+        <strong>Possible Issues:</strong>
+        <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+          <li>WSH Wholesale plugin may not be installed or activated</li>
+          <li>Plugin may use different metafield paths than expected</li>
+          <li>Product doesn't have wholesale pricing configured in WSH plugin</li>
+          <li>Check WSH plugin settings in Shopify Admin → Apps</li>
+        </ul>
+      </div>
+    {% endif %}
+  </div>
+
+  <div style="margin-top: 15px; padding: 12px; background: #e8f4f8; border-left: 4px solid #3498db; color: #2c3e50; font-family: sans-serif;">
+    ℹ️ <strong>To remove this debug panel:</strong> Delete or comment out the <code>{% raw %}{% render 'debug-wsh-detection' %}{% endraw %}</code> line from your product template.
+  </div>
+</div>

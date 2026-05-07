@@ -1,0 +1,93 @@
+{% comment %}
+  Collection Handle Mapping
+  Maps incorrect/expected handles to actual Shopify collection handles
+  Generated from CORRECT-collection-mapping.json
+
+  Usage in templates:
+    {% render 'collection-handle-map', input_handle: some_handle, output: 'correct_handle' %}
+    Then use: {{ correct_handle }}
+{% endcomment %}
+
+{%- liquid
+  # Input: input_handle (the handle from URL or menu)
+  # Output: correct_handle (the actual Shopify collection handle)
+
+  assign correct_handle = input_handle
+
+  # Restaurant Equipment mappings
+  case input_handle
+    when 'new-theme-griddles' or 'griddles'
+      assign correct_handle = 'new-theme-gas-griddles'
+    when 'new-theme-gas-fryer' or 'gas-fryer'
+      assign correct_handle = 'new-theme-electric-fryer-copy'
+    when 'new-theme-deep-fryer' or 'deep-fryer'
+      assign correct_handle = 'new-theme-gas-fryer-copy'
+    when 'new-theme-combination-ovens' or 'combination-ovens'
+      assign correct_handle = 'new-theme-convection-ovens-copy'
+    when 'new-theme-hold-ovens-cabinets' or 'hold-ovens-cabinets'
+      assign correct_handle = 'new-theme-oven-cabinets'
+    when 'new-theme-commercial-sealers' or 'commercial-sealers' or 'vacuum-sealers'
+      assign correct_handle = 'new-theme-vacuum-sealers'
+    when 'new-theme-work-tables' or 'work-tables'
+      assign correct_handle = 'new-theme-stainless-steel-work-tables-with-undershelves'
+    when 'new-them-compartment-sinks' or 'compartment-sinks' or 'one-compartment-sinks'
+      assign correct_handle = 'new-them-one-compartment-sinks'
+
+    # Refrigeration mappings
+    when 'new-theme-back-bar-coolers' or 'back-bar-coolers'
+      assign correct_handle = 'new-theme-bar-coolers'
+    when 'new-theme-combination-reach-in-refrigerators-and-freezers'
+      assign correct_handle = 'new-them-combination-reach-in-refrigerators-and-freezers'
+    when 'new-theme-commercial-wine-coolers' or 'commercial-wine-coolers'
+      assign correct_handle = 'new-theme-wine-coolers'
+    when 'new-theme-meat-and-deli-display' or 'meat-and-deli-display'
+      assign correct_handle = 'new-theme-meat-cases'
+    when 'new-theme-undercounter-ice-machines' or 'undercounter-ice-machines'
+      assign correct_handle = 'new-them-undercounter-ice-machines'
+    when 'new-theme-worktop-refrigerators'
+      assign correct_handle = 'worktop-refrigerators'
+    when 'new-theme-milk-coolers' or 'milk-coolers'
+      assign correct_handle = 'new-theme-milk-cooler'
+
+    # Storage & Transport mappings
+    when 'new-theme-dish-tray-carts-and-dollies' or 'dish-tray-carts'
+      assign correct_handle = 'new-theme-platform-trucks'
+    when 'new-theme-pizza-pan-racks' or 'pizza-pan-racks'
+      assign correct_handle = 'new-theme-steam-table-pan-racks'
+    when 'new-theme-storage-racks' or 'storage-racks'
+      assign correct_handle = 'chrome'
+    when 'new-theme-wire-shelving' or 'wire-shelving'
+      assign correct_handle = 'new-theme-restaurant-shelving'
+
+    # Tabletop mappings
+    when 'new-theme-china-mugs' or 'china-mugs'
+      assign correct_handle = 'test'
+    when 'new-theme-china-plates' or 'china-plates'
+      assign correct_handle = 'new-theme-china-dinnerware'
+    when 'new-theme-melamine-mugs' or 'melamine-mugs'
+      assign correct_handle = 'mugs'
+    when 'new-theme-melamine-platters' or 'melamine-platters'
+      assign correct_handle = 'new-theme-melamine-trays'
+    when 'new-theme-plastic-barware' or 'plastic-barware'
+      assign correct_handle = 'new-theme-stoneware-bowls'
+    when 'new-theme-plastic-tumblers' or 'plastic-tumblers'
+      assign correct_handle = 'test-1'
+    when 'new-theme-china-cups' or 'china-cups'
+      assign correct_handle = 'new-theme-china-cups-mugs-and-saucers'
+    when 'new-theme-porcelain-cups-mugs' or 'porcelain-cups-mugs'
+      assign correct_handle = 'new-theme-porcelain-cups'
+
+    # Indian Specialty mappings
+    when 'cookware-kadai-all' or 'kadai-all' or 'kadai'
+      assign correct_handle = 'kadai-all'
+    when 'cookware-tava-all' or 'tava-all' or 'tava'
+      assign correct_handle = 'taav-all'
+    when 'patila-all' or 'patila'
+      assign correct_handle = 'aluminium-patila'
+    when 'rotoquip-tandoor'
+      assign correct_handle = 'rotoquip'
+    when 'jhara-biryani-sev-namkeen-and-boondi-tools'
+      assign correct_handle = 'sev-namkeen-and-boondi-tools'
+
+  endcase
+-%}

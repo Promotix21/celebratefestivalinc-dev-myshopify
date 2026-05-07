@@ -1,0 +1,95 @@
+{% comment %}
+===========================================
+LOGO-GRID-MENU.LIQUID - Fixed Logo Grid Menu
+===========================================
+{% endcomment %}
+
+{% comment %} Find the logo grid block for this menu {% endcomment %}
+{% assign logo_grid_block = null %}
+{% for block in section.blocks %}
+  {% if block.type == 'logo_grid' and block.settings.menu_item_title == link.title %}
+    {% assign logo_grid_block = block %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% if logo_grid_block %}
+<div class="mega-menu">
+  <div class="mega-menu-container">
+    {% comment %} Collect all logo items for this menu {% endcomment %}
+    {% assign logo_items = section.blocks | where: 'type', 'logo_grid_item' %}
+    {% assign current_logo_items = '' | split: ',' %}
+    
+    {% for logo_item in logo_items %}
+      {% if logo_item.settings.parent_menu_title == link.title %}
+        {% assign current_logo_items = current_logo_items | append: logo_item %}
+      {% endif %}
+    {% endfor %}
+
+    {% if current_logo_items.size > 0 %}
+      {% comment %} Custom logo grid with uploaded logos {% endcomment %}
+      <div style="display: grid; grid-template-columns: repeat({{ logo_grid_block.settings.logos_per_row | default: 8 }}, 1fr); gap: 20px; padding: 30px;">
+        {% for logo_item in current_logo_items %}
+          <div style="text-align: center; padding: 15px; border-radius: 8px; transition: all 0.3s ease; border: 1px solid transparent;">
+            {% if logo_item.settings.brand_url != blank %}
+              <a href="{{ logo_item.settings.brand_url }}" style="display: block; text-decoration: none; color: inherit;">
+            {% else %}
+              <div style="display: block;">
+            {% endif %}
+              
+              {% if logo_item.settings.brand_logo %}
+                <img src="{{ logo_item.settings.brand_logo | image_url: width: 120 }}" 
+                     alt="{{ logo_item.settings.brand_name | default: 'Brand logo' }}"
+                     style="max-width: 80px; max-height: 40px; width: auto; height: auto; margin-bottom: 8px; object-fit: contain;">
+              {% else %}
+                <div style="width: 80px; height: 40px; background: #f5f5f5; border: 1px solid #e1e5e9; border-radius: 4px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;">
+                  <span style="font-size: 10px; color: #999; text-align: center;">{{ logo_item.settings.brand_name | truncate: 8 }}</span>
+                </div>
+              {% endif %}
+              
+              {% if logo_item.settings.brand_name %}
+                <span style="font-size: 12px; font-weight: 500; display: block; color: #333;">{{ logo_item.settings.brand_name }}</span>
+              {% endif %}
+            
+            {% if logo_item.settings.brand_url != blank %}
+              </a>
+            {% else %}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      {% comment %} Fallback message when no logos are added {% endcomment %}
+      <div style="text-align: center; padding: 40px; color: #666;">
+        <div style="background: #f0f7ff; border: 1px solid #b3d7ff; border-radius: 8px; padding: 20px; margin: 0 auto; max-width: 500px;">
+          <h3 style="margin: 0 0 10px 0; color: #1a5490;">👋 Add Brand Logos</h3>
+          <p style="margin: 0; font-size: 14px;">Go to Theme Customizer > Enhanced Header and add "Logo Grid Item" blocks to display brand logos here.</p>
+        </div>
+      </div>
+    {% endif %}
+
+    {% comment %} Optional: Add a "View All Brands" link {% endcomment %}
+    {% if logo_grid_block.settings.show_view_all and logo_grid_block.settings.view_all_url != blank %}
+      <div style="text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e1e5e9;">
+        <a href="{{ logo_grid_block.settings.view_all_url }}" 
+           style="display: inline-block; background: #FF6B6B; color: white; padding: 12px 25px; text-decoration: none; border-radius: 6px; font-weight: 500; transition: all 0.3s ease;">
+          {{ logo_grid_block.settings.view_all_text | default: 'View All Brands' }}
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  .enhanced-header-wrapper .mega-menu div[style*="grid-template-columns"] > div:hover {
+    background: rgba(0,0,0,0.05) !important;
+    border-color: #FF6B6B !important;
+    transform: translateY(-2px) !important;
+  }
+  
+  .enhanced-header-wrapper .mega-menu div[style*="grid-template-columns"] > div:hover img {
+    transform: scale(1.05) !important;
+  }
+</style>
+{% endif %}

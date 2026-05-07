@@ -1,0 +1,141 @@
+{
+  "sections": {
+    "journey": {
+      "type": "page-journey",
+      "blocks": {
+        "step_1": {
+          "type": "step",
+          "settings": {
+            "title": "Design & Planning",
+            "subtitle": "Kitchen Layout \u2022 Workflow \u2022 Budgeting",
+            "description": "We start with a comprehensive analysis of your space. Our experts create optimized kitchen layouts that maximize workflow efficiency while strictly adhering to your budgetary requirements.",
+            "icon": "pentool",
+            "default_image_url": "https://cdn.shopify.com/s/files/1/0562/3483/6013/t/28/assets/journey-step-1-design-planning.webp"
+          }
+        },
+        "step_2": {
+          "type": "step",
+          "settings": {
+            "title": "Consult & Select Right Products",
+            "subtitle": "Expert Guidance \u2022 Custom Solutions",
+            "description": "Navigate our extensive catalog with expert guidance. We help you select the perfect commercial-grade equipment tailored to your specific menu, volume, and operational needs.",
+            "icon": "users",
+            "default_image_url": "https://cdn.shopify.com/s/files/1/0562/3483/6013/t/28/assets/journey-step-2-consult-select.webp"
+          }
+        },
+        "step_3": {
+          "type": "step",
+          "settings": {
+            "title": "Best Pricing & Order Placement",
+            "subtitle": "Competitive Pricing \u2022 Bulk Sourcing",
+            "description": "Leverage our industry relationships and bulk sourcing capabilities. We ensure you get the most competitive pricing on top-tier restaurant equipment.",
+            "icon": "dollar",
+            "default_image_url": "https://cdn.shopify.com/s/files/1/0562/3483/6013/t/28/assets/journey-step-3-pricing-order.webp"
+          }
+        },
+        "step_4": {
+          "type": "step",
+          "settings": {
+            "title": "Equipment Delivery",
+            "subtitle": "(On Schedule)",
+            "description": "Time is money. We coordinate precise, on-schedule deliveries to your location, ensuring your equipment arrives safely and exactly when your project timeline demands it.",
+            "icon": "truck",
+            "default_image_url": "https://cdn.shopify.com/s/files/1/0562/3483/6013/t/28/assets/journey-step-4-delivery.webp"
+          }
+        },
+        "step_5": {
+          "type": "step",
+          "settings": {
+            "title": "Installation & Setup",
+            "subtitle": "Professional Installation & Testing",
+            "description": "Our certified professionals handle the heavy lifting. We provide complete installation, calibration, and rigorous testing of all equipment to ensure peak performance from day one.",
+            "icon": "wrench",
+            "default_image_url": "https://cdn.shopify.com/s/files/1/0562/3483/6013/t/28/assets/journey-step-5-installation.webp"
+          }
+        },
+        "step_6": {
+          "type": "step",
+          "settings": {
+            "title": "Final Inspection & Approvals",
+            "subtitle": "Compliance \u2022 Health \u2022 Fire Safety",
+            "description": "We stand by you through the red tape. Our team assists with final compliance checks, ensuring your kitchen meets all health, safety, and fire department regulations.",
+            "icon": "clipboard",
+            "default_image_url": "https://cdn.shopify.com/s/files/1/0562/3483/6013/t/28/assets/journey-step-6-inspection.webp"
+          }
+        },
+        "step_7": {
+          "type": "step",
+          "settings": {
+            "title": "Grand Opening & Serving Customers",
+            "subtitle": "Your Kitchen is Ready to Serve!",
+            "description": "The moment of truth. With a fully equipped, optimized, and approved kitchen, you are ready to open your doors and celebrate your success.",
+            "icon": "party",
+            "default_image_url": "https://cdn.shopify.com/s/files/1/0562/3483/6013/t/28/assets/journey-step-7-grand-opening.webp"
+          }
+        },
+        "feature_1": {
+          "type": "feature",
+          "settings": {
+            "title": "Quality Products",
+            "description": "We source only top-tier, commercial-grade equipment built to withstand the rigorous demands of a professional kitchen environment.",
+            "icon": "shield"
+          }
+        },
+        "feature_2": {
+          "type": "feature",
+          "settings": {
+            "title": "On-Time Delivery",
+            "description": "Your opening schedule is our priority. We coordinate logistics meticulously to ensure your equipment arrives exactly when needed.",
+            "icon": "truck"
+          }
+        },
+        "feature_3": {
+          "type": "feature",
+          "settings": {
+            "title": "Best Pricing",
+            "description": "Through our extensive network and bulk purchasing power, we secure the most competitive rates in the industry for your project.",
+            "icon": "tag"
+          }
+        },
+        "feature_4": {
+          "type": "feature",
+          "settings": {
+            "title": "Full Project Support",
+            "description": "From the first blueprint to the final health inspection, you have a dedicated team of experts ensuring your success.",
+            "icon": "handshake"
+          }
+        }
+      },
+      "block_order": [
+        "step_1",
+        "step_2",
+        "step_3",
+        "step_4",
+        "step_5",
+        "step_6",
+        "step_7",
+        "feature_1",
+        "feature_2",
+        "feature_3",
+        "feature_4"
+      ],
+      "settings": {
+        "hero_tagline": "Restaurant Equipment Solutions",
+        "hero_title_before": "Your Partner From",
+        "hero_title_highlight_1": "Design",
+        "hero_title_middle": "to",
+        "hero_title_highlight_2": "Grand Opening",
+        "hero_subtitle": "We guide restaurant owners through every step — from initial design and equipment selection to installation, inspection, and your grand opening day.",
+        "hero_cta_text": "Start Your Journey",
+        "timeline_title": "The 7-Step Journey",
+        "timeline_subtitle": "From concept to grand opening, we walk with you through every critical phase of building your restaurant.",
+        "features_title": "Building Successful Restaurants Together!",
+        "cta_title": "Ready to Build Your Dream Kitchen?",
+        "cta_text": "Let our team of experts guide you from the very first blueprint to your grand opening day. Your success is our mission.",
+        "cta_primary_text": "Get Started Today",
+        "cta_secondary_text": "View Our Portfolio"
+      }
+    }
+  },
+  "order": ["journey"]
+}

@@ -1,0 +1,256 @@
+{% comment %}
+  Collection Page Header Section
+  Displays H1 title and optional subtitle/description
+
+  Strips "New Theme - " prefix from display
+  Positioned ABOVE the hero banner image
+{% endcomment %}
+
+{%- liquid
+  assign display_title = collection.title | remove: "New Theme - "
+-%}
+
+<div class="collection-page-header">
+  <div class="container">
+    <h1 class="collection-page-title">{{ display_title }}</h1>
+
+    {%- if section.settings.show_description and collection.description != blank -%}
+      <div class="collection-page-subtitle">
+        {%- if section.settings.truncate_description -%}
+          {{ collection.description | strip_html | truncatewords: section.settings.description_words }}
+        {%- else -%}
+          {{ collection.description }}
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.show_product_count -%}
+      <div class="collection-page-meta">
+        <span class="product-count">
+          {{ collection.products_count }}
+          {% if collection.products_count == 1 %}product{% else %}products{% endif %}
+        </span>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Collection Page Header",
+  "tag": "section",
+  "class": "section-collection-page-header",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show collection description",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "truncate_description",
+      "label": "Truncate description",
+      "default": true,
+      "info": "Limit description length for cleaner display"
+    },
+    {
+      "type": "range",
+      "id": "description_words",
+      "label": "Description word limit",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "default": 40
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_count",
+      "label": "Show product count",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Content max width",
+      "min": 600,
+      "max": 1200,
+      "step": 50,
+      "default": 900,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "default": 32,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#1e3a5f"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Subtitle color",
+      "default": "#666666"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size_desktop",
+      "label": "Title size (desktop)",
+      "min": 28,
+      "max": 56,
+      "step": 2,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "title_size_mobile",
+      "label": "Title size (mobile)",
+      "min": 22,
+      "max": 40,
+      "step": 2,
+      "default": 28,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "label": "Subtitle size",
+      "min": 14,
+      "max": 22,
+      "step": 1,
+      "default": 16,
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Page Header"
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+  .collection-page-header {
+    background-color: {{ section.settings.background_color }};
+    padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px;
+    text-align: {{ section.settings.text_alignment }};
+  }
+
+  .collection-page-header .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .collection-page-title {
+    font-size: {{ section.settings.title_size_desktop }}px;
+    font-weight: 700;
+    color: {{ section.settings.title_color }};
+    margin: 0 0 16px;
+    line-height: 1.2;
+    max-width: {{ section.settings.max_width }}px;
+    {%- if section.settings.text_alignment == 'center' -%}
+      margin-left: auto;
+      margin-right: auto;
+    {%- elsif section.settings.text_alignment == 'right' -%}
+      margin-left: auto;
+    {%- endif -%}
+  }
+
+  .collection-page-subtitle {
+    font-size: {{ section.settings.subtitle_size }}px;
+    color: {{ section.settings.subtitle_color }};
+    line-height: 1.6;
+    max-width: {{ section.settings.max_width }}px;
+    {%- if section.settings.text_alignment == 'center' -%}
+      margin-left: auto;
+      margin-right: auto;
+    {%- elsif section.settings.text_alignment == 'right' -%}
+      margin-left: auto;
+    {%- endif -%}
+  }
+
+  .collection-page-subtitle p {
+    margin: 0;
+  }
+
+  .collection-page-meta {
+    margin-top: 12px;
+    font-size: 14px;
+    color: {{ section.settings.subtitle_color }};
+    opacity: 0.8;
+  }
+
+  @media (max-width: 768px) {
+    .collection-page-header {
+      padding: {{ section.settings.padding_top | divided_by: 1.5 | round }}px 0 {{ section.settings.padding_bottom | divided_by: 1.5 | round }}px;
+    }
+
+    .collection-page-title {
+      font-size: {{ section.settings.title_size_mobile }}px;
+      margin-bottom: 12px;
+    }
+
+    .collection-page-subtitle {
+      font-size: {{ section.settings.subtitle_size | minus: 2 }}px;
+    }
+  }
+</style>

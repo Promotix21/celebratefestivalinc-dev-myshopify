@@ -1,0 +1,214 @@
+{{ 'customer.css' | asset_url | stylesheet_tag }}
+{{ 'customer-accounts.css' | asset_url | stylesheet_tag }}
+
+<div class="cf-account-page">
+  <div class="cf-account-container">
+    <div class="cf-account-layout">
+      <!-- Sidebar -->
+      <aside class="cf-account-sidebar">
+        <ul class="cf-sidebar-nav">
+          <li><a href="{{ routes.account_url }}"><span class="icon">📊</span> Dashboard</a></li>
+          <li><a href="{{ routes.account_url }}#orders" class="active"><span class="icon">📦</span> Orders</a></li>
+          <li><a href="{{ routes.account_addresses_url }}"><span class="icon">📍</span> Addresses</a></li>
+        </ul>
+        <div class="cf-sidebar-logout">
+          <ul class="cf-sidebar-nav">
+            <li><a href="{{ routes.account_logout_url }}?return_to={{ request.path | url_param_escape }}"><span class="icon">🚪</span> Logout</a></li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="cf-account-content">
+        <div class="cf-content-header">
+          <h2 class="cf-content-title">
+            <a href="{{ routes.account_url }}" style="color: var(--cf-navy); text-decoration: none;">←</a>
+            {{ 'customer.order.title' | t: name: order.name }}
+          </h2>
+          <button class="cf-btn cf-btn-outline cf-btn-sm" onclick="window.print()">🖨️ Print Invoice</button>
+        </div>
+
+        <div class="cf-content-body">
+          <!-- Order Header -->
+          <div class="cf-order-details-header">
+            <div class="cf-order-info">
+              <h2>{{ 'customer.order.title' | t: name: order.name }}</h2>
+              <div class="cf-order-info-meta">
+                <span>📅 {{ order.created_at | date: '%B %d, %Y at %I:%M %p' }}</span>
+                <span class="cf-order-status cf-status-{% if order.financial_status == 'paid' %}fulfilled{% else %}processing{% endif %}">
+                  {{ order.financial_status_label }}
+                </span>
+                <span class="cf-order-status cf-status-{% if order.fulfillment_status == 'fulfilled' %}fulfilled{% elsif order.fulfillment_status == 'partial' %}shipped{% else %}processing{% endif %}">
+                  {{ order.fulfillment_status_label }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {%- if order.cancelled -%}
+            <div class="cf-alert cf-alert-error" style="margin-bottom: 24px;">
+              <span class="cf-alert-icon">!</span>
+              <div>
+                <strong>Order Cancelled</strong><br>
+                {{ 'customer.order.cancelled_html' | t: date: order.cancelled_at | date: '%B %d, %Y' }}<br>
+                {{ 'customer.order.cancelled_reason' | t: reason: order.cancel_reason_label }}
+              </div>
+            </div>
+          {%- endif -%}
+
+          <!-- Order Items -->
+          <div class="cf-order-items">
+            {%- for line_item in order.line_items -%}
+              <div class="cf-order-item">
+                <div class="cf-order-item-image">
+                  {%- if line_item.image -%}
+                    <img src="{{ line_item.image | image_url: width: 160 }}" alt="{{ line_item.title }}" loading="lazy">
+                  {%- else -%}
+                    📦
+                  {%- endif -%}
+                </div>
+                <div class="cf-order-item-details">
+                  <div class="cf-order-item-name">
+                    {%- if line_item.url != blank -%}
+                      <a href="{{ line_item.url }}" style="color: inherit; text-decoration: none;">{{ line_item.title | escape }}</a>
+                    {%- else -%}
+                      {{ line_item.title | escape }}
+                    {%- endif -%}
+                  </div>
+                  <div class="cf-order-item-sku">
+                    {%- unless line_item.product.has_only_default_variant -%}
+                      {{ line_item.variant.title | escape }} &bull;
+                    {%- endunless -%}
+                    SKU: {{ line_item.sku | default: 'N/A' }}
+                  </div>
+                  <div class="cf-order-item-meta">
+                    <span>Qty: {{ line_item.quantity }}</span>
+                    {%- if line_item.fulfillment -%}
+                      <span style="color: var(--cf-success);">
+                        ✓ Fulfilled {{ line_item.fulfillment.created_at | date: '%b %d' }}
+                        {%- if line_item.fulfillment.tracking_url -%}
+                          - <a href="{{ line_item.fulfillment.tracking_url }}" style="color: var(--cf-navy);">Track</a>
+                        {%- endif -%}
+                      </span>
+                    {%- endif -%}
+                  </div>
+                  {%- if line_item.line_level_discount_allocations != blank -%}
+                    <div style="margin-top: 8px;">
+                      {%- for discount_allocation in line_item.line_level_discount_allocations -%}
+                        <span style="display: inline-block; padding: 2px 8px; background: var(--cf-pale-coral); color: var(--cf-coral); border-radius: 4px; font-size: 12px;">
+                          {{ discount_allocation.discount_application.title | escape }} (-{{ discount_allocation.amount | money }})
+                        </span>
+                      {%- endfor -%}
+                    </div>
+                  {%- endif -%}
+                </div>
+                <div class="cf-order-item-price">
+                  <div class="cf-order-item-unit-price">{{ line_item.final_price | money }} each</div>
+                  <div class="cf-order-item-total">{{ line_item.final_line_price | money }}</div>
+                </div>
+              </div>
+            {%- endfor -%}
+          </div>
+
+          <!-- Order Summary -->
+          <div class="cf-order-summary-grid">
+            <!-- Shipping Address -->
+            <div class="cf-order-summary-box">
+              <h4>{{ 'customer.order.shipping_address' | t }}</h4>
+              <div style="font-size: 14px; color: var(--cf-text-medium); line-height: 1.7;">
+                {{ order.shipping_address | format_address }}
+              </div>
+            </div>
+
+            <!-- Order Totals -->
+            <div class="cf-order-summary-box">
+              <h4>Order Summary</h4>
+              <div class="cf-summary-row">
+                <span class="label">{{ 'customer.order.subtotal' | t }}</span>
+                <span class="value">{{ order.line_items_subtotal_price | money }}</span>
+              </div>
+
+              {%- if order.cart_level_discount_applications != blank -%}
+                {%- for discount_application in order.cart_level_discount_applications -%}
+                  <div class="cf-summary-row">
+                    <span class="label">{{ 'customer.order.discount' | t }} ({{ discount_application.title | escape }})</span>
+                    <span class="value" style="color: var(--cf-success);">-{{ discount_application.total_allocated_amount | money }}</span>
+                  </div>
+                {%- endfor -%}
+              {%- endif -%}
+
+              {%- for shipping_method in order.shipping_methods -%}
+                <div class="cf-summary-row">
+                  <span class="label">{{ 'customer.order.shipping' | t }} ({{ shipping_method.title | escape }})</span>
+                  <span class="value">{% if shipping_method.price == 0 %}<span style="color: var(--cf-success);">FREE</span>{% else %}{{ shipping_method.price | money }}{% endif %}</span>
+                </div>
+              {%- endfor -%}
+
+              {%- for tax_line in order.tax_lines -%}
+                <div class="cf-summary-row">
+                  <span class="label">{{ 'customer.order.tax' | t }} ({{ tax_line.title | escape }} {{ tax_line.rate | times: 100 }}%)</span>
+                  <span class="value">{{ tax_line.price | money }}</span>
+                </div>
+              {%- endfor -%}
+
+              {%- if order.total_refunded_amount > 0 -%}
+                <div class="cf-summary-row">
+                  <span class="label">{{ 'customer.order.total_refunded' | t }}</span>
+                  <span class="value" style="color: var(--cf-success);">-{{ order.total_refunded_amount | money_with_currency }}</span>
+                </div>
+              {%- endif -%}
+
+              <div class="cf-summary-row total">
+                <span class="label">{{ 'customer.order.total' | t }}</span>
+                <span class="value">{{ order.total_net_amount | money_with_currency }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Billing Address -->
+          <div style="margin-top: 24px;">
+            <div class="cf-order-summary-box" style="max-width: 50%;">
+              <h4>{{ 'customer.order.billing_address' | t }}</h4>
+              <div style="font-size: 14px; color: var(--cf-text-medium); line-height: 1.7;">
+                {{ order.billing_address | format_address }}
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.main-order.name",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 0
+    }
+  ]
+}
+{% endschema %}

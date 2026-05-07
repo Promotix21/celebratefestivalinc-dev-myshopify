@@ -1,0 +1,545 @@
+{% comment %}
+  Return Policy Page Section - Celebrate Festival Inc
+  Professional return/refund policy page with structured content sections
+{% endcomment %}
+
+<style>
+  .return-page {
+    --cf-deep-blue: #1a365d;
+    --cf-navy: #2d5a87;
+    --cf-coral: #ff6b6b;
+    --cf-text-dark: #0f172a;
+    --cf-text-medium: #475569;
+    --cf-text-light: #64748b;
+    --cf-text-muted: #94a3b8;
+    --cf-border: #e2e8f0;
+    --cf-bg-light: #f8fafc;
+    --cf-bg-white: #ffffff;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  /* Hero */
+  .return-hero {
+    background: linear-gradient(135deg, var(--cf-deep-blue) 0%, #0f172a 100%);
+    padding: 60px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .return-hero__shapes {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .return-hero .shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    background: white;
+  }
+
+  .return-hero .shape--1 {
+    width: 300px;
+    height: 300px;
+    top: -100px;
+    right: -50px;
+  }
+
+  .return-hero .shape--2 {
+    width: 200px;
+    height: 200px;
+    bottom: -80px;
+    left: 10%;
+  }
+
+  .return-hero__content {
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .return-hero__tagline {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  .return-hero__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 16px;
+  }
+
+  .return-hero__subtitle {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* Content */
+  .return-content {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 50px 40px;
+  }
+
+  /* Sections */
+  .return-section {
+    margin-bottom: 40px;
+  }
+
+  .return-section__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--cf-border);
+  }
+
+  .return-section__icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--cf-deep-blue) 0%, var(--cf-navy) 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .return-section__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--cf-deep-blue);
+    margin: 0;
+  }
+
+  .return-section__body {
+    color: var(--cf-text-medium);
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .return-section__body p {
+    margin: 0 0 16px;
+  }
+
+  .return-section__body p:last-child {
+    margin-bottom: 0;
+  }
+
+  .return-section__body h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--cf-deep-blue);
+    margin: 24px 0 12px;
+  }
+
+  .return-section__body ul,
+  .return-section__body ol {
+    margin: 12px 0;
+    padding-left: 24px;
+  }
+
+  .return-section__body li {
+    margin-bottom: 8px;
+    line-height: 1.7;
+  }
+
+  .return-section__body a {
+    color: var(--cf-navy);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.2s ease;
+  }
+
+  .return-section__body a:hover {
+    color: var(--cf-coral);
+  }
+
+  .return-section__body strong {
+    color: var(--cf-text-dark);
+    font-weight: 600;
+  }
+
+  /* Highlight box for important notes */
+  .return-highlight {
+    background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+    border: 1px solid rgba(45, 90, 135, 0.2);
+    border-left: 4px solid var(--cf-navy);
+    padding: 20px 24px;
+    border-radius: 0 10px 10px 0;
+    margin: 20px 0;
+  }
+
+  .return-highlight p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--cf-deep-blue);
+    font-weight: 500;
+  }
+
+  .return-warning {
+    background: linear-gradient(135deg, #fef2f2 0%, #fff5f5 100%);
+    border: 1px solid rgba(255, 107, 107, 0.2);
+    border-left: 4px solid var(--cf-coral);
+    padding: 20px 24px;
+    border-radius: 0 10px 10px 0;
+    margin: 20px 0;
+  }
+
+  .return-warning p {
+    margin: 0;
+    font-size: 14px;
+    color: #991b1b;
+    font-weight: 500;
+  }
+
+  /* Contact CTA */
+  .return-contact {
+    background: var(--cf-bg-light);
+    padding: 50px 40px;
+    text-align: center;
+  }
+
+  .return-contact__inner {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .return-contact__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--cf-deep-blue);
+    margin: 0 0 12px;
+  }
+
+  .return-contact__text {
+    font-size: 15px;
+    color: var(--cf-text-medium);
+    margin: 0 0 24px;
+    line-height: 1.6;
+  }
+
+  .return-contact__buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .return-contact__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .return-contact__btn--primary {
+    background: var(--cf-coral);
+    color: white;
+  }
+
+  .return-contact__btn--primary:hover {
+    background: #ff5252;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+  }
+
+  .return-contact__btn--secondary {
+    background: white;
+    color: var(--cf-navy);
+    border: 2px solid var(--cf-navy);
+  }
+
+  .return-contact__btn--secondary:hover {
+    background: var(--cf-navy);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .return-hero {
+      padding: 40px 20px;
+    }
+
+    .return-hero__title {
+      font-size: 28px;
+    }
+
+    .return-content {
+      padding: 30px 20px;
+    }
+
+    .return-contact {
+      padding: 40px 20px;
+    }
+
+    .return-contact__buttons {
+      flex-direction: column;
+    }
+
+    .return-contact__btn {
+      justify-content: center;
+    }
+  }
+</style>
+
+<div class="return-page">
+  <!-- Hero Section -->
+  <section class="return-hero">
+    <div class="return-hero__shapes">
+      <div class="shape shape--1"></div>
+      <div class="shape shape--2"></div>
+    </div>
+    <div class="return-hero__content">
+      <span class="return-hero__tagline">{{ section.settings.hero_tagline | default: 'Policy' }}</span>
+      <h1 class="return-hero__title">{{ section.settings.hero_title | default: 'Return & Refund Policy' }}</h1>
+      <p class="return-hero__subtitle">{{ section.settings.hero_subtitle | default: 'Our commitment to your satisfaction with clear and fair return guidelines.' }}</p>
+    </div>
+  </section>
+
+  <!-- Return Policy Content -->
+  <section class="return-content">
+
+    <!-- Standard Returns -->
+    <div class="return-section">
+      <div class="return-section__header">
+        <div class="return-section__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        </div>
+        <h2 class="return-section__title">Standard Returns</h2>
+      </div>
+      <div class="return-section__body">
+        <p>Except for the items listed in the "Final Sale & Non-returnable Items" section, unused, regularly stocked items may be returned by contacting our customer care team within <strong>30 days</strong> of the date of invoice. The customer care team should be able to get authorization, create return authorization and give you further instructions for completing the return process.</p>
+        <div class="return-highlight">
+          <p>Each return is subject to a <strong>25 percent restocking fee</strong> which will be deducted from your refund amount. The customer will also be responsible for securing a shipping agent to return the merchandise, plus all shipping fees incurred.</p>
+        </div>
+        <p>All returned items must be <strong>new, unused, and in the original packaging</strong>.</p>
+      </div>
+    </div>
+
+    <!-- Other Types of Returns -->
+    <div class="return-section">
+      <div class="return-section__header">
+        <div class="return-section__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </div>
+        <h2 class="return-section__title">Other Types of Returns</h2>
+      </div>
+      <div class="return-section__body">
+        <p>Please note that "special order items" like custom fabrications, spare parts, and most furniture cannot be returned. Items shipped directly to you from a manufacturer require a return authorization from that manufacturer. A member of our customer care team can assist you in securing that authorization.</p>
+        <p>Please contact us at <a href="tel:14086739999">1-408-673-9999</a> or <a href="mailto:{{ section.settings.contact_email | default: 'sales@celebratefestivalinc.com' }}">{{ section.settings.contact_email | default: 'sales@celebratefestivalinc.com' }}</a>.</p>
+      </div>
+    </div>
+
+    <!-- Final Sale & Non-returnable Items -->
+    <div class="return-section">
+      <div class="return-section__header">
+        <div class="return-section__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        </div>
+        <h2 class="return-section__title">Final Sale & Non-returnable Items</h2>
+      </div>
+      <div class="return-section__body">
+        <ul>
+          <li>Special order items (these are marked on our product pages)</li>
+          <li>Used equipment and supplies</li>
+          <li>Closeout items</li>
+          <li>Spare Parts (make sure you know what you are ordering)</li>
+          <li>Perishable and consumable items, including foods, and disposable items like lids, plates, and cups</li>
+          <li>Furniture</li>
+          <li>Items shipped to U.S. territories and areas outside the United States</li>
+          <li>Items shipped outside of the contiguous United States, including Hawaii, Alaska, and all U.S. territories</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Fees -->
+    <div class="return-section">
+      <div class="return-section__header">
+        <div class="return-section__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <h2 class="return-section__title">Fees</h2>
+      </div>
+      <div class="return-section__body">
+        <h3>Restocking Fees</h3>
+        <p>There are many costs involved in processing a return. To keep our prices as low as possible, we charge a <strong>25 percent restocking fee</strong> for all items returned.</p>
+
+        <h3>Additional Restocking Fees</h3>
+        <p>In some situations, additional shipping and handling fees will be assessed in the return process. Please keep in mind that items shipped to you with "Free Shipping" are only free when shipping from Celebrate Festival Inc. to you. Free shipping does not apply in the case of a return. These fees will be deducted from your refund amount &mdash; we collect the cost of shipping incurred to ship the item from our warehouse to you as well as the cost of shipping for return.</p>
+      </div>
+    </div>
+
+    <!-- Defective Merchandise -->
+    <div class="return-section">
+      <div class="return-section__header">
+        <div class="return-section__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <h2 class="return-section__title">Defective Merchandise</h2>
+      </div>
+      <div class="return-section__body">
+        <p>If you receive a defective item, you will have to file a warranty claim. For more information on warranties and this process, please contact us.</p>
+      </div>
+    </div>
+
+    <!-- Missing or Damaged Items -->
+    <div class="return-section">
+      <div class="return-section__header">
+        <div class="return-section__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        </div>
+        <h2 class="return-section__title">Missing or Damaged Items</h2>
+      </div>
+      <div class="return-section__body">
+        <div class="return-warning">
+          <p>Claims of items missing from a shipment or damaged in transit must be reported within <strong>five business days</strong> of receipt of the merchandise.</p>
+        </div>
+        <p>Anytime you receive items, please take some time to carefully inspect your items. Each shipment will include a packing label on the box. Please verify that you received all items listed on that label.</p>
+      </div>
+    </div>
+
+    <!-- Order Cancellation -->
+    <div class="return-section">
+      <div class="return-section__header">
+        <div class="return-section__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        </div>
+        <h2 class="return-section__title">Order Cancellation</h2>
+      </div>
+      <div class="return-section__body">
+        <h3>Open Order</h3>
+        <p>If your order is still open in our system, please contact our customer care team to cancel your order. You will not be charged any shipping or restocking fees. (Exception: if this order ships directly from manufacturer location and if manufacturer has already packed the order, this may result in a restocking fee.)</p>
+
+        <h3>Shipped Order</h3>
+        <p>If your order has already shipped, you can refuse the shipment when it arrives at your location or you can accept the order and initiate a return authorization through our returns process. When a shipment is refused, it will come back to our warehouse and you may be charged a restocking fee and any shipping fees associated with the return.</p>
+
+        <h3>Received Order</h3>
+        <p>If you have already received your purchased item(s), you will have to contact our customer appreciation team to start a return. You will be provided a return authorization number and instructions to ship your items back.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Contact CTA -->
+  {% if section.settings.show_contact_cta %}
+  <section class="return-contact">
+    <div class="return-contact__inner">
+      <h2 class="return-contact__title">{{ section.settings.cta_title | default: 'Need to Start a Return?' }}</h2>
+      <p class="return-contact__text">{{ section.settings.cta_text | default: 'Contact our customer care team to get a return authorization and instructions.' }}</p>
+      <div class="return-contact__buttons">
+        <a href="tel:{{ section.settings.contact_phone | default: '14086739999' | remove: ' ' | remove: '-' | remove: '(' | remove: ')' }}" class="return-contact__btn return-contact__btn--primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          {{ section.settings.contact_phone | default: '(408) 673-9999' }}
+        </a>
+        {% if section.settings.contact_email != blank %}
+        <a href="mailto:{{ section.settings.contact_email }}" class="return-contact__btn return-contact__btn--secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Email Us
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Return Policy",
+  "tag": "section",
+  "class": "section-return-policy",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Hero Section"
+    },
+    {
+      "type": "text",
+      "id": "hero_tagline",
+      "label": "Hero Tagline",
+      "default": "Policy"
+    },
+    {
+      "type": "text",
+      "id": "hero_title",
+      "label": "Hero Title",
+      "default": "Return & Refund Policy"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_subtitle",
+      "label": "Hero Subtitle",
+      "default": "Our commitment to your satisfaction with clear and fair return guidelines."
+    },
+    {
+      "type": "header",
+      "content": "Contact Information"
+    },
+    {
+      "type": "text",
+      "id": "contact_email",
+      "label": "Contact Email",
+      "default": "sales@celebratefestivalinc.com"
+    },
+    {
+      "type": "text",
+      "id": "contact_phone",
+      "label": "Contact Phone",
+      "default": "(408) 673-9999"
+    },
+    {
+      "type": "header",
+      "content": "Contact CTA Section"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_contact_cta",
+      "label": "Show Contact CTA",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cta_title",
+      "label": "CTA Title",
+      "default": "Need to Start a Return?"
+    },
+    {
+      "type": "textarea",
+      "id": "cta_text",
+      "label": "CTA Text",
+      "default": "Contact our customer care team to get a return authorization and instructions."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Return Policy"
+    }
+  ]
+}
+{% endschema %}

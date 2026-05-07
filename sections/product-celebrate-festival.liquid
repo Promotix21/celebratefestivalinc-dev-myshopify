@@ -1,0 +1,3392 @@
+{% comment %}
+  Celebrate Festival Inc - Product Template
+  Version: 2.0 - Updated with WSH Plugin Integration & Enhancements
+
+  This template supports:
+  - Demo mode for previewing design
+  - Multiple metafield types (text, images, PDFs, arrays, booleans)
+  - Smart related products
+  - Member/non-member pricing with WSH Wholesale Plugin integration
+  - Bulletproof fallback pricing (works with or without plugin)
+  - SKU display
+  - Vendor logo mapping
+  - Login prompt with blur effect for non-members
+{% endcomment %}
+
+{%- liquid
+  assign show_demo = section.settings.show_demo_data
+  assign enable_member_pricing = section.settings.enable_member_pricing
+  assign member_discount = section.settings.member_discount_percent
+
+  # Check if customer is logged in
+  assign is_logged_in = false
+  assign is_member = false
+  if customer
+    assign is_logged_in = true
+    # Check for member tags (WSH discount groups + general member tags)
+    for tag in customer.tags
+      assign tag_lower = tag | downcase
+      if tag_lower contains 'wholesale' or tag_lower contains 'plus' or tag_lower contains 'member' or tag_lower contains 'cph' or tag_lower contains 'rou' or tag_lower contains 'margin'
+        assign is_member = true
+        break
+      endif
+    endfor
+  endif
+
+  # CPH Portal Variant Filtering
+  # If customer has 'cph' tag, check for variants tagged with metafield
+  # custom.logged_in_portal_variant_access = "CPH" and hide all others
+  assign is_cph = false
+  if customer
+    for tag in customer.tags
+      assign tag_cph_check = tag | downcase
+      if tag_cph_check == 'cph'
+        assign is_cph = true
+        break
+      endif
+    endfor
+  endif
+
+  # Member price label: always "Member Price" for all wholesale members
+  assign member_price_badge = 'Member Price'
+
+  # Check if product is own-brand using settings-driven vendor list
+  assign is_own_brand = false
+  assign own_brands = settings.own_brand_vendors | downcase | split: ','
+  assign vendor_check = product.vendor | downcase | strip
+  for brand in own_brands
+    assign brand_check = brand | strip
+    if vendor_check == brand_check
+      assign is_own_brand = true
+      break
+    endif
+  endfor
+
+  # Call-to-order products — listed but not purchasable online
+  assign call_to_order = false
+  if product.tags contains 'call-to-order'
+    assign call_to_order = true
+  endif
+-%}
+
+{%- comment -%}
+  CPH Variant Filtering - Build allowed variant list
+  If CPH member: collect variants with metafield custom.logged_in_portal_variant_access = "CPH"
+  If product has CPH variants: filter_variants_for_cph = true, override current_variant
+  If product has NO CPH variants: show all variants normally (not a CPH-curated product)
+{%- endcomment -%}
+{%- assign cph_variant_ids = '' -%}
+{%- assign cph_variant_count = 0 -%}
+{%- assign filter_variants_for_cph = false -%}
+{%- if is_cph -%}
+  {%- for variant in product.variants -%}
+    {%- assign portal_access = variant.metafields.custom.logged_in_portal_variant_access | downcase | strip -%}
+    {%- if portal_access == 'cph' -%}
+      {%- if cph_variant_count > 0 -%}
+        {%- assign cph_variant_ids = cph_variant_ids | append: ',' -%}
+      {%- endif -%}
+      {%- assign cph_variant_ids = cph_variant_ids | append: variant.id -%}
+      {%- assign cph_variant_count = cph_variant_count | plus: 1 -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- if cph_variant_count > 0 -%}
+    {%- assign filter_variants_for_cph = true -%}
+  {%- endif -%}
+{%- endif -%}
+
+{%- comment -%} Build CPH-allowed option values for pill filtering {%- endcomment -%}
+{%- assign cph_opt1_vals = '' -%}
+{%- assign cph_opt2_vals = '' -%}
+{%- assign cph_opt3_vals = '' -%}
+{%- assign cph_first_opt1 = '' -%}
+{%- assign cph_first_opt2 = '' -%}
+{%- assign cph_first_opt3 = '' -%}
+{%- if filter_variants_for_cph -%}
+  {%- assign cph_first_found = false -%}
+  {%- for variant in product.variants -%}
+    {%- assign portal_access = variant.metafields.custom.logged_in_portal_variant_access | downcase | strip -%}
+    {%- if portal_access == 'cph' -%}
+      {%- unless cph_first_found -%}
+        {%- assign cph_first_opt1 = variant.option1 -%}
+        {%- assign cph_first_opt2 = variant.option2 -%}
+        {%- assign cph_first_opt3 = variant.option3 -%}
+        {%- assign cph_first_found = true -%}
+      {%- endunless -%}
+      {%- if variant.option1 -%}
+        {%- assign cph_opt1_vals = cph_opt1_vals | append: '|||' | append: variant.option1 | append: '|||' -%}
+      {%- endif -%}
+      {%- if variant.option2 -%}
+        {%- assign cph_opt2_vals = cph_opt2_vals | append: '|||' | append: variant.option2 | append: '|||' -%}
+      {%- endif -%}
+      {%- if variant.option3 -%}
+        {%- assign cph_opt3_vals = cph_opt3_vals | append: '|||' | append: variant.option3 | append: '|||' -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{%- comment -%}
+  Pricing: Server-side renders "Price" only. WSH wholesale pricing is handled
+  entirely client-side by cf-wholesale-pricing.js via BDR API.
+{%- endcomment -%}
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+{%- liquid
+  assign has_compare_price = false
+  assign original_price = current_variant.price
+  assign sale_price = current_variant.price
+  if current_variant.compare_at_price != blank and current_variant.compare_at_price > current_variant.price
+    assign has_compare_price = true
+    assign original_price = current_variant.compare_at_price
+    assign sale_price = current_variant.price
+  endif
+
+  assign has_wholesale_price = false
+  assign retail_price = sale_price
+  assign member_price = sale_price
+-%}
+
+{%- comment -%}
+  Embed all variant data as JSON for cf-wholesale-pricing.js to collect
+  and send to the BDR API in one batch call.
+{%- endcomment -%}
+<script type="application/json" id="cf-spp-variants-data">
+[
+{%- for variant in product.variants -%}
+  {
+    "variant_id": "{{ variant.id }}",
+    "product_id": "{{ product.id }}",
+    "compare_at_price": "{{ variant.compare_at_price | default: '' }}",
+    "price": "{{ variant.price }}",
+    "quantity": 1,
+    "send_vd_table": true,
+    "handle": "{{ product.handle }}",
+    "collection_ids": "{{ product.collections | map: 'id' | join: ',' }}"
+  }{%- unless forloop.last -%},{%- endunless -%}
+{%- endfor -%}
+]
+</script>
+{%- liquid
+  # Vendor Logo Mapping - Using standardized logos from assets folder
+  assign vendor_logo = ''
+  assign vendor_handle = product.vendor | handleize
+
+  # Try to get logo from assets (standard naming: brand-logo-{handle}.png)
+  assign logo_filename = 'brand-logo-' | append: vendor_handle | append: '.png'
+  assign vendor_logo = logo_filename | asset_url
+
+  # Check for common vendor name variations
+  case vendor_handle
+    when 'thunder-group', 'thundergroup'
+      assign vendor_logo = 'brand-logo-thunder-group.png' | asset_url
+    when 'robot-coupe', 'robotcoupe'
+      assign vendor_logo = 'brand-logo-robot-coupe.png' | asset_url
+    when 'turbo-air', 'turboair'
+      assign vendor_logo = 'brand-logo-turbo-air.png' | asset_url
+    when 'global-solutions', 'globalsolutions'
+      assign vendor_logo = 'brand-logo-global-solutions.png' | asset_url
+    when 'hamilton-beach', 'hamiltonbeach'
+      assign vendor_logo = 'brand-logo-hamilton-beach.png' | asset_url
+    when 'john-boos', 'johnboos'
+      assign vendor_logo = 'brand-logo-john-boos.png' | asset_url
+    when 'san-jamar', 'sanjamar'
+      assign vendor_logo = 'brand-logo-san-jamar.png' | asset_url
+    when 'chef-works', 'chefworks'
+      assign vendor_logo = 'brand-logo-chef-works.png' | asset_url
+    when 'ice-o-matic', 'iceomatic'
+      assign vendor_logo = 'brand-logo-ice-o-matic.png' | asset_url
+    when 'la-coppera', 'lacoppera'
+      assign vendor_logo = 'brand-logo-la-coppera.png' | asset_url
+    when 'nor-lake', 'norlake'
+      assign vendor_logo = 'brand-logo-nor-lake.png' | asset_url
+    when 'us-cooler', 'uscooler'
+      assign vendor_logo = 'brand-logo-us-cooler.png' | asset_url
+  endcase
+
+  # Get metafields
+  assign specs_table = product.metafields.custom.specs_table_pic_pdf
+  assign material = product.metafields.custom.material
+  assign free_shipping = product.metafields.custom.free_shipping
+  assign feature_sections = product.metafields.custom.feature_sections
+  assign works_with_products = product.metafields.custom.works_with_products
+  assign warranty_doc = product.metafields.custom.warranty_document
+  assign spec_doc = product.metafields.custom.specification
+  assign manual_doc = product.metafields.custom.instructions_manual
+  assign warranty_text = product.metafields.custom.warranty
+  assign spec_sheet = product.metafields.custom.specification_sheet
+  assign certifications = product.metafields.custom.certifications
+  assign shipment_text = product.metafields.custom.shipment_text1
+  assign shipment_text_sub = product.metafields.custom.shipment_text_sub
+  assign shipment_tooltip_text = product.metafields.custom.shipment_tooltip_text
+
+  # Related products logic
+  assign related_title = section.settings.related_title_default
+  assign related_collection_handle = section.settings.related_collection_default
+
+  # Check for conditional related products based on product type
+  if product.type == section.settings.conditional_product_type_1 and section.settings.conditional_product_type_1 != blank
+    assign related_title = section.settings.conditional_title_1
+    assign related_collection_handle = section.settings.conditional_collection_1
+  elsif product.type == section.settings.conditional_product_type_2 and section.settings.conditional_product_type_2 != blank
+    assign related_title = section.settings.conditional_title_2
+    assign related_collection_handle = section.settings.conditional_collection_2
+  endif
+
+  # Get related collection
+  if related_collection_handle != blank
+    assign related_collection = collections[related_collection_handle]
+  else
+    # Fallback to same collection or vendor
+    if product.collections.size > 0
+      assign related_collection = product.collections.first
+    endif
+  endif
+-%}
+
+{{ 'product-celebrate-festival.css' | asset_url | stylesheet_tag }}
+
+<style>
+/* Compare-at price strikethrough for SPP sale items */
+.price-card-compare-strike {
+  font-size: 14px;
+  color: #94a3b8;
+  margin-bottom: 4px;
+}
+
+.price-card-compare-strike s {
+  text-decoration: line-through;
+}
+
+/* Sale savings badge for SPP */
+.price-card-savings {
+  font-size: 12px;
+  color: #dc2626;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+/* FIX: Remove incorrect strikethrough added by WPD app on single-price displays
+   WPD app incorrectly adds <s> tags to prices even when there's no discount.
+   This only affects .price-card-full (single price layout), not dual-card layouts.
+   Proper fix requires WPD app settings adjustment or contacting their support. */
+.price-card-full .price-card-amount s {
+  text-decoration: none;
+}
+
+/* ENHANCED SKU DISPLAY - FIX #1 */
+.product-meta {
+  font-size: 15px;
+  color: #718096;
+  margin-bottom: 20px;
+  padding: 15px 0;
+  border-bottom: 2px solid #E2E8F0;
+}
+
+.product-meta strong {
+  display: inline-block;
+  color: #1A2332;
+  font-weight: 700;
+  font-size: 18px;
+  background: #FFD93D;
+  padding: 6px 15px;
+  border-radius: 6px;
+  margin-left: 8px;
+  letter-spacing: 0.5px;
+  border: 2px solid #1A2332;
+}
+
+/* ENHANCED THUMBNAIL STYLING - FIX #2 */
+.thumbnail {
+  cursor: pointer !important;
+  transition: all 0.3s ease;
+  border: 3px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.thumbnail:hover {
+  opacity: 0.7 !important;
+  transform: scale(1.05);
+  border-color: #20C997;
+}
+
+.thumbnail.active {
+  border-color: #1A2332;
+  opacity: 1 !important;
+  box-shadow: 0 0 10px rgba(26, 35, 50, 0.3);
+}
+
+.thumbnail img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Blur Effect for Member Pricing */
+.member-price-blur-container {
+  position: relative;
+  margin-top: 15px;
+}
+
+.member-price-blur-overlay {
+  position: relative;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  margin-top: 15px;
+}
+
+.member-price-blur-overlay .login-prompt-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary-navy, #1A2332);
+  margin-bottom: 12px;
+}
+
+.member-price-blur-overlay .login-btn {
+  background: var(--primary-coral, #FF6B6B);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-block;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+}
+
+.member-price-blur-overlay .login-btn:hover {
+  background: var(--accent-teal, #4ECDC4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
+}
+
+.member-price-blur-overlay .info-text {
+  font-size: 12px;
+  color: #666;
+  margin-top: 8px;
+}
+
+/* Enhanced image display - handles small images better */
+.main-image-container {
+  position: relative;
+  background: #f8f8f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.main-image-container img {
+  max-width: 100%;
+  max-height: 600px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  cursor: crosshair;
+}
+
+/* ========================================
+   INLINE HOVER ZOOM
+   ======================================== */
+.main-image-container {
+  background-repeat: no-repeat;
+}
+
+.main-image-container.zoomed {
+  cursor: none;
+}
+
+.main-image-container.zoomed img {
+  opacity: 0;
+}
+
+.magnifier-lens,
+.magnifier-result {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .main-image-container img {
+    cursor: default;
+  }
+}
+
+/* Vendor logo styling */
+.vendor-brand-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.vendor-brand-box .vendor-logo {
+  max-width: 100px;
+  max-height: 40px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.vendor-brand-box .vendor-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary-navy, #1A2332);
+}
+</style>
+
+<div class="celebrate-festival-product-template">
+  <div class="container">
+
+    {%- if section.settings.show_breadcrumb -%}
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <nav class="breadcrumb-nav">
+        <a href="/"><i class="fas fa-home"></i> Home</a>
+        <span class="breadcrumb-separator">&gt;</span>
+        {%- if product.collections.size > 0 -%}
+          {%- assign main_collection = product.collections.first -%}
+          <a href="{{ main_collection.url }}">{{ main_collection.title }}</a>
+          <span class="breadcrumb-separator">&gt;</span>
+        {%- endif -%}
+        <span>{{ product.title }}</span>
+      </nav>
+    </div>
+    {%- endif -%}
+
+    <!-- Main Two Column Layout -->
+    <div class="product-layout">
+
+      <!-- LEFT COLUMN - MAIN CONTENT -->
+      <div class="main-content">
+
+        <!-- Product Title & Meta -->
+        <div>
+          <h1 class="product-title">{{ product.title }}</h1>
+
+          <div class="product-meta">
+            {%- if product.vendor != blank -%}
+              Vendor: <a href="/collections/vendors?q={{ product.vendor | url_encode }}">{{ product.vendor }}</a>
+            {%- endif -%}
+            {%- if product.vendor != blank and current_variant.sku != blank %} | {% endif -%}
+            {%- if current_variant.sku != blank -%}
+              SKU: <strong>{{ current_variant.sku }}</strong>
+            {%- elsif show_demo -%}
+              SKU: <strong>DEMO-SKU-123</strong>
+            {%- endif -%}
+          </div>
+        </div>
+
+        <!-- Product Images with Vertical Thumbnails -->
+        <div class="product-images-wrapper">
+          <div class="product-images-section">
+
+            <!-- Vertical Thumbnail Column -->
+            {%- if product.images.size > 1 or show_demo -%}
+            <div class="thumbnail-column">
+              {%- if product.images.size > 1 -%}
+                {%- for image in product.images limit: 6 -%}
+                  <div class="thumbnail {% if forloop.first %}active{% endif %}" data-image-index="{{ forloop.index0 }}">
+                    <img src="{{ image | image_url: width: 70 }}" alt="{{ image.alt | escape }}">
+                  </div>
+                {%- endfor -%}
+              {%- elsif show_demo -%}
+                {%- for i in (1..6) -%}
+                  <div class="thumbnail {% if forloop.first %}active{% endif %}" data-image-index="{{ forloop.index0 }}">
+                    <img src="https://via.placeholder.com/70x70/f7fafc/718096?text={{ i }}" alt="Demo Image {{ i }}">
+                  </div>
+                {%- endfor -%}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+
+            <!-- Main Product Image - ENHANCED FOR SMALL IMAGES WITH MAGNIFIER ZOOM -->
+            <div class="main-image-container" id="magnifier-container">
+              <div class="magnifier-lens" id="magnifier-lens"></div>
+              {%- if product.featured_image -%}
+                <img id="main-product-image"
+                     src="{{ product.featured_image | image_url: width: 800 }}"
+                     srcset="{{ product.featured_image | image_url: width: 400 }} 400w,
+                             {{ product.featured_image | image_url: width: 600 }} 600w,
+                             {{ product.featured_image | image_url: width: 800 }} 800w,
+                             {{ product.featured_image | image_url: width: 1000 }} 1000w"
+                     sizes="(max-width: 768px) 100vw, 600px"
+                     alt="{{ product.featured_image.alt | escape }}"
+                     data-zoom-src="{{ product.featured_image | image_url: width: 1600 }}">
+              {%- elsif show_demo -%}
+                <img id="main-product-image" src="https://via.placeholder.com/600x600/f7fafc/1a2332?text=Main+Product+Image" alt="Demo Product" data-zoom-src="https://via.placeholder.com/1200x1200/f7fafc/1a2332?text=Zoomed+Image">
+              {%- else -%}
+                {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+              {%- endif -%}
+              <div class="magnifier-result" id="magnifier-result"></div>
+              <div class="zoom-indicator">
+                <i class="fas fa-search-plus"></i>
+                Hover to zoom
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end .main-content -->
+
+      <!-- BELOW-IMAGE CONTENT (carousel, description, Q&A, reviews — reordered below sidebar on mobile) -->
+      <div class="spp-content-col">
+
+        <!-- Other Products from this Line -->
+        {%- assign has_related_top = false -%}
+        {%- if works_with_products.value or related_collection.products.size > 0 -%}{%- assign has_related_top = true -%}{%- endif -%}
+        {%- if section.settings.show_other_products and has_related_top or show_demo -%}
+        <div class="other-products-section">
+          <h3>{{ related_title }}</h3>
+          <div class="carousel-wrapper">
+            <button class="carousel-nav carousel-nav-left" aria-label="Previous products">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="products-carousel">
+            {%- comment %} First priority: Use works_with_products metafield if it exists {% endcomment -%}
+            {%- if works_with_products.value -%}
+              {%- for related_product in works_with_products.value -%}
+                <a href="{{ related_product.url }}" class="product-card-small">
+                  {%- if related_product.tags contains 'hot-deal' -%}
+                    <span class="product-badge">Hot Deal</span>
+                  {%- elsif related_product.tags contains 'new' -%}
+                    <span class="product-badge new">New</span>
+                  {%- endif -%}
+                  <div class="product-card-small-image">
+                    {%- if related_product.featured_image -%}
+                      <img src="{{ related_product.featured_image | image_url: width: 80 }}" alt="{{ related_product.title | escape }}">
+                    {%- else -%}
+                      {{ 'product-1' | placeholder_svg_tag }}
+                    {%- endif -%}
+                  </div>
+                  <div class="product-card-small-info">
+                    <div class="product-card-title-small">{{ related_product.title }}</div>
+                    <div class="product-card-small-price">{{ related_product.price | money }}</div>
+                  </div>
+                </a>
+              {%- endfor -%}
+            {%- comment %} Fallback: Use collection if no metafield {% endcomment -%}
+            {%- elsif related_collection.products.size > 0 -%}
+              {%- for related_product in related_collection.products limit: 8 -%}
+                {%- unless related_product.id == product.id -%}
+                <a href="{{ related_product.url }}" class="product-card-small">
+                  {%- if related_product.tags contains 'hot-deal' -%}
+                    <span class="product-badge">Hot Deal</span>
+                  {%- elsif related_product.tags contains 'new' -%}
+                    <span class="product-badge new">New</span>
+                  {%- endif -%}
+                  <div class="product-card-small-image">
+                    {%- if related_product.featured_image -%}
+                      <img src="{{ related_product.featured_image | image_url: width: 80 }}" alt="{{ related_product.title | escape }}">
+                    {%- else -%}
+                      {{ 'product-1' | placeholder_svg_tag }}
+                    {%- endif -%}
+                  </div>
+                  <div class="product-card-small-info">
+                    <div class="product-card-title-small">{{ related_product.title }}</div>
+                    <div class="product-card-small-price">{{ related_product.price | money }}</div>
+                  </div>
+                </a>
+                {%- endunless -%}
+              {%- endfor -%}
+            {%- elsif show_demo -%}
+              {%- for i in (1..6) -%}
+              <div class="product-card-small">
+                {% if i <= 3 %}<span class="product-badge">Hot Deal</span>{% endif %}
+                <div class="product-card-small-image">
+                  <img src="https://via.placeholder.com/80x80/f7fafc/718096?text={{ i }}" alt="Demo Product">
+                </div>
+                <div class="product-card-small-info">
+                  <div class="product-card-title-small">Demo Related Product {{ i }} with Long Name</div>
+                  <div class="product-card-small-price">$2,{{ i }}99.00</div>
+                </div>
+              </div>
+              {%- endfor -%}
+            {%- endif -%}
+            </div>
+            <button class="carousel-nav carousel-nav-right" aria-label="Next products">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+        {%- endif -%}
+
+        <!-- Product Description -->
+        {%- if product.description != blank or show_demo -%}
+        <div class="description-section">
+          <h2>{{ section.settings.description_heading | default: "Product Description" }}</h2>
+
+          {%- if product.description != blank -%}
+            {{ product.description }}
+          {%- elsif show_demo -%}
+            <p>This is a demo description. Your actual product description will appear here when you add it to your product.</p>
+
+            <div class="feature-icons-grid">
+              <div class="feature-icon-item">
+                <div class="feature-icon-img">📦</div>
+                <h4>Feature One</h4>
+                <p>Description here</p>
+              </div>
+              <div class="feature-icon-item">
+                <div class="feature-icon-img">🌡️</div>
+                <h4>Feature Two</h4>
+                <p>Description here</p>
+              </div>
+              <div class="feature-icon-item">
+                <div class="feature-icon-img">⚡</div>
+                <h4>Feature Three</h4>
+                <p>Description here</p>
+              </div>
+              <div class="feature-icon-item">
+                <div class="feature-icon-img">🔧</div>
+                <h4>Feature Four</h4>
+                <p>Description here</p>
+              </div>
+            </div>
+          {%- endif -%}
+
+          {%- if feature_sections != blank -%}
+            <h3>Key Features</h3>
+            <div style="background: var(--neutral-light); border: 2px solid var(--primary-coral); border-radius: 12px; padding: 25px; margin: 20px 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+              <table style="width: 100%; border-collapse: collapse;">
+                {%- assign features = feature_sections | split: '|' -%}
+                {%- for feature in features -%}
+                  {%- assign trimmed_feature = feature | strip -%}
+                  {%- if trimmed_feature != blank -%}
+                    <tr style="border-bottom: 1px solid var(--neutral-gray);">
+                      <td style="padding: 12px 8px; color: var(--primary-navy); font-weight: 600; font-size: 14px;">
+                        <i class="fas fa-check-circle" style="color: var(--primary-coral); margin-right: 10px; font-size: 16px;"></i>
+                        {{ trimmed_feature }}
+                      </td>
+                    </tr>
+                  {%- endif -%}
+                {%- endfor -%}
+              </table>
+            </div>
+          {%- endif -%}
+
+          {%- comment %} Dimensions & Utilities Section {% endcomment -%}
+          {%- assign dimensions_utilities = product.metafields.custom.dimensions_utilities -%}
+          {%- if dimensions_utilities != blank -%}
+            <h3>Dimensions & Utilities</h3>
+            <div style="background: var(--neutral-light); border: 2px solid var(--accent-teal); border-radius: 12px; padding: 25px; margin: 20px 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+              <table style="width: 100%; border-collapse: collapse;">
+                {%- assign dimension_items = dimensions_utilities | split: '|' -%}
+                {%- for item in dimension_items -%}
+                  {%- assign trimmed_item = item | strip -%}
+                  {%- if trimmed_item != blank -%}
+                    <tr style="border-bottom: 1px solid var(--neutral-gray);">
+                      <td style="padding: 12px 8px; color: var(--primary-navy); font-weight: 600; font-size: 14px;">
+                        <i class="fas fa-ruler-combined" style="color: var(--accent-teal); margin-right: 10px; font-size: 16px;"></i>
+                        {{ trimmed_item }}
+                      </td>
+                    </tr>
+                  {%- endif -%}
+                {%- endfor -%}
+              </table>
+            </div>
+          {%- endif -%}
+
+          {%- comment %} Display Compatible/Works With Products {% endcomment -%}
+          {%- if works_with_products.value.size > 0 -%}
+            <h3>Works With / Compatible Products</h3>
+            <div class="products-carousel" style="margin: 20px 0;">
+              {%- for compatible_product in works_with_products.value limit: 8 -%}
+                <a href="{{ compatible_product.url }}" class="product-card-small">
+                  <div class="product-card-small-image">
+                    {%- if compatible_product.featured_image -%}
+                      <img src="{{ compatible_product.featured_image | image_url: width: 80 }}" alt="{{ compatible_product.title | escape }}">
+                    {%- else -%}
+                      {{ 'product-1' | placeholder_svg_tag }}
+                    {%- endif -%}
+                  </div>
+                  <div class="product-card-small-info">
+                    <div class="product-card-title-small">{{ compatible_product.title }}</div>
+                    <div class="product-card-small-price">{{ compatible_product.price | money }}</div>
+                  </div>
+                </a>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        </div>
+        {%- endif -%}
+
+        <!-- Product Certificates -->
+        {%- assign product_certificates = product.metafields.custom.product_certificates -%}
+        {%- if product_certificates.value.size > 0 -%}
+        <div class="certificates-section">
+          <h2>Certifications & Standards</h2>
+          <div class="certificates-grid">
+            {%- for cert_name in product_certificates.value -%}
+              {%- comment %} Map certificate names to images and descriptions {% endcomment -%}
+              {%- assign cert_image = '' -%}
+              {%- assign cert_description = '' -%}
+              
+              {%- if cert_name == 'Made in America' -%}
+                {%- assign cert_image = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/MIA.png?v=1763021316' -%}
+                {%- assign cert_description = 'This item was made in the United States of America.' -%}
+              {%- elsif cert_name == 'NSF Listed' -%}
+                {%- assign cert_image = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/nsf.png?v=1763021314' -%}
+                {%- assign cert_description = 'This item has been certified by NSF International to meet applicable product standards on public safety, health, and / or the environment.' -%}
+              {%- elsif cert_name == 'ETL, US & Canada' -%}
+                {%- assign cert_image = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/elt.png?v=1763021315' -%}
+                {%- assign cert_description = 'This product has been certified by ETL, a division of the Intertek Group, to meet applicable electrical product safety standards required for use in the United States and Canada.' -%}
+              {%- endif -%}
+              
+              {%- if cert_image != '' -%}
+              <div class="certificate-card">
+                <div class="certificate-icon">
+                  <img src="{{ cert_image }}" alt="{{ cert_name }}">
+                </div>
+                <div class="certificate-content">
+                  <h3 class="certificate-title">{{ cert_name }}</h3>
+                  <p class="certificate-description">{{ cert_description }}</p>
+                </div>
+              </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </div>
+        {%- endif -%}
+
+        <!-- Q&A Section -->
+        {%- if section.settings.enable_qa or show_demo -%}
+        <div class="qa-section">
+          <h2>{{ section.settings.qa_heading | default: "Questions & Answers" }}</h2>
+
+          {%- if section.settings.qa_items != blank -%}
+            {%- assign qa_items = section.settings.qa_items | split: '||' -%}
+            {%- for item in qa_items -%}
+              {%- assign qa_parts = item | split: '|' -%}
+              <div class="qa-item">
+                <div class="qa-question">Q: {{ qa_parts[0] }}</div>
+                <div class="qa-answer">A: {{ qa_parts[1] }}</div>
+                {%- if qa_parts[2] != blank -%}
+                  <div class="qa-meta">{{ qa_parts[2] }}</div>
+                {%- endif -%}
+              </div>
+            {%- endfor -%}
+          {%- elsif show_demo -%}
+            <div class="qa-item">
+              <div class="qa-question">Q: What is the warranty on this product?</div>
+              <div class="qa-answer">A: This product comes with a comprehensive warranty. Check the specifications section for details.</div>
+              <div class="qa-meta">Asked by: Customer | Answered by: Celebrate Festival Team</div>
+            </div>
+          {%- endif -%}
+
+          <button class="ask-question-btn" onclick="document.getElementById('cf-ask-question-modal').classList.add('active')">
+            {{ section.settings.qa_button_text | default: 'Ask a Question' }}
+          </button>
+        </div>
+        {%- endif -%}
+
+        <!-- Compare Section -->
+        {%- if section.settings.enable_compare or show_demo -%}
+        <div class="compare-section">
+          <h2>{{ section.settings.compare_heading | default: "Compare to Other Products" }}</h2>
+          <p style="text-align: center; color: var(--text-light); margin-bottom: 20px;">
+            Configure comparison products in theme settings
+          </p>
+        </div>
+        {%- endif -%}
+
+        <!-- Customer Reviews -->
+        {%- if section.settings.enable_reviews -%}
+        <div class="reviews-section" id="shopify-product-reviews">
+          <h2>{{ section.settings.reviews_heading | default: "Customer Reviews" }}</h2>
+          
+          {%- comment %} Check if customer is logged in {% endcomment -%}
+          {%- if customer -%}
+            {%- comment %} Logged in - Show review form {% endcomment -%}
+            <div class="review-form-wrapper">
+              <button class="write-review-btn" onclick="toggleReviewForm()">
+                <i class="fas fa-star"></i> Write a Review
+              </button>
+              
+              <div id="review-form-container" style="display: none; margin-top: 20px; padding: 25px; background: var(--neutral-light); border-radius: 12px; border: 2px solid var(--primary-navy);">
+                <h3 style="margin: 0 0 20px 0; color: var(--primary-navy);">Share Your Experience</h3>
+                <form id="new-review-form" class="review-form">
+                  <div class="form-group">
+                    <label for="review-rating">Rating <span style="color: var(--primary-coral);">*</span></label>
+                    <div class="star-rating-input">
+                      <input type="radio" name="rating" value="5" id="star5"><label for="star5">★</label>
+                      <input type="radio" name="rating" value="4" id="star4"><label for="star4">★</label>
+                      <input type="radio" name="rating" value="3" id="star3"><label for="star3">★</label>
+                      <input type="radio" name="rating" value="2" id="star2"><label for="star2">★</label>
+                      <input type="radio" name="rating" value="1" id="star1"><label for="star1">★</label>
+                    </div>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="review-title">Review Title <span style="color: var(--primary-coral);">*</span></label>
+                    <input type="text" id="review-title" name="review[title]" placeholder="Give your review a title" required>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="review-body">Your Review <span style="color: var(--primary-coral);">*</span></label>
+                    <textarea id="review-body" name="review[body]" rows="5" placeholder="Share your thoughts about this product..." required></textarea>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="review-name">Name <span style="color: var(--primary-coral);">*</span></label>
+                    <input type="text" id="review-name" name="review[author]" value="{{ customer.name }}" required>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="review-email">Email <span style="color: var(--primary-coral);">*</span></label>
+                    <input type="email" id="review-email" name="review[email]" value="{{ customer.email }}" required>
+                  </div>
+                  
+                  <div class="form-actions">
+                    <button type="submit" class="submit-review-btn">
+                      <i class="fas fa-paper-plane"></i> Submit Review
+                    </button>
+                    <button type="button" class="cancel-review-btn" onclick="toggleReviewForm()">
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          {%- else -%}
+            {%- comment %} Not logged in - Show login prompt {% endcomment -%}
+            <div class="review-login-prompt">
+              <div class="login-prompt-box">
+                <i class="fas fa-user-lock" style="font-size: 48px; color: var(--primary-coral); margin-bottom: 15px;"></i>
+                <h3 style="margin: 0 0 10px 0; color: var(--primary-navy);">Want to Share Your Experience?</h3>
+                <p style="color: var(--text-light); margin-bottom: 20px;">Log in or create an account to write a review</p>
+                <div class="login-prompt-actions">
+                  <a href="/account/login?return_url={{ request.path | url_param_escape }}" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> Log In
+                  </a>
+                  <a href="/account/register?return_url={{ request.path | url_param_escape }}" class="register-btn">
+                    <i class="fas fa-user-plus"></i> Create Account
+                  </a>
+                </div>
+              </div>
+            </div>
+          {%- endif -%}
+          
+          {%- comment %} Shopify Product Reviews App Integration {% endcomment -%}
+          <div id="shopify-product-reviews" data-id="{{ product.id }}"></div>
+        </div>
+        
+        <script>
+        function toggleReviewForm() {
+          const formContainer = document.getElementById('review-form-container');
+          if (formContainer.style.display === 'none') {
+            formContainer.style.display = 'block';
+            formContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else {
+            formContainer.style.display = 'none';
+          }
+        }
+        
+        // Handle review form submission
+        document.addEventListener('DOMContentLoaded', function() {
+          const reviewForm = document.getElementById('new-review-form');
+          if (reviewForm) {
+            reviewForm.addEventListener('submit', function(e) {
+              e.preventDefault();
+              
+              // Get form data
+              const formData = new FormData(reviewForm);
+              const rating = document.querySelector('input[name="rating"]:checked');
+              
+              if (!rating) {
+                alert('Please select a star rating');
+                return;
+              }
+              
+              // Here you would typically submit to Shopify Product Reviews app
+              // This is a placeholder - actual implementation depends on your review app
+              console.log('Review submitted:', {
+                rating: rating.value,
+                title: formData.get('review[title]'),
+                body: formData.get('review[body]'),
+                author: formData.get('review[author]'),
+                email: formData.get('review[email]')
+              });
+              
+              // Show success message
+              alert('Thank you for your review! It will be published after moderation.');
+              reviewForm.reset();
+              toggleReviewForm();
+            });
+          }
+        });
+        </script>
+        {%- endif -%}
+
+        <!-- Related Products (Bottom) -->
+        {%- if section.settings.enable_bottom_related and related_collection.products.size > 0 or show_demo -%}
+        <div class="related-section">
+          <h2>{{ section.settings.bottom_related_title | default: "You May Also Need" }}</h2>
+          <div class="carousel-wrapper">
+            <button class="carousel-nav carousel-nav-left" aria-label="Previous products">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="products-carousel">
+            {%- if related_collection.products.size > 0 -%}
+              {%- for related_product in related_collection.products limit: 8 -%}
+                {%- unless related_product.id == product.id -%}
+                <a href="{{ related_product.url }}" class="product-card-small">
+                  <div class="product-card-small-image">
+                    {%- if related_product.featured_image -%}
+                      <img src="{{ related_product.featured_image | image_url: width: 80 }}" alt="{{ related_product.title | escape }}">
+                    {%- else -%}
+                      {{ 'product-1' | placeholder_svg_tag }}
+                    {%- endif -%}
+                  </div>
+                  <div class="product-card-small-info">
+                    <div class="product-card-title-small">{{ related_product.title }}</div>
+                    <div class="product-card-small-price">{{ related_product.price | money }}</div>
+                  </div>
+                </a>
+                {%- endunless -%}
+              {%- endfor -%}
+            {%- elsif show_demo -%}
+              {%- for i in (1..6) -%}
+              <div class="product-card-small">
+                <div class="product-card-small-image">
+                  <img src="https://via.placeholder.com/80x80/f7fafc/718096?text=Item{{ i }}" alt="Demo">
+                </div>
+                <div class="product-card-small-info">
+                  <div class="product-card-title-small">Accessory Product {{ i }}</div>
+                  <div class="product-card-small-price">${{ i }}9.99</div>
+                </div>
+              </div>
+              {%- endfor -%}
+            {%- endif -%}
+            </div>
+            <button class="carousel-nav carousel-nav-right" aria-label="Next products">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+        {%- endif -%}
+      </div><!-- end .spp-content-col -->
+
+      <!-- RIGHT SIDEBAR -->
+      <div class="sidebar">
+
+        <!-- Price Box -->
+        <div class="price-section-container"
+          data-cf-product-id="{{ product.id }}"
+          data-cf-variant-id="{{ current_variant.id }}"
+          data-cf-price="{{ current_variant.price }}"
+          data-cf-compare-at-price="{{ current_variant.compare_at_price }}"
+          data-cf-handle="{{ product.handle }}"
+          data-cf-collection-ids="{{ product.collections | map: 'id' | join: ',' }}"
+        >
+        <div class="price-section-container">
+          <div class="price-cards-row price-cards-single">
+            <div class="price-card price-card-regular price-card-full">
+              {%- if has_compare_price -%}
+                <div class="price-card-label">Sale Price</div>
+                <div class="price-card-compare-strike"><s>{{ original_price | money }}</s></div>
+              {%- else -%}
+                <div class="price-card-label">Price</div>
+              {%- endif -%}
+              <div class="price-card-amount">{{ sale_price | money }}<span class="price-unit">/{{ section.settings.price_unit | default: "Each" }}</span></div>
+              {%- if has_compare_price -%}
+                {%- assign sale_savings = original_price | minus: sale_price -%}
+                {%- assign sale_percent = sale_savings | times: 100.0 | divided_by: original_price | round -%}
+                <div class="price-card-savings">Save {{ sale_percent }}%</div>
+              {%- endif -%}
+            </div>
+          </div>
+
+          <a href="/pages/contact-us#financing" class="financing-row financing-coming-soon-style" style="text-decoration:none;cursor:pointer;">
+            <svg class="financing-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+              <line x1="1" y1="10" x2="23" y2="10"></line>
+            </svg>
+            <span class="financing-text">Financing Available</span>
+            <span class="financing-coming-soon" style="background:#2d5a87;color:#fff;border-color:#2d5a87;">Apply Now →</span>
+          </a>
+
+          <!-- Variant Picker - Inside Price Section -->
+          {%- unless product.has_only_default_variant -%}
+        <div class="variant-picker-section">
+          <style>
+            .variant-picker-section {
+              margin-top: 16px;
+              margin-bottom: 16px;
+            }
+            .variant-pills-container {
+              margin-bottom: 14px;
+            }
+            .variant-pills-label {
+              display: block;
+              font-weight: 600;
+              font-size: 12px;
+              margin-bottom: 8px;
+              color: var(--cf-deep-blue, #1a365d);
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+            .variant-pills {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 6px;
+            }
+            .variant-pill {
+              display: inline-block;
+              position: relative;
+            }
+            .variant-pill input {
+              position: absolute;
+              opacity: 0;
+              pointer-events: none;
+            }
+            .variant-pill label {
+              display: inline-block;
+              padding: 8px 14px;
+              border: 2px solid #e2e8f0;
+              border-radius: 6px;
+              font-size: 12px;
+              font-weight: 500;
+              color: #475569;
+              background: #fff;
+              cursor: pointer;
+              transition: all 0.2s ease;
+              max-width: 140px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+            .variant-pill label:hover {
+              border-color: var(--cf-navy, #2d5a87);
+              color: var(--cf-navy, #2d5a87);
+            }
+            .variant-pill input:checked + label {
+              border-color: var(--cf-navy, #2d5a87);
+              background: var(--cf-navy, #2d5a87);
+              color: #fff;
+            }
+            .variant-pill input:disabled + label {
+              opacity: 0.4;
+              cursor: not-allowed;
+              text-decoration: line-through;
+            }
+            /* Tooltip on hover */
+            .variant-pill .variant-tooltip {
+              position: absolute;
+              bottom: calc(100% + 8px);
+              left: 50%;
+              transform: translateX(-50%);
+              background: #1a365d;
+              color: #fff;
+              font-size: 11px;
+              font-weight: 500;
+              padding: 6px 10px;
+              border-radius: 4px;
+              white-space: nowrap;
+              max-width: 280px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              opacity: 0;
+              visibility: hidden;
+              transition: opacity 0.2s ease, visibility 0.2s ease;
+              z-index: 100;
+              pointer-events: none;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            }
+            .variant-pill .variant-tooltip::after {
+              content: '';
+              position: absolute;
+              top: 100%;
+              left: 50%;
+              transform: translateX(-50%);
+              border: 6px solid transparent;
+              border-top-color: #1a365d;
+            }
+            .variant-pill:hover .variant-tooltip {
+              opacity: 1;
+              visibility: visible;
+            }
+          </style>
+          <variant-selects
+            id="variant-selects-{{ section.id }}"
+            class="no-js-hidden"
+            data-section="{{ section.id }}"
+            data-url="{{ product.url }}"
+            data-update-url="true"
+          >
+            {%- for option in product.options_with_values -%}
+              {%- comment -%} CPH: Determine effective selected value for this option {%- endcomment -%}
+              {%- if filter_variants_for_cph -%}
+                {%- case forloop.index0 -%}
+                  {%- when 0 -%}{%- assign cph_effective_selected = cph_first_opt1 -%}
+                  {%- when 1 -%}{%- assign cph_effective_selected = cph_first_opt2 -%}
+                  {%- when 2 -%}{%- assign cph_effective_selected = cph_first_opt3 -%}
+                {%- endcase -%}
+              {%- endif -%}
+              <div class="variant-pills-container">
+                <span class="variant-pills-label">{{ option.name }}:</span>
+                <div class="variant-pills" data-option-index="{{ forloop.index0 }}">
+                  {%- for value in option.values -%}
+                    {%- comment -%} CPH: Skip option values not linked to any CPH variant {%- endcomment -%}
+                    {%- assign show_pill = true -%}
+                    {%- if filter_variants_for_cph -%}
+                      {%- assign pill_check = '|||' | append: value | append: '|||' -%}
+                      {%- case forloop.parentloop.index0 -%}
+                        {%- when 0 -%}{%- unless cph_opt1_vals contains pill_check -%}{%- assign show_pill = false -%}{%- endunless -%}
+                        {%- when 1 -%}{%- unless cph_opt2_vals contains pill_check -%}{%- assign show_pill = false -%}{%- endunless -%}
+                        {%- when 2 -%}{%- unless cph_opt3_vals contains pill_check -%}{%- assign show_pill = false -%}{%- endunless -%}
+                      {%- endcase -%}
+                    {%- endif -%}
+                    {%- if show_pill -%}
+                    {%- assign truncated_value = value | truncate: 18, '...' -%}
+                    {%- assign needs_tooltip = false -%}
+                    {%- if value.size > 18 -%}
+                      {%- assign needs_tooltip = true -%}
+                    {%- endif -%}
+                    <div class="variant-pill">
+                      <input
+                        type="radio"
+                        id="Option-{{ section.id }}-{{ forloop.index0 }}-{{ forloop.index }}"
+                        name="options[{{ option.name | escape }}]"
+                        value="{{ value | escape }}"
+                        form="product-form-{{ section.id }}"
+                        {% if filter_variants_for_cph %}{% if cph_effective_selected == value %}checked{% endif %}{% else %}{% if option.selected_value == value %}checked{% endif %}{% endif %}
+                        data-option-index="{{ forloop.parentloop.index0 }}"
+                        onchange="handleVariantPillChange(this, '{{ section.id }}')"
+                      >
+                      <label for="Option-{{ section.id }}-{{ forloop.index0 }}-{{ forloop.index }}" title="{{ value | escape }}">
+                        {{ truncated_value }}
+                      </label>
+                      {%- if needs_tooltip -%}
+                        <span class="variant-tooltip">{{ value | escape }}</span>
+                      {%- endif -%}
+                    </div>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </div>
+              </div>
+            {%- endfor -%}
+
+            <script type="application/json" data-selected-variant>
+              {{ current_variant | json }}
+            </script>
+          </variant-selects>
+          </div>
+          {%- endunless -%}
+
+          <!-- Quantity and Add to Cart - Inside Price Section -->
+          <div class="quantity-section quantity-section-in-price">
+            {%- if call_to_order -%}
+              {%- comment -%} Call to Order — no cart form, show contact CTA instead {%- endcomment -%}
+              <div class="cf-call-to-order-spp" style="display:flex;flex-direction:column;gap:10px;width:100%;">
+                <a href="tel:+14086739999" class="btn btn-add-cart cf-call-to-order-btn" style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;background:linear-gradient(135deg,#1a365d 0%,#2d5a87 100%);color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;width:100%;text-align:center;">
+                  <i class="fas fa-phone-alt"></i> Call to Order — (408) 673-9999
+                </a>
+                <a href="/pages/contact" style="display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;color:#2d5a87;font-size:13px;font-weight:600;">
+                  <i class="fas fa-envelope"></i> Or Contact Us Online
+                </a>
+              </div>
+            {%- else -%}
+            <form action="/cart/add" method="post" enctype="multipart/form-data" id="product-form-{{ section.id }}" class="add-to-cart-row">
+              <input type="hidden" name="id" id="product-variant-id-{{ section.id }}" value="{{ current_variant.id }}">
+              {%- unless current_variant.price == 0 -%}
+              <div class="qty-wrapper">
+                <input type="number" name="quantity" value="1" min="1" id="quantity-input">
+                <span class="qty-unit">{{ section.settings.price_unit | default: "Each" }}</span>
+              </div>
+              {%- endunless -%}
+              <button type="submit" class="btn btn-add-cart" id="add-to-cart-btn-{{ section.id }}" {% if current_variant.price == 0 or product.available == false %}disabled{% endif %}>
+                <i class="fas fa-shopping-cart"></i>
+                {%- if current_variant.price == 0 -%}
+                  Contact Us
+                {%- elsif product.available -%}
+                  {{ section.settings.add_to_cart_text | default: "Add to Cart" }}
+                {%- else -%}
+                  Sold Out
+                {%- endif -%}
+              </button>
+              <button
+                type="button"
+                class="btn btn-add-list"
+                data-wishlist-btn
+                data-product-id="{{ product.id }}"
+                data-variant-id="{{ current_variant.id }}"
+                data-product-title="{{ product.title | escape }}"
+                data-product-handle="{{ product.handle }}"
+                data-product-image="{{ product.featured_media | image_url: width: 400 }}"
+                data-product-price="{{ product.price }}"
+                data-product-compare-price="{{ product.compare_at_price }}"
+                data-product-url="{{ product.url }}"
+                aria-label="Add to wishlist"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+              </button>
+            </form>
+            <div class="zero-price-notice" id="zero-price-notice-{{ section.id }}" style="margin-top:10px;padding:10px 14px;background:#fff8e1;border:1px solid #ffc107;border-radius:6px;font-size:12px;color:#856404;line-height:1.5;{%- if current_variant.price != 0 -%}display:none;{%- endif -%}">
+              Sorry, product can't be added to cart as price not available. <a href="/pages/contact" style="color:#2d5a87;font-weight:600;">Contact us</a> to confirm availability, or call <a href="tel:+14086739999" style="color:#2d5a87;font-weight:600;">(408) 673-9999</a>.
+            </div>
+            {%- endif -%}
+          </div>
+        </div>
+
+        <!-- Shipping Alert -->
+        {%- comment %} Only show schema alert if no shipment_text metafield {% endcomment -%}
+        {%- if section.settings.shipping_alert_text != blank and shipment_text == blank -%}
+        <div class="alert-box alert-warning">
+          ⚠️ {{ section.settings.shipping_alert_text }}
+        </div>
+        {%- endif -%}
+
+        {%- comment %} Free shipping status {% endcomment -%}
+        {%- if free_shipping -%}
+        <div class="alert-box" style="background-color: #d4edda; border-color: #6bcf7f; color: #155724;">
+          ✓ This item qualifies for FREE SHIPPING
+        </div>
+        {%- elsif free_shipping == false -%}
+        <div class="alert-box alert-warning">
+          📦 This item is not eligible for free shipping
+        </div>
+        {%- endif -%}
+
+
+        <!-- Instant Access Shipping -->
+        {%- if section.settings.show_shipping_info or shipment_text != blank -%}
+        <div class="instant-access-box">
+          <div class="instant-access-title">🚀 {{ section.settings.shipping_info_title | default: "Shipping Information" }}</div>
+
+          {%- comment %} Display shipment_text metafield if available (multi-line text) {% endcomment -%}
+          {%- if shipment_text != blank -%}
+            <p style="font-size: 14px; font-weight: 600; color: var(--success-green); margin-bottom: 10px; white-space: pre-line;">
+              ✓ {{ shipment_text }}
+            </p>
+            {%- if shipment_text_sub != blank -%}
+              <p style="font-size: 13px; color: var(--neutral-dark); margin-bottom: 10px; white-space: pre-line;">
+                {{ shipment_text_sub }}
+              </p>
+            {%- endif -%}
+          {%- else -%}
+            {%- comment %} Show schema defaults if no shipment_text metafield {% endcomment -%}
+            {%- if section.settings.shipping_info_list != blank -%}
+              <ul class="instant-access-list">
+                {%- assign shipping_items = section.settings.shipping_info_list | split: '|' -%}
+                {%- for item in shipping_items -%}
+                  <li>{{ item }}</li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          {%- endif -%}
+        </div>
+        {%- endif -%}
+
+        <!-- Brand Box with Logo (Clean - no background) -->
+        {%- if product.vendor -%}
+        <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin: 2px 0; text-align: center; background: #fff;">
+          {%- if vendor_logo != blank -%}
+            {%- comment %} Show logo only (no colored background) {% endcomment -%}
+            <div class="vendor-brand-box" style="justify-content: center;">
+              <img src="{{ vendor_logo }}" alt="{{ product.vendor }}" class="vendor-logo" style="max-width: 180px; max-height: 70px; object-fit: contain;">
+            </div>
+          {%- else -%}
+            {%- comment %} Show text if no logo {% endcomment -%}
+            <div style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px;">Brand</div>
+            <div style="font-size: 18px; font-weight: 700; color: #1a365d;">{{ product.vendor }}</div>
+          {%- endif -%}
+        </div>
+        {%- endif -%}
+
+        <!-- Parts & Service Banner -->
+        {%- if section.settings.show_service_banner -%}
+        <div class="sidebar-banner">
+          <div class="promo-banner-2">
+            <div class="icon">{{ section.settings.service_banner_icon | default: "🏆" }}</div>
+            <div class="title">{{ section.settings.service_banner_title }}</div>
+            <div class="description">{{ section.settings.service_banner_description }}</div>
+            {%- if section.settings.service_banner_list != blank -%}
+            <hr>
+            <div class="services-list">
+              {{ section.settings.service_banner_list | newline_to_br }}
+            </div>
+            {%- endif -%}
+            {%- if section.settings.service_banner_button_text != blank -%}
+            <button class="cta-btn" onclick="window.location.href='{{ section.settings.service_banner_button_url }}'">
+              {{ section.settings.service_banner_button_text }}
+            </button>
+            {%- endif -%}
+          </div>
+        </div>
+        {%- endif -%}
+
+        <!-- SPECIFICATIONS IN SIDEBAR -->
+        <div class="sidebar-specs">
+          <h4>📋 Specifications</h4>
+
+          {%- comment %} Display Specs Table Image (always an image) {% endcomment -%}
+          {%- if specs_table != blank -%}
+            {%- assign specs_file_url = specs_table | file_url -%}
+            <div class="spec-item" style="display: block; padding: 10px 0; margin-bottom: 15px;">
+              <img src="{{ specs_file_url }}" alt="Product Specifications" style="width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--neutral-gray);">
+            </div>
+          {%- endif -%}
+
+          {%- comment %} Display Spec Doc - Can be PDF or Image {% endcomment -%}
+          {%- if spec_doc != blank -%}
+            {%- assign spec_doc_url = spec_doc | file_url -%}
+            {%- if spec_doc_url contains '.pdf' -%}
+              <div class="spec-item" style="display: block; text-align: center; padding: 15px 0; margin-bottom: 15px;">
+                <a href="{{ spec_doc_url }}" target="_blank" class="spec-download-btn">
+                  <i class="fas fa-file-pdf"></i> Download Spec Sheet PDF
+                </a>
+              </div>
+            {%- else -%}
+              <div class="spec-item" style="display: block; padding: 10px 0; margin-bottom: 15px;">
+                <img src="{{ spec_doc_url }}" alt="Specification Document" style="width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--neutral-gray);">
+              </div>
+            {%- endif -%}
+          {%- endif -%}
+
+          {%- comment %} Display Spec Sheet Rich Text as Table {% endcomment -%}
+          {%- if spec_sheet != blank -%}
+            <div style="background: var(--neutral-light); border-radius: 12px; padding: 20px; margin: 20px 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+              <h4 style="margin: 0 0 15px 0; color: var(--primary-navy); font-size: 16px; font-weight: 700;">Specification Table</h4>
+              
+              {%- comment %} Convert rich text to plain text and parse by pipe separator {% endcomment -%}
+              {%- assign spec_html = spec_sheet | metafield_tag -%}
+              {%- assign spec_text = spec_html | strip_html | strip -%}
+              {%- assign spec_lines = spec_text | split: '|' -%}
+              
+              <table style="width: 100%; border-collapse: collapse;">
+                {%- for line in spec_lines -%}
+                  {%- assign trimmed_line = line | strip -%}
+                  {%- if trimmed_line != blank -%}
+                    {%- if trimmed_line contains ':' -%}
+                      {%- assign parts = trimmed_line | split: ':' -%}
+                      <tr>
+                        <td style="padding: 12px 15px; font-weight: 600; color: var(--primary-navy); width: 45%; background: rgba(26, 35, 50, 0.04);">
+                          {{ parts[0] | strip }}
+                        </td>
+                        <td style="padding: 12px 15px; color: var(--neutral-dark);">
+                          {{ parts[1] | strip }}
+                        </td>
+                      </tr>
+                    {%- else -%}
+                      <tr>
+                        <td colspan="2" style="padding: 12px 15px; color: var(--neutral-dark); font-weight: 500;">
+                          {{ trimmed_line }}
+                        </td>
+                      </tr>
+                    {%- endif -%}
+                  {%- endif -%}
+                {%- endfor -%}
+              </table>
+            </div>
+          {%- endif -%}
+
+          {%- comment %} Display Material Metaobject List {% endcomment -%}
+          {%- if material != blank -%}
+            {%- if material.value.size > 0 -%}
+              <div class="spec-item">
+                <div class="spec-label">Material:</div>
+                <div class="spec-value">
+                  {%- for mat in material.value -%}
+                    {{ mat.name }}{% unless forloop.last %}, {% endunless %}
+                  {%- endfor -%}
+                </div>
+              </div>
+            {%- elsif material -%}
+              <div class="spec-item">
+                <div class="spec-label">Material:</div>
+                <div class="spec-value">{{ material }}</div>
+              </div>
+            {%- endif -%}
+          {%- endif -%}
+
+          {%- if product.weight -%}
+          <div class="spec-item">
+            <div class="spec-label">Weight:</div>
+            <div class="spec-value">{{ product.weight | weight_with_unit }}</div>
+          </div>
+          {%- endif -%}
+
+          {%- if product.type -%}
+          <div class="spec-item">
+            <div class="spec-label">Type:</div>
+            <div class="spec-value">{{ product.type }}</div>
+          </div>
+          {%- endif -%}
+
+          {%- comment %} Display Warranty Rich Text {% endcomment -%}
+          {%- if warranty_text != blank -%}
+          <div class="spec-item">
+            <div class="spec-label">Warranty:</div>
+            <div class="spec-value">
+              {{ warranty_text | metafield_tag }}
+            </div>
+          </div>
+          {%- endif -%}
+
+          {%- if show_demo and material == blank and spec_sheet == blank -%}
+            <div class="spec-item">
+              <div class="spec-label">Type:</div>
+              <div class="spec-value">Demo Product</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-label">Capacity:</div>
+              <div class="spec-value">Demo Value</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-label">Dimensions:</div>
+              <div class="spec-value">24" x 30" x 36"</div>
+            </div>
+          {%- endif -%}
+        </div>
+
+        <!-- Resources Box -->
+        {%- if warranty_doc != blank or spec_doc != blank or manual_doc != blank or section.settings.show_resources or show_demo -%}
+        <div class="sidebar-info-box">
+          <h4>📄 Resources & Documents</h4>
+          <ul>
+            {%- if spec_doc != blank -%}
+              {%- assign spec_doc_url = spec_doc | file_url -%}
+              {%- if spec_doc_url contains '.pdf' -%}
+                <li><a href="{{ spec_doc_url }}" target="_blank"><i class="fas fa-file-pdf"></i> Spec Sheet (PDF)</a></li>
+              {%- else -%}
+                <li><a href="{{ spec_doc_url }}" target="_blank"><i class="fas fa-image"></i> Spec Sheet (Image)</a></li>
+              {%- endif -%}
+            {%- endif -%}
+            {%- if manual_doc != blank -%}
+              {%- assign manual_doc_url = manual_doc | file_url -%}
+              {%- if manual_doc_url contains '.pdf' -%}
+                <li><a href="{{ manual_doc_url }}" target="_blank"><i class="fas fa-file-pdf"></i> Installation Manual (PDF)</a></li>
+              {%- else -%}
+                <li><a href="{{ manual_doc_url }}" target="_blank"><i class="fas fa-image"></i> Installation Manual (Image)</a></li>
+              {%- endif -%}
+            {%- endif -%}
+            {%- if warranty_doc != blank -%}
+              {%- assign warranty_doc_url = warranty_doc | file_url -%}
+              <li><a href="{{ warranty_doc_url }}" target="_blank"><i class="fas fa-file-pdf"></i> Warranty Information</a></li>
+            {%- endif -%}
+            {%- if section.settings.resource_links != blank -%}
+              {%- assign resources = section.settings.resource_links | split: '|' -%}
+              {%- for resource in resources -%}
+                {%- assign resource_parts = resource | split: '::' -%}
+                <li><a href="{{ resource_parts[1] }}" target="_blank">{{ resource_parts[0] }}</a></li>
+              {%- endfor -%}
+            {%- endif -%}
+            {%- if show_demo and spec_doc == blank -%}
+              <li><a href="#">Demo Spec Sheet</a></li>
+              <li><a href="#">Demo Manual</a></li>
+              <li><a href="#">Demo Warranty Info</a></li>
+            {%- endif -%}
+          </ul>
+        </div>
+        {%- endif -%}
+
+        <!-- Additional Resources Banner -->
+        {%- if section.settings.show_additional_resources -%}
+        <div class="sidebar-banner">
+          <div class="promo-banner-3">
+            <div class="title">{{ section.settings.additional_resources_title | default: "📚 Additional Resources" }}</div>
+            <div class="description">{{ section.settings.additional_resources_description }}</div>
+            {%- if section.settings.video_resources != blank -%}
+            <div class="resource-box">
+              <h5>📹 Video Resources:</h5>
+              <ul>
+                {%- assign videos = section.settings.video_resources | split: '|' -%}
+                {%- for video in videos -%}
+                  <li>{{ video }}</li>
+                {%- endfor -%}
+              </ul>
+            </div>
+            {%- endif -%}
+            {%- if section.settings.guide_resources != blank -%}
+            <div class="resource-box">
+              <h5>📖 Buying Guides:</h5>
+              <ul>
+                {%- assign guides = section.settings.guide_resources | split: '|' -%}
+                {%- for guide in guides -%}
+                  <li>{{ guide }}</li>
+                {%- endfor -%}
+              </ul>
+            </div>
+            {%- endif -%}
+          </div>
+        </div>
+        {%- endif -%}
+
+        <!-- Help Box -->
+        {%- if section.settings.show_help_box -%}
+        <div class="sidebar-info-box">
+          <h4>💡 Need Help?</h4>
+          <ul>
+            {%- if section.settings.help_phone != blank -%}
+              <li>📞 Call: <a href="tel:{{ section.settings.help_phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' }}">{{ section.settings.help_phone }}</a></li>
+            {%- endif -%}
+            {%- if section.settings.help_email != blank -%}
+              <li>📧 <a href="mailto:{{ section.settings.help_email }}">Email Support</a></li>
+            {%- endif -%}
+            {%- if section.settings.help_chat_enabled -%}
+              <li>💬 Live Chat Available</li>
+            {%- endif -%}
+            {%- comment -%} BUG-015 FIX: Removed hardcoded links - use dynamic help_additional_links setting instead {%- endcomment -%}
+            {%- if section.settings.help_additional_links != blank -%}
+              {%- assign help_links = section.settings.help_additional_links | split: '|' -%}
+              {%- for link in help_links -%}
+                <li>{{ link }}</li>
+              {%- endfor -%}
+            {%- endif -%}
+          </ul>
+        </div>
+        {%- endif -%}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FIX #2: REWRITTEN IMAGE GALLERY + LIGHTBOX -->
+<style>
+/* Lightbox Styles */
+.lightbox-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+
+.lightbox-overlay.active {
+  display: flex;
+}
+
+.lightbox-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-image {
+  max-width: 100%;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+.lightbox-close:hover {
+  transform: scale(1.1);
+  background: #ff6b6b;
+  color: white;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+.lightbox-nav:hover {
+  transform: translateY(-50%) scale(1.1);
+  background: #20C997;
+  color: white;
+}
+
+.lightbox-prev {
+  left: 20px;
+}
+
+.lightbox-next {
+  right: 20px;
+}
+
+.lightbox-counter {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: 600;
+  color: #1A2332;
+}
+</style>
+
+<script>
+(function() {
+  'use strict';
+
+  // Guard against multiple initializations
+  if (window.__cfImageGalleryInitialized) return;
+  window.__cfImageGalleryInitialized = true;
+
+  let currentImageIndex = 0;
+  let allImages = [];
+
+  // Helper: convert any Shopify image URL to a specific width using modern ?width= format
+  function getShopifySizedUrl(url, width) {
+    if (!url) return url;
+    // Keep the path (filename) intact — only manipulate query params.
+    // Stripping _NNNxNNN from filenames breaks products where the size is embedded
+    // mid-filename (e.g. UP-2040W_695x695_uuid.webp) rather than at the end.
+    const qIdx = url.indexOf('?');
+    const path = qIdx === -1 ? url : url.slice(0, qIdx);
+    const query = qIdx === -1 ? '' : url.slice(qIdx + 1);
+    // Remove any existing width= param, then add the desired width
+    const params = query.split('&').filter(Boolean).filter(p => !p.startsWith('width='));
+    params.push('width=' + width);
+    return path + '?' + params.join('&');
+  }
+
+  // Helper: get base URL (no size, no protocol, no query params) for comparison
+  function getBaseUrl(url) {
+    if (!url) return '';
+    let base = url.split('?')[0];
+    // Normalize protocol (// vs https://) for consistent comparison
+    base = base.replace(/^https?:\/\//, '//');
+    base = base.replace(/_\d+x\d*/i, '');
+    base = base.replace(/_(pico|icon|thumb|small|compact|medium|large|grande|master)/i, '');
+    return base;
+  }
+
+  function initImageGallery() {
+    const mainImage = document.getElementById('main-product-image');
+    const thumbnails = document.querySelectorAll('.thumbnail');
+
+    if (!mainImage || thumbnails.length === 0) return;
+
+    // Build image array from thumbnails
+    allImages = [];
+    thumbnails.forEach((thumb, index) => {
+      const thumbImg = thumb.querySelector('img');
+      if (thumbImg && thumbImg.src) {
+        allImages.push({
+          baseUrl: getBaseUrl(thumbImg.src),
+          src: thumbImg.src,
+          alt: thumbImg.alt || 'Product image ' + (index + 1)
+        });
+      }
+    });
+
+    // Function to switch main image
+    function switchImage(index) {
+      if (index < 0 || index >= allImages.length) return;
+
+      currentImageIndex = index;
+      const imageData = allImages[index];
+
+      // Use modern Shopify URL format for large image
+      // Must update BOTH src AND srcset — browser uses srcset over src
+      mainImage.src = getShopifySizedUrl(imageData.src, 800);
+      mainImage.srcset = getShopifySizedUrl(imageData.src, 400) + ' 400w, ' +
+                         getShopifySizedUrl(imageData.src, 600) + ' 600w, ' +
+                         getShopifySizedUrl(imageData.src, 800) + ' 800w, ' +
+                         getShopifySizedUrl(imageData.src, 1000) + ' 1000w';
+      mainImage.alt = imageData.alt;
+
+      // Update active thumbnail via class only (CSS handles styling)
+      thumbnails.forEach((thumb, i) => {
+        thumb.classList.toggle('active', i === index);
+      });
+    }
+
+    // Attach click events to thumbnails
+    thumbnails.forEach((thumbnail, index) => {
+      thumbnail.style.cursor = 'pointer';
+
+      thumbnail.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        switchImage(index);
+      });
+    });
+
+    // Create lightbox (only once)
+    if (!document.getElementById('product-lightbox')) {
+      createLightbox(mainImage);
+    }
+
+    // Set first thumbnail as active (don't override main image src — Liquid already set it correctly)
+    currentImageIndex = 0;
+    thumbnails.forEach((thumb, i) => {
+      thumb.classList.toggle('active', i === 0);
+    });
+  }
+
+  function createLightbox(mainImage) {
+    const lightboxHTML =
+      '<div class="lightbox-overlay" id="product-lightbox">' +
+        '<button class="lightbox-close" id="lightbox-close">\u2715</button>' +
+        '<button class="lightbox-nav lightbox-prev" id="lightbox-prev">\u2039</button>' +
+        '<div class="lightbox-content">' +
+          '<img class="lightbox-image" id="lightbox-image" src="" alt="">' +
+        '</div>' +
+        '<button class="lightbox-nav lightbox-next" id="lightbox-next">\u203A</button>' +
+        '<div class="lightbox-counter" id="lightbox-counter">1 / 1</div>' +
+      '</div>';
+
+    document.body.insertAdjacentHTML('beforeend', lightboxHTML);
+
+    const lightbox = document.getElementById('product-lightbox');
+    const lightboxImage = document.getElementById('lightbox-image');
+    const closeBtn = document.getElementById('lightbox-close');
+    const prevBtn = document.getElementById('lightbox-prev');
+    const nextBtn = document.getElementById('lightbox-next');
+    const counter = document.getElementById('lightbox-counter');
+
+    // Open lightbox when main image is clicked
+    mainImage.style.cursor = 'pointer';
+    mainImage.addEventListener('click', function() {
+      openLightbox(currentImageIndex);
+    });
+
+    function openLightbox(index) {
+      if (allImages.length === 0) return;
+      currentImageIndex = index;
+      updateLightboxImage();
+      lightbox.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function updateLightboxImage() {
+      if (currentImageIndex < 0 || currentImageIndex >= allImages.length) return;
+      const imageData = allImages[currentImageIndex];
+      lightboxImage.src = getShopifySizedUrl(imageData.src, 1600);
+      lightboxImage.alt = imageData.alt;
+      counter.textContent = (currentImageIndex + 1) + ' / ' + allImages.length;
+
+      if (allImages.length <= 1) {
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+      }
+    }
+
+    function navigateLightbox(direction) {
+      currentImageIndex += direction;
+      if (currentImageIndex < 0) currentImageIndex = allImages.length - 1;
+      if (currentImageIndex >= allImages.length) currentImageIndex = 0;
+      updateLightboxImage();
+    }
+
+    closeBtn.addEventListener('click', closeLightbox);
+    prevBtn.addEventListener('click', function() { navigateLightbox(-1); });
+    nextBtn.addEventListener('click', function() { navigateLightbox(1); });
+
+    lightbox.addEventListener('click', function(e) {
+      if (e.target === lightbox) closeLightbox();
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (!lightbox.classList.contains('active')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') navigateLightbox(-1);
+      if (e.key === 'ArrowRight') navigateLightbox(1);
+    });
+  }
+
+  // Initialize once when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initImageGallery);
+  } else {
+    initImageGallery();
+  }
+
+  // Expose helper globally for variant selector and external use
+  window.switchProductImage = function(imageUrl) {
+    const mainImage = document.getElementById('main-product-image');
+    if (mainImage && imageUrl) {
+      mainImage.src = getShopifySizedUrl(imageUrl, 800);
+      mainImage.srcset = getShopifySizedUrl(imageUrl, 400) + ' 400w, ' +
+                         getShopifySizedUrl(imageUrl, 600) + ' 600w, ' +
+                         getShopifySizedUrl(imageUrl, 800) + ' 800w, ' +
+                         getShopifySizedUrl(imageUrl, 1000) + ' 1000w';
+    }
+  };
+
+  // Expose the sized URL helper globally for variant handler
+  window.cfGetShopifySizedUrl = getShopifySizedUrl;
+  window.cfGetBaseUrl = getBaseUrl;
+})();
+</script>
+
+<!-- Variant Selection Handler - Pill Version -->
+<script>
+(function() {
+  'use strict';
+
+  const sectionId = '{{ section.id }}';
+  const productJson = {{ product | json }};
+
+  // Create a variant lookup map
+  const variantMap = {};
+  productJson.variants.forEach(function(variant) {
+    variantMap[variant.id] = variant;
+  });
+
+  // Variant WSH pricing map - populated by cf-wholesale-pricing.js via BDR API
+  // Initially empty; gets filled when cf:wholesale-prices-ready event fires
+  let variantWshMap = window.cfVariantWshMap || {};
+
+  // Customer/member status from Liquid
+  const isMember = {{ is_member | json }};
+  const isOwnBrand = {{ is_own_brand | json }};
+  const enableMemberPricing = {{ enable_member_pricing | json }};
+
+  // CPH variant filtering
+  const filterForCph = {{ filter_variants_for_cph | json }};
+  const cphAllowedVariantIds = [{{ cph_variant_ids }}];
+  const memberPriceBadge = window.cfMemberPriceBadge || {{ member_price_badge | json }};
+
+  // Listen for BDR API response from cf-wholesale-pricing.js
+  document.addEventListener('cf:wholesale-prices-ready', function(e) {
+    variantWshMap = e.detail || {};
+    window.cfVariantWshMap = variantWshMap;
+    // Re-render current variant with wholesale pricing
+    let currentVariant = getSelectedVariantFromPills();
+    // Fallback for single-variant products: pills are not rendered in the DOM
+    // (product.has_only_default_variant = true), so getSelectedVariantFromPills()
+    // returns null. Fall back to URL param or first variant.
+    if (!currentVariant) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const variantIdFromUrl = urlParams.get('variant');
+      if (variantIdFromUrl) currentVariant = variantMap[parseInt(variantIdFromUrl)];
+      if (!currentVariant && productJson.variants.length > 0) currentVariant = productJson.variants[0];
+    }
+    if (currentVariant) {
+      updateVariantDisplay(currentVariant);
+    }
+  });
+
+  // Get selected variant from checked radio pills
+  function getSelectedVariantFromPills() {
+    const variantSelects = document.getElementById('variant-selects-' + sectionId);
+    if (!variantSelects) return null;
+
+    const selectedOptions = [];
+    const optionContainers = variantSelects.querySelectorAll('.variant-pills');
+
+    optionContainers.forEach(function(container, index) {
+      const checkedRadio = container.querySelector('input[type="radio"]:checked');
+      if (checkedRadio) {
+        selectedOptions.push(checkedRadio.value);
+      }
+    });
+
+    // Find matching variant
+    for (let i = 0; i < productJson.variants.length; i++) {
+      const variant = productJson.variants[i];
+      let match = true;
+
+      for (let j = 0; j < selectedOptions.length; j++) {
+        if (variant['option' + (j + 1)] !== selectedOptions[j]) {
+          match = false;
+          break;
+        }
+      }
+
+      if (match) {
+        return variant;
+      }
+    }
+
+    return null;
+  }
+
+  // Shared money formatter - accessible to all functions
+  const formatMoney = function(cents) {
+    if (Shopify && Shopify.formatMoney) {
+      return Shopify.formatMoney(cents);
+    }
+    return '$' + (cents / 100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
+  // Update the page based on selected variant
+  function updateVariantDisplay(selectedVariant) {
+    if (!selectedVariant) {
+      console.warn('No matching variant found');
+      return;
+    }
+
+    console.log('🔄 Selected variant:', selectedVariant.title, '(ID:', selectedVariant.id, ')');
+
+    const variantIdInput = document.getElementById('product-variant-id-' + sectionId);
+    const addToCartBtn = document.getElementById('add-to-cart-btn-' + sectionId);
+    const mainImage = document.getElementById('main-product-image');
+    const skuElement = document.querySelector('.product-meta strong');
+
+    // Update hidden variant ID input
+    if (variantIdInput) {
+      variantIdInput.value = selectedVariant.id;
+    }
+
+    // Update button state
+    const isZeroPrice = (selectedVariant.price === 0);
+    window._cfSppZeroPrice = isZeroPrice;
+
+    // Toggle zero-price notice
+    const zeroPriceNotice = document.getElementById('zero-price-notice-' + sectionId);
+    if (zeroPriceNotice) zeroPriceNotice.style.display = isZeroPrice ? '' : 'none';
+
+    // Toggle qty wrapper
+    const qtyWrapper = document.querySelector('.qty-wrapper');
+    if (qtyWrapper) qtyWrapper.style.display = isZeroPrice ? 'none' : '';
+
+    if (addToCartBtn) {
+      if (isZeroPrice) {
+        addToCartBtn.disabled = true;
+        addToCartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Contact Us';
+      } else if (selectedVariant.available) {
+        addToCartBtn.disabled = false;
+        addToCartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> {{ section.settings.add_to_cart_text | default: "Add to Cart" }}';
+      } else {
+        addToCartBtn.disabled = true;
+        addToCartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Sold Out';
+      }
+    }
+
+    // Update SKU display
+    if (skuElement && selectedVariant.sku) {
+      skuElement.textContent = selectedVariant.sku;
+    }
+
+    // Price display - using pre-computed variant WSH data
+    const priceUnit = '{{ section.settings.price_unit | default: "Each" }}';
+
+    // Get variant's WSH pricing data from pre-computed map
+    const variantWshData = variantWshMap[selectedVariant.id] || { hasWsh: false, hasDiscount: false, wshPrice: 0, variantPrice: selectedVariant.price };
+    const variantHasWsh = variantWshData.hasWsh;
+    const variantWshPrice = variantWshData.wshPrice;
+    const variantPrice = selectedVariant.price;
+    const variantCompareAt = selectedVariant.compare_at_price || 0;
+    // hasDiscount is true only when WSH price is actually lower than Shopify price
+    const variantHasDiscount = variantWshData.hasDiscount || (variantWshPrice > 0 && variantWshPrice < variantPrice);
+
+    console.log('💎 Variant WSH data:', variantWshData);
+
+    // Price section container
+    const priceSectionContainer = document.querySelector('.price-section-container');
+
+    if (priceSectionContainer && enableMemberPricing && isMember) {
+      // MEMBER VIEWING - Dynamic layout based on variant's WSH status
+      const existingPriceRow = priceSectionContainer.querySelector('.price-cards-row');
+      const existingFinancingRow = priceSectionContainer.querySelector('.financing-row');
+
+      if (variantHasWsh) {
+        // This variant HAS a WSH price - determine layout
+        const formattedMemberPrice = formatMoney(variantWshPrice);
+
+        let dualCardHtml;
+        if (variantHasDiscount) {
+          // WSH price is lower than Shopify price - show full dual-card with strikethrough
+          const formattedRegularPrice = formatMoney(variantPrice);
+          dualCardHtml = `
+            <div class="price-cards-row">
+              <div class="price-card price-card-regular">
+                <div class="price-card-label">Regularly</div>
+                <div class="price-card-amount"><s>${formattedRegularPrice}</s><span class="price-unit">/${priceUnit}</span></div>
+              </div>
+              <div class="price-card price-card-member">
+                <div class="price-card-badge">${memberPriceBadge}</div>
+                <div class="price-card-amount">${formattedMemberPrice}<span class="price-unit">/${priceUnit}</span></div>
+              </div>
+            </div>
+          `;
+          console.log('💰 Showing DUAL-CARD layout for member (variant HAS discount)');
+          console.log('   Regular:', formattedRegularPrice, '| Member:', formattedMemberPrice);
+        } else {
+          // WSH price equals Shopify price - show single member price card
+          dualCardHtml = `
+            <div class="price-cards-row price-cards-single">
+              <div class="price-card price-card-member price-card-full">
+                <div class="price-card-badge">${memberPriceBadge}</div>
+                <div class="price-card-amount">${formattedMemberPrice}<span class="price-unit">/${priceUnit}</span></div>
+              </div>
+            </div>
+          `;
+          console.log('💰 Showing MEMBER PRICE card (no additional discount over Shopify price)');
+          console.log('   Member Price:', formattedMemberPrice);
+        }
+
+        const financingHtml = `
+          <a href="/pages/contact-us#financing" class="financing-row financing-coming-soon-style" data-wpd-financing style="text-decoration:none;cursor:pointer;">
+            <svg class="financing-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+              <line x1="1" y1="10" x2="23" y2="10"></line>
+            </svg>
+            <span class="financing-text">Financing Available</span>
+            <span class="financing-coming-soon" style="background:#2d5a87;color:#fff;border-color:#2d5a87;">Apply Now →</span>
+          </a>
+        `;
+
+        // Replace existing content
+        if (existingPriceRow) existingPriceRow.outerHTML = dualCardHtml;
+        if (existingFinancingRow) existingFinancingRow.outerHTML = financingHtml;
+
+      } else {
+        // This variant does NOT have WSH pricing - show single-card layout
+        const displayPrice = variantCompareAt > variantPrice ? variantPrice : variantPrice;
+        const formattedPrice = formatMoney(displayPrice);
+        const installmentPrice = formatMoney(Math.round(displayPrice / 4));
+
+        // Build single-card HTML
+        let singleCardHtml = `
+          <div class="price-cards-row price-cards-single">
+            <div class="price-card price-card-regular price-card-full">
+        `;
+
+        if (variantCompareAt > variantPrice) {
+          singleCardHtml += `
+              <div class="price-card-label">Sale Price</div>
+              <div class="price-card-compare-strike"><s>${formatMoney(variantCompareAt)}</s></div>
+          `;
+        } else {
+          singleCardHtml += `
+              <div class="price-card-label">Price</div>
+          `;
+        }
+
+        singleCardHtml += `
+              <div class="price-card-amount">${formattedPrice}<span class="price-unit">/${priceUnit}</span></div>
+            </div>
+          </div>
+        `;
+
+        const financingHtml = `
+          <a href="/pages/contact-us#financing" class="financing-row financing-coming-soon-style" data-wpd-financing style="text-decoration:none;cursor:pointer;">
+            <svg class="financing-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+              <line x1="1" y1="10" x2="23" y2="10"></line>
+            </svg>
+            <span class="financing-text">Financing Available</span>
+            <span class="financing-coming-soon" style="background:#2d5a87;color:#fff;border-color:#2d5a87;">Apply Now →</span>
+          </a>
+        `;
+
+        // Replace existing content
+        if (existingPriceRow) existingPriceRow.outerHTML = singleCardHtml;
+        if (existingFinancingRow) existingFinancingRow.outerHTML = financingHtml;
+
+        console.log('💰 Showing SINGLE-CARD layout for member (variant has NO WSH price)');
+        console.log('   Price:', formattedPrice);
+      }
+
+    } else {
+      // NON-MEMBER or member pricing disabled - update prices and toggle CTAs
+      const regularPriceElement = document.querySelector('.price-card-regular .price-card-amount');
+      const formattedPrice = formatMoney(variantPrice);
+
+      if (regularPriceElement) {
+        if (variantCompareAt > variantPrice) {
+          // Has compare_at (sale)
+          const compareStrike = regularPriceElement.parentElement.querySelector('.price-card-compare-strike');
+          if (compareStrike) {
+            compareStrike.innerHTML = '<s>' + formatMoney(variantCompareAt) + '</s>';
+          }
+          regularPriceElement.innerHTML = formattedPrice + '<span class="price-unit">/' + priceUnit + '</span>';
+        } else {
+          regularPriceElement.innerHTML = formattedPrice + '<span class="price-unit">/' + priceUnit + '</span>';
+        }
+      }
+
+      // Update financing
+      const financingInstallment = document.querySelector('[data-wpd-installment]');
+      if (financingInstallment) {
+        financingInstallment.textContent = formatMoney(Math.round(variantPrice / 4));
+      }
+
+      // Dynamic CTA toggling based on variant WSH status
+      let loginCta = document.querySelector('.spp-login-member-pricing');
+      let callCta = document.querySelector('.spp-call-for-details');
+      const blurredCard = document.querySelector('.price-card-blurred');
+      const priceSectionContainer = document.querySelector('.price-section-container');
+
+      if (variantHasWsh && isOwnBrand) {
+        // Own brand + WSH → show Login CTA, hide Call CTA, show blurred card
+        if (!loginCta && priceSectionContainer) {
+          loginCta = document.createElement('a');
+          loginCta.href = '/account/login?return_url=' + encodeURIComponent(window.location.pathname);
+          loginCta.className = 'spp-login-member-pricing';
+          loginCta.innerHTML = '<span class="spp-lock-icon">&#128274;</span> Login for Member Pricing';
+          const financingRow = priceSectionContainer.querySelector('.financing-row');
+          if (financingRow) {
+            priceSectionContainer.insertBefore(loginCta, financingRow);
+          } else {
+            priceSectionContainer.appendChild(loginCta);
+          }
+        }
+        if (loginCta) loginCta.style.display = '';
+        if (callCta) callCta.style.display = 'none';
+        if (blurredCard) blurredCard.style.display = '';
+
+      } else if (variantHasWsh && !isOwnBrand) {
+        // Non-own-brand + WSH → show Call CTA, hide Login CTA, hide blurred card
+        if (!callCta && priceSectionContainer) {
+          callCta = document.createElement('a');
+          callCta.href = 'tel:+14086739999';
+          callCta.className = 'spp-call-for-details';
+          callCta.innerHTML = '<span class="spp-phone-icon">&#128222;</span> Call Us For Details - (408) 673-9999';
+          const financingRow = priceSectionContainer.querySelector('.financing-row');
+          if (financingRow) {
+            priceSectionContainer.insertBefore(callCta, financingRow);
+          } else {
+            priceSectionContainer.appendChild(callCta);
+          }
+        }
+        if (callCta) callCta.style.display = '';
+        if (loginCta) loginCta.style.display = 'none';
+        if (blurredCard) blurredCard.style.display = 'none';
+
+      } else {
+        // No WSH → hide both CTAs and blurred card
+        if (loginCta) loginCta.style.display = 'none';
+        if (callCta) callCta.style.display = 'none';
+        if (blurredCard) blurredCard.style.display = 'none';
+      }
+
+      console.log('💰 Updated price for non-member:', formattedPrice, '| WSH:', variantHasWsh, '| Own brand:', isOwnBrand);
+    }
+
+    // Update sticky bar price (always update)
+    const stickyPriceElement = document.getElementById('sticky-price');
+    if (stickyPriceElement) {
+      if (isMember && variantHasWsh) {
+        stickyPriceElement.textContent = formatMoney(variantWshPrice);
+      } else {
+        stickyPriceElement.textContent = formatMoney(variantPrice);
+      }
+    }
+
+    // Update data-cf-* attributes on price container for potential re-fetching
+    const priceContainer = document.querySelector('.price-section-container[data-cf-variant-id]');
+    if (priceContainer) {
+      priceContainer.setAttribute('data-cf-variant-id', selectedVariant.id);
+      priceContainer.setAttribute('data-cf-price', selectedVariant.price);
+      priceContainer.setAttribute('data-cf-compare-at-price', selectedVariant.compare_at_price || '');
+    }
+
+    // Update main image if variant has a featured image
+    if (selectedVariant.featured_image && mainImage) {
+      const variantImageUrl = selectedVariant.featured_image.src;
+
+      // Use modern Shopify URL format via shared helper
+      // Must update BOTH src AND srcset — browser uses srcset over src
+      var getSizedUrl = window.cfGetShopifySizedUrl || function(u) { return u; };
+      var sizedUrl = getSizedUrl(variantImageUrl, 800);
+      mainImage.src = sizedUrl;
+      mainImage.srcset = getSizedUrl(variantImageUrl, 400) + ' 400w, ' +
+                         getSizedUrl(variantImageUrl, 600) + ' 600w, ' +
+                         getSizedUrl(variantImageUrl, 800) + ' 800w, ' +
+                         getSizedUrl(variantImageUrl, 1000) + ' 1000w';
+      mainImage.alt = selectedVariant.featured_image.alt || selectedVariant.title;
+
+      // Match variant image to thumbnail using base URL comparison
+      var variantBase = (window.cfGetBaseUrl || function(u) { return u; })(variantImageUrl);
+      var thumbnails = document.querySelectorAll('.thumbnail');
+      var foundMatch = false;
+
+      thumbnails.forEach(function(thumb, index) {
+        var thumbImg = thumb.querySelector('img');
+        if (thumbImg) {
+          var thumbBase = (window.cfGetBaseUrl || function(u) { return u; })(thumbImg.src);
+          if (thumbBase === variantBase) {
+            thumb.classList.add('active');
+            foundMatch = true;
+          } else {
+            thumb.classList.remove('active');
+          }
+        }
+      });
+    }
+
+    // Update URL without page reload
+    if (history.replaceState) {
+      const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '?variant=' + selectedVariant.id;
+      history.replaceState({ path: newUrl }, '', newUrl);
+    }
+  }
+
+  // Debounce guard: prevents double-fire from inline onchange + JS listener
+  var _lastVariantUpdateId = null;
+
+  // Global function for pill change handler (called by inline onchange)
+  window.handleVariantPillChange = function(radio, sectionId) {
+    console.log('📝 Pill selected:', radio.name, '=', radio.value);
+    const selectedVariant = getSelectedVariantFromPills();
+    if (selectedVariant) {
+      _lastVariantUpdateId = selectedVariant.id;
+      updateVariantDisplay(selectedVariant);
+    }
+  };
+
+  // JS event listeners on radios: stop propagation to prevent Shopify global.js
+  // VariantSelects.updateSelectionMetadata crash, and serve as backup handler
+  var variantRadios = document.querySelectorAll('.variant-pills input[type="radio"]');
+  variantRadios.forEach(function(radio) {
+    radio.addEventListener('change', function(e) {
+      e.stopPropagation();
+      // Backup: if inline onchange didn't handle this, run variant update
+      var selectedVariant = getSelectedVariantFromPills();
+      if (selectedVariant && selectedVariant.id !== _lastVariantUpdateId) {
+        _lastVariantUpdateId = selectedVariant.id;
+        updateVariantDisplay(selectedVariant);
+      }
+    });
+  });
+
+  // Backup click handler on pill wrappers for browsers where label-for doesn't fire onchange
+  var variantPillDivs = document.querySelectorAll('.variant-pill');
+  variantPillDivs.forEach(function(pill) {
+    pill.addEventListener('click', function(e) {
+      if (e.target.tagName === 'INPUT') return;
+      var radio = pill.querySelector('input[type="radio"]');
+      if (radio && !radio.checked) {
+        radio.checked = true;
+        radio.dispatchEvent(new Event('change', { bubbles: false }));
+      }
+    });
+  });
+
+  // ─── WSH BRIDGE: Use wpd.js to get real per-variant wholesale pricing ───
+  // ─── WSH Bridge removed — pricing now via BDR API (cf-wholesale-pricing.js) ───
+
+  // CPH: Programmatically select variant pills for a given variant
+  function selectVariantInPills(variant) {
+    const variantSelects = document.getElementById('variant-selects-' + sectionId);
+    if (!variantSelects) return;
+    const optionContainers = variantSelects.querySelectorAll('.variant-pills');
+    optionContainers.forEach(function(container, index) {
+      const optionValue = variant['option' + (index + 1)];
+      if (optionValue) {
+        const radios = container.querySelectorAll('input[type="radio"]');
+        radios.forEach(function(radio) {
+          radio.checked = (radio.value === optionValue);
+        });
+      }
+    });
+  }
+
+  // Initialize on page load - handle pre-selected variants from URL parameter
+  function initializeVariantFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const variantIdFromUrl = urlParams.get('variant');
+
+    // CPH filtering: if URL variant is not in allowed list, snap to first CPH variant
+    if (filterForCph && cphAllowedVariantIds.length > 0) {
+      if (variantIdFromUrl) {
+        const urlVarId = parseInt(variantIdFromUrl);
+        if (!cphAllowedVariantIds.includes(urlVarId)) {
+          const firstCphVariant = variantMap[cphAllowedVariantIds[0]];
+          if (firstCphVariant) {
+            console.log('🔒 CPH: URL variant not allowed, snapping to CPH variant:', firstCphVariant.title);
+            selectVariantInPills(firstCphVariant);
+            updateVariantDisplay(firstCphVariant);
+            return;
+          }
+        }
+      }
+      // CPH: Always initialize with the current CPH variant (Liquid already set it)
+      const selectedVariant = getSelectedVariantFromPills();
+      if (selectedVariant) {
+        updateVariantDisplay(selectedVariant);
+        return;
+      }
+    }
+
+    if (variantIdFromUrl) {
+      const preSelectedVariant = variantMap[parseInt(variantIdFromUrl)];
+      if (preSelectedVariant) {
+        console.log('🔄 Initializing pre-selected variant from URL:', preSelectedVariant.title);
+        updateVariantDisplay(preSelectedVariant);
+        return;
+      }
+    }
+
+    // Fallback: check what's currently selected in the pills
+    const selectedVariant = getSelectedVariantFromPills();
+    if (selectedVariant) {
+      const firstVariant = productJson.variants[0];
+      if (selectedVariant.id !== firstVariant.id) {
+        console.log('🔄 Initializing pre-selected variant:', selectedVariant.title);
+        updateVariantDisplay(selectedVariant);
+      }
+    }
+  }
+
+  // WSH bridge removed — BDR API handles pricing via cf-wholesale-pricing.js
+
+  // Run initialization when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeVariantFromUrl);
+  } else {
+    // DOM already loaded, run immediately
+    initializeVariantFromUrl();
+  }
+
+  console.log('✅ Variant pill selection handler initialized');
+})();
+</script>
+
+<!-- Inline Hover Zoom Script -->
+<script>
+(function() {
+  'use strict';
+
+  // Guard against multiple initializations
+  if (window.__cfInlineZoomInitialized) return;
+  window.__cfInlineZoomInitialized = true;
+
+  function initInlineZoom() {
+    const container = document.getElementById('magnifier-container');
+    const mainImage = document.getElementById('main-product-image');
+
+    if (!container || !mainImage) return;
+
+    // Disable on mobile
+    if (window.innerWidth <= 768) return;
+
+    const zoomLevel = 2.5;
+    const zoomIndicator = container.querySelector('.zoom-indicator');
+
+    function getZoomImageUrl() {
+      return mainImage.dataset.zoomSrc || mainImage.src.replace(/width=\d+/, 'width=1600');
+    }
+
+    function onEnter() {
+      if (window.innerWidth <= 768) return;
+      const zoomUrl = getZoomImageUrl();
+      var img = new Image();
+      img.src = zoomUrl;
+
+      container.style.backgroundImage = "url('" + zoomUrl + "')";
+      container.style.backgroundSize = (zoomLevel * 100) + '%';
+      container.classList.add('zoomed');
+      if (zoomIndicator) zoomIndicator.style.opacity = '0';
+    }
+
+    function onMove(e) {
+      if (!container.classList.contains('zoomed')) return;
+      const rect = container.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      container.style.backgroundPosition = x + '% ' + y + '%';
+    }
+
+    function onLeave() {
+      container.classList.remove('zoomed');
+      container.style.backgroundImage = '';
+      container.style.backgroundSize = '';
+      container.style.backgroundPosition = '';
+      if (zoomIndicator) zoomIndicator.style.opacity = '1';
+    }
+
+    container.addEventListener('mouseenter', onEnter);
+    container.addEventListener('mousemove', onMove);
+    container.addEventListener('mouseleave', onLeave);
+
+    // Update zoom source when main image changes (thumbnail click / variant switch)
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(m) {
+        if (m.type === 'attributes' && m.attributeName === 'src') {
+          const newZoomSrc = mainImage.src.replace(/width=\d+/, 'width=1600');
+          mainImage.dataset.zoomSrc = newZoomSrc;
+          if (container.classList.contains('zoomed')) {
+            container.style.backgroundImage = "url('" + newZoomSrc + "')";
+          }
+        }
+      });
+    });
+    observer.observe(mainImage, { attributes: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initInlineZoom);
+  } else {
+    initInlineZoom();
+  }
+})();
+</script>
+
+<script src="{{ 'product-celebrate-festival.js' | asset_url }}" defer></script>
+<script>window._cfSppZeroPrice = ({{ current_variant.price | default: 0 }} === 0);</script>
+
+<!-- Floating Sticky Add to Cart Bar -->
+{%- unless call_to_order -%}
+<div id="sticky-add-to-cart" class="sticky-atc-bar" style="display: none;">
+  <div class="sticky-atc-container">
+    <div class="sticky-atc-product">
+      {%- if product.featured_image -%}
+        <img src="{{ product.featured_image | image_url: width: 50 }}" alt="{{ product.title }}" class="sticky-atc-image">
+      {%- endif -%}
+      <div class="sticky-atc-info">
+        <span class="sticky-atc-title">{{ product.title | truncate: 40 }}</span>
+        <span class="sticky-atc-price" id="sticky-price">{{ current_variant.price | money }}</span>
+      </div>
+    </div>
+    <div class="sticky-atc-actions">
+      <div class="sticky-atc-qty">
+        <button type="button" class="sticky-qty-btn" onclick="stickyQtyChange(-1)">−</button>
+        <input type="number" id="sticky-qty" value="1" min="1" class="sticky-qty-input">
+        <button type="button" class="sticky-qty-btn" onclick="stickyQtyChange(1)">+</button>
+      </div>
+      <button type="button" id="sticky-add-btn" class="sticky-atc-btn" onclick="stickyAddToCart()">
+        Add to Cart
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+.sticky-atc-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid #e2e8f0;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+  z-index: 999;
+  padding: 10px 20px;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+.sticky-atc-bar.visible { transform: translateY(0); display: block !important; }
+.sticky-atc-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.sticky-atc-product { display: flex; align-items: center; gap: 12px; }
+.sticky-atc-image { width: 45px; height: 45px; object-fit: contain; border-radius: 6px; border: 1px solid #e2e8f0; }
+.sticky-atc-info { display: flex; flex-direction: column; }
+.sticky-atc-title { font-size: 13px; font-weight: 600; color: #1a365d; line-height: 1.3; }
+.sticky-atc-price { font-size: 16px; font-weight: 700; color: #ff6b6b; }
+.sticky-atc-actions { display: flex; align-items: center; gap: 12px; }
+.sticky-atc-qty { display: flex; align-items: center; border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden; }
+.sticky-qty-btn { width: 32px; height: 36px; border: none; background: #f8fafc; cursor: pointer; font-size: 16px; font-weight: 600; color: #1a365d; }
+.sticky-qty-btn:hover { background: #e2e8f0; }
+.sticky-qty-input { width: 40px; height: 36px; border: none; text-align: center; font-size: 14px; font-weight: 600; }
+.sticky-atc-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+.sticky-atc-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255,107,107,0.3); }
+@media (max-width: 768px) {
+  .sticky-atc-container { flex-wrap: wrap; gap: 10px; }
+  .sticky-atc-product { flex: 1; min-width: 0; }
+  .sticky-atc-title { font-size: 12px; }
+  .sticky-atc-price { font-size: 14px; }
+  .sticky-atc-actions { width: 100%; justify-content: space-between; }
+}
+</style>
+
+<script>
+(function() {
+  const stickyBar = document.getElementById('sticky-add-to-cart');
+  const mainForm = document.querySelector('.celebrate-festival-product-template form[action*="/cart/add"]');
+  const mainAddBtn = document.querySelector('.add-to-cart-btn');
+  let ticking = false;
+
+  function checkScroll() {
+    if (!mainAddBtn || !stickyBar) return;
+    // Never show sticky bar for zero-price products
+    if (window._cfSppZeroPrice) { stickyBar.classList.remove('visible'); return; }
+    const btnRect = mainAddBtn.getBoundingClientRect();
+    const isHidden = btnRect.bottom < 0 || btnRect.top > window.innerHeight;
+
+    if (isHidden) {
+      stickyBar.classList.add('visible');
+    } else {
+      stickyBar.classList.remove('visible');
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    if (!ticking) {
+      window.requestAnimationFrame(function() {
+        checkScroll();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+
+  window.stickyQtyChange = function(delta) {
+    const input = document.getElementById('sticky-qty');
+    let val = parseInt(input.value) || 1;
+    val = Math.max(1, val + delta);
+    input.value = val;
+  };
+
+  window.stickyAddToCart = function() {
+    const variantInput = document.querySelector('input[name="id"]');
+    const qty = parseInt(document.getElementById('sticky-qty').value) || 1;
+    const btn = document.getElementById('sticky-add-btn');
+
+    if (!variantInput) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Adding...';
+
+    fetch('/cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: parseInt(variantInput.value), quantity: qty })
+    })
+    .then(res => res.json())
+    .then(data => {
+      btn.textContent = 'Added!';
+      btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+
+      // Update cart count
+      fetch('/cart.js').then(r => r.json()).then(cart => {
+        document.querySelectorAll('.cart-count-bubble span, [data-cart-count]').forEach(el => el.textContent = cart.item_count);
+      });
+
+      // Show toast notification instead of cart drawer
+      if (typeof window.cfShowCartToast === 'function') {
+        const qty = parseInt(document.querySelector('[name="quantity"]')?.value) || 1;
+        window.cfShowCartToast(data, qty);
+      }
+
+      setTimeout(() => {
+        btn.textContent = 'Add to Cart';
+        btn.style.background = '';
+        btn.disabled = false;
+      }, 2000);
+    })
+    .catch(err => {
+      btn.textContent = 'Error';
+      setTimeout(() => { btn.textContent = 'Add to Cart'; btn.disabled = false; }, 2000);
+    });
+  };
+
+  // Initial check
+  setTimeout(checkScroll, 500);
+})();
+</script>
+{%- endunless -%}
+
+<!-- Ask a Question Modal -->
+<div id="cf-ask-question-modal" class="cf-aq-modal">
+  <div class="cf-aq-overlay" onclick="document.getElementById('cf-ask-question-modal').classList.remove('active')"></div>
+  <div class="cf-aq-dialog">
+    <button class="cf-aq-close" onclick="document.getElementById('cf-ask-question-modal').classList.remove('active')">&times;</button>
+
+    <div class="cf-aq-header">
+      <h3>Ask a Question</h3>
+      <p>About: <strong>{{ product.title | escape }}</strong></p>
+    </div>
+
+    <div class="cf-aq-body" id="cf-aq-form-body">
+      {% form 'contact', class: 'cf-aq-form', id: 'cf-aq-contact-form' %}
+        {% if form.posted_successfully? %}
+          <script>window.__cfAqSuccess = true;</script>
+        {% endif %}
+
+        <input type="hidden" name="contact[inquiry_type]" value="Product Question">
+        <input type="hidden" name="contact[product_title]" value="{{ product.title | escape }}">
+        <input type="hidden" name="contact[product_url]" value="{{ shop.url }}{{ product.url }}">
+        <input type="hidden" name="contact[product_sku]" value="{{ product.variants.first.sku | escape }}">
+        <input type="hidden" name="contact[product_vendor]" value="{{ product.vendor | escape }}">
+
+        <div class="cf-aq-product-tag">
+          {% if product.featured_image %}
+            <img src="{{ product.featured_image | image_url: width: 100 }}" alt="{{ product.title | escape }}">
+          {% endif %}
+          <div>
+            <span class="cf-aq-product-name">{{ product.title }}</span>
+            {% if product.variants.first.sku != blank %}
+              <span class="cf-aq-product-sku">SKU: {{ product.variants.first.sku }}</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="cf-aq-row">
+          <div class="cf-aq-field">
+            <label>Name <span class="cf-aq-req">*</span></label>
+            <input type="text" name="contact[name]" required
+              {% if customer %}value="{{ customer.name | escape }}"{% endif %}
+              placeholder="Your name">
+          </div>
+          <div class="cf-aq-field">
+            <label>Email <span class="cf-aq-req">*</span></label>
+            <input type="email" name="contact[email]" required
+              {% if customer %}value="{{ customer.email | escape }}"{% endif %}
+              placeholder="your@email.com">
+          </div>
+        </div>
+
+        <div class="cf-aq-field">
+          <label>Category</label>
+          <select name="contact[question_category]">
+            <option value="general">General Question</option>
+            <option value="specs">Specifications & Features</option>
+            <option value="compatibility">Compatibility & Sizing</option>
+            <option value="shipping">Shipping & Delivery</option>
+            <option value="warranty">Warranty & Returns</option>
+            <option value="installation">Installation & Setup</option>
+            <option value="pricing">Pricing & Availability</option>
+          </select>
+        </div>
+
+        <div class="cf-aq-field">
+          <label>Your Question <span class="cf-aq-req">*</span></label>
+          <textarea name="contact[body]" required placeholder="Type your question here..." rows="4"></textarea>
+        </div>
+
+        <button type="submit" class="cf-aq-submit">Submit Question</button>
+      {% endform %}
+    </div>
+  </div>
+</div>
+
+<style>
+/* Ask a Question Modal */
+.cf-aq-modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+.cf-aq-modal.active { display: flex; }
+
+.cf-aq-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(26, 54, 93, 0.6);
+  backdrop-filter: blur(3px);
+}
+
+.cf-aq-dialog {
+  position: relative;
+  background: #fff;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  animation: cfAqSlideUp 0.25s ease-out;
+}
+@keyframes cfAqSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cf-aq-close {
+  position: absolute;
+  top: 12px; right: 14px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #fff;
+  cursor: pointer;
+  width: 32px; height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+  z-index: 2;
+}
+.cf-aq-close:hover { background: rgba(255, 255, 255, 0.15); }
+
+.cf-aq-header {
+  background: linear-gradient(135deg, #1a365d, #2d5a87);
+  padding: 22px 24px;
+  border-radius: 12px 12px 0 0;
+  color: #fff;
+}
+.cf-aq-header h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+}
+.cf-aq-header p {
+  font-size: 13px;
+  opacity: 0.9;
+  margin: 0;
+  line-height: 1.4;
+}
+.cf-aq-header p strong { color: #fff; }
+
+.cf-aq-body { padding: 20px 24px 24px; }
+
+.cf-aq-product-tag {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 18px;
+}
+.cf-aq-product-tag img {
+  width: 48px; height: 48px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+}
+.cf-aq-product-name {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a365d;
+  line-height: 1.3;
+}
+.cf-aq-product-sku {
+  display: block;
+  font-size: 11px;
+  color: #718096;
+  margin-top: 2px;
+}
+
+.cf-aq-form { display: flex; flex-direction: column; gap: 14px; }
+
+.cf-aq-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.cf-aq-field { display: flex; flex-direction: column; }
+.cf-aq-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 5px;
+}
+.cf-aq-req { color: #ff6b6b; }
+
+.cf-aq-field input,
+.cf-aq-field textarea,
+.cf-aq-field select {
+  padding: 10px 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #2d3748;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.cf-aq-field input:focus,
+.cf-aq-field textarea:focus,
+.cf-aq-field select:focus {
+  outline: none;
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+}
+.cf-aq-field textarea { resize: vertical; min-height: 90px; }
+.cf-aq-field select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%232d3748' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px;
+}
+
+.cf-aq-submit {
+  background: linear-gradient(135deg, #ff6b6b, #e85a4f);
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 2px;
+}
+.cf-aq-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+/* Success state */
+.cf-aq-success {
+  text-align: center;
+  padding: 30px 20px;
+}
+.cf-aq-success-icon {
+  width: 56px; height: 56px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-size: 28px;
+  color: #fff;
+}
+.cf-aq-success h4 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  color: #1a365d;
+  margin: 0 0 8px 0;
+}
+.cf-aq-success p {
+  font-size: 13px;
+  color: #718096;
+  margin: 0;
+  line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+  .cf-aq-dialog { width: 95%; max-width: none; }
+  .cf-aq-row { grid-template-columns: 1fr; }
+  .cf-aq-header { padding: 18px 20px; }
+  .cf-aq-body { padding: 16px 20px 20px; }
+}
+</style>
+
+<script>
+(function() {
+  // Handle success state for Ask a Question modal
+  if (window.__cfAqSuccess) {
+    document.addEventListener('DOMContentLoaded', function() {
+      var modal = document.getElementById('cf-ask-question-modal');
+      var body = document.getElementById('cf-aq-form-body');
+      if (modal && body) {
+        body.innerHTML = '<div class="cf-aq-success">' +
+          '<div class="cf-aq-success-icon">&#10003;</div>' +
+          '<h4>Question Submitted!</h4>' +
+          '<p>Thank you! Our team will respond to your email within 24 hours.</p>' +
+          '</div>';
+        modal.classList.add('active');
+      }
+    });
+  }
+
+  // Close modal on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      var modal = document.getElementById('cf-ask-question-modal');
+      if (modal) modal.classList.remove('active');
+    }
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Product - CF v2.0",
+  "settings": [
+    {
+      "type": "header",
+      "content": "🎨 Demo Mode"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_demo_data",
+      "label": "Show Demo Data",
+      "default": false,
+      "info": "Enable to preview design with sample data. Disable for live products."
+    },
+    {
+      "type": "header",
+      "content": "🛒 General Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumb",
+      "label": "Show Breadcrumb",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "description_heading",
+      "label": "Description Section Heading",
+      "default": "Product Description"
+    },
+    {
+      "type": "header",
+      "content": "💰 Pricing Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_member_pricing",
+      "label": "Enable Member Pricing Display",
+      "default": false,
+      "info": "⚠️ IMPORTANT: This shows a FALLBACK calculated price, NOT actual WSH wholesale pricing. WSH plugin only works in /apps/wpdapp/wholesale section. Enable only if you want to show promotional member pricing on regular storefront."
+    },
+    {
+      "type": "range",
+      "id": "member_discount_percent",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "%",
+      "label": "Member Discount Percentage (Calculated)",
+      "default": 2,
+      "info": "The percentage discount to calculate and display. This is NOT connected to WSH - it's purely visual/promotional."
+    },
+    {
+      "type": "text",
+      "id": "price_label",
+      "label": "Price Label",
+      "default": "Non-Member Price:"
+    },
+    {
+      "type": "text",
+      "id": "member_price_label",
+      "label": "Member Price Label",
+      "default": "Member Price:"
+    },
+    {
+      "type": "text",
+      "id": "price_unit",
+      "label": "Price Unit",
+      "default": "Each"
+    },
+    {
+      "type": "text",
+      "id": "member_info_text",
+      "label": "Member Info Text",
+      "default": "Members save on this item. Learn more",
+      "info": "Text shown in member info box"
+    },
+    {
+      "type": "text",
+      "id": "login_prompt_logged_in",
+      "label": "Login Prompt (Logged In)",
+      "default": "Become a Member to see savings",
+      "info": "Text shown to logged-in non-members"
+    },
+    {
+      "type": "text",
+      "id": "login_prompt_not_logged_in",
+      "label": "Login Prompt (Not Logged In)",
+      "default": "🔒 Login to see member pricing",
+      "info": "Text shown to users who are not logged in"
+    },
+    {
+      "type": "text",
+      "id": "login_button_logged_in",
+      "label": "Login Button (Logged In)",
+      "default": "Learn About Membership",
+      "info": "Button text for logged-in non-members"
+    },
+    {
+      "type": "text",
+      "id": "login_button_not_logged_in",
+      "label": "Login Button (Not Logged In)",
+      "default": "Login to Your Account",
+      "info": "Button text for users who are not logged in"
+    },
+    {
+      "type": "text",
+      "id": "membership_learn_more_url",
+      "label": "Membership Info URL",
+      "default": "/pages/membership",
+      "info": "URL for 'Learn About Membership' button"
+    },
+    {
+      "type": "header",
+      "content": "🚚 Shipping Settings"
+    },
+    {
+      "type": "text",
+      "id": "shipping_alert_text",
+      "label": "Shipping Alert Text",
+      "default": "This item ships via freight. Additional time and fees may apply.",
+      "info": "Leave blank to hide"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_shipping_info",
+      "label": "Show Shipping Info Box",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "shipping_info_title",
+      "label": "Shipping Info Title",
+      "default": "Instant Access Shipping"
+    },
+    {
+      "type": "textarea",
+      "id": "shipping_info_list",
+      "label": "Shipping Info List",
+      "default": "Ships in 1-2 business days|Ships via freight carrier|Free lift gate service included",
+      "info": "Separate items with | (pipe character)"
+    },
+    {
+      "type": "header",
+      "content": "🛍️ Add to Cart"
+    },
+    {
+      "type": "text",
+      "id": "add_to_cart_text",
+      "label": "Add to Cart Button Text",
+      "default": "Add to Cart"
+    },
+    {
+      "type": "header",
+      "content": "🔗 Related Products"
+    },
+    {
+      "type": "text",
+      "id": "related_title_default",
+      "label": "Default Related Products Title",
+      "default": "Other Products from this Line"
+    },
+    {
+      "type": "collection",
+      "id": "related_collection_default",
+      "label": "Default Related Products Collection",
+      "info": "Fallback to same collection if empty"
+    },
+    {
+      "type": "text",
+      "id": "conditional_product_type_1",
+      "label": "Conditional Product Type 1",
+      "info": "If product type matches, use settings below"
+    },
+    {
+      "type": "text",
+      "id": "conditional_title_1",
+      "label": "Conditional Title 1",
+      "info": "Title to show for conditional type 1"
+    },
+    {
+      "type": "collection",
+      "id": "conditional_collection_1",
+      "label": "Conditional Collection 1"
+    },
+    {
+      "type": "text",
+      "id": "conditional_product_type_2",
+      "label": "Conditional Product Type 2"
+    },
+    {
+      "type": "text",
+      "id": "conditional_title_2",
+      "label": "Conditional Title 2"
+    },
+    {
+      "type": "collection",
+      "id": "conditional_collection_2",
+      "label": "Conditional Collection 2"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_other_products",
+      "label": "Show Other Products from this Line",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_bottom_related",
+      "label": "Show Bottom Related Products",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "bottom_related_title",
+      "label": "Bottom Related Products Title",
+      "default": "You May Also Need"
+    },
+    {
+      "type": "header",
+      "content": "❓ Q&A Section"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_qa",
+      "label": "Enable Q&A Section",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "qa_heading",
+      "label": "Q&A Heading",
+      "default": "Questions & Answers"
+    },
+    {
+      "type": "textarea",
+      "id": "qa_items",
+      "label": "Q&A Items",
+      "info": "Format: Question|Answer|Meta||Question|Answer|Meta (use || to separate items)"
+    },
+    {
+      "type": "text",
+      "id": "qa_button_text",
+      "label": "Ask Question Button Text",
+      "default": "Ask a Question"
+    },
+    {
+      "type": "text",
+      "id": "qa_button_link",
+      "label": "Ask Question Button Link",
+      "default": "/pages/contact",
+      "info": "Enter page URL (e.g., /pages/contact)"
+    },
+    {
+      "type": "header",
+      "content": "⚖️ Compare Section"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_compare",
+      "label": "Enable Compare Section",
+      "default": false,
+      "info": "Note: Comparison table requires custom development"
+    },
+    {
+      "type": "text",
+      "id": "compare_heading",
+      "label": "Compare Heading",
+      "default": "Compare to Other Products"
+    },
+    {
+      "type": "header",
+      "content": "⭐ Reviews"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_reviews",
+      "label": "Enable Reviews Section",
+      "default": true,
+      "info": "Requires Shopify Product Reviews app"
+    },
+    {
+      "type": "text",
+      "id": "reviews_heading",
+      "label": "Reviews Heading",
+      "default": "Customer Reviews"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Brand Banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_brand_banner",
+      "label": "Show Brand Banner",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "brand_banner_name",
+      "label": "Brand Banner Name",
+      "info": "Leave blank to use product vendor"
+    },
+    {
+      "type": "text",
+      "id": "brand_banner_tagline",
+      "label": "Brand Banner Tagline"
+    },
+    {
+      "type": "textarea",
+      "id": "brand_banner_description",
+      "label": "Brand Banner Description"
+    },
+    {
+      "type": "textarea",
+      "id": "brand_banner_features",
+      "label": "Brand Banner Features",
+      "info": "Separate features with | (pipe character)"
+    },
+    {
+      "type": "header",
+      "content": "🏆 Service Banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_service_banner",
+      "label": "Show Service Banner",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "service_banner_icon",
+      "label": "Service Banner Icon (Emoji)",
+      "default": "🏆"
+    },
+    {
+      "type": "text",
+      "id": "service_banner_title",
+      "label": "Service Banner Title",
+      "default": "Proud Parts & Service Partner"
+    },
+    {
+      "type": "textarea",
+      "id": "service_banner_description",
+      "label": "Service Banner Description"
+    },
+    {
+      "type": "textarea",
+      "id": "service_banner_list",
+      "label": "Service Banner List",
+      "info": "Services available - use line breaks"
+    },
+    {
+      "type": "text",
+      "id": "service_banner_button_text",
+      "label": "Service Banner Button Text",
+      "default": "Find Parts & Manuals"
+    },
+    {
+      "type": "text",
+      "id": "service_banner_button_url",
+      "label": "Service Banner Button URL",
+      "default": "/pages/parts-and-service",
+      "info": "Enter page URL (e.g., /pages/parts-and-service)"
+    },
+    {
+      "type": "header",
+      "content": "📄 Resources"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_resources",
+      "label": "Show Resources Box",
+      "default": true,
+      "info": "Shows metafield PDFs automatically"
+    },
+    {
+      "type": "textarea",
+      "id": "resource_links",
+      "label": "Additional Resource Links",
+      "info": "Format: Link Text::URL|Link Text::URL"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_additional_resources",
+      "label": "Show Additional Resources Banner",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "additional_resources_title",
+      "label": "Additional Resources Title",
+      "default": "📚 Additional Resources"
+    },
+    {
+      "type": "textarea",
+      "id": "additional_resources_description",
+      "label": "Additional Resources Description"
+    },
+    {
+      "type": "textarea",
+      "id": "video_resources",
+      "label": "Video Resources List",
+      "info": "Separate with | (pipe character)"
+    },
+    {
+      "type": "textarea",
+      "id": "guide_resources",
+      "label": "Guide Resources List",
+      "info": "Separate with | (pipe character)"
+    },
+    {
+      "type": "header",
+      "content": "💡 Help Box"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_help_box",
+      "label": "Show Help Box",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "help_phone",
+      "label": "Help Phone Number",
+      "default": "(408) 673-9999"
+    },
+    {
+      "type": "text",
+      "id": "help_email",
+      "label": "Help Email"
+    },
+    {
+      "type": "checkbox",
+      "id": "help_chat_enabled",
+      "label": "Show Live Chat Option",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_resource_links",
+      "label": "Show Resource Page Links",
+      "default": true,
+      "info": "Shows links to Product Videos, FAQ, and Installation Service pages"
+    },
+    {
+      "type": "textarea",
+      "id": "help_additional_links",
+      "label": "Additional Help Links",
+      "info": "Separate with | (pipe character)"
+    }
+  ]
+}
+{% endschema %}

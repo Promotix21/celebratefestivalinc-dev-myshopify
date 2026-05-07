@@ -1,0 +1,145 @@
+{% comment %} CF Brand: CAC Dinnerware - Complete Collection {% endcomment %}
+
+{%- liquid
+  # CAC Collections - Part 1
+  assign cac_part1_handles = 'cac-bahamas,cac-rainforest,cac-maxwell-rolled-edge,cac-maxwell-narrow-rim,cac-tucson,cac-palm-springs,cac-unirversal,cac-grand-canyon,cac-everest,cac-victoria,cac-niagara,cac-great-wall,cac-majesty,cac-majesty-coupe,cac-sushi-signature,cac-modern' | split: ','
+
+  assign cac_part1_titles = 'Bahamas,Rainforest,Maxwell-Rolled Edge,Maxwell-Narrow Rim,Tucson,Palm Springs,Universal,Grand Canyon,Everest,Victoria,Niagara,Great Wall,Majesty,Majesty - Coupe,Sushi - Signature,Modern' | split: ','
+
+  assign cac_part1_images = 'bahamas.jpg,collection-rainforest.jpg,collection-maxwellre.jpg,maxwellnc.jpg,tucson.jpg,palmsprings.jpg,universal.jpg,grandcanyon.jpg,everest.jpg,victoria.jpg,niagara.jpg,great_wall.jpg,majesty.jpg,majesty_coupe.jpg,sushi_signature.jpg,modern.jpg' | split: ','
+
+  # CAC Collections - Part 2
+  assign cac_part2_handles = 'cac-white-pearl,cac-studio,cac-artdeco,cac-sunrice-square-flat-plates,cac-oxford,cac-palace-square,cac-oak,cac-aspen-tree,cac-long-island-dishes,cac-dynasty,cac-paris-french-square,cac-paris-french-platter,cac-pairs-french-round,cac-paris-french-champagne,cac-sheer,cac-queen-square' | split: ','
+
+  assign cac_part2_titles = 'White Pearl,Studio,Artdeco,Sunrise Square Flat Plates,Oxford,Palace Square,Oak,Aspen Tree,Long Island Dishes,Dynasty,Paris - French Square,Paris - French Platters,Paris - French Round,Paris - French Champagne,Sheer,Queen Square' | split: ','
+
+  assign cac_part2_images = 'white_pearl.jpg,studio.jpg,artdeco.jpg,sunrisesquareflatplates.jpg,oxford.jpg,palacesquare.jpg,oak.jpg,aspen_tree.jpg,longislanddishes_b4d31422-945a-457c-8ac7-fe81dfd8050b.jpg,dynasty_8716e688-3a11-44be-af1e-051cf1fdcb8a.jpg,parisfrenchsquare_f5a708fc-8cfa-4627-a5c6-e97e832e76d6.jpg,parisfrenchplatters.jpg,parisfrenchround.jpg,parisfrenchchampagne.jpg,sheer.jpg,queensquare.jpg' | split: ','
+
+  # CAC Collections - Part 3
+  assign cac_part3_handles = 'cac-gold-book,cac-tokyia,cac-miami,cac-tango,cac-color-tango,cac-garden-state,cac-transition,cac-harmony,cac-boston,cac-corona,cac-roosevelt,cac-clinton-rolled-edge,cac-clinton-narrow-rim,cac-clinton-egg-shape-platters,cac-clinton-teardrop-plates,cac-golder-royal' | split: ','
+
+  assign cac_part3_titles = 'Gold Book,Tokyia,Miami,Tango,Color Tango,Garden State,Transitions,Harmony,Boston,Corona,Roosevelt,Clinton - Rolled Edge,Clinton - Narrow Rim,Clinton - Egg Shape Platter,Clinton - Teardrop Plates,Golden Royal' | split: ','
+
+  assign cac_part3_images = 'goldbook.jpg,tokyia.jpg,miami.jpg,tango.jpg,colortango.jpg,gardenstate.jpg,transitions.jpg,harmony.jpg,boston.jpg,corona.jpg,roosevelt.jpg,clintonrollededge.jpg,clintonnarrowrim.jpg,clintoneggshapeplatters.jpg,clintonteardropplates.jpg,goldenroyal.jpg' | split: ','
+
+  # CAC Collections - Part 4
+  assign cac_part4_handles = 'cac-hamption,cac-coupe,cac-king-square,cac-prince-square,cac-cambridge-square,cac-key-west,cac-color-arts,cac-clinton-square-plate,cac-color-stoneware,cac-clinton-rectangular-platters,cac-bamboo,cac-sushia,cac-butterfly,cac-time-square,cac-philadelphia,cac-city-square' | split: ','
+
+  assign cac_part4_titles = 'Hampton,Coupe,King Square,Prince Square,Cambridge Square,Key West,Color Arts,Clinton - Square Plates,Color Stoneware,Clinton - Rectangular Platter,Bamboo,Sushia,Butterfly,Times - Square,Philadelphia,City Square' | split: ','
+
+  assign cac_part4_images = 'hampton.jpg,coupe.jpg,kingsquare.jpg,princesquare.jpg,cambridgesquare.jpg,keywest.jpg,caccolorarts_836b70b6-53b7-4c25-957b-8dee270e663b.jpg,clintonsquareplates.jpg,colorstoneware.jpg,clintonrectangularplatters.jpg,bamboo.jpg,sushia.jpg,butterfly.jpg,timesquare.jpg,philadelphia.jpg,citysquare.jpg' | split: ','
+
+  # CAC Collections - Part 5 (Final)
+  assign cac_part5_handles = 'cac-fortune,cac-crystal,cac-diamond,cac-camptown,cac-triumph,cac-rolled-edge,cac-narrow-rim,cac-rec-coupe,cac-beret-bowl' | split: ','
+
+  assign cac_part5_titles = 'Fortune,Crystal,Diamond,Camptown,Triumph,Rolled Edge,Narrow Rim,REC - Coupe,Beret Bowl' | split: ','
+
+  assign cac_part5_images = 'fortune.jpg,crystal.jpg,diamond.jpg,camptown.jpg,triumph.jpg,rollededge.jpg,narrowrim.jpg,reccoupe.jpg,beretbowl.jpg' | split: ','
+-%}
+
+<div class="cf-brand-hub__grid">
+  {%- comment %} Part 1 {% endcomment -%}
+  {%- for handle in cac_part1_handles -%}
+    {%- assign idx = forloop.index0 -%}
+    {%- assign title = cac_part1_titles[idx] -%}
+    {%- assign image_file = cac_part1_images[idx] -%}
+    {%- assign cdn_url = 'https://celebratefestivalinc.com/cdn/shop/files/' | append: image_file | append: '?width=400&height=400&crop=center' -%}
+
+    <a href="/collections/{{ handle }}" class="cf-brand-hub__card">
+      <div class="cf-brand-hub__card-image">
+        <img src="{{ cdn_url }}" alt="{{ title }}" loading="lazy">
+        <div class="cf-brand-hub__card-overlay">
+          <span class="cf-brand-hub__card-overlay-text">{{ title }}</span>
+        </div>
+      </div>
+      <div class="cf-brand-hub__card-content">
+        <h3 class="cf-brand-hub__card-title">{{ title }}</h3>
+        <span class="cf-brand-hub__card-btn">Shop Now</span>
+      </div>
+    </a>
+  {%- endfor -%}
+
+  {%- comment %} Part 2 {% endcomment -%}
+  {%- for handle in cac_part2_handles -%}
+    {%- assign idx = forloop.index0 -%}
+    {%- assign title = cac_part2_titles[idx] -%}
+    {%- assign image_file = cac_part2_images[idx] -%}
+    {%- assign cdn_url = 'https://celebratefestivalinc.com/cdn/shop/files/' | append: image_file | append: '?width=400&height=400&crop=center' -%}
+
+    <a href="/collections/{{ handle }}" class="cf-brand-hub__card">
+      <div class="cf-brand-hub__card-image">
+        <img src="{{ cdn_url }}" alt="{{ title }}" loading="lazy">
+        <div class="cf-brand-hub__card-overlay">
+          <span class="cf-brand-hub__card-overlay-text">{{ title }}</span>
+        </div>
+      </div>
+      <div class="cf-brand-hub__card-content">
+        <h3 class="cf-brand-hub__card-title">{{ title }}</h3>
+        <span class="cf-brand-hub__card-btn">Shop Now</span>
+      </div>
+    </a>
+  {%- endfor -%}
+
+  {%- comment %} Part 3 {% endcomment -%}
+  {%- for handle in cac_part3_handles -%}
+    {%- assign idx = forloop.index0 -%}
+    {%- assign title = cac_part3_titles[idx] -%}
+    {%- assign image_file = cac_part3_images[idx] -%}
+    {%- assign cdn_url = 'https://celebratefestivalinc.com/cdn/shop/files/' | append: image_file | append: '?width=400&height=400&crop=center' -%}
+
+    <a href="/collections/{{ handle }}" class="cf-brand-hub__card">
+      <div class="cf-brand-hub__card-image">
+        <img src="{{ cdn_url }}" alt="{{ title }}" loading="lazy">
+        <div class="cf-brand-hub__card-overlay">
+          <span class="cf-brand-hub__card-overlay-text">{{ title }}</span>
+        </div>
+      </div>
+      <div class="cf-brand-hub__card-content">
+        <h3 class="cf-brand-hub__card-title">{{ title }}</h3>
+        <span class="cf-brand-hub__card-btn">Shop Now</span>
+      </div>
+    </a>
+  {%- endfor -%}
+
+  {%- comment %} Part 4 {% endcomment -%}
+  {%- for handle in cac_part4_handles -%}
+    {%- assign idx = forloop.index0 -%}
+    {%- assign title = cac_part4_titles[idx] -%}
+    {%- assign image_file = cac_part4_images[idx] -%}
+    {%- assign cdn_url = 'https://celebratefestivalinc.com/cdn/shop/files/' | append: image_file | append: '?width=400&height=400&crop=center' -%}
+
+    <a href="/collections/{{ handle }}" class="cf-brand-hub__card">
+      <div class="cf-brand-hub__card-image">
+        <img src="{{ cdn_url }}" alt="{{ title }}" loading="lazy">
+        <div class="cf-brand-hub__card-overlay">
+          <span class="cf-brand-hub__card-overlay-text">{{ title }}</span>
+        </div>
+      </div>
+      <div class="cf-brand-hub__card-content">
+        <h3 class="cf-brand-hub__card-title">{{ title }}</h3>
+        <span class="cf-brand-hub__card-btn">Shop Now</span>
+      </div>
+    </a>
+  {%- endfor -%}
+
+  {%- comment %} Part 5 {% endcomment -%}
+  {%- for handle in cac_part5_handles -%}
+    {%- assign idx = forloop.index0 -%}
+    {%- assign title = cac_part5_titles[idx] -%}
+    {%- assign image_file = cac_part5_images[idx] -%}
+    {%- assign cdn_url = 'https://celebratefestivalinc.com/cdn/shop/files/' | append: image_file | append: '?width=400&height=400&crop=center' -%}
+
+    <a href="/collections/{{ handle }}" class="cf-brand-hub__card">
+      <div class="cf-brand-hub__card-image">
+        <img src="{{ cdn_url }}" alt="{{ title }}" loading="lazy">
+        <div class="cf-brand-hub__card-overlay">
+          <span class="cf-brand-hub__card-overlay-text">{{ title }}</span>
+        </div>
+      </div>
+      <div class="cf-brand-hub__card-content">
+        <h3 class="cf-brand-hub__card-title">{{ title }}</h3>
+        <span class="cf-brand-hub__card-btn">Shop Now</span>
+      </div>
+    </a>
+  {%- endfor -%}
+</div>

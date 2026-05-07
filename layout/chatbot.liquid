@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+    {%- endif -%}
+    <title>{{ page_title | default: 'AI Kitchen Consultant' }} – {{ shop.name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+    {{ content_for_header }}
+    <style>
+      html, body { height: 100%; margin: 0; padding: 0; background: #f1f5f9; font-family: Inter, system-ui, sans-serif; color: #0f172a; -webkit-font-smoothing: antialiased; }
+      *, *::before, *::after { box-sizing: border-box; }
+    </style>
+  </head>
+  <body>
+    {{ content_for_layout }}
+  </body>
+</html>

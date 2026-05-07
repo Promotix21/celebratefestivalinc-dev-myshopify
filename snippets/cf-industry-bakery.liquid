@@ -1,0 +1,48 @@
+{% comment %} CF Industry: Bakeries & Cafes {% endcomment %}
+
+{%- liquid
+  # Bakery & Cafe Equipment - using CORRECT Shopify handles
+  assign categories = 'new-theme-convection-ovens,new-theme-planetary-spiral-mixers,new-theme-baking-pans,new-theme-baking-utensils,new-theme-dough-prep-equipment,new-theme-refrigerated-bakery-cases,new-theme-hot-food-display-cases,new-theme-commercial-blenders' | split: ','
+
+  assign titles = 'Convection Ovens,Planetary Mixers,Baking Pans,Baking Utensils,Dough Prep Equipment,Bakery Display Cases,Hot Display Cases,Commercial Blenders' | split: ','
+
+  assign images = 'convection-oven-category.jpg,mixer-category.jpg,baking-pan-category.jpg,baking-utensils-category.jpg,dough-prep-category.jpg,bakery-case-category.jpg,hot-display-category.jpg,blender-category.jpg' | split: ','
+-%}
+
+<h2 class="cf-industry-hub__section-title">Essential Bakery & Cafe Equipment</h2>
+
+<div class="cf-industry-hub__grid">
+  {%- for handle in categories -%}
+    {%- assign idx = forloop.index0 -%}
+    {%- assign title = titles[idx] -%}
+    {%- assign image_file = images[idx] -%}
+    {%- assign collection = collections[handle] -%}
+
+    <a href="/collections/{{ handle }}" class="cf-industry-hub__card">
+      <div class="cf-industry-hub__card-image">
+        {%- if collection != blank and collection.image -%}
+          <img src="{{ collection.image | image_url: width: 400, height: 400, crop: 'center' }}" alt="{{ title }}" loading="lazy">
+        {%- elsif collection != blank and collection.products_count > 0 -%}
+          <div class="cf-industry-hub__slideshow">
+            {%- for product in collection.products limit: 5 -%}
+              {%- if product.featured_image -%}
+                <img src="{{ product.featured_image | image_url: width: 400, height: 400, crop: 'center' }}" alt="{{ product.title }}" class="cf-industry-hub__slideshow-img{% if forloop.first %} active{% endif %}" loading="lazy">
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- else -%}
+          <div style="width:100%;height:100%;background:linear-gradient(135deg,#f1f5f9 0%,#e2e8f0 100%);display:flex;align-items:center;justify-content:center;">
+            <span style="font-size:14px;color:#94a3b8;">No Products</span>
+          </div>
+        {%- endif -%}
+        <div class="cf-industry-hub__card-overlay">
+          <span class="cf-industry-hub__card-overlay-text">{{ title }}</span>
+        </div>
+      </div>
+      <div class="cf-industry-hub__card-content">
+        <h3 class="cf-industry-hub__card-title">{{ title }}</h3>
+        <span class="cf-industry-hub__card-btn">Shop Now</span>
+      </div>
+    </a>
+  {%- endfor -%}
+</div>

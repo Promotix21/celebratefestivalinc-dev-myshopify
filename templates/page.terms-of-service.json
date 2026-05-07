@@ -1,0 +1,105 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "page-terms-of-service",
+      "blocks": {
+        "section_info": {
+          "type": "tos_section",
+          "settings": {
+            "section_title": "Information and Site Content",
+            "section_content": "<p>We take every precaution when adding new items to our website using information directly from our manufacturers and suppliers. We present this information to you as accurately as we can, although errors and omissions do occur from time to time.</p><p>If you see any discrepancies, or potentially incorrect information or have any other questions about products we offer, please contact customer service via email or call us at (408) 673-9999.</p><p>It is our goal to provide you with the best information about foodservice equipment and supplies available on the Internet and we want to correct any missing or erroneous information as quickly as possible.</p>"
+          }
+        },
+        "section_typos": {
+          "type": "tos_section",
+          "settings": {
+            "section_title": "Typographical and Image Errors",
+            "section_content": "<p>We make every effort to provide you with the most up-to-date and accurate information on the products we sell. We work closely with the manufacturers of our products to obtain this information, however, there are cases where obtaining an exact description or photo of the product is impossible.</p><p>When purchasing an item, please make sure to read the description as well as look at the image before committing to the purchase. We reserve the right to refuse or cancel any order for any reason.</p>"
+          }
+        },
+        "section_prices": {
+          "type": "tos_section",
+          "settings": {
+            "section_title": "Prices",
+            "section_content": "<p>At Celebrate Festival Inc we believe you deserve the industry's best customer care and lowest prices for every purchase. If you find an item we offer elsewhere at a lower total cost, including shipping costs, please reach out to us at sales@celebratefestivalinc.com with the details.</p><p>Prices are subject to change without notification. If a price differs from the website total you will be contacted to confirm.</p>"
+          }
+        },
+        "section_images": {
+          "type": "tos_section",
+          "settings": {
+            "section_title": "Images",
+            "section_content": "<p>All pictures shown on our website are the best available at the time the item is added to our website and may not accurately reflect product updates or features. Pictures may also contain optional accessories which must be purchased separately.</p><p>In cases where an accurate image was not found, we use a representative or a place holder image.</p>"
+          }
+        },
+        "section_availability": {
+          "type": "tos_section",
+          "settings": {
+            "section_title": "Availability",
+            "section_content": "<p>Products and services may on occasion have limited or no availability due to your geographical location, an item being discontinued by the manufacturer, or an item being on backorder due to increased demand.</p><p>We try to fulfill every order promptly and will work with you to replace or substitute unavailable items. Please note that nothing on this site constitutes a guarantee that Celebrate Festival Inc. will supply goods or services.</p>"
+          }
+        },
+        "section_payments": {
+          "type": "tos_section",
+          "settings": {
+            "section_title": "Payments",
+            "section_content": "<p>We accept all major credit cards.</p><p>We have multiple options for financing your new restaurant equipment. For more information on our financing partners, contact us at (408) 673-9999.</p>"
+          }
+        },
+        "section_coupons": {
+          "type": "tos_section",
+          "settings": {
+            "section_title": "Coupons",
+            "section_content": "<p>Occasionally coupon codes are offered to further discount merchandise. Coupon codes will have an expiration date and will only be honored on orders placed while the coupon is valid. They cannot be used in conjunction with other offers.</p><p>Coupon codes that are not valid will not be accepted at checkout. Coupons from 3rd parties are invalid.</p>"
+          }
+        },
+        "section_disputes": {
+          "type": "tos_section",
+          "settings": {
+            "section_title": "Disputes",
+            "section_content": "<p>Any dispute relating in any way to your visit to the Site or to the products you purchase through the Site shall be submitted to confidential arbitration in Sevier County, Tennessee, except that to the extent you have in any manner violated or threatened to violate our intellectual property rights, we may seek injunctive or other appropriate relief in any state or federal court in the State of Tennessee.</p><p>You hereby consent to, and waive all defenses of lack of personal jurisdiction and forum non conveniens with respect to venue and jurisdiction in the state and federal courts of Tennessee. Arbitration under these Terms of Use shall be conducted pursuant to the Commercial Arbitration Rules then prevailing at the American Arbitration Association. The arbitrator's award shall be final and binding and may be entered as a judgment in any court of competent jurisdiction.</p><p>To the fullest extent permitted by applicable law, no arbitration under this Agreement shall be joined to an arbitration involving any other party subject to this Agreement, whether through class action proceedings or otherwise.</p><p>You agree that regardless of any statute or law to the contrary, any claim or cause of action arising out of, related to or connected with the use of the Site or this Agreement must be filed within one (1) year after such claim or cause of action arose or be forever banned.</p>"
+          }
+        },
+        "section_disclaimer": {
+          "type": "tos_section",
+          "settings": {
+            "section_title": "Disclaimer and Limitation of Liability",
+            "section_content": "<p>Except as otherwise provided in the standard terms of sale that govern the sale of each product on this site, this site, the products offered for sale on it and the transactions conducted through it are provided by us on an \"as is\" basis. We make no representations or warranties of any kind, express or implied, as to the operation of the site or the information, content, materials, or products included on this site (and on the webpages to which that webpage links).</p><p>To the full extent permissible by applicable law, we disclaim all warranties, express or implied, including, but not limited to, implied warranties of merchantability for a particular purpose, noninfringement, title, quiet enjoyment, data accuracy and system integration. This site may include inaccuracies, mistakes or typographical errors. We do not warrant that the content will be uninterrupted or error free.</p><p>To the maximum extent permitted by law, we will not be liable for any damages of any kind arising from the use of this site, including, but not limited to indirect, incidental, punitive, exemplary, special or consequential damages.</p><p>To the maximum extent permitted by applicable law, our total liability to you for any damages (regardless of the foundation for the action) shall not exceed in the aggregate the amount of fees actually paid by you to us during the month immediately preceding the act allegedly giving rise to our liability.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "section_info",
+        "section_typos",
+        "section_prices",
+        "section_images",
+        "section_availability",
+        "section_payments",
+        "section_coupons",
+        "section_disputes",
+        "section_disclaimer"
+      ],
+      "settings": {
+        "hero_tagline": "Legal",
+        "hero_title": "Terms of Service",
+        "hero_subtitle": "Please review the following terms and conditions that govern your use of our website and purchase of products from Celebrate Festival Inc.",
+        "last_updated": "February 2026",
+        "show_toc": true,
+        "show_contact_cta": true,
+        "contact_title": "Questions about our policies?",
+        "contact_text": "If you have any questions about these terms, please don't hesitate to reach out to our team.",
+        "contact_phone": "(408) 673-9999",
+        "contact_email": "sales@celebratefestivalinc.com"
+      }
+    }
+  },
+  "order": ["main"]
+}

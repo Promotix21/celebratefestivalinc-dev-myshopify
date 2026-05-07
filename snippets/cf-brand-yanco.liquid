@@ -1,0 +1,105 @@
+{% comment %} CF Brand: Yanco - Melamine & Chinaware Collections {% endcomment %}
+
+{%- liquid
+  assign yanco_chinaware_handles = 'yanco-chinaware,yanco-china-universe' | split: ','
+  assign yanco_chinaware_titles = 'Chinaware,China Universe' | split: ','
+
+  assign yanco_mel1_handles = 'yanco-melamineware-collection,yanco-melamine-accessories,yanco-melamine-ardis,yanco-melamine-bamboo-style,yanco-melamine-bay-shell,yanco-melamine-birmingham,yanco-melamine-birmingham-green,yanco-melamine-birmingham-teal,yanco-melamine-black-pearl-1,yanco-melamine-black-red' | split: ','
+  assign yanco_mel1_titles = 'Melamineware Collection,Melamine Accessories,Ardis,Bamboo Style,Bay Shell,Birmingham,Birmingham Green,Birmingham Teal,Black Pearl,Black Red' | split: ','
+
+  assign yanco_mel2_handles = 'yanco-melamine-catering,yanco-melamine-compartment,yanco-melamine-coupe-pattern,yanco-melamine-deli-collection,yanco-melamine-discover,yanco-melamine-gn-pan-collection,yanco-melamine-honda,yanco-melamine-houston,yanco-melamine-japanese,yanco-melamine-longevity-chinese-style' | split: ','
+  assign yanco_mel2_titles = 'Catering,Compartment,Coupe Pattern,Deli Collection,Discover,GN Pan Collection,Honda,Houston,Japanese,Longevity Chinese Style' | split: ','
+
+  assign yanco_mel3_handles = 'yanco-melamine-mexico,yanco-melamine-milando,yanco-melamine-mile-stone,yanco-melamine-moderne,yanco-melamine-nessico,yanco-melamine-olive,yanco-melamine-orchis,yanco-melamine-osaka,yanco-melamine-peony-chinese-style,yanco-melamine-pine-tree' | split: ','
+  assign yanco_mel3_titles = 'Mexico,Milando,Mile Stone,Moderne,Nessico,Olive,Orchis,Osaka,Peony Chinese Style,Pine Tree' | split: ','
+
+  assign yanco_mel4_handles = 'yanco-melamine-rome,yanco-melamine-serving-trays,yanco-melamine-sesame,yanco-melamine-soul,yanco-melamine-venice,yanco-melamine-wood-bamboo,yanco-melamine-wooden-tray-1,yanco-melamine-wooden-tray-2,yanco-melamine-woodland,yanco-melamine-yoto' | split: ','
+  assign yanco_mel4_titles = 'Rome,Serving Trays,Sesame,Soul,Venice,Wood Bamboo,Wooden Tray 1,Wooden Tray 2,Woodland,Yoto' | split: ','
+-%}
+
+<div class="cf-brand-hub__grid">
+  {%- for handle in yanco_chinaware_handles -%}
+    {%- assign idx = forloop.index0 -%}
+    {%- assign title = yanco_chinaware_titles[idx] -%}
+    {%- assign coll = collections[handle] -%}
+    {%- assign image = coll.featured_image -%}
+    <a href="/collections/{{ handle }}" class="cf-brand-hub__card">
+      <div class="cf-brand-hub__card-image">
+        {%- if image -%}<img src="{{ image | image_url: width: 400 }}" alt="{{ title }}" loading="lazy">{%- else -%}<div class="cf-brand-hub__placeholder">{{ title }}</div>{%- endif -%}
+        <div class="cf-brand-hub__card-overlay"><span class="cf-brand-hub__card-overlay-text">{{ title }}</span></div>
+      </div>
+      <div class="cf-brand-hub__card-content">
+        <h3 class="cf-brand-hub__card-title">{{ title }}</h3>
+        <span class="cf-brand-hub__card-btn">Shop Now</span>
+      </div>
+    </a>
+  {%- endfor -%}
+
+  {%- for handle in yanco_mel1_handles -%}
+    {%- assign idx = forloop.index0 -%}
+    {%- assign title = yanco_mel1_titles[idx] -%}
+    {%- assign coll = collections[handle] -%}
+    {%- assign image = coll.featured_image -%}
+    <a href="/collections/{{ handle }}" class="cf-brand-hub__card">
+      <div class="cf-brand-hub__card-image">
+        {%- if image -%}<img src="{{ image | image_url: width: 400 }}" alt="{{ title }}" loading="lazy">{%- else -%}<div class="cf-brand-hub__placeholder">{{ title }}</div>{%- endif -%}
+        <div class="cf-brand-hub__card-overlay"><span class="cf-brand-hub__card-overlay-text">{{ title }}</span></div>
+      </div>
+      <div class="cf-brand-hub__card-content">
+        <h3 class="cf-brand-hub__card-title">{{ title }}</h3>
+        <span class="cf-brand-hub__card-btn">Shop Now</span>
+      </div>
+    </a>
+  {%- endfor -%}
+
+  {%- for handle in yanco_mel2_handles -%}
+    {%- assign idx = forloop.index0 -%}
+    {%- assign title = yanco_mel2_titles[idx] -%}
+    {%- assign coll = collections[handle] -%}
+    {%- assign image = coll.featured_image -%}
+    <a href="/collections/{{ handle }}" class="cf-brand-hub__card">
+      <div class="cf-brand-hub__card-image">
+        {%- if image -%}<img src="{{ image | image_url: width: 400 }}" alt="{{ title }}" loading="lazy">{%- else -%}<div class="cf-brand-hub__placeholder">{{ title }}</div>{%- endif -%}
+        <div class="cf-brand-hub__card-overlay"><span class="cf-brand-hub__card-overlay-text">{{ title }}</span></div>
+      </div>
+      <div class="cf-brand-hub__card-content">
+        <h3 class="cf-brand-hub__card-title">{{ title }}</h3>
+        <span class="cf-brand-hub__card-btn">Shop Now</span>
+      </div>
+    </a>
+  {%- endfor -%}
+
+  {%- for handle in yanco_mel3_handles -%}
+    {%- assign idx = forloop.index0 -%}
+    {%- assign title = yanco_mel3_titles[idx] -%}
+    {%- assign coll = collections[handle] -%}
+    {%- assign image = coll.featured_image -%}
+    <a href="/collections/{{ handle }}" class="cf-brand-hub__card">
+      <div class="cf-brand-hub__card-image">
+        {%- if image -%}<img src="{{ image | image_url: width: 400 }}" alt="{{ title }}" loading="lazy">{%- else -%}<div class="cf-brand-hub__placeholder">{{ title }}</div>{%- endif -%}
+        <div class="cf-brand-hub__card-overlay"><span class="cf-brand-hub__card-overlay-text">{{ title }}</span></div>
+      </div>
+      <div class="cf-brand-hub__card-content">
+        <h3 class="cf-brand-hub__card-title">{{ title }}</h3>
+        <span class="cf-brand-hub__card-btn">Shop Now</span>
+      </div>
+    </a>
+  {%- endfor -%}
+
+  {%- for handle in yanco_mel4_handles -%}
+    {%- assign idx = forloop.index0 -%}
+    {%- assign title = yanco_mel4_titles[idx] -%}
+    {%- assign coll = collections[handle] -%}
+    {%- assign image = coll.featured_image -%}
+    <a href="/collections/{{ handle }}" class="cf-brand-hub__card">
+      <div class="cf-brand-hub__card-image">
+        {%- if image -%}<img src="{{ image | image_url: width: 400 }}" alt="{{ title }}" loading="lazy">{%- else -%}<div class="cf-brand-hub__placeholder">{{ title }}</div>{%- endif -%}
+        <div class="cf-brand-hub__card-overlay"><span class="cf-brand-hub__card-overlay-text">{{ title }}</span></div>
+      </div>
+      <div class="cf-brand-hub__card-content">
+        <h3 class="cf-brand-hub__card-title">{{ title }}</h3>
+        <span class="cf-brand-hub__card-btn">Shop Now</span>
+      </div>
+    </a>
+  {%- endfor -%}
+</div>

@@ -1,0 +1,1019 @@
+{% comment %}
+  Product Videos Page Section - Celebrate Festival Inc
+  Display a grid of product videos from products with video media
+{% endcomment %}
+
+<style>
+  /* Product Videos Page Styles */
+  .videos-page {
+    --cf-deep-blue: #1a365d;
+    --cf-navy: #2d5a87;
+    --cf-coral: #ff6b6b;
+    --cf-gold: #d4af37;
+    --cf-success: #10b981;
+    --cf-text-dark: #0f172a;
+    --cf-text-medium: #475569;
+    --cf-text-light: #64748b;
+    --cf-text-muted: #94a3b8;
+    --cf-border: #e2e8f0;
+    --cf-bg-light: #f8fafc;
+    --cf-bg-white: #ffffff;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  /* Hero Section */
+  .videos-hero {
+    background: linear-gradient(135deg, var(--cf-deep-blue) 0%, #0f172a 100%);
+    padding: 60px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .videos-hero__shapes {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .videos-hero .shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    background: white;
+  }
+
+  .videos-hero .shape--1 {
+    width: 300px;
+    height: 300px;
+    top: -100px;
+    right: -50px;
+  }
+
+  .videos-hero .shape--2 {
+    width: 200px;
+    height: 200px;
+    bottom: -80px;
+    left: 10%;
+  }
+
+  .videos-hero__content {
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .videos-hero__tagline {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  .videos-hero__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 16px;
+  }
+
+  .videos-hero__subtitle {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* Filter/Category Tabs */
+  .videos-filters {
+    background: var(--cf-bg-light);
+    padding: 20px 40px;
+    border-bottom: 1px solid var(--cf-border);
+  }
+
+  .videos-filters__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .videos-filters__label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--cf-text-medium);
+  }
+
+  .videos-filter-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--cf-border);
+    border-radius: 20px;
+    background: white;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--cf-text-medium);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .videos-filter-btn:hover,
+  .videos-filter-btn.active {
+    background: var(--cf-navy);
+    border-color: var(--cf-navy);
+    color: white;
+  }
+
+  /* Videos Grid Content */
+  .videos-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 50px 40px;
+  }
+
+  .videos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+
+  /* Video Card */
+  .video-card {
+    background: white;
+    border: 1px solid var(--cf-border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .video-card:hover {
+    border-color: var(--cf-navy);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+  }
+
+  .video-card__thumbnail {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: var(--cf-bg-light);
+    overflow: hidden;
+  }
+
+  .video-card__thumbnail img,
+  .video-card__thumbnail video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .video-card__play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 64px;
+    height: 64px;
+    background: rgba(26, 54, 93, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+  }
+
+  .video-card__play-btn svg {
+    width: 24px;
+    height: 24px;
+    color: white;
+    margin-left: 4px;
+  }
+
+  .video-card:hover .video-card__play-btn {
+    background: var(--cf-coral);
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+
+  .video-card__duration {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .video-card__content {
+    padding: 20px;
+  }
+
+  .video-card__category {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--cf-coral);
+    margin-bottom: 8px;
+  }
+
+  .video-card__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--cf-text-dark);
+    margin: 0 0 8px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .video-card__description {
+    font-size: 13px;
+    color: var(--cf-text-medium);
+    line-height: 1.6;
+    margin: 0 0 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .video-card__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--cf-navy);
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .video-card__link:hover {
+    color: var(--cf-coral);
+    gap: 10px;
+  }
+
+  /* Featured Video Section */
+  .videos-featured {
+    background: var(--cf-bg-light);
+    padding: 50px 40px;
+    margin-bottom: 0;
+  }
+
+  .videos-featured__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .videos-featured__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .videos-featured__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--cf-deep-blue);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .videos-featured__title::before {
+    content: '';
+    width: 4px;
+    height: 28px;
+    background: linear-gradient(180deg, var(--cf-coral) 0%, var(--cf-navy) 100%);
+    border-radius: 2px;
+  }
+
+  .videos-featured__grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+  }
+
+  .videos-featured__main {
+    position: relative;
+    aspect-ratio: 16/9;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--cf-deep-blue);
+  }
+
+  .videos-featured__main video,
+  .videos-featured__main iframe {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .videos-featured__sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .videos-featured__sidebar .video-card {
+    flex: 1;
+  }
+
+  .videos-featured__sidebar .video-card__thumbnail {
+    aspect-ratio: 16/9;
+  }
+
+  /* Empty State */
+  .videos-empty {
+    text-align: center;
+    padding: 60px 40px;
+  }
+
+  .videos-empty__icon {
+    width: 80px;
+    height: 80px;
+    background: var(--cf-bg-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+  }
+
+  .videos-empty__icon svg {
+    width: 40px;
+    height: 40px;
+    color: var(--cf-text-muted);
+  }
+
+  .videos-empty__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--cf-text-dark);
+    margin: 0 0 10px;
+  }
+
+  .videos-empty__text {
+    font-size: 14px;
+    color: var(--cf-text-medium);
+    margin: 0 0 24px;
+  }
+
+  .videos-empty__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: var(--cf-coral);
+    color: white;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .videos-empty__btn:hover {
+    background: #ff5252;
+    transform: translateY(-2px);
+  }
+
+  /* Video Modal */
+  .video-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.95);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .video-modal.active {
+    display: flex;
+  }
+
+  .video-modal__content {
+    position: relative;
+    width: 90%;
+    max-width: 1000px;
+    aspect-ratio: 16/9;
+  }
+
+  .video-modal__video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+
+  .video-modal__close {
+    position: absolute;
+    top: -50px;
+    right: 0;
+    width: 40px;
+    height: 40px;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+
+  .video-modal__close:hover {
+    background: var(--cf-coral);
+    color: white;
+  }
+
+  /* Responsive */
+  @media (max-width: 992px) {
+    .videos-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .videos-featured__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .videos-featured__sidebar {
+      flex-direction: row;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .videos-hero {
+      padding: 40px 20px;
+    }
+
+    .videos-hero__title {
+      font-size: 28px;
+    }
+
+    .videos-filters {
+      padding: 16px 20px;
+    }
+
+    .videos-content {
+      padding: 30px 20px;
+    }
+
+    .videos-featured {
+      padding: 30px 20px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .videos-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .videos-featured__sidebar {
+      flex-direction: column;
+    }
+
+    .videos-filters__inner {
+      justify-content: center;
+    }
+  }
+</style>
+
+<div class="videos-page">
+  <!-- Hero Section -->
+  <section class="videos-hero">
+    <div class="videos-hero__shapes">
+      <div class="shape shape--1"></div>
+      <div class="shape shape--2"></div>
+    </div>
+    <div class="videos-hero__content">
+      <span class="videos-hero__tagline">{{ section.settings.hero_tagline | default: 'Video Library' }}</span>
+      <h1 class="videos-hero__title">{{ section.settings.hero_title | default: 'Product Videos' }}</h1>
+      <p class="videos-hero__subtitle">{{ section.settings.hero_subtitle | default: 'Watch product demonstrations, tutorials, and equipment reviews.' }}</p>
+    </div>
+  </section>
+
+  <!-- Filter Tabs -->
+  {% if section.settings.show_filters %}
+  <section class="videos-filters">
+    <div class="videos-filters__inner">
+      <span class="videos-filters__label">Filter by:</span>
+      <button class="videos-filter-btn active" data-filter="all">All Videos</button>
+      {% for block in section.blocks %}
+        {% if block.type == 'category_filter' %}
+          <button class="videos-filter-btn" data-filter="{{ block.settings.category_handle }}" {{ block.shopify_attributes }}>
+            {{ block.settings.category_name }}
+          </button>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Videos Content -->
+  <section class="videos-content">
+    {% assign has_videos = false %}
+
+    <!-- Manual Video Entries from Blocks -->
+    {% assign manual_videos = section.blocks | where: 'type', 'video_entry' %}
+    {% if manual_videos.size > 0 %}
+      {% assign has_videos = true %}
+      <div class="videos-grid">
+        {% for block in manual_videos %}
+          <div class="video-card" data-category="{{ block.settings.video_category | handleize }}" {{ block.shopify_attributes }}>
+            <div class="video-card__thumbnail">
+              {% if block.settings.video_thumbnail %}
+                {{ block.settings.video_thumbnail | image_url: width: 600 | image_tag: loading: 'lazy' }}
+              {% elsif block.settings.video_url != blank %}
+                <div style="background: linear-gradient(135deg, #1a365d 0%, #2d5a87 100%); width: 100%; height: 100%;"></div>
+              {% endif %}
+              <button class="video-card__play-btn" data-video-url="{{ block.settings.video_url }}" data-video-type="{{ block.settings.video_type }}">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5 3 19 12 5 21 5 3"/>
+                </svg>
+              </button>
+              {% if block.settings.video_duration != blank %}
+                <span class="video-card__duration">{{ block.settings.video_duration }}</span>
+              {% endif %}
+            </div>
+            <div class="video-card__content">
+              {% if block.settings.video_category != blank %}
+                <span class="video-card__category">{{ block.settings.video_category }}</span>
+              {% endif %}
+              <h3 class="video-card__title">{{ block.settings.video_title }}</h3>
+              {% if block.settings.video_description != blank %}
+                <p class="video-card__description">{{ block.settings.video_description }}</p>
+              {% endif %}
+              {% if block.settings.product_link != blank %}
+                <a href="{{ block.settings.product_link }}" class="video-card__link">
+                  View Product <span>&#8594;</span>
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Auto-fetch videos from products -->
+    {% if section.settings.auto_fetch_videos %}
+      {% assign video_products = collections[section.settings.video_collection].products %}
+      {% if video_products.size > 0 %}
+        {% unless has_videos %}
+          <div class="videos-grid">
+        {% endunless %}
+        {% for product in video_products limit: section.settings.max_videos %}
+          {% for media in product.media %}
+            {% if media.media_type == 'video' or media.media_type == 'external_video' %}
+              {% assign has_videos = true %}
+              <div class="video-card" data-category="{{ product.type | handleize }}">
+                <div class="video-card__thumbnail">
+                  {% if media.preview_image %}
+                    {{ media.preview_image | image_url: width: 600 | image_tag: loading: 'lazy' }}
+                  {% endif %}
+                  <button class="video-card__play-btn"
+                    {% if media.media_type == 'external_video' %}
+                      data-video-url="{{ media.external_id }}"
+                      data-video-type="{{ media.host }}"
+                    {% else %}
+                      data-video-url="{{ media.sources[0].url }}"
+                      data-video-type="hosted"
+                    {% endif %}
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                  </button>
+                </div>
+                <div class="video-card__content">
+                  <span class="video-card__category">{{ product.type | default: 'Product Demo' }}</span>
+                  <h3 class="video-card__title">{{ product.title }}</h3>
+                  <p class="video-card__description">{{ product.description | strip_html | truncate: 100 }}</p>
+                  <a href="{{ product.url }}" class="video-card__link">
+                    View Product <span>&#8594;</span>
+                  </a>
+                </div>
+              </div>
+              {% break %}
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
+        {% unless has_videos %}
+          </div>
+        {% endunless %}
+      {% endif %}
+    {% endif %}
+
+    <!-- Empty State -->
+    {% unless has_videos %}
+      <div class="videos-empty">
+        <div class="videos-empty__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polygon points="23 7 16 12 23 17 23 7"/>
+            <rect x="1" y="5" width="15" height="14" rx="2"/>
+          </svg>
+        </div>
+        <h2 class="videos-empty__title">{{ section.settings.empty_title | default: 'Videos Coming Soon' }}</h2>
+        <p class="videos-empty__text">{{ section.settings.empty_text | default: "We're working on adding product videos. Check back soon!" }}</p>
+        <a href="{{ section.settings.empty_cta_url | default: '/collections/all' }}" class="videos-empty__btn">
+          {{ section.settings.empty_cta_text | default: 'Browse Products' }}
+        </a>
+      </div>
+    {% endunless %}
+  </section>
+
+  <!-- Contact Section -->
+  {% if section.settings.show_contact_section %}
+  <section class="videos-featured" style="text-align: center;">
+    <div class="videos-featured__inner">
+      <h2 style="font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: 700; color: var(--cf-deep-blue); margin: 0 0 12px;">
+        {{ section.settings.contact_title | default: 'Need a Demo?' }}
+      </h2>
+      <p style="font-size: 15px; color: var(--cf-text-medium); margin: 0 0 24px; max-width: 500px; margin-left: auto; margin-right: auto;">
+        {{ section.settings.contact_text | default: 'Contact us to schedule a live product demonstration or request specific product videos.' }}
+      </p>
+      <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+        {% if section.settings.contact_phone != blank %}
+        <a href="tel:{{ section.settings.contact_phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' }}" style="display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: var(--cf-coral); color: white; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: all 0.3s ease;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          {{ section.settings.contact_phone }}
+        </a>
+        {% endif %}
+        {% if section.settings.contact_email != blank %}
+        <a href="mailto:{{ section.settings.contact_email }}" style="display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: white; color: var(--cf-navy); border: 2px solid var(--cf-navy); border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: all 0.3s ease;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Email Us
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+</div>
+
+<!-- Video Modal -->
+<div class="video-modal" id="video-modal">
+  <div class="video-modal__content">
+    <button class="video-modal__close" id="video-modal-close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+    <div id="video-modal-container"></div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const modal = document.getElementById('video-modal');
+  const modalContainer = document.getElementById('video-modal-container');
+  const modalClose = document.getElementById('video-modal-close');
+  const playButtons = document.querySelectorAll('.video-card__play-btn');
+  const filterButtons = document.querySelectorAll('.videos-filter-btn');
+  const videoCards = document.querySelectorAll('.video-card');
+
+  // Play button click handlers
+  playButtons.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const videoUrl = this.dataset.videoUrl;
+      const videoType = this.dataset.videoType;
+
+      let videoHtml = '';
+      if (videoType === 'youtube') {
+        videoHtml = '<iframe class="video-modal__video" src="https://www.youtube.com/embed/' + videoUrl + '?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+      } else if (videoType === 'vimeo') {
+        videoHtml = '<iframe class="video-modal__video" src="https://player.vimeo.com/video/' + videoUrl + '?autoplay=1" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>';
+      } else {
+        videoHtml = '<video class="video-modal__video" src="' + videoUrl + '" controls autoplay></video>';
+      }
+
+      modalContainer.innerHTML = videoHtml;
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  // Close modal
+  function closeModal() {
+    modal.classList.remove('active');
+    modalContainer.innerHTML = '';
+    document.body.style.overflow = '';
+  }
+
+  modalClose.addEventListener('click', closeModal);
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) closeModal();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  // Filter functionality
+  filterButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      filterButtons.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+
+      const filter = this.dataset.filter;
+      videoCards.forEach(card => {
+        if (filter === 'all' || card.dataset.category === filter) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+});
+</script>
+
+{% schema %}
+{
+  "name": "Product Videos Page",
+  "tag": "section",
+  "class": "section-product-videos-page",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Hero Section"
+    },
+    {
+      "type": "text",
+      "id": "hero_tagline",
+      "label": "Hero Tagline",
+      "default": "Video Library"
+    },
+    {
+      "type": "text",
+      "id": "hero_title",
+      "label": "Hero Title",
+      "default": "Product Videos"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_subtitle",
+      "label": "Hero Subtitle",
+      "default": "Watch product demonstrations, tutorials, and equipment reviews."
+    },
+    {
+      "type": "header",
+      "content": "Filters"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Show Filter Buttons",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Auto-Fetch Videos"
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_fetch_videos",
+      "label": "Auto-fetch videos from products",
+      "default": false,
+      "info": "Automatically display videos from products in selected collection"
+    },
+    {
+      "type": "collection",
+      "id": "video_collection",
+      "label": "Collection to fetch videos from"
+    },
+    {
+      "type": "range",
+      "id": "max_videos",
+      "label": "Maximum videos to display",
+      "min": 6,
+      "max": 30,
+      "step": 3,
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Empty State"
+    },
+    {
+      "type": "text",
+      "id": "empty_title",
+      "label": "Empty State Title",
+      "default": "Videos Coming Soon"
+    },
+    {
+      "type": "textarea",
+      "id": "empty_text",
+      "label": "Empty State Text",
+      "default": "We're working on adding product videos. Check back soon!"
+    },
+    {
+      "type": "text",
+      "id": "empty_cta_text",
+      "label": "Empty State Button Text",
+      "default": "Browse Products"
+    },
+    {
+      "type": "url",
+      "id": "empty_cta_url",
+      "label": "Empty State Button URL"
+    },
+    {
+      "type": "header",
+      "content": "Contact Section"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_contact_section",
+      "label": "Show Contact Section",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "contact_title",
+      "label": "Contact Title",
+      "default": "Need a Demo?"
+    },
+    {
+      "type": "textarea",
+      "id": "contact_text",
+      "label": "Contact Text",
+      "default": "Contact us to schedule a live product demonstration or request specific product videos."
+    },
+    {
+      "type": "text",
+      "id": "contact_phone",
+      "label": "Contact Phone",
+      "default": "(408) 673-9999"
+    },
+    {
+      "type": "text",
+      "id": "contact_email",
+      "label": "Contact Email",
+      "default": "sales@celebratefestivalinc.com"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category_filter",
+      "name": "Video Category",
+      "settings": [
+        {
+          "type": "text",
+          "id": "category_name",
+          "label": "Category Name",
+          "default": "Tandoors"
+        },
+        {
+          "type": "text",
+          "id": "category_handle",
+          "label": "Category Handle",
+          "default": "tandoors",
+          "info": "Lowercase, no spaces (used for filtering)"
+        }
+      ]
+    },
+    {
+      "type": "video_entry",
+      "name": "Video Entry",
+      "settings": [
+        {
+          "type": "text",
+          "id": "video_title",
+          "label": "Video Title",
+          "default": "Product Demo Video"
+        },
+        {
+          "type": "textarea",
+          "id": "video_description",
+          "label": "Video Description"
+        },
+        {
+          "type": "text",
+          "id": "video_category",
+          "label": "Video Category",
+          "default": "Product Demo"
+        },
+        {
+          "type": "select",
+          "id": "video_type",
+          "label": "Video Type",
+          "options": [
+            { "value": "youtube", "label": "YouTube" },
+            { "value": "vimeo", "label": "Vimeo" },
+            { "value": "hosted", "label": "Hosted/Direct URL" }
+          ],
+          "default": "youtube"
+        },
+        {
+          "type": "text",
+          "id": "video_url",
+          "label": "Video URL/ID",
+          "info": "For YouTube/Vimeo: just the video ID. For hosted: full URL."
+        },
+        {
+          "type": "image_picker",
+          "id": "video_thumbnail",
+          "label": "Video Thumbnail"
+        },
+        {
+          "type": "text",
+          "id": "video_duration",
+          "label": "Video Duration",
+          "default": "3:45"
+        },
+        {
+          "type": "url",
+          "id": "product_link",
+          "label": "Link to Product"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Videos Page",
+      "blocks": [
+        {
+          "type": "category_filter",
+          "settings": {
+            "category_name": "Tandoors",
+            "category_handle": "tandoors"
+          }
+        },
+        {
+          "type": "category_filter",
+          "settings": {
+            "category_name": "Refrigeration",
+            "category_handle": "refrigeration"
+          }
+        },
+        {
+          "type": "category_filter",
+          "settings": {
+            "category_name": "Food Processors",
+            "category_handle": "food-processors"
+          }
+        },
+        {
+          "type": "video_entry",
+          "settings": {
+            "video_title": "Shaan Tandoor Demo - Commercial Clay Oven",
+            "video_description": "See our UK-made Shaan Tandoor in action. ETL NSF certified for commercial use.",
+            "video_category": "Tandoors",
+            "video_type": "youtube",
+            "video_url": "",
+            "video_duration": "4:30"
+          }
+        },
+        {
+          "type": "video_entry",
+          "settings": {
+            "video_title": "Walk-In Cooler Installation Guide",
+            "video_description": "Complete installation walkthrough for commercial walk-in coolers.",
+            "video_category": "Refrigeration",
+            "video_type": "youtube",
+            "video_url": "",
+            "video_duration": "8:15"
+          }
+        },
+        {
+          "type": "video_entry",
+          "settings": {
+            "video_title": "Robot Coupe Food Processor Overview",
+            "video_description": "Features and capabilities of the Robot Coupe commercial food processor.",
+            "video_category": "Food Processors",
+            "video_type": "youtube",
+            "video_url": "",
+            "video_duration": "5:45"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

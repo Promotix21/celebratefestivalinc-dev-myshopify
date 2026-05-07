@@ -1,0 +1,367 @@
+{{ 'customer.css' | asset_url | stylesheet_tag }}
+{{ 'customer-accounts.css' | asset_url | stylesheet_tag }}
+
+<div class="cf-auth-split">
+  <!-- Left Side - Benefits -->
+  <div class="cf-auth-benefits">
+    <div class="cf-benefits-content">
+      <div class="cf-benefits-logo">
+        <a href="{{ routes.root_url }}">
+          {%- if settings.logo != blank -%}
+            <img src="{{ settings.logo | image_url: width: 180 }}" alt="{{ shop.name }}">
+          {%- else -%}
+            <img src="https://celebratefestivalinc.com/cdn/shop/files/celebrate-logo.png" alt="{{ shop.name }}">
+          {%- endif -%}
+        </a>
+      </div>
+
+      <h2 class="cf-benefits-title">Member Benefits</h2>
+
+      <div class="cf-benefits-list">
+        <div class="cf-benefit-item">
+          <div class="cf-benefit-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+            </svg>
+          </div>
+          <div class="cf-benefit-text">
+            <strong>Exclusive Member Pricing</strong>
+            <span>Save more every time you shop</span>
+          </div>
+        </div>
+
+        <div class="cf-benefit-item">
+          <div class="cf-benefit-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="3" width="22" height="18" rx="2" ry="2"></rect>
+              <line x1="1" y1="9" x2="23" y2="9"></line>
+            </svg>
+          </div>
+          <div class="cf-benefit-text">
+            <strong>Easy Order Tracking</strong>
+            <span>Track all your orders in one place</span>
+          </div>
+        </div>
+
+        <div class="cf-benefit-item">
+          <div class="cf-benefit-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+          </div>
+          <div class="cf-benefit-text">
+            <strong>Fast Shipping (Free on Select Items)</strong>
+            <span>Most refrigerators, burners & US brands ship free</span>
+          </div>
+        </div>
+
+        <div class="cf-benefit-item">
+          <div class="cf-benefit-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <div class="cf-benefit-text">
+            <strong>Priority Support</strong>
+            <span>Dedicated customer service team</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cf-benefits-footer">
+        <p>Trusted by 10,000+ restaurant professionals</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side - Form -->
+  <div class="cf-auth-form-side">
+    <div class="cf-auth-form-container">
+      {%- comment %} Capture return_url from query string {% endcomment -%}
+      {%- assign return_url = '' -%}
+      {%- if request.query_string contains 'return_url=' -%}
+        {%- assign return_url_parts = request.query_string | split: 'return_url=' -%}
+        {%- if return_url_parts.size > 1 -%}
+          {%- assign return_url = return_url_parts[1] | split: '&' | first | url_decode -%}
+        {%- endif -%}
+      {%- endif -%}
+
+      <!-- Login Form Section -->
+      <div id="login-section">
+        <h1 class="cf-auth-title" tabindex="-1">Welcome Back</h1>
+        <p class="cf-auth-subtitle">Sign in to access your account and member pricing</p>
+
+        {%- form 'customer_login', novalidate: 'novalidate' -%}
+          {%- if return_url != blank and return_url != '/account/login' -%}
+            <input type="hidden" name="return_to" value="{{ return_url }}">
+          {%- endif -%}
+
+          {%- if form.errors -%}
+            <div class="cf-alert cf-alert-error">
+              <span class="cf-alert-icon">!</span>
+              <span>{{ form.errors | default_errors }}</span>
+            </div>
+          {%- endif -%}
+
+          <div class="cf-form-group">
+            <label class="cf-form-label" for="CustomerEmail">
+              Email Address <span class="required">*</span>
+            </label>
+            <input
+              type="email"
+              class="cf-form-input"
+              name="customer[email]"
+              id="CustomerEmail"
+              autocomplete="email"
+              autocorrect="off"
+              autocapitalize="off"
+              {% if form.errors contains 'form' %}
+                aria-invalid="true"
+              {% endif %}
+              placeholder="you@company.com"
+            >
+          </div>
+
+          {%- if form.password_needed -%}
+            <div class="cf-form-group">
+              <label class="cf-form-label" for="CustomerPassword">
+                Password <span class="required">*</span>
+              </label>
+              <input
+                type="password"
+                class="cf-form-input"
+                value=""
+                name="customer[password]"
+                id="CustomerPassword"
+                autocomplete="current-password"
+                {% if form.errors contains 'form' %}
+                  aria-invalid="true"
+                {% endif %}
+                placeholder="Enter your password"
+              >
+            </div>
+
+            <div class="cf-form-options">
+              <label class="cf-checkbox-label">
+                <input type="checkbox" name="remember"> Remember me
+              </label>
+              <a href="#recover" class="cf-forgot-link">
+                Forgot password?
+              </a>
+            </div>
+          {%- endif -%}
+
+          <button type="submit" class="cf-btn cf-btn-primary">
+            Sign In
+          </button>
+        {%- endform -%}
+
+        <div class="cf-auth-divider">
+          <span>New to Celebrate Festival?</span>
+        </div>
+
+        <a href="{{ routes.account_register_url }}{% if return_url != blank %}?return_url={{ return_url | url_param_escape }}{% endif %}" class="cf-btn cf-btn-outline">
+          Create an Account
+        </a>
+      </div>
+
+      <!-- Forgot Password / Recover Section -->
+      {%- form 'recover_customer_password' -%}
+        {%- assign recover_success = form.posted_successfully? -%}
+        {%- assign recover_errors = form.errors -%}
+      {%- endform -%}
+
+      <div id="recover-section" style="display: none;" data-recover-success="{{ recover_success }}">
+        <h1 class="cf-auth-title" tabindex="-1">
+          {%- if recover_success -%}
+            Check Your Email
+          {%- else -%}
+            Reset Your Password
+          {%- endif -%}
+        </h1>
+        <p class="cf-auth-subtitle">
+          {%- if recover_success -%}
+            If an account exists with that email, you'll receive a password reset link shortly.
+          {%- else -%}
+            Enter your email address and we'll send you a link to reset your password.
+          {%- endif -%}
+        </p>
+
+        {%- if recover_success -%}
+          <div class="cf-alert cf-alert-success">
+            <span class="cf-alert-icon">✓</span>
+            <span>We've sent you an email with a link to reset your password. Please check your inbox (and spam folder).</span>
+          </div>
+
+          <div class="cf-auth-footer" style="margin-top: 24px;">
+            <a href="{{ routes.account_login_url }}" class="cf-btn cf-btn-primary">Back to Sign In</a>
+          </div>
+        {%- else -%}
+          {%- form 'recover_customer_password' -%}
+            {%- if form.errors -%}
+              <div class="cf-alert cf-alert-error">
+                <span class="cf-alert-icon">!</span>
+                <span>{{ form.errors.messages.form }}</span>
+              </div>
+            {%- endif -%}
+
+            <div class="cf-form-group">
+              <label class="cf-form-label" for="RecoverEmail">
+                Email Address <span class="required">*</span>
+              </label>
+              <input
+                type="email"
+                class="cf-form-input"
+                value=""
+                name="email"
+                id="RecoverEmail"
+                autocorrect="off"
+                autocapitalize="off"
+                autocomplete="email"
+                {% if form.errors %}
+                  aria-invalid="true"
+                  aria-describedby="RecoverEmail-email-error"
+                {% endif %}
+                placeholder="Enter your email address"
+              >
+            </div>
+
+            <button type="submit" class="cf-btn cf-btn-primary">
+              Send Reset Link
+            </button>
+          {%- endform -%}
+
+          <div class="cf-auth-footer">
+            Remember your password? <a href="#" class="cf-back-to-login">Back to Sign In</a>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // ============================================
+  // FORGOT PASSWORD / RECOVER TOGGLE
+  // ============================================
+  var loginSection = document.getElementById('login-section');
+  var recoverSection = document.getElementById('recover-section');
+  var forgotLink = document.querySelector('.cf-forgot-link');
+  var backToLoginLink = document.querySelector('.cf-back-to-login');
+
+  function showRecoverForm() {
+    if (loginSection) loginSection.style.display = 'none';
+    if (recoverSection) recoverSection.style.display = 'block';
+    window.location.hash = 'recover';
+  }
+
+  function showLoginForm() {
+    if (recoverSection) recoverSection.style.display = 'none';
+    if (loginSection) loginSection.style.display = 'block';
+    window.location.hash = '';
+  }
+
+  // Check if recover form was submitted successfully (server-side flag)
+  var recoverSuccess = recoverSection && recoverSection.getAttribute('data-recover-success') === 'true';
+
+  // Check hash on page load OR if recover was successful
+  if (window.location.hash === '#recover' || recoverSuccess) {
+    showRecoverForm();
+  }
+
+  // Handle forgot password link click
+  if (forgotLink) {
+    forgotLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      showRecoverForm();
+    });
+  }
+
+  // Handle back to login link click
+  if (backToLoginLink) {
+    backToLoginLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      showLoginForm();
+    });
+  }
+
+  // Handle hash change (browser back/forward)
+  window.addEventListener('hashchange', function() {
+    if (window.location.hash === '#recover') {
+      showRecoverForm();
+    } else {
+      showLoginForm();
+    }
+  });
+
+  // ============================================
+  // LOGIN FORM HANDLING
+  // ============================================
+  var loginForm = document.querySelector('form[action*="login"]');
+  var loginButton = loginForm ? loginForm.querySelector('button[type="submit"]') : null;
+
+  if (loginButton && loginForm) {
+    loginButton.addEventListener('click', function(e) {
+      var email = loginForm.querySelector('input[type="email"]');
+      var password = loginForm.querySelector('input[type="password"]');
+
+      if (email && email.value && password && password.value) {
+        return true;
+      } else if (email && !email.value) {
+        email.focus();
+        e.preventDefault();
+        return false;
+      } else if (password && !password.value) {
+        password.focus();
+        e.preventDefault();
+        return false;
+      }
+    });
+
+    var passwordField = loginForm.querySelector('input[type="password"]');
+    if (passwordField) {
+      passwordField.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          loginForm.submit();
+        }
+      });
+    }
+  }
+});
+</script>
+
+{% schema %}
+{
+  "name": "t:sections.main-login.name",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 0
+    }
+  ]
+}
+{% endschema %}

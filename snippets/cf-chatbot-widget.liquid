@@ -1,0 +1,22 @@
+{%- comment -%}
+  CF AI Kitchen Consultant floating widget.
+  Include once near the end of theme.liquid <body>.
+  Hide on the dedicated chat page by checking template.
+{%- endcomment -%}
+
+{%- unless template contains 'ai-assistant' -%}
+  <link rel="stylesheet" href="{{ 'cf-chatbot.css' | asset_url }}">
+  <link rel="stylesheet" href="{{ 'cf-chatbot-orb.css' | asset_url }}">
+  <link rel="stylesheet" href="{{ 'cf-chatbot-pro.css' | asset_url }}">
+  <script>
+    window.CF_CHATBOT_API = {{ settings.cf_chatbot_api_url | default: 'https://cf-chatbot.hiraya.digital' | json }};
+    {%- if customer -%}
+      window.CF_CHATBOT_CUSTOMER_ID = {{ customer.id | json }};
+      window.CF_CHATBOT_CUSTOMER_TAGS = {{ customer.tags | json }};
+      window.CF_CHATBOT_LOGGED_IN = true;
+    {%- else -%}
+      window.CF_CHATBOT_LOGGED_IN = false;
+    {%- endif -%}
+  </script>
+  <script src="{{ 'cf-chatbot.js' | asset_url }}" defer></script>
+{%- endunless -%}

@@ -1,0 +1,33 @@
+{
+  "layout": "chatbot",
+  "sections": {
+    "main": {
+      "type": "page-ai-assistant",
+      "settings": {
+        "api_url": "https://cf-chatbot.hiraya.digital",
+        "headline": "How can we help you",
+        "headline_accent": "cook?",
+        "subhead": "Ask anything about commercial kitchen equipment, restaurant setup, or your next kitchen build.",
+        "stat_1_number": "16K+",
+        "stat_1_label": "Products Indexed",
+        "stat_2_number": "24/7",
+        "stat_2_label": "AI Support",
+        "stat_3_number": "100%",
+        "stat_3_label": "Expert Backed",
+        "cta_card_title": "Book a Free Consultation",
+        "cta_card_text": "Talk to a real specialist — equipment selection, kitchen design, installation.",
+        "cta_card_button": "Schedule Call",
+        "cta_card_link": "tel:+14086739999",
+        "phone_number": "(408) 673-9999"
+      },
+      "blocks": {
+        "chip-1": { "type": "prompt_chip", "settings": { "label": "Find Equipment", "prompt": "I need help finding commercial kitchen equipment" } },
+        "chip-2": { "type": "prompt_chip", "settings": { "label": "Plan My Kitchen", "prompt": "Help me plan a restaurant kitchen from scratch" } },
+        "chip-3": { "type": "prompt_chip", "settings": { "label": "Talk to Expert", "prompt": "I want to speak with a specialist about my project" } },
+        "chip-4": { "type": "prompt_chip", "settings": { "label": "Compare Products", "prompt": "Help me compare equipment options" } }
+      },
+      "block_order": ["chip-1", "chip-2", "chip-3", "chip-4"]
+    }
+  },
+  "order": ["main"]
+}

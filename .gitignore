@@ -1,0 +1,45 @@
+# ===== SECRETS / API KEYS =====
+.env
+.env.local
+.env.*.local
+*.env
+
+# ===== Shopify CLI =====
+node_modules/
+.shopify/
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Claude Code =====
+# Local Claude Code state, session handover notes, screenshots, etc.
+# Some of these have historically contained credentials — never commit them.
+.claude/
+
+# ===== Python =====
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+
+# ===== Temp / Debug =====
+tmp/
+temp/
+*.tmp
+*.log
+*.bak
+
+# ===== Screenshots / large binaries (optional — uncomment if needed) =====
+# *.png
+# *.jpeg
+# *.jpg
+# *.xlsx
+
+# Cortex intelligence files (auto-generated)
+.cortex-context.md
+NEXT_SESSION_PROMPT.md
+NEXT-SESSION-PROMPT.md
+CORTEX_INTELLIGENCE_MASTER.md

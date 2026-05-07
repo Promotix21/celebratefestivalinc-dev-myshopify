@@ -1,0 +1,228 @@
+{% comment %}
+  Vendor Brand Hero - Shows brand hero on /collections/vendors?q=BRAND_NAME
+  Detects vendor from URL query parameter and displays appropriate brand hero
+{% endcomment %}
+
+<style>
+  .vendor-brand-hero {
+    background: linear-gradient(135deg, #1a365d 0%, #0f172a 100%);
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .vendor-brand-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+  }
+
+  .vendor-brand-hero__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .vendor-brand-hero__logo {
+    flex-shrink: 0;
+    width: 180px;
+    height: 180px;
+    background: #fff;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  .vendor-brand-hero__logo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .vendor-brand-hero__logo-placeholder {
+    font-size: 48px;
+    font-weight: 700;
+    color: #1a365d;
+    text-transform: uppercase;
+  }
+
+  .vendor-brand-hero__content {
+    flex: 1;
+  }
+
+  .vendor-brand-hero__tagline {
+    display: inline-block;
+    background: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+
+  .vendor-brand-hero__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 12px;
+    line-height: 1.2;
+  }
+
+  .vendor-brand-hero__description {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0;
+  }
+
+  .vendor-brand-hero__stats {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+  }
+
+  .vendor-brand-hero__stat {
+    text-align: center;
+  }
+
+  .vendor-brand-hero__stat-value {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #ff6b6b;
+  }
+
+  .vendor-brand-hero__stat-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+  }
+
+  /* Hidden by default - shown via JS when vendor detected */
+  .vendor-brand-hero {
+    display: none;
+  }
+
+  .vendor-brand-hero.active {
+    display: block;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .vendor-brand-hero {
+      padding: 30px 20px;
+    }
+
+    .vendor-brand-hero__container {
+      flex-direction: column;
+      text-align: center;
+      gap: 24px;
+    }
+
+    .vendor-brand-hero__logo {
+      width: 120px;
+      height: 120px;
+    }
+
+    .vendor-brand-hero__title {
+      font-size: 28px;
+    }
+
+    .vendor-brand-hero__description {
+      font-size: 14px;
+    }
+
+    .vendor-brand-hero__stats {
+      justify-content: center;
+    }
+  }
+</style>
+
+<div class="vendor-brand-hero" id="vendor-brand-hero">
+  <div class="vendor-brand-hero__container">
+    <div class="vendor-brand-hero__logo">
+      <img id="vendor-logo" src="" alt="" style="display: none;">
+      <span id="vendor-logo-placeholder" class="vendor-brand-hero__logo-placeholder"></span>
+    </div>
+    <div class="vendor-brand-hero__content">
+      <span class="vendor-brand-hero__tagline" id="vendor-tagline">Official Partner</span>
+      <h1 class="vendor-brand-hero__title" id="vendor-title"></h1>
+      <p class="vendor-brand-hero__description" id="vendor-description"></p>
+      <div class="vendor-brand-hero__stats" id="vendor-stats"></div>
+    </div>
+  </div>
+</div>
+
+{%- comment -%} Inject a real asset URL; JS replaces 'atosa' with the actual vendor handle {%- endcomment -%}
+{%- assign _logo_template_url = 'brand-logo-atosa.png' | asset_url -%}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Only run on vendors collection
+  if (!window.location.pathname.includes('/collections/vendors')) return;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const vendorQuery = urlParams.get('q');
+  if (!vendorQuery) return;
+
+  // Build display name (title-case)
+  const formattedName = vendorQuery
+    .replace(/\+/g, ' ').replace(/-/g, ' ').replace(/_/g, ' ')
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+
+  // Build logo URL from theme assets — same pattern as SPP
+  const logoTemplate = {{ _logo_template_url | json }};
+  const vendorHandle = vendorQuery
+    .toLowerCase().trim()
+    .replace(/\+/g, '-').replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '');
+  const logoUrl = logoTemplate.replace('brand-logo-atosa', 'brand-logo-' + vendorHandle);
+
+  // Populate the hero
+  const heroEl = document.getElementById('vendor-brand-hero');
+  const logoImg = document.getElementById('vendor-logo');
+  const logoPlaceholder = document.getElementById('vendor-logo-placeholder');
+  const titleEl = document.getElementById('vendor-title');
+  const taglineEl = document.getElementById('vendor-tagline');
+  const descEl = document.getElementById('vendor-description');
+  const statsEl = document.getElementById('vendor-stats');
+
+  titleEl.textContent = formattedName;
+  taglineEl.textContent = 'Official Brand Partner';
+  descEl.textContent = 'Browse our complete selection of ' + formattedName + ' products. Quality equipment and supplies for your commercial kitchen needs.';
+  statsEl.style.display = 'none';
+
+  // Try to load logo from theme assets; fall back to letter placeholder
+  logoImg.alt = formattedName;
+  logoImg.style.display = 'block';
+  logoPlaceholder.style.display = 'none';
+  logoImg.onerror = function() {
+    logoImg.style.display = 'none';
+    logoPlaceholder.textContent = formattedName.charAt(0);
+    logoPlaceholder.style.display = 'block';
+  };
+  logoImg.src = logoUrl;
+
+  // Show the hero
+  heroEl.classList.add('active');
+});
+</script>

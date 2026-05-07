@@ -1,0 +1,257 @@
+{% comment %}
+  Collection Breadcrumb Section
+  Displays hierarchical breadcrumb navigation for collection pages
+
+  Uses parent-{handle} tags to build breadcrumb trail
+  Strips "New Theme - " prefix from display names
+{% endcomment %}
+
+{%- liquid
+  assign display_title = collection.title | remove: "New Theme - "
+
+  comment
+    Find parent collection from metafields
+  endcomment
+  assign parent_collection = nil
+  assign parent_handle = collection.metafields.custom.parent_handle.value
+  if parent_handle != blank
+    assign parent_collection = collections[parent_handle]
+  endif
+
+  comment
+    Find grandparent if parent exists
+  endcomment
+  assign grandparent_collection = nil
+  if parent_collection
+    assign gp_handle = parent_collection.metafields.custom.parent_handle.value
+    if gp_handle != blank
+      assign grandparent_collection = collections[gp_handle]
+    endif
+  endif
+
+  comment
+    Find great-grandparent if grandparent exists
+  endcomment
+  assign great_grandparent_collection = nil
+  if grandparent_collection
+    assign ggp_handle = grandparent_collection.metafields.custom.parent_handle.value
+    if ggp_handle != blank
+      assign great_grandparent_collection = collections[ggp_handle]
+    endif
+  endif
+-%}
+
+<nav class="collection-breadcrumb" aria-label="Breadcrumb">
+  <div class="container">
+    <ol class="breadcrumb-list" itemscope itemtype="https://schema.org/BreadcrumbList">
+
+      {%- comment %} Home {% endcomment -%}
+      <li class="breadcrumb-item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a href="{{ routes.root_url }}" itemprop="item">
+          <span itemprop="name">Home</span>
+        </a>
+        <meta itemprop="position" content="1">
+      </li>
+
+      {%- assign position = 2 -%}
+
+      {%- comment %} Great-grandparent (Level 1) {% endcomment -%}
+      {%- if great_grandparent_collection -%}
+        <li class="breadcrumb-item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <span class="breadcrumb-separator" aria-hidden="true">
+            <svg width="6" height="10" viewBox="0 0 6 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 1L5 5L1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <a href="{{ great_grandparent_collection.url }}" itemprop="item">
+            <span itemprop="name">{{ great_grandparent_collection.title | remove: "New Theme - " }}</span>
+          </a>
+          <meta itemprop="position" content="{{ position }}">
+        </li>
+        {%- assign position = position | plus: 1 -%}
+      {%- endif -%}
+
+      {%- comment %} Grandparent (Level 2) {% endcomment -%}
+      {%- if grandparent_collection -%}
+        <li class="breadcrumb-item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <span class="breadcrumb-separator" aria-hidden="true">
+            <svg width="6" height="10" viewBox="0 0 6 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 1L5 5L1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <a href="{{ grandparent_collection.url }}" itemprop="item">
+            <span itemprop="name">{{ grandparent_collection.title | remove: "New Theme - " }}</span>
+          </a>
+          <meta itemprop="position" content="{{ position }}">
+        </li>
+        {%- assign position = position | plus: 1 -%}
+      {%- endif -%}
+
+      {%- comment %} Parent (Level 3) {% endcomment -%}
+      {%- if parent_collection -%}
+        <li class="breadcrumb-item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <span class="breadcrumb-separator" aria-hidden="true">
+            <svg width="6" height="10" viewBox="0 0 6 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 1L5 5L1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <a href="{{ parent_collection.url }}" itemprop="item">
+            <span itemprop="name">{{ parent_collection.title | remove: "New Theme - " }}</span>
+          </a>
+          <meta itemprop="position" content="{{ position }}">
+        </li>
+        {%- assign position = position | plus: 1 -%}
+      {%- endif -%}
+
+      {%- comment %} Current Collection {% endcomment -%}
+      <li class="breadcrumb-item active" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" aria-current="page">
+        <span class="breadcrumb-separator" aria-hidden="true">
+          <svg width="6" height="10" viewBox="0 0 6 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 1L5 5L1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span itemprop="name">{{ display_title }}</span>
+        <meta itemprop="position" content="{{ position }}">
+      </li>
+
+    </ol>
+  </div>
+</nav>
+
+{% schema %}
+{
+  "name": "Collection Breadcrumb",
+  "tag": "section",
+  "class": "section-collection-breadcrumb",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_home_icon",
+      "label": "Show home icon",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "Link color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "link_hover_color",
+      "label": "Link hover color",
+      "default": "#ff6b6b"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#f8f9fa"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "default": 16,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "default": 16,
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Breadcrumb"
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+  .collection-breadcrumb {
+    background-color: {{ section.settings.background_color }};
+    padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px;
+  }
+
+  .collection-breadcrumb .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .breadcrumb-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    gap: 0;
+  }
+
+  .breadcrumb-item {
+    display: flex;
+    align-items: center;
+    color: {{ section.settings.text_color }};
+  }
+
+  .breadcrumb-item a {
+    color: {{ section.settings.link_color }};
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .breadcrumb-item a:hover {
+    color: {{ section.settings.link_hover_color }};
+  }
+
+  .breadcrumb-item.active {
+    color: {{ section.settings.text_color }};
+    font-weight: 500;
+  }
+
+  .breadcrumb-separator {
+    display: flex;
+    align-items: center;
+    margin: 0 10px;
+    color: {{ section.settings.text_color }};
+    opacity: 0.5;
+  }
+
+  .breadcrumb-separator svg {
+    width: 6px;
+    height: 10px;
+  }
+
+  @media (max-width: 768px) {
+    .breadcrumb-list {
+      font-size: 12px;
+    }
+
+    .breadcrumb-separator {
+      margin: 0 6px;
+    }
+
+    .breadcrumb-separator svg {
+      width: 5px;
+      height: 8px;
+    }
+  }
+</style>

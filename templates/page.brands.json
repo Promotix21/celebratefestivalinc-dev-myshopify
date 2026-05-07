@@ -1,0 +1,23 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "brands": {
+      "type": "page-brands",
+      "settings": {
+        "page_title": "Shop by Brand",
+        "page_subtitle": "Browse our extensive collection of trusted brands in commercial restaurant equipment and supplies."
+      }
+    }
+  },
+  "order": [
+    "brands"
+  ]
+}

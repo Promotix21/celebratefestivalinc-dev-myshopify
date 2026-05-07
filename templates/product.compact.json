@@ -1,0 +1,76 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "product-compact",
+      "settings": {
+        "show_demo_data": false,
+        "show_breadcrumb": true,
+        "description_heading": "Product Description",
+        "enable_member_pricing": true,
+        "member_discount_percent": 2,
+        "price_label": "Non-Member Price:",
+        "member_price_label": "Plus Member Price:",
+        "price_unit": "Each",
+        "member_info_text": "Plus Members save on this item. Learn more",
+        "login_prompt_logged_in": "Become a Member to see savings",
+        "login_prompt_not_logged_in": "Login to see member pricing",
+        "login_button_logged_in": "Learn About Membership",
+        "login_button_not_logged_in": "Login to Your Account",
+        "membership_learn_more_url": "/pages/membership",
+        "shipping_alert_text": "This item ships via freight. Additional time and fees may apply.",
+        "show_shipping_info": true,
+        "shipping_info_title": "Shipping Information",
+        "shipping_info_list": "Ships in 1-2 business days|Ships via freight carrier|Eligible for expedited shipping|Original packaging to reduce damage|Free lift gate service included",
+        "add_to_cart_text": "Add to Cart",
+        "related_title_default": "Other Products from this Line",
+        "related_collection_default": "",
+        "conditional_product_type_1": "",
+        "conditional_title_1": "",
+        "conditional_collection_1": "",
+        "conditional_product_type_2": "",
+        "conditional_title_2": "",
+        "conditional_collection_2": "",
+        "show_other_products": true,
+        "enable_bottom_related": true,
+        "bottom_related_title": "You May Also Need",
+        "also_like_collection": "",
+        "enable_fbt": true,
+        "fbt_max_items": 3,
+        "enable_qa": true,
+        "qa_heading": "Questions & Answers",
+        "qa_items": "",
+        "qa_button_text": "Ask a Question",
+        "qa_button_link": "/pages/contact",
+        "enable_reviews": true,
+        "reviews_heading": "Customer Reviews",
+        "show_service_banner": true,
+        "service_banner_icon": "🏆",
+        "service_banner_title": "Parts & Service",
+        "service_banner_description": "We stock genuine replacement parts and provide expert technical support.",
+        "service_banner_list": "<strong>Services Available:</strong><br>• Genuine OEM Parts<br>• Technical Support<br>• Installation Assistance<br>• Warranty Service",
+        "service_banner_button_text": "Find Parts & Manuals",
+        "service_banner_button_url": "/pages/parts-and-service",
+        "show_resources": true,
+        "resource_links": "",
+        "show_help_box": true,
+        "help_phone": "(408) 673-9999",
+        "help_email": "sales@celebratefestivalinc.com",
+        "help_address": "235 Whitney Pl, Fremont, CA 94539",
+        "help_chat_enabled": true,
+        "help_additional_links": "🎥 Product Videos|❓ FAQ Section|🛠️ Installation Service"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

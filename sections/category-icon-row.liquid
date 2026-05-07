@@ -1,0 +1,275 @@
+{%- if section.settings.show_section -%}
+
+<section class="cir-root" style="background: {{ section.settings.bg_color | default: '#f1f5f9' }};">
+  {%- if section.settings.section_title != blank -%}
+    <div class="cir-header">
+      <h2 class="cir-title">{{ section.settings.section_title }}</h2>
+      {%- if section.settings.section_subtitle != blank -%}
+        <p class="cir-subtitle">{{ section.settings.section_subtitle }}</p>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <div class="cir-track {% if section.settings.scroll_mobile %}cir-track--scroll{% endif %}">
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign item_title  = block.settings.label
+        assign item_url    = block.settings.link
+        assign item_image  = block.settings.icon_image
+        assign coll_handle = block.settings.collection_handle
+        assign coll_obj    = collections[coll_handle]
+
+        if item_url == blank and coll_handle != blank
+          assign item_url = '/collections/' | append: coll_handle
+        endif
+        if item_image == blank and coll_obj != blank
+          if coll_obj.image != blank
+            assign item_image = coll_obj.image
+          else
+            for product in coll_obj.products limit: 5
+              if product.featured_image != blank
+                assign item_image = product.featured_image
+                break
+              endif
+            endfor
+          endif
+        endif
+        if item_title == blank and coll_obj != blank
+          assign item_title = coll_obj.title
+        endif
+      -%}
+
+      <a href="{{ item_url | default: '#' }}" class="cir-item" {{ block.shopify_attributes }}>
+        <div class="cir-item__icon">
+          {%- if item_image != blank -%}
+            {%- if item_image.src -%}
+              <img src="{{ item_image | image_url: width: 160 }}" alt="{{ item_title | escape }}" loading="lazy" width="80" height="80">
+            {%- else -%}
+              <img src="{{ item_image | image_url: width: 160 }}" alt="{{ item_title | escape }}" loading="lazy" width="80" height="80">
+            {%- endif -%}
+          {%- else -%}
+            <div class="cir-item__placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            </div>
+          {%- endif -%}
+        </div>
+        <span class="cir-item__label">{{ item_title | default: 'Category' }}</span>
+      </a>
+    {%- endfor -%}
+  </div>
+</section>
+
+<style>
+  .cir-root {
+    padding: 24px 40px;
+    font-family: 'Inter', sans-serif;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .cir-header {
+    text-align: center;
+    margin-bottom: 18px;
+  }
+  .cir-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a365d;
+    margin: 0 0 6px;
+  }
+  .cir-subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+  }
+
+  .cir-track {
+    max-width: 1440px;
+    margin: 0 auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .cir-item {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: #1a365d;
+    padding: 8px 4px;
+    transition: transform .2s;
+  }
+  .cir-item:hover {
+    transform: translateY(-3px);
+    color: #2d5a87;
+  }
+
+  .cir-item__icon {
+    width: 90px;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+  }
+  .cir-item__icon img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  .cir-item__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #cbd5e1;
+  }
+  .cir-item__placeholder svg { width: 48px; height: 48px; }
+
+  .cir-item__label {
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    line-height: 1.3;
+    color: #0f172a;
+    max-width: 110px;
+  }
+
+  /* Tablet */
+  @media (max-width: 1200px) {
+    .cir-item__icon { width: 78px; height: 78px; }
+    .cir-item__label { font-size: 12px; }
+  }
+  @media (max-width: 992px) {
+    .cir-track { flex-wrap: wrap; justify-content: center; gap: 14px; }
+    .cir-item { flex: 0 0 calc(25% - 14px); }
+  }
+
+  /* Mobile with optional horizontal scroll */
+  @media (max-width: 640px) {
+    .cir-root { padding: 18px 12px; }
+    .cir-track--scroll {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      justify-content: flex-start;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      gap: 4px;
+    }
+    .cir-track--scroll::-webkit-scrollbar { display: none; }
+    .cir-track--scroll .cir-item { flex: 0 0 90px; }
+    .cir-track:not(.cir-track--scroll) .cir-item { flex: 0 0 calc(33.333% - 10px); }
+    .cir-item__icon { width: 64px; height: 64px; }
+    .cir-item__label { font-size: 11px; }
+  }
+</style>
+
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Category Icon Row",
+  "tag": "div",
+  "class": "category-icon-row-wrap",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_section",
+      "label": "Show section",
+      "default": false,
+      "info": "Toggle to show or hide this icon row."
+    },
+    {
+      "type": "header",
+      "content": "Section Text"
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section title (optional)"
+    },
+    {
+      "type": "text",
+      "id": "section_subtitle",
+      "label": "Section subtitle (optional)"
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "scroll_mobile",
+      "label": "Horizontal scroll on mobile",
+      "default": true,
+      "info": "When enabled, the row scrolls horizontally on small screens instead of wrapping."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "icon_item",
+      "name": "Icon Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "info": "Falls back to collection title if left blank."
+        },
+        {
+          "type": "collection",
+          "id": "collection_handle",
+          "label": "Collection (recommended)",
+          "info": "Auto-populates image from the collection's featured image or first product image, and the link."
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "Custom icon image (optional)",
+          "info": "Overrides the collection's featured image. Square/round works best."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Custom link (optional)",
+          "info": "Overrides the collection link."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Category Icon Row",
+      "blocks": [
+        { "type": "icon_item", "settings": { "label": "Tandoor and Pans" } },
+        { "type": "icon_item", "settings": { "label": "Idli & Momo" } },
+        { "type": "icon_item", "settings": { "label": "Pressure Cooker" } },
+        { "type": "icon_item", "settings": { "label": "Patila" } },
+        { "type": "icon_item", "settings": { "label": "Kadai" } },
+        { "type": "icon_item", "settings": { "label": "Biryani Lagan" } },
+        { "type": "icon_item", "settings": { "label": "Tava / Griddle" } },
+        { "type": "icon_item", "settings": { "label": "Cooking Ladle" } },
+        { "type": "icon_item", "settings": { "label": "Atara ke Bhandi" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,37 @@
+{% comment %} CF Brand: Thunder Group Cookware {% endcomment %}
+
+{%- liquid
+  assign tg_categories = 'thundergroup-asian-cookware,thundergroup-professional-cookware,thundergroup-cookware' | split: ','
+  assign tg_titles = 'ASIAN COOKWARE,PROFESSIONAL COOKWARE,Cookware ALL' | split: ','
+  assign tg_images = 'Thunder-Group.png,Thunder-Group.png,Thunder-Group.png' | split: ','
+-%}
+
+<div class="cf-brand-hub__grid cf-brand-hub__grid--3col">
+  {%- for handle in tg_categories -%}
+    {%- assign idx = forloop.index0 -%}
+    {%- assign title = tg_titles[idx] -%}
+    {%- assign image_file = tg_images[idx] -%}
+    {%- assign cdn_url = 'https://celebratefestivalinc.com/cdn/shop/files/' | append: image_file | append: '?width=400&height=400&crop=center' -%}
+
+    <a href="/collections/{{ handle }}" class="cf-brand-hub__card">
+      <div class="cf-brand-hub__card-image">
+        <img src="{{ cdn_url }}" alt="{{ title }}" loading="lazy">
+        <div class="cf-brand-hub__card-overlay">
+          <span class="cf-brand-hub__card-overlay-text">{{ title }}</span>
+        </div>
+      </div>
+      <div class="cf-brand-hub__card-content">
+        <h3 class="cf-brand-hub__card-title">{{ title }}</h3>
+        <span class="cf-brand-hub__card-btn">Shop Now</span>
+      </div>
+    </a>
+  {%- endfor -%}
+</div>
+
+<div class="cf-brand-hub__note">
+  <h4 class="cf-brand-hub__note-title">Note by Thunder Group</h4>
+  <p class="cf-brand-hub__note-text">
+    <strong>Thunder Group can custom make and design to meet your special request.<br>
+    We can create from concept to final product, such as, tumbler for stadium, custom logo melamine dinnerware, or any idea within our specification. One stop solution for OEM and ODM. (MOQ may apply for special order)</strong>
+  </p>
+</div>

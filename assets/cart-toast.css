@@ -1,0 +1,220 @@
+/**
+ * Cart Toast Notification - Celebrate Festival
+ * Compact design with CF brand colors
+ */
+
+.cf-toast {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 10001;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(20px);
+  transition: all 0.3s ease;
+  width: 320px;
+  max-width: calc(100vw - 32px);
+  pointer-events: none;
+}
+
+.cf-toast.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.cf-toast__card {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(26, 54, 93, 0.15);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+/* Header */
+.cf-toast__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #1a365d 0%, #2d5a87 100%);
+}
+
+.cf-toast__title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cf-toast__title::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #10b981;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+}
+
+.cf-toast__close {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  padding: 0;
+  font-size: 18px;
+  line-height: 1;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.cf-toast__close:hover {
+  color: #ffffff;
+}
+
+/* Body */
+.cf-toast__body {
+  padding: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: #fff;
+}
+
+.cf-toast__image {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cf-toast__image img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.cf-toast__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cf-toast__product-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1a365d;
+  margin: 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Footer - Two buttons */
+.cf-toast__footer {
+  padding: 10px 12px;
+  display: flex;
+  gap: 8px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+.cf-toast__btn {
+  flex: 1;
+  padding: 8px 14px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  display: inline-block;
+}
+
+.cf-toast__btn--cart {
+  background: #2d5a87;
+  color: white;
+}
+
+.cf-toast__btn--cart:hover {
+  background: #1a365d;
+  color: white;
+  text-decoration: none;
+}
+
+.cf-toast__btn--checkout {
+  background: #ff6b6b;
+  color: white;
+}
+
+.cf-toast__btn--checkout:hover {
+  background: #ff5252;
+  color: white;
+  text-decoration: none;
+}
+
+/* Responsive */
+@media (max-width: 440px) {
+  .cf-toast {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+  }
+
+  .cf-toast__header {
+    padding: 8px 12px;
+  }
+
+  .cf-toast__title {
+    font-size: 12px;
+  }
+
+  .cf-toast__body {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .cf-toast__image {
+    width: 50px;
+    height: 50px;
+  }
+
+  .cf-toast__product-title {
+    font-size: 12px;
+  }
+
+  .cf-toast__footer {
+    padding: 8px 10px;
+  }
+
+  .cf-toast__btn {
+    padding: 7px 12px;
+    font-size: 11px;
+  }
+}

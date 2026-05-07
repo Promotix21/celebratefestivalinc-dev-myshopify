@@ -1,0 +1,740 @@
+{% comment %}
+  Staff Picks Compact - Infinite Auto-Scrolling Product Slider
+  A compact, continuously scrolling product carousel with minimal vertical footprint.
+{% endcomment %}
+
+{%- liquid
+  assign staff_products = blank
+  if section.settings.product_source == 'collection' and section.settings.featured_collection != blank
+    assign staff_products = collections[section.settings.featured_collection].products
+  elsif section.settings.product_source == 'manual'
+    assign staff_products = section.settings.featured_products
+  endif
+
+  assign product_count = 0
+  for product in staff_products limit: section.settings.products_limit
+    if product.price > 0
+      assign product_count = product_count | plus: 1
+    endif
+  endfor
+-%}
+
+<style>
+  .spc-section {
+    padding: 40px 0 36px;
+    background: #f8fafc;
+    overflow: hidden;
+  }
+
+  .spc-header {
+    max-width: 100%;
+    padding: 0 40px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .spc-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a365d;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+  }
+
+  .spc-title::before {
+    content: '';
+    width: 4px;
+    height: 28px;
+    background: linear-gradient(180deg, #ff6b6b 0%, #1a365d 100%);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .spc-subtitle {
+    color: #64748b;
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  .spc-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .spc-pause-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid #e2e8f0;
+    background: #fff;
+    color: #1a365d;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .spc-pause-btn:hover {
+    background: #ff6b6b;
+    border-color: #ff6b6b;
+    color: #fff;
+  }
+
+  .spc-pause-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Infinite scroll track */
+  .spc-track-wrapper {
+    overflow: hidden;
+    width: 100%;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%);
+  }
+
+  .spc-track {
+    display: flex;
+    gap: 16px;
+    width: max-content;
+    animation: spc-scroll var(--spc-duration, 40s) linear infinite;
+  }
+
+  .spc-track:hover,
+  .spc-section.spc-paused .spc-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes spc-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* Compact card */
+  .spc-card {
+    flex-shrink: 0;
+    width: 180px;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .spc-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(26, 54, 93, 0.12);
+    border-color: #2d5a87;
+  }
+
+  .spc-card-link {
+    text-decoration: none;
+    display: block;
+  }
+
+  .spc-card-image {
+    position: relative;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background: linear-gradient(135deg, #f8fafc 0%, #fff 100%);
+    overflow: hidden;
+  }
+
+  .spc-card-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0) 20%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 80%, transparent 100%);
+    transform: skewX(-25deg);
+    z-index: 1;
+    transition: left 0.6s ease;
+    pointer-events: none;
+  }
+
+  .spc-card:hover .spc-card-image::before {
+    left: 150%;
+  }
+
+  .spc-card-image img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+  }
+
+  .spc-card:hover .spc-card-image img {
+    transform: scale(1.05);
+  }
+
+  .spc-badge-wrap {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 2;
+  }
+
+  .spc-badge {
+    font-size: 8px;
+    padding: 3px 6px;
+    border-radius: 3px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .spc-badge--low-stock {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+  }
+
+  .spc-badge--sale {
+    background: linear-gradient(135deg, #1a365d, #2d5a87);
+  }
+
+  .spc-wishlist {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .spc-wishlist:hover {
+    border-color: #ff6b6b;
+    transform: scale(1.1);
+  }
+
+  .spc-wishlist svg {
+    width: 13px;
+    height: 13px;
+    color: #cbd5e1;
+    transition: color 0.2s ease;
+  }
+
+  .spc-wishlist:hover svg,
+  .spc-wishlist.active svg {
+    color: #ff6b6b;
+  }
+
+  /* Card body */
+  .spc-card-body {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .spc-card-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #1a365d;
+    line-height: 1.35;
+    margin: 0 0 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: calc(11px * 1.35 * 2);
+    transition: color 0.2s ease;
+  }
+
+  .spc-card:hover .spc-card-title {
+    color: #2d5a87;
+  }
+
+  .spc-card-sku {
+    font-size: 8px;
+    font-weight: 600;
+    color: #1a365d;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    display: inline-block;
+    margin-bottom: 6px;
+    align-self: flex-start;
+  }
+
+  /* Compact price */
+  .spc-price-box {
+    background: linear-gradient(135deg, #f8fafc, #fff);
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 6px 8px;
+    text-align: center;
+    margin-bottom: 8px;
+    min-height: 44px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .spc-price-label {
+    font-size: 8px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+
+  .spc-price-compare {
+    font-size: 10px;
+    color: #94a3b8;
+    text-decoration: line-through;
+    margin-bottom: 1px;
+  }
+
+  .spc-price-amount {
+    font-size: 13px;
+    font-weight: 800;
+    color: #1a365d;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+  }
+
+  .spc-price-unit {
+    font-size: 9px;
+    font-weight: 500;
+    color: #64748b;
+  }
+
+  /* Compact add to cart */
+  .spc-card-actions {
+    margin-top: auto;
+    display: flex;
+    gap: 6px;
+  }
+
+  .spc-qty {
+    width: 36px;
+    height: 30px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #0f172a;
+  }
+
+  .spc-qty:focus {
+    outline: none;
+    border-color: #2d5a87;
+  }
+
+  .spc-atc {
+    flex: 1;
+    height: 30px;
+    background: linear-gradient(135deg, #ff6b6b, #ef4444);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .spc-atc:hover {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(255, 107, 107, 0.3);
+  }
+
+  .spc-atc.spc-added {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+  }
+
+  .spc-select-opts {
+    flex: 1;
+    height: 30px;
+    background: linear-gradient(135deg, #2d5a87, #1a365d);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+  }
+
+  .spc-select-opts:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(26, 54, 93, 0.3);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .spc-section { padding: 28px 0 24px; }
+    .spc-header { padding: 0 16px; margin-bottom: 16px; }
+    .spc-title { font-size: 20px; }
+    .spc-card { width: 160px; }
+    .spc-card-image { height: 100px; }
+  }
+</style>
+
+<section class="spc-section" id="spc-section-{{ section.id }}">
+  <div class="spc-header">
+    <div>
+      <h2 class="spc-title">{{ section.settings.section_title | default: 'Staff Picks' }}</h2>
+      {% if section.settings.section_subtitle != blank %}
+        <p class="spc-subtitle">{{ section.settings.section_subtitle }}</p>
+      {% endif %}
+    </div>
+    <div class="spc-controls">
+      <button class="spc-pause-btn" id="spc-pause-{{ section.id }}" aria-label="Pause slider">
+        <svg viewBox="0 0 24 24" fill="currentColor" id="spc-pause-icon-{{ section.id }}">
+          <rect x="6" y="4" width="4" height="16" rx="1"/>
+          <rect x="14" y="4" width="4" height="16" rx="1"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="spc-track-wrapper">
+    <div class="spc-track" id="spc-track-{{ section.id }}" style="--spc-duration: {{ section.settings.scroll_speed | default: 40 }}s;">
+
+      {%- comment -%} First set of products {%- endcomment -%}
+      {% for product in staff_products limit: section.settings.products_limit %}
+
+        {%- liquid
+          assign on_sale = false
+          if product.compare_at_price > product.price
+            assign on_sale = true
+          endif
+
+          assign low_stock = false
+          assign total_inv = 0
+          for variant in product.variants
+            assign total_inv = total_inv | plus: variant.inventory_quantity
+          endfor
+          if total_inv > 0 and total_inv <= 10
+            assign low_stock = true
+          endif
+
+          assign p_sku = product.selected_or_first_available_variant.sku
+        -%}
+
+        <div class="spc-card" data-product-id="{{ product.id }}">
+          <a href="{{ product.url }}" class="spc-card-link">
+            <div class="spc-card-image">
+              {%- if product.featured_media -%}
+                <img src="{{ product.featured_media | image_url: width: 300 }}" alt="{{ product.featured_media.alt | escape }}" loading="lazy" width="150" height="150">
+              {%- else -%}
+                {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+              {%- endif -%}
+
+              <div class="spc-badge-wrap">
+                {%- if low_stock -%}<span class="spc-badge spc-badge--low-stock">Low Stock</span>{%- endif -%}
+                {%- if on_sale -%}<span class="spc-badge spc-badge--sale">Sale</span>{%- endif -%}
+              </div>
+
+              <button type="button" class="spc-wishlist" data-wishlist-btn data-product-id="{{ product.id }}" data-variant-id="{{ product.selected_or_first_available_variant.id }}" data-product-title="{{ product.title | escape }}" data-product-handle="{{ product.handle }}" data-product-image="{{ product.featured_media | image_url: width: 400 }}" data-product-price="{{ product.price }}" data-product-url="{{ product.url }}" aria-label="Add to wishlist">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              </button>
+            </div>
+          </a>
+
+          <div class="spc-card-body">
+            <a href="{{ product.url }}" style="text-decoration:none;">
+              <h3 class="spc-card-title">{{ product.title }}</h3>
+            </a>
+
+            {%- if p_sku != blank -%}
+              <span class="spc-card-sku">#{{ p_sku }}</span>
+            {%- endif -%}
+
+            <div class="spc-price-box">
+              {%- if product.price == 0 -%}
+                <div class="spc-price-label">Contact Us</div>
+              {%- elsif on_sale -%}
+                <div class="spc-price-label">Sale Price</div>
+                <div class="spc-price-compare">{{ product.compare_at_price | money }}</div>
+              {%- else -%}
+                <div class="spc-price-label">Price</div>
+              {%- endif -%}
+              {%- unless product.price == 0 -%}
+                <div class="spc-price-amount">{{ product.price | money }}<span class="spc-price-unit">/Each</span></div>
+              {%- endunless -%}
+            </div>
+
+            <div class="spc-card-actions">
+              {%- if product.price == 0 -%}
+                <a href="{{ product.url }}" class="spc-select-opts">Get a Quote</a>
+              {%- elsif product.available -%}
+                {%- if product.variants.size == 1 -%}
+                  <input type="number" class="spc-qty" value="1" min="1" aria-label="Quantity" data-product-id="{{ product.id }}">
+                  <button type="button" class="spc-atc" data-variant-id="{{ product.selected_or_first_available_variant.id }}" data-product-id="{{ product.id }}">Add to Cart</button>
+                {%- else -%}
+                  <a href="{{ product.url }}" class="spc-select-opts">Select Options</a>
+                {%- endif -%}
+              {%- else -%}
+                <button class="spc-atc" disabled style="background:#94a3b8;cursor:not-allowed;">Sold Out</button>
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+
+      {%- comment -%} Duplicate set for seamless infinite loop {%- endcomment -%}
+      {% for product in staff_products limit: section.settings.products_limit %}
+
+        {%- liquid
+          assign on_sale = false
+          if product.compare_at_price > product.price
+            assign on_sale = true
+          endif
+
+          assign low_stock = false
+          assign total_inv = 0
+          for variant in product.variants
+            assign total_inv = total_inv | plus: variant.inventory_quantity
+          endfor
+          if total_inv > 0 and total_inv <= 10
+            assign low_stock = true
+          endif
+
+          assign p_sku = product.selected_or_first_available_variant.sku
+        -%}
+
+        <div class="spc-card" data-product-id="{{ product.id }}" aria-hidden="true">
+          <a href="{{ product.url }}" class="spc-card-link" tabindex="-1">
+            <div class="spc-card-image">
+              {%- if product.featured_media -%}
+                <img src="{{ product.featured_media | image_url: width: 300 }}" alt="{{ product.featured_media.alt | escape }}" loading="lazy" width="150" height="150">
+              {%- else -%}
+                {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+              {%- endif -%}
+
+              <div class="spc-badge-wrap">
+                {%- if low_stock -%}<span class="spc-badge spc-badge--low-stock">Low Stock</span>{%- endif -%}
+                {%- if on_sale -%}<span class="spc-badge spc-badge--sale">Sale</span>{%- endif -%}
+              </div>
+
+              <button type="button" class="spc-wishlist" tabindex="-1" data-wishlist-btn data-product-id="{{ product.id }}" data-variant-id="{{ product.selected_or_first_available_variant.id }}" data-product-title="{{ product.title | escape }}" data-product-handle="{{ product.handle }}" data-product-image="{{ product.featured_media | image_url: width: 400 }}" data-product-price="{{ product.price }}" data-product-url="{{ product.url }}" aria-label="Add to wishlist">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              </button>
+            </div>
+          </a>
+
+          <div class="spc-card-body">
+            <a href="{{ product.url }}" style="text-decoration:none;" tabindex="-1">
+              <h3 class="spc-card-title">{{ product.title }}</h3>
+            </a>
+
+            {%- if p_sku != blank -%}
+              <span class="spc-card-sku">#{{ p_sku }}</span>
+            {%- endif -%}
+
+            <div class="spc-price-box">
+              {%- if on_sale -%}
+                <div class="spc-price-label">Sale Price</div>
+                <div class="spc-price-compare">{{ product.compare_at_price | money }}</div>
+              {%- else -%}
+                <div class="spc-price-label">Price</div>
+              {%- endif -%}
+              <div class="spc-price-amount">{{ product.price | money }}<span class="spc-price-unit">/Each</span></div>
+            </div>
+
+            <div class="spc-card-actions">
+              {%- if product.available -%}
+                {%- if product.variants.size == 1 -%}
+                  <input type="number" class="spc-qty" value="1" min="1" aria-label="Quantity" data-product-id="{{ product.id }}" tabindex="-1">
+                  <button type="button" class="spc-atc" data-variant-id="{{ product.selected_or_first_available_variant.id }}" data-product-id="{{ product.id }}" tabindex="-1">Add to Cart</button>
+                {%- else -%}
+                  <a href="{{ product.url }}" class="spc-select-opts" tabindex="-1">Select Options</a>
+                {%- endif -%}
+              {%- else -%}
+                <button class="spc-atc" disabled style="background:#94a3b8;cursor:not-allowed;" tabindex="-1">Sold Out</button>
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Pause/play toggle
+  const section = document.getElementById('spc-section-{{ section.id }}');
+  const pauseBtn = document.getElementById('spc-pause-{{ section.id }}');
+  const pauseIcon = document.getElementById('spc-pause-icon-{{ section.id }}');
+  let paused = false;
+
+  if (pauseBtn && section) {
+    pauseBtn.addEventListener('click', function() {
+      paused = !paused;
+      section.classList.toggle('spc-paused', paused);
+      pauseIcon.innerHTML = paused
+        ? '<polygon points="5,3 19,12 5,21" />'
+        : '<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>';
+    });
+  }
+
+  // Quick add to cart
+  document.querySelectorAll('#spc-section-{{ section.id }} .spc-atc[data-variant-id]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var variantId = this.dataset.variantId;
+      var card = this.closest('.spc-card');
+      var qty = 1;
+      var qtyInput = card ? card.querySelector('.spc-qty') : null;
+      if (qtyInput) qty = parseInt(qtyInput.value, 10) || 1;
+
+      this.disabled = true;
+      var origText = this.innerHTML;
+      this.innerHTML = 'Adding...';
+      var self = this;
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: variantId, quantity: qty })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        fetch('/cart.js').then(function(r) { return r.json(); }).then(function(cart) {
+          var cc = document.querySelector('.cart-count');
+          if (cc) cc.textContent = cart.item_count;
+          var ccb = document.querySelector('.cart-count-bubble span[aria-hidden="true"]');
+          if (ccb) ccb.textContent = cart.item_count;
+          if (typeof window.cfShowCartToast === 'function') window.cfShowCartToast(data, qty);
+        });
+        self.innerHTML = 'Added!';
+        self.classList.add('spc-added');
+        setTimeout(function() {
+          self.innerHTML = 'Add to Cart';
+          self.classList.remove('spc-added');
+          self.disabled = false;
+        }, 2000);
+      })
+      .catch(function() {
+        self.innerHTML = 'Error';
+        setTimeout(function() {
+          self.innerHTML = 'Add to Cart';
+          self.disabled = false;
+        }, 2000);
+      });
+    });
+  });
+});
+</script>
+
+{% schema %}
+{
+  "name": "Staff Picks Compact",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section Title",
+      "default": "Staff Picks"
+    },
+    {
+      "type": "text",
+      "id": "section_subtitle",
+      "label": "Section Subtitle",
+      "default": "Handpicked by our equipment experts"
+    },
+    {
+      "type": "header",
+      "content": "Product Source"
+    },
+    {
+      "type": "select",
+      "id": "product_source",
+      "label": "Product Source",
+      "options": [
+        { "value": "collection", "label": "Collection" },
+        { "value": "manual", "label": "Manual Selection" }
+      ],
+      "default": "collection"
+    },
+    {
+      "type": "collection",
+      "id": "featured_collection",
+      "label": "Featured Collection"
+    },
+    {
+      "type": "product_list",
+      "id": "featured_products",
+      "label": "Featured Products",
+      "limit": 20
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "label": "Products Limit",
+      "min": 4,
+      "max": 20,
+      "step": 1,
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Scroll Settings"
+    },
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "label": "Scroll Speed (seconds for full cycle)",
+      "min": 15,
+      "max": 80,
+      "step": 5,
+      "default": 40,
+      "info": "Lower = faster. 40s is a comfortable reading speed."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Staff Picks Compact"
+    }
+  ]
+}
+{% endschema %}

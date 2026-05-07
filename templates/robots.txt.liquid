@@ -1,0 +1,68 @@
+{% comment %}
+  Custom robots.txt — Shopify default rules + AI crawler access.
+  Shopify renders its default rules via content_for_layout.
+  We append AI bot directives to maximize SEO in AI-powered search.
+{% endcomment %}
+{{ content_for_layout }}
+
+# AI Crawlers — Allowed for SEO visibility in AI search tools
+User-agent: GPTBot
+Allow: /
+Disallow: /admin
+Disallow: /cart
+Disallow: /orders
+Disallow: /checkouts
+Disallow: /account
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin
+Disallow: /cart
+Disallow: /orders
+Disallow: /checkouts
+Disallow: /account
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GoogleOther
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /admin
+Disallow: /cart
+Disallow: /orders
+Disallow: /checkouts
+Disallow: /account
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin
+Disallow: /cart
+Disallow: /orders
+Disallow: /checkouts
+Disallow: /account
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin
+Disallow: /cart
+Disallow: /orders
+Disallow: /checkouts
+Disallow: /account
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /

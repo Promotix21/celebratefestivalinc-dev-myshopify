@@ -1,0 +1,216 @@
+{% comment %}
+  Trust Badges Section
+  Image on left + 4 Badge Cards on right in 2x2 grid
+{% endcomment %}
+
+{{ 'trust-badges-section.css' | asset_url | stylesheet_tag }}
+
+<section class="trust-badges" id="trust-badges-{{ section.id }}">
+  <div class="trust-badges__inner">
+    <!-- Left: Image -->
+    <div class="trust-badges__image-wrapper">
+      {% if section.settings.image != blank %}
+        {% assign cache_bust = 'now' | date: '%s' %}
+        <img
+          src="{{ section.settings.image | image_url: width: 800 }}?v={{ cache_bust }}"
+          srcset="{{ section.settings.image | image_url: width: 400 }}?v={{ cache_bust }} 400w,
+                  {{ section.settings.image | image_url: width: 600 }}?v={{ cache_bust }} 600w,
+                  {{ section.settings.image | image_url: width: 800 }}?v={{ cache_bust }} 800w"
+          sizes="(max-width: 1100px) 100vw, 50vw"
+          alt="{{ section.settings.image_alt | default: 'Restaurant Equipment' }}"
+          loading="lazy"
+          class="trust-badges__image"
+        >
+      {% else %}
+        <div class="trust-badges__image-placeholder">
+          <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+          <span>Add Image</span>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Right: Badge Cards Grid -->
+    <div class="trust-badges__grid">
+      {% for block in section.blocks %}
+        {% if block.type == 'badge' %}
+          <div class="trust-badges__card" {{ block.shopify_attributes }}>
+            <div class="trust-badges__card-icon">
+              {% if block.settings.icon_image != blank %}
+                {% assign icon_cache_bust = 'now' | date: '%s' %}
+                <img
+                  src="{{ block.settings.icon_image | image_url: width: 130 }}?v={{ icon_cache_bust }}"
+                  alt="{{ block.settings.title }}"
+                  width="65"
+                  height="65"
+                  loading="lazy"
+                >
+              {% else %}
+                <span class="trust-badges__card-icon-placeholder">
+                  {{ block.settings.title | slice: 0 }}
+                </span>
+              {% endif %}
+            </div>
+            <div class="trust-badges__card-text">
+              {% if block.settings.title != blank %}
+                <h3 class="trust-badges__card-title">{{ block.settings.title }}</h3>
+              {% endif %}
+              {% if block.settings.description != blank %}
+                <p class="trust-badges__card-desc">{{ block.settings.description }}</p>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const section = document.getElementById('trust-badges-{{ section.id }}');
+  if (!section) return;
+
+  const cards = section.querySelectorAll('.trust-badges__card');
+
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px 0px -50px 0px',
+    threshold: 0.1
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        cards.forEach((card, index) => {
+          setTimeout(() => {
+            card.classList.add('trust-badges__card--visible');
+          }, index * 100);
+        });
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  observer.observe(section);
+});
+</script>
+
+{% schema %}
+{
+  "name": "Trust Badges",
+  "tag": "section",
+  "class": "trust-badges-section",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Section image"
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image alt text",
+      "default": "Restaurant Equipment"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#f5f7f9"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 20,
+      "max": 120,
+      "step": 10,
+      "default": 80,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 20,
+      "max": 120,
+      "step": 10,
+      "default": 100,
+      "unit": "px"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "badge",
+      "name": "Badge Card",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "Icon image (65x65px recommended)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Best Price Guarantee"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Exposed pricing, no hidden costs"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Trust Badges",
+      "blocks": [
+        {
+          "type": "badge",
+          "settings": {
+            "title": "Best Price Guarantee",
+            "description": "Exposed pricing, no hidden costs"
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "title": "100+ Trusted Brands",
+            "description": "Premium equipment selection"
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "title": "Free Palletized Shipping",
+            "description": "Safe delivery guaranteed"
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "title": "Premium Customer Support",
+            "description": "Expert help when you need it"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

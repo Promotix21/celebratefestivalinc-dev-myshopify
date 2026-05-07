@@ -1,0 +1,314 @@
+{%- liquid
+  assign api_url        = section.settings.api_url | default: 'https://cf-chatbot.hiraya.digital'
+  assign headline       = section.settings.headline | default: 'How can we help you'
+  assign headline_accent = section.settings.headline_accent | default: 'cook?'
+  assign subhead        = section.settings.subhead
+  assign phone          = section.settings.phone_number | default: '(408) 673-9999'
+  assign cta_title      = section.settings.cta_card_title | default: 'Book a Free Consultation'
+  assign cta_text       = section.settings.cta_card_text
+  assign cta_btn        = section.settings.cta_card_button | default: 'Schedule Call'
+  assign cta_link       = section.settings.cta_card_link | default: 'tel:+14086739999'
+  assign logo           = section.settings.logo
+  assign cta_image      = section.settings.cta_image
+-%}
+
+<link rel="stylesheet" href="{{ 'cf-chatbot.css' | asset_url }}">
+<link rel="stylesheet" href="{{ 'cf-chatbot-orb.css' | asset_url }}">
+<link rel="stylesheet" href="{{ 'cf-chatbot-pro.css' | asset_url }}">
+<link rel="stylesheet" href="{{ 'cf-apex-mascot.css' | asset_url }}">
+
+<style>
+  .cf-ai { display: grid; grid-template-columns: 320px 1fr 320px; height: 100vh; background: #f1f5f9; overflow: hidden; }
+
+  /* Left panel */
+  .cf-ai__left { background: linear-gradient(160deg, #1a365d 0%, #2d5a87 55%, #3d6a9f 100%); color: #fff; padding: 32px 26px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+  .cf-ai__left::before { content: ''; position: absolute; top: -30px; right: -30px; width: 180px; height: 180px; border-radius: 50%; background: rgba(255, 107, 107, 0.18); filter: blur(30px); }
+  .cf-ai__left::after { content: ''; position: absolute; bottom: -40px; left: -40px; width: 220px; height: 220px; border-radius: 50%; background: rgba(255, 255, 255, 0.08); filter: blur(40px); }
+  .cf-ai__left > * { position: relative; z-index: 1; }
+  .cf-ai__logo { margin-bottom: 36px; display: inline-flex; align-items: center; background: #fff; padding: 10px 16px; border-radius: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.12); align-self: flex-start; }
+  .cf-ai__logo img { max-height: 56px; max-width: 220px; width: auto; object-fit: contain; display: block; }
+  .cf-ai__headline { font: 800 34px/1.1 Montserrat, sans-serif; letter-spacing: -0.02em; margin-bottom: 14px; }
+  .cf-ai__headline em { font-style: normal; background: linear-gradient(135deg, #ff6b6b, #ffd24a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .cf-ai__subhead { font: 400 14px/1.55 Inter, sans-serif; color: rgba(255, 255, 255, 0.78); margin-bottom: 28px; }
+  .cf-ai__chips { display: flex; flex-direction: column; gap: 10px; margin-bottom: auto; }
+  .cf-ai__chip { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.18); color: #fff; padding: 12px 16px; border-radius: 12px; text-align: left; font: 600 13.5px/1.3 Inter, sans-serif; cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 10px; }
+  .cf-ai__chip:hover { background: rgba(255, 255, 255, 0.18); border-color: rgba(255, 255, 255, 0.3); transform: translateY(-1px); }
+  .cf-ai__chip svg { flex: 0 0 auto; opacity: .85; }
+  .cf-ai__stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding-top: 24px; margin-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.15); }
+  .cf-ai__stat-num { font: 800 20px/1 Montserrat, sans-serif; color: #fff; }
+  .cf-ai__stat-lbl { font: 500 11px/1.3 Inter, sans-serif; color: rgba(255, 255, 255, 0.65); margin-top: 4px; }
+  .cf-ai__back { margin-top: 24px; font: 600 13px/1 Inter, sans-serif; color: rgba(255, 255, 255, 0.8); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: color .2s; }
+  .cf-ai__back:hover { color: #fff; }
+
+  /* Center (chat) */
+  .cf-ai__center { display: flex; flex-direction: column; background: #fff; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; overflow: hidden; min-height: 0; }
+  .cf-ai__chat-header { padding: 18px 28px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 12px; background: #fff; }
+  .cf-ai__chat-header .cf-orb { flex: 0 0 auto; }
+  .cf-ai__agent-name { font: 700 14px/1.2 Montserrat, sans-serif; color: #0f172a; }
+  .cf-ai__agent-status { font: 500 11.5px/1.2 Inter, sans-serif; color: #10b981; display: flex; align-items: center; gap: 5px; margin-top: 2px; }
+  .cf-ai__agent-status::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #10b981; }
+
+  #cf-chatbot-fullpage { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+
+  /* Right panel */
+  .cf-ai__right { padding: 28px 24px; display: flex; flex-direction: column; gap: 20px; background: #f8fafc; overflow-y: auto; }
+  .cf-ai__cta-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; }
+  .cf-ai__cta-img { width: 100%; height: 130px; object-fit: cover; background: linear-gradient(135deg, #ff6b6b, #2d5a87); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 48px; }
+  .cf-ai__cta-body { padding: 18px; }
+  .cf-ai__cta-title { font: 700 16px/1.25 Montserrat, sans-serif; color: #1a365d; margin: 0 0 8px; }
+  .cf-ai__cta-text { font: 400 13px/1.5 Inter, sans-serif; color: #475569; margin: 0 0 14px; }
+  .cf-ai__cta-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 11px 14px; background: #1a365d; color: #fff; border-radius: 10px; font: 700 13.5px/1 Inter, sans-serif; text-decoration: none; transition: background .2s; }
+  .cf-ai__cta-btn:hover { background: #2d5a87; }
+  .cf-ai__phone { text-align: center; padding: 14px; border: 1px dashed #e2e8f0; border-radius: 12px; }
+  .cf-ai__phone-label { font: 500 11px/1 Inter, sans-serif; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 6px; }
+  .cf-ai__phone-num { font: 800 18px/1 Montserrat, sans-serif; color: #1a365d; text-decoration: none; }
+
+  .cf-ai__info { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; }
+  .cf-ai__info h4 { font: 700 13px/1.2 Montserrat, sans-serif; color: #1a365d; margin: 0 0 8px; display: flex; align-items: center; gap: 6px; }
+  .cf-ai__info p { font: 400 12.5px/1.55 Inter, sans-serif; color: #475569; margin: 0; }
+
+  .cf-ai__mascot { border-radius: 16px; overflow: hidden; aspect-ratio: 1 / 1; }
+  .cf-ai__mascot .cf-apex { width: 100%; height: 100%; aspect-ratio: auto; }
+
+  /* Tablet */
+  @media (max-width: 1200px) and (min-width: 769px) {
+    .cf-ai { grid-template-columns: 280px 1fr; }
+    .cf-ai__right { display: none; }
+    .cf-ai__center { border-right: 0; }
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .cf-ai { grid-template-columns: 1fr; grid-template-rows: auto 1fr; height: 100vh; height: 100dvh; }
+    .cf-ai__left, .cf-ai__right { display: none; }
+    .cf-ai__center { border: 0; }
+    .cf-ai__mobile-header { display: flex; }
+    .cf-ai__chat-header { padding: 14px 18px; }
+    .cf-ai__center .cf-chatbot__body { padding: 16px 18px; }
+    .cf-ai__center .cf-chatbot__quick { padding: 0 18px 10px; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+    .cf-ai__center .cf-chatbot__quick-btn { white-space: nowrap; flex-shrink: 0; }
+    .cf-ai__center .cf-chatbot__form { padding: 12px 18px 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+    .cf-msg { max-width: 92%; }
+  }
+
+  .cf-ai__mobile-header { display: none; padding: 12px 18px; background: linear-gradient(135deg, #1a365d, #2d5a87); color: #fff; align-items: center; justify-content: space-between; }
+  .cf-ai__mobile-header img { max-height: 32px; width: auto; background: #fff; padding: 4px 8px; border-radius: 6px; }
+  .cf-ai__mobile-header a { color: #fff; text-decoration: none; font: 600 13px/1 Inter, sans-serif; opacity: .9; }
+
+  /* Chat bubble overrides for this page */
+  .cf-ai__center .cf-msg--assistant .cf-msg__bubble { background: #f1f5f9; color: #0f172a; }
+  .cf-ai__center .cf-msg--user .cf-msg__bubble { background: #1a365d; }
+  .cf-ai__center .cf-chatbot__body { background: #fff; padding: 24px 28px; }
+  .cf-ai__center .cf-chatbot__quick { background: #fff; padding: 0 28px 12px; border-top: 1px solid #f1f5f9; }
+  .cf-ai__center .cf-chatbot__form { padding: 16px 28px 22px; }
+  .cf-ai__center .cf-chatbot__input { border-radius: 12px; padding: 12px 14px; font-size: 14.5px; }
+  .cf-ai__center .cf-chatbot__send { border-radius: 12px; width: 46px; }
+</style>
+
+<div class="cf-ai">
+  <!-- MOBILE HEADER -->
+  <div class="cf-ai__mobile-header">
+    <img src="{{ 'brand-logo-celebrate-festival-inc.png' | asset_url }}" alt="{{ shop.name }}">
+    <a href="/">← Back</a>
+  </div>
+
+  <!-- LEFT -->
+  <aside class="cf-ai__left">
+    <div class="cf-ai__logo">
+      {% if logo %}
+        <img src="{{ logo | image_url: width: 280 }}" alt="{{ shop.name }}" loading="lazy">
+      {% else %}
+        <img src="{{ 'brand-logo-celebrate-festival-inc.png' | asset_url }}" alt="{{ shop.name }}" loading="lazy">
+      {% endif %}
+    </div>
+
+    <h1 class="cf-ai__headline">{{ headline | escape }} <em>{{ headline_accent | escape }}</em></h1>
+    {% if subhead != blank %}<p class="cf-ai__subhead">{{ subhead | escape }}</p>{% endif %}
+
+    <div class="cf-ai__chips">
+      {% for block in section.blocks %}
+        {% if block.type == 'prompt_chip' %}
+          <button class="cf-ai__chip" type="button" data-cf-prompt="{{ block.settings.prompt | escape }}" {{ block.shopify_attributes }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            {{ block.settings.label | escape }}
+          </button>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="cf-ai__stats">
+      <div>
+        <div class="cf-ai__stat-num">{{ section.settings.stat_1_number | default: '16K+' }}</div>
+        <div class="cf-ai__stat-lbl">{{ section.settings.stat_1_label | default: 'Products' }}</div>
+      </div>
+      <div>
+        <div class="cf-ai__stat-num">{{ section.settings.stat_2_number | default: '24/7' }}</div>
+        <div class="cf-ai__stat-lbl">{{ section.settings.stat_2_label | default: 'Support' }}</div>
+      </div>
+      <div>
+        <div class="cf-ai__stat-num">{{ section.settings.stat_3_number | default: '100%' }}</div>
+        <div class="cf-ai__stat-lbl">{{ section.settings.stat_3_label | default: 'Expert' }}</div>
+      </div>
+    </div>
+
+    <a href="/" class="cf-ai__back">← Back to store</a>
+  </aside>
+
+  <!-- CENTER -->
+  <main class="cf-ai__center">
+    <div class="cf-ai__chat-header">
+      <div class="cf-orb cf-orb--md cf-orb--idle" data-orb>
+        <div class="cf-orb__frame">
+          <div class="cf-orb__glow"></div>
+          <div class="cf-orb__ring"></div>
+          <div class="cf-orb__shimmer"></div>
+          <div class="cf-orb__core"></div>
+        </div>
+      </div>
+      <div>
+        <div class="cf-ai__agent-name">Apex_Forge · Kitchen Consultant</div>
+        <div class="cf-ai__agent-status">Online • AI-powered</div>
+      </div>
+    </div>
+    <div id="cf-chatbot-fullpage"></div>
+  </main>
+
+  <!-- RIGHT -->
+  <aside class="cf-ai__right">
+    <div class="cf-ai__mascot">
+      <div class="cf-apex cf-apex--idle" data-cf-apex>
+        <div class="cf-apex__badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" aria-hidden="true">
+            <path d="M12 2v20 M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+          Apex_Forge
+        </div>
+        <div class="cf-apex__sublabel">Equipment Intelligence Core</div>
+
+        <div class="cf-apex__stage">
+          <div class="cf-apex__ambient" data-apex-layer="ambient"></div>
+
+          <div class="cf-apex__casing" data-apex-layer="casing">
+            <div class="cf-apex__spoke cf-apex__spoke--0"></div>
+            <div class="cf-apex__spoke cf-apex__spoke--45"></div>
+            <div class="cf-apex__spoke cf-apex__spoke--90"></div>
+            <div class="cf-apex__spoke cf-apex__spoke--135"></div>
+          </div>
+
+          <div class="cf-apex__coils" data-apex-layer="coils">
+            <div class="cf-apex__coils-inner">
+              <svg viewBox="0 0 100 100" class="cf-apex__coil-svg" aria-hidden="true">
+                <circle cx="50" cy="50" r="42" fill="none" stroke-width="4" stroke-dasharray="18 4" class="cf-apex__ring cf-apex__ring--outer"/>
+                <circle cx="50" cy="50" r="32" fill="none" stroke-width="4" stroke-dasharray="12 4" class="cf-apex__ring cf-apex__ring--mid"/>
+                <circle cx="50" cy="50" r="22" fill="none" stroke-width="4" stroke-dasharray="6 4" class="cf-apex__ring cf-apex__ring--inner"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="cf-apex__thermostat" data-apex-layer="thermostat">
+            <div class="cf-apex__screen">
+              <div class="cf-apex__flame"></div>
+              <span class="cf-apex__temp" data-apex-temp>120°</span>
+              <span class="cf-apex__label" data-apex-label>STANDBY</span>
+            </div>
+          </div>
+
+          <div class="cf-apex__gauge" data-apex-layer="gauge">
+            <div class="cf-apex__bars">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="cf-apex__gauge-label">BTU Output</div>
+          </div>
+
+          <div class="cf-apex__sparks" data-apex-sparks></div>
+        </div>
+
+        <div class="cf-apex__status">System Online</div>
+      </div>
+    </div>
+    <div class="cf-ai__cta-card">
+      {% if cta_image %}
+        <div class="cf-ai__cta-img">
+          <img src="{{ cta_image | image_url: width: 600 }}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+        </div>
+      {% endif %}
+      <div class="cf-ai__cta-body">
+        <h3 class="cf-ai__cta-title">{{ cta_title | escape }}</h3>
+        {% if cta_text != blank %}<p class="cf-ai__cta-text">{{ cta_text | escape }}</p>{% endif %}
+        <a href="{{ cta_link }}" class="cf-ai__cta-btn">
+          {{ cta_btn | escape }} →
+        </a>
+      </div>
+    </div>
+
+  </aside>
+</div>
+
+<script>
+  window.CF_CHATBOT_API = {{ api_url | json }};
+  window.CF_CHATBOT_DISABLE_WIDGET = true;
+  {% if customer %}
+    window.CF_CHATBOT_CUSTOMER_ID = {{ customer.id | json }};
+    window.CF_CHATBOT_CUSTOMER_TAGS = {{ customer.tags | json }};
+    window.CF_CHATBOT_LOGGED_IN = true;
+  {% else %}
+    window.CF_CHATBOT_LOGGED_IN = false;
+  {% endif %}
+</script>
+<script src="{{ 'cf-apex-mascot.js' | asset_url }}" defer></script>
+<script src="{{ 'cf-chatbot.js' | asset_url }}" defer></script>
+
+<script>
+  (function () {
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.cf-ai__chip').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var prompt = btn.getAttribute('data-cf-prompt');
+          var input = document.querySelector('#cf-chatbot-fullpage .cf-chatbot__input');
+          var form = document.querySelector('#cf-chatbot-fullpage .cf-chatbot__form');
+          if (input && form) {
+            input.value = prompt;
+            form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+          }
+        });
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "AI Assistant Page",
+  "settings": [
+    { "type": "url", "id": "api_url", "label": "Backend API URL" },
+    { "type": "image_picker", "id": "logo", "label": "Logo (left sidebar)" },
+    { "type": "text", "id": "headline", "label": "Headline", "default": "How can we help you" },
+    { "type": "text", "id": "headline_accent", "label": "Headline accent word", "default": "cook?" },
+    { "type": "textarea", "id": "subhead", "label": "Subhead" },
+    { "type": "header", "content": "Stats" },
+    { "type": "text", "id": "stat_1_number", "label": "Stat 1 number", "default": "16K+" },
+    { "type": "text", "id": "stat_1_label", "label": "Stat 1 label", "default": "Products" },
+    { "type": "text", "id": "stat_2_number", "label": "Stat 2 number", "default": "24/7" },
+    { "type": "text", "id": "stat_2_label", "label": "Stat 2 label", "default": "Support" },
+    { "type": "text", "id": "stat_3_number", "label": "Stat 3 number", "default": "100%" },
+    { "type": "text", "id": "stat_3_label", "label": "Stat 3 label", "default": "Expert" },
+    { "type": "header", "content": "Right CTA Card" },
+    { "type": "image_picker", "id": "cta_image", "label": "CTA Image" },
+    { "type": "text", "id": "cta_card_title", "label": "CTA Title", "default": "Book a Free Consultation" },
+    { "type": "textarea", "id": "cta_card_text", "label": "CTA Text" },
+    { "type": "text", "id": "cta_card_button", "label": "CTA Button Label", "default": "Schedule Call" },
+    { "type": "url", "id": "cta_card_link", "label": "CTA Link" },
+    { "type": "text", "id": "phone_number", "label": "Phone", "default": "(408) 673-9999" }
+  ],
+  "blocks": [
+    {
+      "type": "prompt_chip",
+      "name": "Prompt Chip",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Chip Label" },
+        { "type": "textarea", "id": "prompt", "label": "Full prompt text" }
+      ]
+    }
+  ]
+}
+{% endschema %}
