@@ -3,6 +3,9 @@
 .env.local
 .env.*.local
 *.env
+# Backup zip of the chatbot backend — contains a real .env inside.
+cf-chatbot-backend.zip
+cf-chatbot-backend*.zip
 
 # ===== Shopify CLI =====
 node_modules/
