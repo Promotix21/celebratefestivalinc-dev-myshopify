@@ -81,6 +81,7 @@
     "cf-related": {
       "type": "cf-you-may-like",
       "settings": {
+        "show_section": true,
         "heading": "You May Also Like",
         "intent": "related",
         "limit": 8

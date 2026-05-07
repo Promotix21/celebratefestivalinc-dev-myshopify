@@ -27,7 +27,16 @@
 
 {{ 'product-compact.css' | asset_url | stylesheet_tag }}
 
-{%- if recommendations.performed and recommendations.products_count > 0 -%}
+{%- comment -%}
+  Theme-editor on/off toggle. When unchecked the section renders nothing:
+  the carousel HTML is suppressed AND the loader script doesn't run, so
+  the inline <div data-cf-related-inline> placeholder in product-compact
+  stays empty and the carousel doesn't appear on the SPP.
+{%- endcomment -%}
+{%- if section.settings.show_section == false -%}
+  {%- comment -%} disabled via theme editor — render nothing {%- endcomment -%}
+
+{%- elsif recommendations.performed and recommendations.products_count > 0 -%}
   {%- comment -%}
     Carousel HTML returned to fetch callers (?section_id=…). The
     [data-cf-related-payload] wrapper is only a marker so the loader can
@@ -82,6 +91,7 @@
   </div>
 {%- endif -%}
 
+{%- if section.settings.show_section != false -%}
 <script>
   (function () {
     window.cfYouMayLikeSectionId = {{ section.id | json }};
@@ -121,6 +131,7 @@
     }
   })();
 </script>
+{%- endif -%}
 
 {% schema %}
 {
@@ -128,6 +139,13 @@
   "tag": "section",
   "class": "cf-you-may-like-section",
   "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_section",
+      "label": "Show \"You May Also Like\" section",
+      "info": "Toggle the recommendations carousel at the bottom of the product page on or off.",
+      "default": true
+    },
     {
       "type": "text",
       "id": "heading",
