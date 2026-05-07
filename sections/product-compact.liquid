@@ -422,13 +422,6 @@
       </div>
       {%- endif -%}
 
-      {%- comment -%}
-        "You May Also Like" / "Other Products from this Line" carousel
-        moved out of this section. Now rendered by sections/cf-you-may-like.liquid
-        (added in templates/product.json after main), using Shopify's built-in
-        recommendations.products API instead of a manual metafield.
-      {%- endcomment -%}
-
       {%- comment -%} ── Product Description ── {%- endcomment -%}
       {%- if product.description != blank or show_demo -%}
       <div class="compact-description">
@@ -683,6 +676,23 @@
           </script>
         {%- endif -%}
       {%- endif -%}
+
+      {%- comment -%} ── "You May Also Like" inline placeholder (bottom of content) ── {%- endcomment -%}
+      {%- comment -%}
+        Empty placeholder. The cf-you-may-like section (registered as
+        "cf-related" in templates/product.json) lazy-loads Shopify's
+        recommendations.products via section_id and injects the carousel
+        HTML here. Living inside .compact-content-col means the carousel
+        inherits the left content column's width — same scope as the
+        "Works With Products" carousel above. Sits at the bottom of the
+        left content area, after description / Q&A / reviews / service
+        banner — the conventional spot for "you may also like" so users
+        see alternatives only after they've finished evaluating this product.
+      {%- endcomment -%}
+      <div data-cf-related-inline
+           data-product-id="{{ product.id }}"
+           data-limit="8"
+           data-intent="related"></div>
 
     </div>{%- comment -%} end .compact-content-col {%- endcomment -%}
 

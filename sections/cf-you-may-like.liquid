@@ -9,29 +9,31 @@
   the SPP main section (sections/product-compact.liquid) — uses the same
   compact-carousel-* class set defined in assets/product-compact.css.
 
-  How it works:
-    1. On the initial page render, `recommendations.products` is empty, so
-       only an empty wrapper with data-* hooks is emitted.
-    2. The inline script below detects the empty wrapper and fetches
-       /recommendations/products?section_id=...&product_id=...&limit=...&intent=...
-       Shopify responds with this section's HTML, but this time `recommendations`
-       is populated, so the carousel renders fully.
-    3. The fetched HTML replaces the wrapper's contents — the carousel
-       appears in place.
+  Architecture:
+    • This section is registered in templates/product.json (id "cf-related")
+      so that /recommendations/products?section_id={section.id} works as a
+      standard Shopify section_id fetch — that's what populates the
+      `recommendations` Liquid object with real products.
+    • On a NORMAL page render (not a section_id fetch) we deliberately emit
+      NO visible carousel. If we did, Shopify would render it as a top-level
+      sibling below product-compact and it would span the full container
+      width — outside the SPP's left content column.
+    • The carousel actually appears via an inline placeholder
+      <div data-cf-related-inline …> placed inside .compact-content-col in
+      sections/product-compact.liquid. The loader script below fetches this
+      section by section_id and injects the carousel HTML into that
+      placeholder, so it inherits the left content column's width.
 {%- endcomment -%}
 
 {{ 'product-compact.css' | asset_url | stylesheet_tag }}
 
-<div
-  class="compact-product cf-you-may-like"
-  data-cf-related-section
-  data-product-id="{{ product.id }}"
-  data-section-id="{{ section.id }}"
-  data-limit="{{ section.settings.limit | default: 8 }}"
-  data-intent="{{ section.settings.intent | default: 'related' }}"
-  style="max-width:1280px;margin:24px auto 32px;padding:0 24px;"
->
-  {%- if recommendations.performed and recommendations.products_count > 0 -%}
+{%- if recommendations.performed and recommendations.products_count > 0 -%}
+  {%- comment -%}
+    Carousel HTML returned to fetch callers (?section_id=…). The
+    [data-cf-related-payload] wrapper is only a marker so the loader can
+    pluck this block out of the response.
+  {%- endcomment -%}
+  <div data-cf-related-payload>
     <div class="compact-carousel-section">
       <h3>{{ section.settings.heading | default: 'You May Also Like' }}</h3>
       <div class="compact-carousel-wrap" id="carousel-cf-related-{{ section.id }}">
@@ -77,22 +79,22 @@
         >&rsaquo;</button>
       </div>
     </div>
-  {%- endif -%}
-</div>
+  </div>
+{%- endif -%}
 
 <script>
   (function () {
-    function init() {
-      var wrappers = document.querySelectorAll('[data-cf-related-section]:not([data-cf-loaded])');
-      wrappers.forEach(function (el) {
-        if (el.querySelector('.compact-carousel-section')) {
-          el.setAttribute('data-cf-loaded', '1');
-          return;
-        }
+    window.cfYouMayLikeSectionId = {{ section.id | json }};
+    var DEFAULT_LIMIT  = {{ section.settings.limit  | default: 8         | json }};
+    var DEFAULT_INTENT = {{ section.settings.intent | default: 'related' | json }};
+
+    function load() {
+      var nodes = document.querySelectorAll('[data-cf-related-inline]:not([data-cf-loaded])');
+      nodes.forEach(function (el) {
         var pid    = el.getAttribute('data-product-id');
-        var sid    = el.getAttribute('data-section-id');
-        var limit  = el.getAttribute('data-limit')  || '8';
-        var intent = el.getAttribute('data-intent') || 'related';
+        var sid    = window.cfYouMayLikeSectionId;
+        var limit  = el.getAttribute('data-limit')  || DEFAULT_LIMIT;
+        var intent = el.getAttribute('data-intent') || DEFAULT_INTENT;
         if (!pid || !sid) { el.setAttribute('data-cf-loaded', '1'); return; }
         var url = '/recommendations/products'
           + '?section_id=' + encodeURIComponent(sid)
@@ -104,19 +106,18 @@
           .then(function (html) {
             var wrap = document.createElement('div');
             wrap.innerHTML = html.trim();
-            var fetched = wrap.querySelector('[data-cf-related-section]');
-            if (fetched && fetched.querySelector('.compact-carousel-section')) {
-              el.innerHTML = fetched.innerHTML;
-            }
+            var payload = wrap.querySelector('[data-cf-related-payload]');
+            if (payload) { el.innerHTML = payload.innerHTML; }
             el.setAttribute('data-cf-loaded', '1');
           })
           .catch(function () { el.setAttribute('data-cf-loaded', '1'); });
       });
     }
+
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
+      document.addEventListener('DOMContentLoaded', load);
     } else {
-      init();
+      load();
     }
   })();
 </script>
