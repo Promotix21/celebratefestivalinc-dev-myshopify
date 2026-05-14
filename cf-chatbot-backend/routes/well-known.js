@@ -1,25 +1,26 @@
 /**
  * well-known.js — AI/Agent discovery endpoints
  * Mounted at /wk/ in server.js
- * Accessible via Shopify App Proxy: /apps/wk/*
+ * Accessible via Shopify App Proxy: /a/wk/*
  *
  * App Proxy setup (Shopify Partner Dashboard):
- *   Subpath prefix: wk
+ *   Subpath prefix: a
+ *   Subpath: wk
  *   Proxy URL: http://31.220.21.130:3001/wk
  *
  * Endpoints:
- *   GET /wk/.well-known/api-catalog
- *   GET /wk/.well-known/oauth-protected-resource
- *   GET /wk/.well-known/agent-skills/index.json
- *   GET /wk/.well-known/mcp/server-card.json
- *   GET /wk/openapi.json
+ *   GET /a/wk/.well-known/api-catalog
+ *   GET /a/wk/.well-known/oauth-protected-resource
+ *   GET /a/wk/.well-known/agent-skills/index.json
+ *   GET /a/wk/.well-known/mcp/server-card.json
+ *   GET /a/wk/openapi.json
  */
 
 const express = require('express');
 const router = express.Router();
 
 const BASE_URL = 'https://celebratefestivalinc.myshopify.com';
-const PROXY_BASE = `${BASE_URL}/apps/wk`;
+const PROXY_BASE = `${BASE_URL}/a/wk`;
 
 // Shared headers for all AI discovery responses
 function setDiscoveryHeaders(res) {
