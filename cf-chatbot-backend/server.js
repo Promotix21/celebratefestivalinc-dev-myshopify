@@ -10,6 +10,7 @@ const sessionsRoute = require('./routes/sessions');
 const skuRoute = require('./routes/sku');
 const calendarRoute = require('./routes/calendar');
 const adminRoute = require('./routes/admin');
+const wellKnownRoute = require('./routes/well-known');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -78,6 +79,10 @@ app.use('/sessions', sessionsRoute);
 app.use('/sku-lookup', skuLookupLimiter, skuRoute);
 app.use('/calendar-slots', calendarRoute);
 app.use('/admin', adminRoute);
+
+// AI/Agent discovery endpoints — served via Shopify App Proxy at /apps/wk/*
+// App Proxy config: Subpath=wk, Proxy URL=http://31.220.21.130:3001/wk
+app.use('/wk', wellKnownRoute);
 
 app.use((err, req, res, next) => {
   console.error('Uncaught:', err);

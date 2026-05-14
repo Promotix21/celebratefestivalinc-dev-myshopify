@@ -848,7 +848,21 @@
                         onchange="handleCompactVariantChange(this, '{{ section.id }}')"
                         {% if pill_sold_out %}disabled{% endif %}
                       >
-                      <label for="CompactOpt-{{ section.id }}-{{ forloop.index0 }}-{{ forloop.index }}">
+                      <label for="CompactOpt-{{ section.id }}-{{ forloop.index0 }}-{{ forloop.index }}" class="{% if option.name == 'Color' or option.name == 'color' %}compact-color-pill{% endif %}">
+                        {% if option.name == 'Color' or option.name == 'color' %}
+                          {%- liquid
+                            assign swatch_value = null
+                            if value.swatch.image
+                              assign image_url = value.swatch.image | image_url: width: 50
+                              assign swatch_value = 'url(' | append: image_url | append: ')'
+                            elsif value.swatch.color
+                              assign swatch_value = 'rgb(' | append: value.swatch.color.rgb | append: ')'
+                            endif
+                          -%}
+                          {% if swatch_value %}
+                            <span class="compact-swatch-indicator" style="background: {{ swatch_value }};"></span>
+                          {% endif %}
+                        {% endif %}
                         {{ value }}
                       </label>
                     </div>

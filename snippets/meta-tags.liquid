@@ -43,3 +43,27 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ og_title | escape }}">
 <meta name="twitter:description" content="{{ og_description | escape }}">
+
+{%- comment -%} AI Readiness: permit large snippets and image previews for AI answer engines {%- endcomment -%}
+<meta name="robots" content="max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+
+{%- comment -%} AI content purpose signals {%- endcomment -%}
+<meta name="ai-content-purpose" content="product-catalog, b2b-wholesale, restaurant-equipment, commercial-kitchen">
+<meta name="dcterms.subject" content="Restaurant Equipment; Commercial Kitchen; Foodservice; B2B Wholesale">
+<meta name="dcterms.type" content="Dataset">
+<meta name="dcterms.publisher" content="Celebrate Festival Inc">
+<meta name="dcterms.language" content="en-US">
+
+{%- comment -%} Page-type specific AI hints {%- endcomment -%}
+{%- if request.page_type == 'product' and product -%}
+  <meta name="ai-entity-type" content="Product">
+  <meta name="ai-entity-id" content="shopify:product:{{ product.id }}">
+  <meta name="product:price:amount" content="{{ product.price | money_without_currency }}">
+  <meta name="product:price:currency" content="{{ cart.currency.iso_code }}">
+  <meta name="product:availability" content="{% if product.available %}in stock{% else %}out of stock{% endif %}">
+  <meta name="product:condition" content="new">
+  <meta name="product:brand" content="{{ product.vendor | escape }}">
+{%- elsif request.page_type == 'collection' and collection -%}
+  <meta name="ai-entity-type" content="ProductCollection">
+  <meta name="ai-entity-id" content="shopify:collection:{{ collection.id }}">
+{%- endif -%}

@@ -1,21 +1,36 @@
 /* swatch-input lives in its own file for reusability of the swatch in other areas than the product form context */
 .swatch-input__input + .swatch-input__label {
-  --swatch-input--border-radius: 50%;
-  display: inline-block;
-  max-width: 100%;
+  --swatch-input--border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.5rem 1.2rem 0.5rem 0.6rem;
   border-radius: var(--swatch-input--border-radius);
   cursor: pointer;
   outline-offset: 0.2rem;
   outline-color: transparent;
   outline-style: solid;
-  transition-property: outline-color, outline-width, box-shadow;
+  transition-property: outline-color, outline-width, box-shadow, background-color;
   transition-duration: var(--duration-short);
   transition-timing-function: ease;
   forced-color-adjust: none;
+  border: 1px solid rgba(var(--color-foreground), 0.1);
+  background-color: rgb(var(--color-background));
+}
+
+.swatch-input__name {
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: rgb(var(--color-foreground));
+}
+
+.swatch-input__label .swatch {
+  --swatch--size: 1.8rem !important;
+  flex-shrink: 0;
 }
 
 .swatch-input__input + .swatch-input__label.swatch-input__label--square {
-  --swatch-input--border-radius: 0.2rem;
+  --swatch-input--border-radius: 4px;
 }
 
 /* Active state */

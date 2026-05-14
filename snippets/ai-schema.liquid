@@ -1,0 +1,39 @@
+{% comment %}
+  ai-schema.liquid — Page-specific JSON-LD for AI crawlers and answer engines.
+  DO NOT remove — required for AI search indexing and agent discoverability.
+{% endcomment %}
+
+{%- if request.page_type == 'product' and product -%}
+{%- liquid
+  assign av = 'https://schema.org/InStock'
+  unless product.available
+    assign av = 'https://schema.org/OutOfStock'
+  endunless
+  assign pr = product.price | money_without_currency | remove: ','
+  assign img = ''
+  if product.featured_image
+    assign img = product.featured_image | image_url: width: 800
+  endif
+-%}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Product","@id":"{{ shop.url }}/products/{{ product.handle }}#product","name":{{ product.title | json }},"description":{{ product.description | strip_html | strip_newlines | truncate: 500 | json }},"url":"{{ shop.url }}/products/{{ product.handle }}"{% if img != '' %},"image":"https:{{ img }}"{% endif %},"brand":{"@type":"Brand","name":{{ product.vendor | json }}},"sku":{{ product.selected_or_first_available_variant.sku | default: '' | json }},"category":{{ product.type | default: 'Restaurant Equipment' | json }},"offers":{"@type":"Offer","url":"{{ shop.url }}/products/{{ product.handle }}","priceCurrency":{{ cart.currency.iso_code | json }},"price":"{{ pr }}","availability":"{{ av }}","itemCondition":"https://schema.org/NewCondition","seller":{"@type":"Organization","name":{{ shop.name | json }}}}}
+</script>
+{%- endif -%}
+
+{%- if request.page_type == 'collection' and collection -%}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"CollectionPage","@id":"{{ shop.url }}{{ collection.url }}#collection","name":{{ collection.title | json }},"description":{{ collection.description | strip_html | strip_newlines | truncate: 300 | default: collection.title | json }},"url":"{{ shop.url }}{{ collection.url }}","breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"{{ shop.url }}"},{"@type":"ListItem","position":2,"name":{{ collection.title | json }},"item":"{{ shop.url }}{{ collection.url }}"}]},"mainEntity":{"@type":"ItemList","itemListElement":[{%- assign li = 0 -%}{%- for p in collection.products limit: 6 -%}{%- if li > 0 -%},{%- endif -%}{"@type":"ListItem","position":{{ forloop.index }},"item":{"@type":"Product","name":{{ p.title | json }},"url":"{{ shop.url }}/products/{{ p.handle }}","offers":{"@type":"Offer","priceCurrency":{{ cart.currency.iso_code | json }},"price":"{{ p.price | money_without_currency | remove: ',' }}","availability":"{% if p.available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}"}}}{%- assign li = li | plus: 1 -%}{%- endfor -%}]}}
+</script>
+{%- endif -%}
+
+{%- if request.page_type == 'index' -%}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Store","@id":"{{ shop.url }}/#store","name":{{ shop.name | json }},"url":"{{ shop.url }}","description":{{ shop.description | default: 'B2B restaurant and commercial kitchen equipment supplier.' | json }},"telephone":"+1-408-673-9999","email":"support@celebratefestivalinc.com","address":{"@type":"PostalAddress","streetAddress":"235 Whitney Pl","addressLocality":"Fremont","addressRegion":"CA","postalCode":"94539","addressCountry":"US"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"09:00","closes":"18:00"}],"hasOfferCatalog":{"@type":"OfferCatalog","name":"Restaurant Equipment Catalog","description":"Commercial kitchen and restaurant equipment for B2B wholesale buyers"},"priceRange":"$$-$$$","paymentAccepted":["Credit Card","Purchase Order"],"currenciesAccepted":"USD"}
+</script>
+{%- endif -%}
+
+{%- if request.page_type == 'search' -%}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SearchResultsPage","url":"{{ shop.url }}/search?q={{ search.terms | url_encode }}","name":{{ 'Search: ' | append: search.terms | json }}}
+</script>
+{%- endif -%}

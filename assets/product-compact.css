@@ -969,7 +969,9 @@
   pointer-events: none;
 }
 .compact-product .compact-variant-pill label {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 6px 12px;
   border: 2px solid var(--g200);
   border-radius: 5px;
@@ -981,6 +983,16 @@
   transition: all .2s;
   white-space: normal;
   word-break: break-word;
+}
+
+.compact-swatch-indicator {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.1);
+  background-size: cover;
+  flex-shrink: 0;
 }
 .compact-product .compact-variant-pill label:hover {
   border-color: var(--blue);

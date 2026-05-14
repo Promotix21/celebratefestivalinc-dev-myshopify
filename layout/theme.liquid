@@ -400,6 +400,12 @@
       {{ 'swiper-bundle.min.js' | asset_url | script_tag }}
     {%- endunless -%}
 
+    {%- comment -%} AI Agent Discovery: Link relation tags (RFC 8631 service-desc/service-doc + emerging api-catalog) {%- endcomment -%}
+    <link rel="service-desc" href="/pages/openapi" type="application/json" title="Celebrate Festival Inc API">
+    <link rel="api-catalog" href="/pages/api-catalog" type="application/json">
+    <link rel="alternate" href="/pages/agent-skills" type="application/json" title="Agent Skills">
+    <link rel="https://schema.org/WebAPI" href="/pages/mcp-server-card" type="application/json" title="MCP Server Card">
+
   </head>
 
   <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
@@ -407,6 +413,9 @@
     <script type="application/ld+json">
     {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"{{ shop.url }}/#organization","name":{{ shop.name | json }},"url":"{{ shop.url }}","logo":{"@type":"ImageObject","url":"{{ 'logo.png' | asset_url }}"},"contactPoint":{"@type":"ContactPoint","telephone":"+1-408-673-9999","contactType":"customer service","email":"support@celebratefestivalinc.com","areaServed":"US","availableLanguage":"English"},"address":{"@type":"PostalAddress","streetAddress":"235 Whitney Pl","addressLocality":"Fremont","addressRegion":"CA","postalCode":"94539","addressCountry":"US"},"sameAs":["https://www.facebook.com/celebratefestivalinc","https://www.instagram.com/celebratefestivalinc"]},{"@type":"WebSite","@id":"{{ shop.url }}/#website","name":{{ shop.name | json }},"url":"{{ shop.url }}","publisher":{"@id":"{{ shop.url }}/#organization"},"potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"{{ shop.url }}/search?q={search_term_string}"},"query-input":"required name=search_term_string"}}]}
     </script>
+
+    {%- comment -%} Page-specific JSON-LD: Product, Collection, Store, SearchResultsPage {%- endcomment -%}
+    {%- render 'ai-schema' -%}
     <a class="skip-to-content-link button visually-hidden" href="#MainContent">
       {{ 'accessibility.skip_to_text' | t }}
     </a>

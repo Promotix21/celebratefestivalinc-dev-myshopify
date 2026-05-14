@@ -1046,7 +1046,9 @@
               pointer-events: none;
             }
             .variant-pill label {
-              display: inline-block;
+              display: inline-flex;
+              align-items: center;
+              gap: 6px;
               padding: 8px 14px;
               border: 2px solid #e2e8f0;
               border-radius: 6px;
@@ -1060,6 +1062,15 @@
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
+            }
+            .swatch-indicator {
+              display: block;
+              width: 14px;
+              height: 14px;
+              border-radius: 50%;
+              border: 1px solid rgba(0,0,0,0.1);
+              background-size: cover;
+              flex-shrink: 0;
             }
             .variant-pill label:hover {
               border-color: var(--cf-navy, #2d5a87);
@@ -1159,7 +1170,21 @@
                         data-option-index="{{ forloop.parentloop.index0 }}"
                         onchange="handleVariantPillChange(this, '{{ section.id }}')"
                       >
-                      <label for="Option-{{ section.id }}-{{ forloop.index0 }}-{{ forloop.index }}" title="{{ value | escape }}">
+                      <label for="Option-{{ section.id }}-{{ forloop.index0 }}-{{ forloop.index }}" title="{{ value | escape }}" class="{% if option.name == 'Color' or option.name == 'color' %}color-pill{% endif %}">
+                        {% if option.name == 'Color' or option.name == 'color' %}
+                          {%- liquid
+                            assign swatch_value = null
+                            if value.swatch.image
+                              assign image_url = value.swatch.image | image_url: width: 50
+                              assign swatch_value = 'url(' | append: image_url | append: ')'
+                            elsif value.swatch.color
+                              assign swatch_value = 'rgb(' | append: value.swatch.color.rgb | append: ')'
+                            endif
+                          -%}
+                          {% if swatch_value %}
+                            <span class="swatch-indicator" style="background: {{ swatch_value }}; display: inline-block; width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1); margin-right: 6px; vertical-align: middle;"></span>
+                          {% endif %}
+                        {% endif %}
                         {{ truncated_value }}
                       </label>
                       {%- if needs_tooltip -%}

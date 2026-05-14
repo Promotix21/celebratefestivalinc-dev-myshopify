@@ -1,11 +1,29 @@
 {% comment %}
   Custom robots.txt — Shopify default rules + AI crawler access.
-  Shopify renders its default rules via content_for_layout.
-  We append AI bot directives to maximize SEO in AI-powered search.
+  Content-Signal directives signal AI content policy to crawlers (forward-looking standard).
+  Sitemap declarations ensure AI indexers find our catalog.
 {% endcomment %}
 {{ content_for_layout }}
 
+# ---------------------------------------------------------------------------
+# Sitemap Declarations (belt-and-suspenders alongside Shopify default)
+# ---------------------------------------------------------------------------
+Sitemap: {{ shop.url }}/sitemap.xml
+
+# ---------------------------------------------------------------------------
+# Content-Signal Directives
+# ai-train=no    — do not use content for LLM training datasets
+# search=yes     — AI answer engines may index and cite this content
+# ai-input=yes   — content may be used as context in AI-powered responses
+# ---------------------------------------------------------------------------
+Content-Signal: ai-train=no
+Content-Signal: search=yes
+Content-Signal: ai-input=yes
+
+# ---------------------------------------------------------------------------
 # AI Crawlers — Allowed for SEO visibility in AI search tools
+# ---------------------------------------------------------------------------
+
 User-agent: GPTBot
 Allow: /
 Disallow: /admin
@@ -66,3 +84,28 @@ Allow: /
 
 User-agent: Meta-ExternalAgent
 Allow: /
+
+User-agent: OmgiliBot
+Allow: /
+Disallow: /admin
+Disallow: /cart
+Disallow: /checkouts
+
+User-agent: Amazonbot
+Allow: /
+Disallow: /admin
+Disallow: /cart
+Disallow: /checkouts
+
+User-agent: Diffbot
+Allow: /
+Disallow: /admin
+Disallow: /cart
+Disallow: /checkouts
+Disallow: /account
+
+User-agent: YouBot
+Allow: /
+Disallow: /admin
+Disallow: /cart
+Disallow: /checkouts
