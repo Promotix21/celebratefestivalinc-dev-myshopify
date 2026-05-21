@@ -3,28 +3,50 @@
     "main": {
       "type": "use-cases-landing",
       "blocks": {
-        "uc_pizza": {
+        "uc_bakery": {
           "type": "use_case",
           "settings": {
-            "title": "Pizza Restaurants",
-            "cat_slug": "pizza",
-            "icon": "🍕",
-            "description": "Complete solutions for pizzerias from dough preparation to wood-fired perfection.",
-            "cta_text": "Shop Pizza Equipment",
-            "cta_url": "/pages/cf-pizza-restaurants",
+            "title": "Bakery",
+            "cat_slug": "bakery",
+            "icon": "🧁",
+            "image_url": "https://placehold.co/500x375",
+            "description": "From mixing to display — premium equipment for every step of a successful bakery operation.",
+            "cta_text": "Shop Bakery Equipment",
+            "cta_url": "/collections/dough-prep-equipment",
+            "featured_collection": "dough-prep-equipment",
+            "view_all_url": "/collections/dough-prep-equipment",
             "is_new": false,
             "is_featured": false
           }
         },
-        "uc_italian": {
+        "uc_pizza": {
           "type": "use_case",
           "settings": {
-            "title": "Italian Restaurants",
-            "cat_slug": "italian",
-            "icon": "🍝",
-            "description": "Authentic equipment for pasta making, sauce preparation, and fine Italian cuisine.",
-            "cta_text": "Shop Italian Equipment",
-            "cta_url": "/pages/cf-italian-restaurants",
+            "title": "Pizza Restaurant",
+            "cat_slug": "pizza-restaurant",
+            "icon": "🍕",
+            "image_url": "https://placehold.co/500x375",
+            "description": "High-performance equipment engineered for every stage of pizza preparation and service.",
+            "cta_text": "Shop Pizza Equipment",
+            "cta_url": "/collections/refrigerated-pizza-prep-tables",
+            "featured_collection": "refrigerated-pizza-prep-tables",
+            "view_all_url": "/collections/refrigerated-pizza-prep-tables",
+            "is_new": false,
+            "is_featured": false
+          }
+        },
+        "uc_grocery": {
+          "type": "use_case",
+          "settings": {
+            "title": "Grocery Store",
+            "cat_slug": "grocery-store",
+            "icon": "🛒",
+            "image_url": "https://placehold.co/500x375",
+            "description": "Durable, efficient solutions for retail and supermarket operations of every size.",
+            "cta_text": "Shop Grocery Equipment",
+            "cta_url": "/pages/cf-grocery-store",
+            "featured_collection": "reach-in-refrigerators-all",
+            "view_all_url": "/pages/cf-grocery-store",
             "is_new": false,
             "is_featured": false
           }
@@ -32,51 +54,31 @@
         "uc_indian": {
           "type": "use_case",
           "settings": {
-            "title": "Indian Restaurants",
-            "cat_slug": "indian",
+            "title": "Indian Restaurant",
+            "cat_slug": "indian-restaurant",
             "icon": "🍛",
-            "description": "Authentic tandoors and specialty equipment for traditional Indian cooking methods.",
+            "image_url": "https://placehold.co/500x375",
+            "description": "Specialized equipment built for authentic Indian cuisine and high-volume kitchen demands.",
             "cta_text": "Shop Indian Restaurant Equipment",
-            "cta_url": "/pages/cf-indian-restaurants",
+            "cta_url": "/collections/indian-specialty",
+            "featured_collection": "indian-specialty",
+            "view_all_url": "/collections/indian-specialty",
             "is_new": true,
             "is_featured": true
           }
         },
-        "uc_fastcasual": {
+        "uc_cafe": {
           "type": "use_case",
           "settings": {
-            "title": "Fast Casual",
-            "cat_slug": "fast-casual",
-            "icon": "🍔",
-            "description": "High-volume equipment designed for speed and consistency in fast-casual dining.",
-            "cta_text": "Shop Fast Casual Equipment",
-            "cta_url": "/pages/cf-fast-casual",
-            "is_new": false,
-            "is_featured": false
-          }
-        },
-        "uc_bakery": {
-          "type": "use_case",
-          "settings": {
-            "title": "Bakeries & Cafes",
-            "cat_slug": "bakery",
-            "icon": "🧁",
-            "description": "Professional baking equipment and display solutions for bakeries and coffee shops.",
-            "cta_text": "Shop Bakery Equipment",
-            "cta_url": "/pages/cf-bakery-cafe",
-            "is_new": false,
-            "is_featured": false
-          }
-        },
-        "uc_hotel": {
-          "type": "use_case",
-          "settings": {
-            "title": "Hotels & Banquets",
-            "cat_slug": "hotel",
-            "icon": "🏨",
-            "description": "Large-scale catering equipment for hotels, banquet halls, and event venues.",
-            "cta_text": "Shop Hotel Equipment",
-            "cta_url": "/collections/restaurant-equipment",
+            "title": "Café / Coffee Shop",
+            "cat_slug": "cafe-coffee-shop",
+            "icon": "☕",
+            "image_url": "https://placehold.co/500x375",
+            "description": "Brew, chill, and serve with equipment designed for the rhythms of a modern coffee business.",
+            "cta_text": "Shop Café Equipment",
+            "cta_url": "/collections/ice-machine-all-by-all-brands",
+            "featured_collection": "ice-machine-all-by-all-brands",
+            "view_all_url": "/collections/ice-machine-all-by-all-brands",
             "is_new": false,
             "is_featured": false
           }
@@ -84,39 +86,27 @@
         "uc_foodtruck": {
           "type": "use_case",
           "settings": {
-            "title": "Food Trucks & Catering",
+            "title": "Food Truck",
             "cat_slug": "food-truck",
             "icon": "🚚",
-            "description": "Compact, powerful equipment built for mobile kitchens and outdoor catering operations.",
+            "image_url": "https://placehold.co/500x375",
+            "description": "Compact, reliable equipment engineered to perform in any mobile kitchen on the road.",
             "cta_text": "Shop Food Truck Equipment",
-            "cta_url": "/collections/restaurant-equipment",
-            "is_new": false,
-            "is_featured": false
-          }
-        },
-        "uc_french": {
-          "type": "use_case",
-          "settings": {
-            "title": "French Bistros",
-            "cat_slug": "french",
-            "icon": "🥖",
-            "description": "Precision cooking equipment for fine French cuisine and artisanal preparations.",
-            "cta_text": "Shop French Bistro Equipment",
-            "cta_url": "/pages/cf-french-bistros",
+            "cta_url": "/collections/commercial-grills-and-griddles",
+            "featured_collection": "commercial-grills-and-griddles",
+            "view_all_url": "/collections/commercial-grills-and-griddles",
             "is_new": false,
             "is_featured": false
           }
         }
       },
       "block_order": [
-        "uc_pizza",
-        "uc_italian",
-        "uc_indian",
-        "uc_fastcasual",
         "uc_bakery",
-        "uc_hotel",
-        "uc_foodtruck",
-        "uc_french"
+        "uc_pizza",
+        "uc_grocery",
+        "uc_indian",
+        "uc_cafe",
+        "uc_foodtruck"
       ],
       "settings": {
         "hero_title": "Equipment Solutions by Business Type",

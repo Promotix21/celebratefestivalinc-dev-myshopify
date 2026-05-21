@@ -1,0 +1,325 @@
+{
+  "sections": {
+    "main": {
+      "type": "cf-industry-hub",
+      "blocks": {
+        "nav_produce": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Produce Coolers",
+            "anchor": "produce-coolers",
+            "icon_svg": ""
+          }
+        },
+        "nav_openair": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Open Air Merchandisers",
+            "anchor": "open-air-merchandisers",
+            "icon_svg": ""
+          }
+        },
+        "nav_reachin": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Reach-In Refrigeration",
+            "anchor": "reach-in-refrigeration",
+            "icon_svg": ""
+          }
+        },
+        "nav_freezers": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Freezers",
+            "anchor": "freezers",
+            "icon_svg": ""
+          }
+        },
+        "nav_hotfood": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Hot Food Display",
+            "anchor": "hot-food-display",
+            "icon_svg": ""
+          }
+        },
+        "nav_deli": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Deli Cases",
+            "anchor": "deli-cases",
+            "icon_svg": ""
+          }
+        },
+        "nav_shelving": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Shelving & Storage",
+            "anchor": "shelving-storage",
+            "icon_svg": ""
+          }
+        },
+        "nav_checkout": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Checkout Counters",
+            "anchor": "checkout-counters",
+            "icon_svg": ""
+          }
+        },
+        "nav_more": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "More Equipment",
+            "anchor": "more-equipment",
+            "icon_svg": ""
+          }
+        },
+        "equip_produce": {
+          "type": "equip_section",
+          "settings": {
+            "image_url": "https://placehold.co/720x540",
+            "section_id": "produce-coolers",
+            "is_reverse": false,
+            "title": "Produce Coolers",
+            "description": "Keep fruits and vegetables fresh and visually appealing with our high-performance produce cooling solutions.",
+            "bullet_1": "Open Air Produce Displays",
+            "bullet_2": "Refrigerated Produce Cases",
+            "bullet_3": "Island Produce Coolers",
+            "cta_text": "Shop Produce Coolers",
+            "cta_url": "/collections/refrigerated-open-merchandizer-all",
+            "featured_collection": "refrigerated-open-merchandizer-all",
+            "view_all_url": "/collections/refrigerated-open-merchandizer-all"
+          }
+        },
+        "equip_hotfood": {
+          "type": "equip_section",
+          "settings": {
+            "image_url": "https://placehold.co/720x540",
+            "section_id": "hot-food-display",
+            "is_reverse": true,
+            "title": "Hot Food Display",
+            "description": "Showcase hot meals and prepared foods while maintaining the perfect temperature for service.",
+            "bullet_1": "Hot Food Display Cases",
+            "bullet_2": "Heated Merchandisers",
+            "bullet_3": "Pizza & Food Warmers",
+            "cta_text": "Shop Hot Food Display",
+            "cta_url": "/collections/hot-food-display-cases",
+            "featured_collection": "hot-food-display-cases",
+            "view_all_url": "/collections/hot-food-display-cases"
+          }
+        },
+        "equip_reachin": {
+          "type": "equip_section",
+          "settings": {
+            "image_url": "https://placehold.co/720x540",
+            "section_id": "reach-in-refrigeration",
+            "is_reverse": false,
+            "title": "Reach-In Refrigeration",
+            "description": "Reliable refrigeration for beverages, dairy, meat, and everyday essentials.",
+            "bullet_1": "Reach-In Refrigerators",
+            "bullet_2": "Glass Door Merchandisers",
+            "bullet_3": "Specialty Refrigerators",
+            "cta_text": "Shop Reach-In Refrigeration",
+            "cta_url": "/collections/reach-in-refrigerators-all",
+            "featured_collection": "reach-in-refrigerators-all",
+            "view_all_url": "/collections/reach-in-refrigerators-all"
+          }
+        },
+        "store_convenience": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "https://placehold.co/320x220",
+            "name": "Small Convenience Store",
+            "url": "/collections/restaurant-equipment"
+          }
+        },
+        "store_supermarket": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "https://placehold.co/320x220",
+            "name": "Supermarket",
+            "url": "/collections/restaurant-equipment"
+          }
+        },
+        "store_asian": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "https://placehold.co/320x220",
+            "name": "Asian Grocery",
+            "url": "/collections/restaurant-equipment"
+          }
+        },
+        "store_indian": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "https://placehold.co/320x220",
+            "name": "Indian Grocery",
+            "url": "/collections/indian-specialty"
+          }
+        },
+        "store_organic": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "https://placehold.co/320x220",
+            "name": "Organic Market",
+            "url": "/collections/restaurant-equipment"
+          }
+        },
+        "store_liquor": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "https://placehold.co/320x220",
+            "name": "Liquor Store",
+            "url": "/collections/bar-refrigeration-all"
+          }
+        },
+        "store_wholesale": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "https://placehold.co/320x220",
+            "name": "Wholesale Club",
+            "url": "/collections/restaurant-equipment"
+          }
+        },
+        "store_grabngo": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "https://placehold.co/320x220",
+            "name": "Grab-and-Go Market",
+            "url": "/collections/hot-food-display-cases"
+          }
+        },
+        "guide_produce": {
+          "type": "guide",
+          "settings": {
+            "image_url": "https://placehold.co/220x140",
+            "title": "How to Choose the Right Produce Cooler for Your Store",
+            "url": "/blogs/news",
+            "meta": "Guide"
+          }
+        },
+        "guide_openair": {
+          "type": "guide",
+          "settings": {
+            "image_url": "https://placehold.co/220x140",
+            "title": "Open Air vs Glass Door Merchandisers: What's Best for Your Grocery Store?",
+            "url": "/blogs/news",
+            "meta": "Guide"
+          }
+        },
+        "guide_layout": {
+          "type": "guide",
+          "settings": {
+            "image_url": "https://placehold.co/220x140",
+            "title": "Refrigeration Layout Guide for Supermarkets",
+            "url": "/blogs/news",
+            "meta": "Guide"
+          }
+        },
+        "brand_turboair": {
+          "type": "brand",
+          "settings": {
+            "name": "Turbo Air",
+            "url": "/pages/turbo-air",
+            "italic": false
+          }
+        },
+        "brand_true": {
+          "type": "brand",
+          "settings": {
+            "name": "True",
+            "url": "/collections/reach-in-refrigerators-all",
+            "italic": false
+          }
+        },
+        "brand_beverageair": {
+          "type": "brand",
+          "settings": {
+            "name": "Beverage-Air",
+            "url": "/collections/reach-in-refrigerators-all",
+            "italic": false
+          }
+        },
+        "brand_atosa": {
+          "type": "brand",
+          "settings": {
+            "name": "Atosa",
+            "url": "/collections/reach-in-refrigerators-all",
+            "italic": false
+          }
+        },
+        "brand_hatco": {
+          "type": "brand",
+          "settings": {
+            "name": "Hatco",
+            "url": "/collections/hot-food-display-cases",
+            "italic": false
+          }
+        },
+        "brand_vulcan": {
+          "type": "brand",
+          "settings": {
+            "name": "Vulcan",
+            "url": "/collections/hot-food-display-cases",
+            "italic": false
+          }
+        }
+      },
+      "block_order": [
+        "nav_produce",
+        "nav_openair",
+        "nav_reachin",
+        "nav_freezers",
+        "nav_hotfood",
+        "nav_deli",
+        "nav_shelving",
+        "nav_checkout",
+        "nav_more",
+        "equip_produce",
+        "equip_hotfood",
+        "equip_reachin",
+        "store_convenience",
+        "store_supermarket",
+        "store_asian",
+        "store_indian",
+        "store_organic",
+        "store_liquor",
+        "store_wholesale",
+        "store_grabngo",
+        "guide_produce",
+        "guide_openair",
+        "guide_layout",
+        "brand_turboair",
+        "brand_true",
+        "brand_beverageair",
+        "brand_atosa",
+        "brand_hatco",
+        "brand_vulcan"
+      ],
+      "settings": {
+        "hero_title_override": "Grocery Store Equipment Solutions",
+        "hero_lead": "Everything you need to run an efficient grocery store — from refrigeration to checkout counters, we've got you covered.",
+        "hero_btn1_text": "Shop All Grocery Equipment",
+        "hero_btn1_url": "/collections/reach-in-refrigerators-all",
+        "hero_btn2_text": "Request a Quote",
+        "hero_btn2_url": "/pages/contact-us",
+        "show_store_types": true,
+        "store_types_title": "Shop by Store Type",
+        "show_guides": true,
+        "help_title": "Need Help Choosing the Right Equipment?",
+        "help_body": "Our experts can help you build the perfect setup for your grocery store.",
+        "show_brands": true,
+        "brands_title": "Top Brands We Carry",
+        "expert_eyebrow": "Designed for grocery operations",
+        "expert_title": "Build out your store with confidence.",
+        "expert_body": "From a single cooler to a complete refrigeration package, our specialists will spec the right equipment for your space, traffic, and budget.",
+        "expert_btn1_text": "Request a Quote",
+        "expert_btn1_url": "/pages/contact-us",
+        "expert_btn2_text": "Talk to an Expert",
+        "expert_btn2_url": "/pages/contact-us"
+      }
+    }
+  },
+  "order": ["main"]
+}
