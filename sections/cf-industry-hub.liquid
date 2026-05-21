@@ -855,7 +855,10 @@
   {%- endif -%}
 
   <!-- Guides + Help -->
-  {%- if (has_guides and section.settings.show_guides) or section.settings.help_title != blank -%}
+  {%- assign show_row_two = false -%}
+  {%- if has_guides and section.settings.show_guides -%}{%- assign show_row_two = true -%}{%- endif -%}
+  {%- if section.settings.help_title != blank -%}{%- assign show_row_two = true -%}{%- endif -%}
+  {%- if show_row_two -%}
     <div class="cih__row-two">
       {%- if has_guides and section.settings.show_guides -%}
         <div class="cih__guides">
