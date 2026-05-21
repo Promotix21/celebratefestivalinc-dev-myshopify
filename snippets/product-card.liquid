@@ -117,6 +117,19 @@
   endif
 
   comment
+    Indian Vendors for special Out of Stock message (Task 76)
+  endcomment
+  assign is_indian_vendor = false
+  assign indian_vendors = "Celebrate Festival Inc,Hawkins,Shaan,Kwitex,Rotoquip,Prestige,Preethi,Milton" | split: ','
+  assign vendor_check = product.vendor | strip
+  for vendor in indian_vendors
+    if vendor_check == vendor
+      assign is_indian_vendor = true
+      break
+    endif
+  endfor
+
+  comment
     Member detection
   endcomment
   assign is_member = false
@@ -346,7 +359,11 @@
         {%- endif -%}
       {%- else -%}
         <button class="add-to-cart cf-plp__add-btn" disabled>
-          Sold Out
+          {%- if is_indian_vendor -%}
+            Notify me when back in stock
+          {%- else -%}
+            Sold Out
+          {%- endif -%}
         </button>
       {%- endif -%}
     </div>

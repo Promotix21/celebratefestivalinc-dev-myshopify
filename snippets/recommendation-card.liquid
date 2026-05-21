@@ -11,6 +11,18 @@
 {% endcomment %}
 
 {% if product %}
+  {%- liquid
+    # Indian Vendors for special Out of Stock message (Task 76)
+    assign is_indian_vendor = false
+    assign indian_vendors = "Celebrate Festival Inc,Hawkins,Shaan,Kwitex,Rotoquip,Prestige,Preethi,Milton" | split: ','
+    assign vendor_check = product.vendor | strip
+    for vendor in indian_vendors
+      if vendor_check == vendor
+        assign is_indian_vendor = true
+        break
+      endif
+    endfor
+  -%}
   <div class="recommendation-card">
     {% comment %} Plus Badge {% endcomment %}
     {% if product.metafields.custom.plus_eligible %}
@@ -83,7 +95,11 @@
         {% if product.available %}
           Add to Cart
         {% else %}
-          Sold Out
+          {%- if is_indian_vendor -%}
+            Notify me when back in stock
+          {%- else -%}
+            Sold Out
+          {%- endif -%}
         {% endif %}
       </button>
     </div>

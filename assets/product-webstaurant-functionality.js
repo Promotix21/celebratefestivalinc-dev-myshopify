@@ -625,7 +625,7 @@ window.previewDocument = function(event, url, title) {
         </div>`
       }
       <div class="document-actions">
-        <a href="${url}" download class="btn-download-doc">Download Document</a>
+        <a href="${url}" target="_blank" class="btn-download-doc">View Document</a>
         <a href="${url}" target="_blank" class="btn-open-new-tab">Open in New Tab</a>
       </div>
     </div>
@@ -653,13 +653,12 @@ window.previewDocument = function(event, url, title) {
   const iframe = modal.querySelector('iframe');
   if (iframe) {
     iframe.addEventListener('error', () => {
-      iframe.outerHTML = `
-        <div style="text-align: center; padding: 40px; background: #F3F4F6; border-radius: 4px;">
-          <p style="color: #6B7280;">Unable to load preview. Please download the document instead.</p>
-        </div>
-      `;
-    });
-  }
+    iframe.outerHTML = `
+      <div style="text-align: center; padding: 40px; background: #F3F4F6; border-radius: 4px;">
+        <p style="color: #6B7280;">Unable to load preview. Please view the document instead.</p>
+      </div>
+    `;
+    });  }
 };
 
 // ============================

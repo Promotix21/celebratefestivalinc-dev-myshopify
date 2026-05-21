@@ -1,0 +1,1143 @@
+{%- liquid
+  assign hero_title = section.settings.hero_title | default: 'Equipment Solutions by Business Type'
+  assign hero_lead  = section.settings.hero_lead  | default: 'Find the right equipment for your business. Explore by industry and discover curated products, packages, and expert recommendations.'
+-%}
+
+<style>
+  .ucl {
+    --maroon: #8B1538;
+    --maroon-dark: #6E0F2B;
+    --coral: #FF6B6B;
+    --coral-soft: #FFF0EE;
+    --navy: #1A365D;
+    --navy-deep: #1B2B47;
+    --gold: #D4AF37;
+    --white: #FFFFFF;
+    --gray-100: #F3F3F3;
+    --gray-200: #E8E8E8;
+    --gray-300: #D9D9D9;
+    --gray-500: #8A8A8A;
+    --gray-700: #4A4A4A;
+    --ink: #121212;
+    --dark-bg: #1B2B47;
+    --maxw: 1600px;
+    --pad-x: clamp(20px, 4vw, 56px);
+    --radius: 6px;
+    --radius-lg: 10px;
+    --shadow-hover: 0 6px 18px rgba(18,18,18,.08);
+    --font-serif: "Playfair Display", "Times New Roman", serif;
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  /* ---------- Hero ---------- */
+  .ucl__hero {
+    position: relative;
+    background: var(--dark-bg);
+    color: var(--white);
+    overflow: hidden;
+    margin-bottom: 56px;
+  }
+  .ucl__hero-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center right;
+    z-index: 0;
+  }
+  .ucl__hero-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+      rgba(18,18,22,.95) 0%,
+      rgba(18,18,22,.85) 30%,
+      rgba(18,18,22,.55) 55%,
+      rgba(18,18,22,.15) 85%,
+      rgba(18,18,22,0) 100%);
+  }
+  .ucl__hero-inner {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 28px var(--pad-x) 64px;
+    position: relative;
+    z-index: 2;
+    min-height: 460px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .ucl__breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: rgba(255,255,255,.75);
+    margin-bottom: 56px;
+    letter-spacing: .01em;
+    font-family: var(--font-sans);
+  }
+  .ucl__breadcrumb a { color: inherit; text-decoration: none; }
+  .ucl__breadcrumb a:hover { color: var(--gold); }
+  .ucl__breadcrumb .sep { opacity: .5; }
+  .ucl__breadcrumb .cur { color: var(--white); }
+  .ucl__hero h1 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: clamp(38px, 5.2vw, 72px);
+    line-height: 1.02;
+    letter-spacing: -.01em;
+    margin: 0 0 22px;
+    max-width: 720px;
+  }
+  .ucl__hero .lead {
+    font-size: 17px;
+    line-height: 1.55;
+    color: rgba(255,255,255,.82);
+    max-width: 480px;
+    margin: 0 0 32px;
+    font-family: var(--font-sans);
+  }
+  .ucl__hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; }
+
+  /* ---------- Gold stripe ---------- */
+  .ucl__gold-stripe {
+    height: 3px;
+    background: linear-gradient(90deg, var(--maroon) 0%, var(--maroon) 30%, var(--gold) 30%, var(--gold) 33%, var(--maroon) 33%, var(--maroon) 100%);
+    max-width: var(--maxw);
+    margin: 0 auto -56px;
+    opacity: .9;
+  }
+
+  /* ---------- Buttons ---------- */
+  .ucl .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    border-radius: var(--radius);
+    transition: background .18s, color .18s, border-color .18s;
+    white-space: nowrap;
+    text-decoration: none;
+    font-family: var(--font-sans);
+    cursor: pointer;
+  }
+  .ucl .btn-primary { background: var(--maroon); color: var(--white); }
+  .ucl .btn-primary:hover { background: var(--maroon-dark); }
+  .ucl .btn-secondary {
+    background: transparent;
+    color: var(--white);
+    border: 1px solid rgba(255,255,255,.45);
+  }
+  .ucl .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+  .ucl .btn-outline {
+    background: transparent;
+    color: var(--maroon);
+    border: 1px solid var(--maroon);
+  }
+  .ucl .btn-outline:hover { background: var(--maroon); color: var(--white); }
+  .ucl .btn-sm { padding: 10px 16px; font-size: 13px; }
+  .ucl .btn-coral { background: var(--coral); color: var(--white); }
+  .ucl .btn-coral:hover { background: #ff5252; }
+
+  /* ---------- Main grid ---------- */
+  .ucl__page {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 var(--pad-x);
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 32px;
+    padding-bottom: 64px;
+  }
+  @media (max-width: 980px) {
+    .ucl__page { grid-template-columns: 1fr; gap: 20px; }
+  }
+
+  /* ---------- Mobile chip strip ---------- */
+  .ucl__chip-strip {
+    display: none;
+  }
+  @media (max-width: 980px) {
+    .ucl__chip-strip {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 0 14px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ucl__chip-strip::-webkit-scrollbar { display: none; }
+  }
+  .ucl__chip {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--gray-200);
+    border-radius: 999px;
+    background: var(--white);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-700);
+    white-space: nowrap;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .ucl__chip.active,
+  .ucl__chip:hover {
+    background: var(--maroon);
+    color: var(--white);
+    border-color: var(--maroon);
+  }
+  .ucl__chip .badge-new {
+    background: var(--coral);
+    color: var(--white);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    padding: 2px 5px;
+    border-radius: 3px;
+  }
+
+  /* ---------- Sidebar ---------- */
+  .ucl__sidebar {
+    position: sticky;
+    top: 24px;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  @media (max-width: 980px) {
+    .ucl__sidebar { display: none; }
+  }
+  .ucl__sidebar-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 22px 14px;
+  }
+  .ucl__sidebar-title {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--ink);
+    margin: 0 6px 14px;
+    padding: 0 6px;
+  }
+  .ucl__cat-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .ucl__cat-list li a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 12px;
+    border-radius: 0;
+    font-size: 14px;
+    color: var(--gray-700);
+    font-weight: 500;
+    border-bottom: 1px solid var(--gray-100);
+    text-decoration: none;
+    transition: background .15s, color .15s;
+    font-family: var(--font-sans);
+    position: relative;
+  }
+  .ucl__cat-list li:last-child a { border-bottom: 0; }
+  .ucl__cat-list li a:hover { background: var(--gray-100); color: var(--ink); border-radius: var(--radius); }
+  .ucl__cat-list li a.active {
+    background: var(--maroon);
+    color: var(--white);
+    font-weight: 600;
+    border-radius: var(--radius);
+    border-bottom-color: transparent;
+  }
+  .ucl__cat-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--maroon);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+  }
+  .ucl__cat-list li a.active .ucl__cat-icon { color: var(--white); }
+  .ucl__badge-new {
+    margin-left: auto;
+    background: var(--coral);
+    color: var(--white);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    padding: 3px 7px;
+    border-radius: 3px;
+  }
+  .ucl__help-card {
+    background: var(--gray-100);
+    border-radius: var(--radius-lg);
+    padding: 22px 20px;
+  }
+  .ucl__help-card h3 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 18px;
+    margin: 0 0 8px;
+    color: var(--ink);
+  }
+  .ucl__help-card p {
+    font-size: 13.5px;
+    color: var(--gray-700);
+    line-height: 1.55;
+    margin: 0 0 16px;
+    font-family: var(--font-sans);
+  }
+  .ucl__help-card .btn { width: 100%; }
+
+  /* ---------- Biz card stack ---------- */
+  .ucl__biz-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .ucl__biz-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    display: grid;
+    grid-template-columns: 240px 1fr auto;
+    gap: 28px;
+    align-items: stretch;
+    transition: box-shadow .2s, border-color .2s;
+  }
+  .ucl__biz-card:hover { box-shadow: var(--shadow-hover); border-color: var(--gray-300); }
+  .ucl__biz-card--featured {
+    background: var(--coral-soft);
+    border-color: #F8D7D2;
+  }
+  .ucl__biz-media {
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--gray-100);
+    aspect-ratio: 4 / 3;
+  }
+  .ucl__biz-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .ucl__biz-body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .ucl__biz-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .ucl__biz-body h2 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 26px;
+    line-height: 1.1;
+    margin: 0;
+    color: var(--ink);
+  }
+  .ucl__badge-new-inline {
+    background: var(--coral);
+    color: var(--white);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    padding: 4px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+  .ucl__biz-body p {
+    font-size: 14px;
+    color: var(--gray-700);
+    line-height: 1.55;
+    margin: 0 0 18px;
+    max-width: 320px;
+    font-family: var(--font-sans);
+  }
+  .ucl__biz-cta { margin-top: auto; }
+
+  /* ---------- Product thumbs ---------- */
+  .ucl__biz-products {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 130px));
+    gap: 12px;
+    min-width: 0;
+  }
+  .ucl__product {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform .15s;
+  }
+  .ucl__product:hover { transform: translateY(-2px); }
+  .ucl__product-thumb {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    transition: border-color .15s;
+  }
+  .ucl__product:hover .ucl__product-thumb { border-color: var(--maroon); }
+  .ucl__product-thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .ucl__product-name {
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.3;
+    font-family: var(--font-sans);
+  }
+  .ucl__view-all {
+    grid-column: 4;
+    justify-self: end;
+    margin-top: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--maroon);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    letter-spacing: .02em;
+    text-decoration: none;
+    font-family: var(--font-sans);
+  }
+  .ucl__view-all:hover { color: var(--maroon-dark); }
+  .ucl__view-all::after { content: "›"; font-size: 14px; line-height: 1; }
+
+  /* Responsive biz card */
+  @media (max-width: 1280px) {
+    .ucl__biz-card { grid-template-columns: 200px 1fr; grid-template-rows: auto auto; }
+    .ucl__biz-products { grid-column: 1 / -1; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  @media (max-width: 720px) {
+    .ucl__biz-card { grid-template-columns: 1fr; gap: 18px; padding: 18px; }
+    .ucl__biz-media { aspect-ratio: 16 / 9; }
+    .ucl__biz-body p { max-width: none; }
+    .ucl__biz-body h2 { font-size: 22px; }
+    .ucl__biz-products {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      gap: 12px;
+      margin: 0 -18px;
+      padding: 0 18px 4px;
+      scrollbar-width: none;
+    }
+    .ucl__biz-products::-webkit-scrollbar { display: none; }
+    .ucl__product { flex: 0 0 38%; max-width: 38%; scroll-snap-align: start; }
+    .ucl__view-all { flex: 0 0 auto; margin-left: auto; align-self: center; }
+  }
+
+  /* ---------- Opening strip ---------- */
+  .ucl__opening-wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--pad-x); }
+  .ucl__opening {
+    margin: 32px 0 48px;
+    background: var(--coral-soft);
+    border-radius: var(--radius-lg);
+    border: 1px solid #F8D7D2;
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+  }
+  .ucl__opening-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--white);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--maroon);
+    flex-shrink: 0;
+  }
+  .ucl__opening-icon svg { width: 28px; height: 28px; }
+  .ucl__opening-text { flex: 1; min-width: 0; }
+  .ucl__opening-text h3 {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    color: var(--ink);
+  }
+  .ucl__opening-text p {
+    font-size: 14px;
+    color: var(--gray-700);
+    margin: 0;
+    font-family: var(--font-sans);
+  }
+  @media (max-width: 720px) {
+    .ucl__opening { flex-direction: column; align-items: flex-start; }
+    .ucl__opening .btn { width: 100%; }
+  }
+
+  /* ---------- Dark CTA ---------- */
+  .ucl__dark-cta {
+    background: var(--navy-deep);
+    color: var(--white);
+    padding: 64px var(--pad-x);
+    position: relative;
+    overflow: hidden;
+  }
+  .ucl__dark-cta::before {
+    content: "";
+    position: absolute;
+    top: -120px; right: -120px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(212,175,55,.18) 0%, rgba(212,175,55,0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .ucl__dark-cta::after {
+    content: "";
+    position: absolute;
+    bottom: -100px; left: 10%;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(139,21,56,.35) 0%, rgba(139,21,56,0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .ucl__dark-cta-inner {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.4fr auto;
+    gap: 40px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+  .ucl__dark-cta-eyebrow {
+    font-size: 12px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 14px;
+    font-family: var(--font-sans);
+  }
+  .ucl__dark-cta h2 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: clamp(30px, 4vw, 46px);
+    line-height: 1.1;
+    margin: 0 0 14px;
+    max-width: 620px;
+  }
+  .ucl__dark-cta p {
+    font-size: 16px;
+    color: rgba(255,255,255,.7);
+    max-width: 560px;
+    margin: 0;
+    line-height: 1.55;
+    font-family: var(--font-sans);
+  }
+  .ucl__dark-cta-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  @media (max-width: 880px) {
+    .ucl__dark-cta-inner { grid-template-columns: 1fr; gap: 22px; }
+  }
+
+  /* ---------- Features ---------- */
+  .ucl__features {
+    background: var(--white);
+    padding: 48px var(--pad-x);
+    border-top: 1px solid var(--gray-200);
+  }
+  .ucl__features-inner {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 28px;
+  }
+  .ucl__feature { display: flex; align-items: center; gap: 16px; }
+  .ucl__feature-icon {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: var(--gray-100);
+    color: var(--maroon);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .ucl__feature-icon svg { width: 26px; height: 26px; }
+  .ucl__feature-text h4 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 15px;
+    margin: 0 0 3px;
+    color: var(--ink);
+    letter-spacing: -.01em;
+  }
+  .ucl__feature-text p {
+    font-size: 13px;
+    color: var(--gray-500);
+    margin: 0;
+    line-height: 1.4;
+    font-family: var(--font-sans);
+  }
+  @media (max-width: 880px) {
+    .ucl__features-inner { grid-template-columns: repeat(2, 1fr); gap: 22px; }
+  }
+  @media (max-width: 480px) {
+    .ucl__features-inner { grid-template-columns: 1fr; }
+  }
+</style>
+
+<!-- ============ HERO ============ -->
+<section class="ucl__hero ucl">
+  <div class="ucl__hero-bg"
+    {% if section.settings.hero_image != blank %}
+      style="background-image: url('{{ section.settings.hero_image | image_url: width: 1600 }}')"
+    {% else %}
+      style="background-image: linear-gradient(135deg, #1B2B47 0%, #0f172a 100%)"
+    {% endif %}
+    aria-hidden="true"></div>
+  <div class="ucl__hero-inner">
+    <nav class="ucl__breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span class="sep">›</span>
+      <span class="cur">Use Cases</span>
+    </nav>
+    <h1>{{ hero_title }}</h1>
+    <p class="lead">{{ hero_lead }}</p>
+    <div class="ucl__hero-ctas">
+      {% if section.settings.hero_btn1_text != blank %}
+        <a href="#categories" class="btn btn-primary">{{ section.settings.hero_btn1_text }}</a>
+      {% endif %}
+      {% if section.settings.hero_btn2_text != blank %}
+        <a href="{{ section.settings.hero_btn2_url | default: '#expert' }}" class="btn btn-secondary">{{ section.settings.hero_btn2_text }}</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- Gold stripe -->
+<div class="ucl__gold-stripe" aria-hidden="true"></div>
+
+<!-- ============ MAIN ============ -->
+<div class="ucl" id="categories">
+
+  <!-- Mobile chip strip -->
+  <div style="max-width:var(--ucl-maxw,1600px);margin:0 auto;padding:20px clamp(20px,4vw,56px) 0;">
+    <nav class="ucl__chip-strip" aria-label="Filter by category">
+      <button class="ucl__chip active" data-cat="all">All Use Cases</button>
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'use_case' -%}
+          <button class="ucl__chip" data-cat="{{ block.settings.cat_slug | default: block.settings.title | handleize }}">
+            {%- if block.settings.icon != blank -%}{{ block.settings.icon }} {%- endif -%}
+            {{ block.settings.title }}
+            {%- if block.settings.is_new -%}<span class="badge-new">NEW</span>{%- endif -%}
+          </button>
+        {%- endif -%}
+      {%- endfor -%}
+    </nav>
+  </div>
+
+  <div class="ucl__page" id="ucl-page">
+
+    <!-- Sidebar -->
+    <aside class="ucl__sidebar" aria-label="Browse use cases">
+      <div class="ucl__sidebar-card">
+        <h2 class="ucl__sidebar-title">Browse Use Cases</h2>
+        <ul class="ucl__cat-list">
+          <li>
+            <a href="#" class="active" data-cat="all">
+              <span class="ucl__cat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+              </span>
+              All Use Cases
+            </a>
+          </li>
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'use_case' -%}
+              <li>
+                <a href="#uc-{{ block.settings.cat_slug | default: block.settings.title | handleize }}" data-cat="{{ block.settings.cat_slug | default: block.settings.title | handleize }}">
+                  <span class="ucl__cat-icon">{{ block.settings.icon | default: '📦' }}</span>
+                  {{ block.settings.title }}
+                  {%- if block.settings.is_new -%}<span class="ucl__badge-new">NEW</span>{%- endif -%}
+                </a>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+
+      <div class="ucl__help-card" id="expert">
+        <h3>Need Help Choosing?</h3>
+        <p>Our equipment experts can help you find the perfect solutions for your business — at the best price.</p>
+        <a href="{{ section.settings.hero_btn2_url | default: '/pages/contact-us' }}" class="btn btn-primary btn-sm ucl">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5A8.4 8.4 0 0 1 9 19l-5 1 1-5a8.4 8.4 0 0 1-1-3.5 8.4 8.4 0 0 1 8.5-8.5 8.4 8.4 0 0 1 8.5 8.5z"/></svg>
+          Contact an Expert
+        </a>
+      </div>
+    </aside>
+
+    <!-- Business cards -->
+    <div class="ucl__biz-stack" id="ucl-biz-stack">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'use_case' -%}
+          {%- assign cat_slug = block.settings.cat_slug | default: block.settings.title | handleize -%}
+          <article
+            class="ucl__biz-card{% if block.settings.is_featured %} ucl__biz-card--featured{% endif %}"
+            id="uc-{{ cat_slug }}"
+            data-cat="{{ cat_slug }}"
+            {{ block.shopify_attributes }}
+          >
+            <!-- Image -->
+            <div class="ucl__biz-media">
+              {%- if block.settings.image != blank -%}
+                <img src="{{ block.settings.image | image_url: width: 500 }}"
+                     alt="{{ block.settings.title }}"
+                     width="500" height="375"
+                     loading="lazy">
+              {%- else -%}
+                <div style="width:100%;height:100%;background:linear-gradient(135deg,#e2e8f0 0%,#f1f5f9 100%);display:flex;align-items:center;justify-content:center;font-size:48px;">{{ block.settings.icon | default: '📦' }}</div>
+              {%- endif -%}
+            </div>
+
+            <!-- Body -->
+            <div class="ucl__biz-body">
+              <div class="ucl__biz-title-row">
+                <h2>{{ block.settings.title }}</h2>
+                {%- if block.settings.is_new -%}
+                  <span class="ucl__badge-new-inline">NEW</span>
+                {%- endif -%}
+              </div>
+              <p>{{ block.settings.description }}</p>
+              <div class="ucl__biz-cta">
+                <a href="{{ block.settings.cta_url | default: '/collections/restaurant-equipment' }}" class="btn btn-primary btn-sm ucl">
+                  {{ block.settings.cta_text | default: 'Shop Equipment' }}
+                </a>
+              </div>
+            </div>
+
+            <!-- Product thumbnails -->
+            {%- assign thumb_col = collections[block.settings.featured_collection] -%}
+            {%- if block.settings.featured_collection != blank and thumb_col != blank -%}
+              <div class="ucl__biz-products">
+                {%- for product in thumb_col.products limit: 4 -%}
+                  <a class="ucl__product" href="{{ product.url }}">
+                    <div class="ucl__product-thumb">
+                      {%- if product.featured_image != blank -%}
+                        <img src="{{ product.featured_image | image_url: width: 250 }}"
+                             alt="{{ product.title }}"
+                             width="250" height="250"
+                             loading="lazy">
+                      {%- else -%}
+                        <div style="width:100%;height:100%;background:var(--gray-100);display:flex;align-items:center;justify-content:center;font-size:28px;">📦</div>
+                      {%- endif -%}
+                    </div>
+                    <div class="ucl__product-name">{{ product.title | truncate: 40 }}</div>
+                  </a>
+                {%- endfor -%}
+                {%- if block.settings.view_all_url != blank -%}
+                  <a href="{{ block.settings.view_all_url }}" class="ucl__view-all">View All</a>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          </article>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ OPENING STRIP ============ -->
+{%- if section.settings.opening_title != blank -%}
+  <div class="ucl__opening-wrap ucl">
+    <div class="ucl__opening">
+      <div class="ucl__opening-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 8l8-4 8 4-8 4z"/><path d="M4 8v9l8 4 8-4V8"/><path d="M12 12v9"/></svg>
+      </div>
+      <div class="ucl__opening-text">
+        <h3>{{ section.settings.opening_title }}</h3>
+        {%- if section.settings.opening_body != blank -%}
+          <p>{{ section.settings.opening_body }}</p>
+        {%- endif -%}
+      </div>
+      {%- if section.settings.opening_btn_text != blank -%}
+        <a href="{{ section.settings.opening_btn_url | default: '/collections/all' }}" class="btn btn-outline ucl">
+          {{ section.settings.opening_btn_text }}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}
+
+<!-- ============ DARK CTA ============ -->
+{%- if section.settings.cta_title != blank -%}
+  <section class="ucl__dark-cta ucl">
+    <div class="ucl__dark-cta-inner">
+      <div>
+        {%- if section.settings.cta_eyebrow != blank -%}
+          <div class="ucl__dark-cta-eyebrow">{{ section.settings.cta_eyebrow }}</div>
+        {%- endif -%}
+        <h2>{{ section.settings.cta_title }}</h2>
+        {%- if section.settings.cta_body != blank -%}
+          <p>{{ section.settings.cta_body }}</p>
+        {%- endif -%}
+      </div>
+      <div class="ucl__dark-cta-actions">
+        {%- if section.settings.cta_btn1_text != blank -%}
+          <a href="{{ section.settings.cta_btn1_url | default: '/pages/contact-us' }}" class="btn btn-coral ucl">{{ section.settings.cta_btn1_text }}</a>
+        {%- endif -%}
+        {%- if section.settings.cta_btn2_text != blank -%}
+          <a href="{{ section.settings.cta_btn2_url | default: '/collections/all' }}" class="btn btn-secondary ucl">{{ section.settings.cta_btn2_text }}</a>
+        {%- endif -%}
+      </div>
+    </div>
+  </section>
+{%- endif -%}
+
+<!-- ============ FEATURES ============ -->
+<section class="ucl__features ucl">
+  <div class="ucl__features-inner">
+    <div class="ucl__feature">
+      <div class="ucl__feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c.7-3.5 3.6-5.5 7-5.5s6.3 2 7 5.5"/></svg></div>
+      <div class="ucl__feature-text"><h4>Expert Support</h4><p>Get help from our equipment experts</p></div>
+    </div>
+    <div class="ucl__feature">
+      <div class="ucl__feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/><path d="M11 8v3l2 2"/></svg></div>
+      <div class="ucl__feature-text"><h4>Lowest Prices</h4><p>Competitive pricing guaranteed</p></div>
+    </div>
+    <div class="ucl__feature">
+      <div class="ucl__feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 8h11v9H2zM13 11h5l3 4v2h-8"/><circle cx="6" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/></svg></div>
+      <div class="ucl__feature-text"><h4>Fast Shipping</h4><p>Quick delivery across the country</p></div>
+    </div>
+    <div class="ucl__feature">
+      <div class="ucl__feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></div>
+      <div class="ucl__feature-text"><h4>Trusted by Businesses</h4><p>Thousands of satisfied customers</p></div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  var stack = document.getElementById('ucl-biz-stack');
+  if (!stack) return;
+
+  function filterCards(cat) {
+    var cards = stack.querySelectorAll('.ucl__biz-card');
+    cards.forEach(function(card) {
+      if (cat === 'all' || card.dataset.cat === cat) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  // Sidebar links
+  var sidebarLinks = document.querySelectorAll('.ucl__cat-list a');
+  sidebarLinks.forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      var cat = this.dataset.cat;
+      if (!cat) return;
+      if (cat !== 'all') e.preventDefault();
+      sidebarLinks.forEach(function(l) { l.classList.remove('active'); });
+      this.classList.add('active');
+      filterCards(cat);
+      // sync chips
+      document.querySelectorAll('.ucl__chip').forEach(function(chip) {
+        chip.classList.toggle('active', chip.dataset.cat === cat);
+      });
+    });
+  });
+
+  // Mobile chips
+  var chips = document.querySelectorAll('.ucl__chip');
+  chips.forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      var cat = this.dataset.cat;
+      chips.forEach(function(c) { c.classList.remove('active'); });
+      this.classList.add('active');
+      filterCards(cat);
+      // sync sidebar
+      sidebarLinks.forEach(function(l) {
+        l.classList.toggle('active', l.dataset.cat === cat);
+      });
+    });
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Use Cases Landing",
+  "tag": "section",
+  "class": "section-use-cases-landing",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Hero"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero background image",
+      "info": "Displays on the right side of the hero with a dark gradient overlay. Leave blank to use solid gradient."
+    },
+    {
+      "type": "text",
+      "id": "hero_title",
+      "label": "Hero headline",
+      "default": "Equipment Solutions by Business Type"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_lead",
+      "label": "Hero lead text",
+      "default": "Find the right equipment for your business. Explore by industry and discover curated products, packages, and expert recommendations."
+    },
+    {
+      "type": "text",
+      "id": "hero_btn1_text",
+      "label": "Primary button text",
+      "default": "Browse Business Types"
+    },
+    {
+      "type": "text",
+      "id": "hero_btn2_text",
+      "label": "Secondary button text",
+      "default": "Talk to an Expert"
+    },
+    {
+      "type": "url",
+      "id": "hero_btn2_url",
+      "label": "Secondary button URL",
+      "info": "Also used for the sidebar 'Contact an Expert' button. Defaults to /pages/contact-us."
+    },
+    {
+      "type": "header",
+      "content": "Opening a New Business Strip"
+    },
+    {
+      "type": "text",
+      "id": "opening_title",
+      "label": "Strip title",
+      "default": "Opening a New Business?"
+    },
+    {
+      "type": "textarea",
+      "id": "opening_body",
+      "label": "Strip body text",
+      "default": "Check out our starter packages curated for each type of business — assembled by our equipment experts."
+    },
+    {
+      "type": "text",
+      "id": "opening_btn_text",
+      "label": "Strip button text",
+      "default": "View Starter Packages"
+    },
+    {
+      "type": "url",
+      "id": "opening_btn_url",
+      "label": "Strip button URL"
+    },
+    {
+      "type": "header",
+      "content": "Dark CTA Section"
+    },
+    {
+      "type": "text",
+      "id": "cta_eyebrow",
+      "label": "Eyebrow label (small text above title)",
+      "default": "Built for hospitality professionals"
+    },
+    {
+      "type": "text",
+      "id": "cta_title",
+      "label": "CTA headline",
+      "default": "Outfit your kitchen with confidence."
+    },
+    {
+      "type": "textarea",
+      "id": "cta_body",
+      "label": "CTA body text",
+      "default": "From a single piece of equipment to a full commercial fit-out, our specialists curate the right solution for your operation — every time."
+    },
+    {
+      "type": "text",
+      "id": "cta_btn1_text",
+      "label": "Primary button text",
+      "default": "Request a Quote"
+    },
+    {
+      "type": "url",
+      "id": "cta_btn1_url",
+      "label": "Primary button URL"
+    },
+    {
+      "type": "text",
+      "id": "cta_btn2_text",
+      "label": "Secondary button text",
+      "default": "Browse Catalog"
+    },
+    {
+      "type": "url",
+      "id": "cta_btn2_url",
+      "label": "Secondary button URL"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "use_case",
+      "name": "Use Case Card",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Card image",
+          "info": "Displays at 4:3 ratio on the left of the card."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Business type name",
+          "default": "Bakery"
+        },
+        {
+          "type": "text",
+          "id": "cat_slug",
+          "label": "Category slug",
+          "info": "Lowercase, hyphenated. Used for sidebar filter (e.g. 'bakery', 'pizza-restaurant'). Leave blank to auto-generate from title."
+        },
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon (emoji)",
+          "default": "🍕",
+          "info": "Emoji shown in the sidebar and mobile chip strip."
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Short description",
+          "default": "Premium equipment for every step of a successful operation."
+        },
+        {
+          "type": "checkbox",
+          "id": "is_new",
+          "label": "Show NEW badge",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "is_featured",
+          "label": "Featured card (coral highlight)",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "cta_text",
+          "label": "Button text",
+          "default": "Shop Equipment"
+        },
+        {
+          "type": "url",
+          "id": "cta_url",
+          "label": "Button URL",
+          "info": "Link to the use-case detail page (e.g. /pages/cf-bakery-cafe)"
+        },
+        {
+          "type": "header",
+          "content": "Product Thumbnails"
+        },
+        {
+          "type": "text",
+          "id": "featured_collection",
+          "label": "Collection handle",
+          "info": "e.g. 'commercial-ovens'. The first 4 products from this collection will appear as thumbnails."
+        },
+        {
+          "type": "url",
+          "id": "view_all_url",
+          "label": "View All link URL",
+          "info": "Shown as a 'View All ›' link in the product grid."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Use Cases Landing",
+      "blocks": [
+        {
+          "type": "use_case",
+          "settings": {
+            "title": "Pizza Restaurants",
+            "cat_slug": "pizza",
+            "icon": "🍕",
+            "description": "Complete solutions for pizzerias from dough preparation to wood-fired perfection.",
+            "cta_text": "Shop Pizza Equipment",
+            "cta_url": "/pages/cf-pizza-restaurants"
+          }
+        },
+        {
+          "type": "use_case",
+          "settings": {
+            "title": "Indian Restaurants",
+            "cat_slug": "indian",
+            "icon": "🍛",
+            "description": "Authentic tandoors and specialty equipment for traditional Indian cooking methods.",
+            "is_new": true,
+            "is_featured": true,
+            "cta_text": "Shop Indian Restaurant Equipment",
+            "cta_url": "/pages/cf-indian-restaurants"
+          }
+        },
+        {
+          "type": "use_case",
+          "settings": {
+            "title": "Bakeries & Cafes",
+            "cat_slug": "bakery",
+            "icon": "🧁",
+            "description": "Professional baking equipment and display solutions for bakeries and coffee shops.",
+            "cta_text": "Shop Bakery Equipment",
+            "cta_url": "/pages/cf-bakery-cafe"
+          }
+        },
+        {
+          "type": "use_case",
+          "settings": {
+            "title": "Hotels & Banquets",
+            "cat_slug": "hotel",
+            "icon": "🏨",
+            "description": "Large-scale catering equipment for hotels, banquet halls, and event venues.",
+            "cta_text": "Shop Hotel Equipment",
+            "cta_url": "/collections/restaurant-equipment"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

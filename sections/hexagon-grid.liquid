@@ -209,6 +209,11 @@
       transform: translateY(-54px) !important;
     }
 
+    /* Row 5 */
+    .hexagon-section .hexagon-grid .hex-row:nth-child(5) {
+      transform: translateY(-72px) !important;
+    }
+
     .hexagon-section .hexagon-grid .hexagon-item {
       margin: 0 -8px !important;
     }
@@ -399,6 +404,51 @@
       </a>
     {% endfor %}
   </div>
+
+  <!-- Row 5: only rendered when all 8 logo slots are filled -->
+  {%- assign row5_filled = 0 -%}
+  {%- for i in (1..8) -%}
+    {%- assign lk = 'logo_row5_' | append: i -%}
+    {%- if section.settings[lk] != blank -%}{%- assign row5_filled = row5_filled | plus: 1 -%}{%- endif -%}
+  {%- endfor -%}
+  {%- if row5_filled == 8 -%}
+  <div class="hex-row">
+    {% for i in (1..8) %}
+      {% assign logo_key = 'logo_row5_' | append: i %}
+      {% assign link_key = 'link_row5_' | append: i %}
+      {% assign logo = section.settings[logo_key] %}
+      {% assign link_url = section.settings[link_key] %}
+
+      {%- assign brand_idx = forloop.index0 | plus: 34 -%}
+      {%- assign default_brand_link = brand_links[brand_idx] | default: '/pages/brands-1' -%}
+      {% assign hex_link = link_url | default: default_brand_link %}
+      <a href="{{ hex_link }}" class="hexagon-link{% if i > 6 %} hide-on-mobile{% endif %}">
+        <div class="hexagon-item">
+          <svg class="hexagon-svg" viewBox="0 0 80 70">
+            <defs>
+              <linearGradient id="hexBorderGradient-row5-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
+                <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
+              </linearGradient>
+            </defs>
+            <polygon class="hex-shape"
+              points="40,2 70,18 70,52 40,68 10,52 10,18"
+              fill="{{ section.settings.hex_background }}"
+              stroke="url(#hexBorderGradient-row5-{{ i }})"
+              stroke-width="{{ section.settings.hex_border_width }}" />
+            <foreignObject x="17" y="25" width="46" height="36">
+              {% if logo != blank %}
+                <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ i }}" loading="lazy">
+              {% else %}
+                <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
+              {% endif %}
+            </foreignObject>
+          </svg>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+  {%- endif -%}
 </div>
 
     <!-- Stats Section -->
@@ -1229,7 +1279,31 @@
       "type": "url",
       "id": "link_row4_9",
       "label": "Row 4 - Link 9"
-    }
+    },
+    {
+      "type": "header",
+      "content": "Row 5 Logos (8 hexagons)"
+    },
+    { "type": "image_picker", "id": "logo_row5_1", "label": "Row 5 - Logo 1" },
+    { "type": "image_picker", "id": "logo_row5_2", "label": "Row 5 - Logo 2" },
+    { "type": "image_picker", "id": "logo_row5_3", "label": "Row 5 - Logo 3" },
+    { "type": "image_picker", "id": "logo_row5_4", "label": "Row 5 - Logo 4" },
+    { "type": "image_picker", "id": "logo_row5_5", "label": "Row 5 - Logo 5" },
+    { "type": "image_picker", "id": "logo_row5_6", "label": "Row 5 - Logo 6" },
+    { "type": "image_picker", "id": "logo_row5_7", "label": "Row 5 - Logo 7" },
+    { "type": "image_picker", "id": "logo_row5_8", "label": "Row 5 - Logo 8" },
+    {
+      "type": "header",
+      "content": "Row 5 Links (8 hexagons)"
+    },
+    { "type": "url", "id": "link_row5_1", "label": "Row 5 - Link 1" },
+    { "type": "url", "id": "link_row5_2", "label": "Row 5 - Link 2" },
+    { "type": "url", "id": "link_row5_3", "label": "Row 5 - Link 3" },
+    { "type": "url", "id": "link_row5_4", "label": "Row 5 - Link 4" },
+    { "type": "url", "id": "link_row5_5", "label": "Row 5 - Link 5" },
+    { "type": "url", "id": "link_row5_6", "label": "Row 5 - Link 6" },
+    { "type": "url", "id": "link_row5_7", "label": "Row 5 - Link 7" },
+    { "type": "url", "id": "link_row5_8", "label": "Row 5 - Link 8" }
   ],
   "presets": [
     {

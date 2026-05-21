@@ -67,6 +67,17 @@
   if product.tags contains 'call-to-order'
     assign call_to_order = true
   endif
+
+  # Indian Vendors for special Out of Stock message (Task 76)
+  assign is_indian_vendor = false
+  assign indian_vendors = "Celebrate Festival Inc,Hawkins,Shaan,Kwitex,Rotoquip,Prestige,Preethi,Milton" | split: ','
+  assign vendor_check = product.vendor | strip
+  for vendor in indian_vendors
+    if vendor_check == vendor
+      assign is_indian_vendor = true
+      break
+    endif
+  endfor
 -%}
 
 {%- comment -%}
@@ -1046,9 +1057,7 @@
               pointer-events: none;
             }
             .variant-pill label {
-              display: inline-flex;
-              align-items: center;
-              gap: 6px;
+              display: inline-block;
               padding: 8px 14px;
               border: 2px solid #e2e8f0;
               border-radius: 6px;
@@ -1062,15 +1071,6 @@
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
-            }
-            .swatch-indicator {
-              display: block;
-              width: 14px;
-              height: 14px;
-              border-radius: 50%;
-              border: 1px solid rgba(0,0,0,0.1);
-              background-size: cover;
-              flex-shrink: 0;
             }
             .variant-pill label:hover {
               border-color: var(--cf-navy, #2d5a87);
@@ -1170,21 +1170,7 @@
                         data-option-index="{{ forloop.parentloop.index0 }}"
                         onchange="handleVariantPillChange(this, '{{ section.id }}')"
                       >
-                      <label for="Option-{{ section.id }}-{{ forloop.index0 }}-{{ forloop.index }}" title="{{ value | escape }}" class="{% if option.name == 'Color' or option.name == 'color' %}color-pill{% endif %}">
-                        {% if option.name == 'Color' or option.name == 'color' %}
-                          {%- liquid
-                            assign swatch_value = null
-                            if value.swatch.image
-                              assign image_url = value.swatch.image | image_url: width: 50
-                              assign swatch_value = 'url(' | append: image_url | append: ')'
-                            elsif value.swatch.color
-                              assign swatch_value = 'rgb(' | append: value.swatch.color.rgb | append: ')'
-                            endif
-                          -%}
-                          {% if swatch_value %}
-                            <span class="swatch-indicator" style="background: {{ swatch_value }}; display: inline-block; width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1); margin-right: 6px; vertical-align: middle;"></span>
-                          {% endif %}
-                        {% endif %}
+                      <label for="Option-{{ section.id }}-{{ forloop.index0 }}-{{ forloop.index }}" title="{{ value | escape }}">
                         {{ truncated_value }}
                       </label>
                       {%- if needs_tooltip -%}
@@ -1212,7 +1198,7 @@
                 <a href="tel:+14086739999" class="btn btn-add-cart cf-call-to-order-btn" style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;background:linear-gradient(135deg,#1a365d 0%,#2d5a87 100%);color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;width:100%;text-align:center;">
                   <i class="fas fa-phone-alt"></i> Call to Order — (408) 673-9999
                 </a>
-                <a href="/pages/contact" style="display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;color:#2d5a87;font-size:13px;font-weight:600;">
+                <a href="/pages/contact-us" style="display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;color:#2d5a87;font-size:13px;font-weight:600;">
                   <i class="fas fa-envelope"></i> Or Contact Us Online
                 </a>
               </div>
@@ -1232,7 +1218,11 @@
                 {%- elsif product.available -%}
                   {{ section.settings.add_to_cart_text | default: "Add to Cart" }}
                 {%- else -%}
-                  Sold Out
+                  {%- if is_indian_vendor -%}
+                    Notify me when back in stock
+                  {%- else -%}
+                    Sold Out
+                  {%- endif -%}
                 {%- endif -%}
               </button>
               <button
@@ -1255,7 +1245,7 @@
               </button>
             </form>
             <div class="zero-price-notice" id="zero-price-notice-{{ section.id }}" style="margin-top:10px;padding:10px 14px;background:#fff8e1;border:1px solid #ffc107;border-radius:6px;font-size:12px;color:#856404;line-height:1.5;{%- if current_variant.price != 0 -%}display:none;{%- endif -%}">
-              Sorry, product can't be added to cart as price not available. <a href="/pages/contact" style="color:#2d5a87;font-weight:600;">Contact us</a> to confirm availability, or call <a href="tel:+14086739999" style="color:#2d5a87;font-weight:600;">(408) 673-9999</a>.
+              Sorry, product can't be added to cart as price not available. <a href="/pages/contact-us" style="color:#2d5a87;font-weight:600;">Contact us</a> to confirm availability, or call <a href="tel:+14086739999" style="color:#2d5a87;font-weight:600;">(408) 673-9999</a>.
             </div>
             {%- endif -%}
           </div>
@@ -1366,7 +1356,7 @@
             {%- if spec_doc_url contains '.pdf' -%}
               <div class="spec-item" style="display: block; text-align: center; padding: 15px 0; margin-bottom: 15px;">
                 <a href="{{ spec_doc_url }}" target="_blank" class="spec-download-btn">
-                  <i class="fas fa-file-pdf"></i> Download Spec Sheet PDF
+                  <i class="fas fa-file-pdf"></i> View Spec Sheet PDF
                 </a>
               </div>
             {%- else -%}
@@ -1382,7 +1372,7 @@
               <h4 style="margin: 0 0 15px 0; color: var(--primary-navy); font-size: 16px; font-weight: 700;">Specification Table</h4>
               
               {%- comment %} Convert rich text to plain text and parse by pipe separator {% endcomment -%}
-              {%- assign spec_html = spec_sheet | metafield_tag -%}
+              {%- assign spec_html = spec_sheet | metafield_tag | replace: '</p>', '|' | replace: '<br>', '|' -%}
               {%- assign spec_text = spec_html | strip_html | strip -%}
               {%- assign spec_lines = spec_text | split: '|' -%}
               
@@ -1476,40 +1466,7 @@
         {%- if warranty_doc != blank or spec_doc != blank or manual_doc != blank or section.settings.show_resources or show_demo -%}
         <div class="sidebar-info-box">
           <h4>📄 Resources & Documents</h4>
-          <ul>
-            {%- if spec_doc != blank -%}
-              {%- assign spec_doc_url = spec_doc | file_url -%}
-              {%- if spec_doc_url contains '.pdf' -%}
-                <li><a href="{{ spec_doc_url }}" target="_blank"><i class="fas fa-file-pdf"></i> Spec Sheet (PDF)</a></li>
-              {%- else -%}
-                <li><a href="{{ spec_doc_url }}" target="_blank"><i class="fas fa-image"></i> Spec Sheet (Image)</a></li>
-              {%- endif -%}
-            {%- endif -%}
-            {%- if manual_doc != blank -%}
-              {%- assign manual_doc_url = manual_doc | file_url -%}
-              {%- if manual_doc_url contains '.pdf' -%}
-                <li><a href="{{ manual_doc_url }}" target="_blank"><i class="fas fa-file-pdf"></i> Installation Manual (PDF)</a></li>
-              {%- else -%}
-                <li><a href="{{ manual_doc_url }}" target="_blank"><i class="fas fa-image"></i> Installation Manual (Image)</a></li>
-              {%- endif -%}
-            {%- endif -%}
-            {%- if warranty_doc != blank -%}
-              {%- assign warranty_doc_url = warranty_doc | file_url -%}
-              <li><a href="{{ warranty_doc_url }}" target="_blank"><i class="fas fa-file-pdf"></i> Warranty Information</a></li>
-            {%- endif -%}
-            {%- if section.settings.resource_links != blank -%}
-              {%- assign resources = section.settings.resource_links | split: '|' -%}
-              {%- for resource in resources -%}
-                {%- assign resource_parts = resource | split: '::' -%}
-                <li><a href="{{ resource_parts[1] }}" target="_blank">{{ resource_parts[0] }}</a></li>
-              {%- endfor -%}
-            {%- endif -%}
-            {%- if show_demo and spec_doc == blank -%}
-              <li><a href="#">Demo Spec Sheet</a></li>
-              <li><a href="#">Demo Manual</a></li>
-              <li><a href="#">Demo Warranty Info</a></li>
-            {%- endif -%}
-          </ul>
+          {% render 'product-resources', product: product, extra_links: section.settings.resource_links, show_demo: show_demo %}
         </div>
         {%- endif -%}
 
@@ -1905,6 +1862,7 @@
   // Customer/member status from Liquid
   const isMember = {{ is_member | json }};
   const isOwnBrand = {{ is_own_brand | json }};
+  const isIndianVendor = {{ is_indian_vendor | json }};
   const enableMemberPricing = {{ enable_member_pricing | json }};
 
   // CPH variant filtering
@@ -2015,7 +1973,11 @@
         addToCartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> {{ section.settings.add_to_cart_text | default: "Add to Cart" }}';
       } else {
         addToCartBtn.disabled = true;
-        addToCartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Sold Out';
+        let soldOutText = 'Sold Out';
+        if (isIndianVendor) {
+          soldOutText = 'Notify me when back in stock';
+        }
+        addToCartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> ' + soldOutText;
       }
     }
 
@@ -3211,8 +3173,8 @@
       "type": "text",
       "id": "qa_button_link",
       "label": "Ask Question Button Link",
-      "default": "/pages/contact",
-      "info": "Enter page URL (e.g., /pages/contact)"
+      "default": "/pages/contact-us",
+      "info": "Enter page URL (e.g., /pages/contact-us)"
     },
     {
       "type": "header",

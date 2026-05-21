@@ -455,6 +455,17 @@
           endif
 
           assign p_sku = product.selected_or_first_available_variant.sku
+
+          # Indian Vendors for special Out of Stock message (Task 76)
+          assign is_indian_vendor = false
+          assign indian_vendors = "Celebrate Festival Inc,Hawkins,Shaan,Kwitex,Rotoquip,Prestige,Preethi,Milton" | split: ','
+          assign vendor_check = product.vendor | strip
+          for vendor in indian_vendors
+            if vendor_check == vendor
+              assign is_indian_vendor = true
+              break
+            endif
+          endfor
         -%}
 
         <div class="spc-card" data-product-id="{{ product.id }}">
@@ -511,7 +522,9 @@
                   <a href="{{ product.url }}" class="spc-select-opts">Select Options</a>
                 {%- endif -%}
               {%- else -%}
-                <button class="spc-atc" disabled style="background:#94a3b8;cursor:not-allowed;">Sold Out</button>
+                <button class="spc-atc" disabled style="background:#94a3b8;cursor:not-allowed;">
+                  {%- if is_indian_vendor -%}Notify me when back in stock{%- else -%}Sold Out{%- endif -%}
+                </button>
               {%- endif -%}
             </div>
           </div>
@@ -537,6 +550,17 @@
           endif
 
           assign p_sku = product.selected_or_first_available_variant.sku
+
+          # Indian Vendors for special Out of Stock message (Task 76)
+          assign is_indian_vendor = false
+          assign indian_vendors = "Celebrate Festival Inc,Hawkins,Shaan,Kwitex,Rotoquip,Prestige,Preethi,Milton" | split: ','
+          assign vendor_check = product.vendor | strip
+          for vendor in indian_vendors
+            if vendor_check == vendor
+              assign is_indian_vendor = true
+              break
+            endif
+          endfor
         -%}
 
         <div class="spc-card" data-product-id="{{ product.id }}" aria-hidden="true">
@@ -587,7 +611,9 @@
                   <a href="{{ product.url }}" class="spc-select-opts" tabindex="-1">Select Options</a>
                 {%- endif -%}
               {%- else -%}
-                <button class="spc-atc" disabled style="background:#94a3b8;cursor:not-allowed;" tabindex="-1">Sold Out</button>
+                <button class="spc-atc" disabled style="background:#94a3b8;cursor:not-allowed;" tabindex="-1">
+                  {%- if is_indian_vendor -%}Notify me when back in stock{%- else -%}Sold Out{%- endif -%}
+                </button>
               {%- endif -%}
             </div>
           </div>

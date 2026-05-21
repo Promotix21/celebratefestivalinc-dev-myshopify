@@ -434,7 +434,7 @@ Features:
         {%- comment -%} REAL DATA: Specs {%- endcomment -%}
         {% if product.metafields.custom.specification != blank %}
           <div class="specs-content">
-            {{ product.metafields.custom.specification }}
+            {{ product.metafields.custom.specification | metafield_tag }}
           </div>
         {% else %}
           {%- comment -%} Basic fallback {%- endcomment -%}
@@ -449,6 +449,14 @@ Features:
       {% endif %}
     </div>
   {% endif %}
+
+  {%- comment -%} RESOURCES & DOCUMENTS {%- endcomment -%}
+  {%- if product.metafields.custom.spec_sheet or product.metafields.custom.specification or product.metafields.custom.manual or product.metafields.custom.instructions_manual or product.metafields.custom.warranty_doc or product.metafields.custom.warranty_document or product.metafields.custom.service_manual or product.metafields.custom.brochure or product.metafields.custom.cleaning_guide or product.metafields.custom.other_resources -%}
+    <div class="resources-section">
+      <h2 class="section-title">Resources & Documents</h2>
+      {% render 'product-resources', product: product, extra_links: section.settings.resource_links, show_demo: demo_mode %}
+    </div>
+  {%- endif -%}
 
   {%- comment -%} WORKS WITH SECTION {%- endcomment -%}
   {% if section.settings.show_works_with %}
@@ -529,13 +537,13 @@ Features:
         </div>
       {% else %}
         <div class="warranty-content">
-          {{ product.metafields.custom.warranty }}
+          {{ product.metafields.custom.warranty | metafield_tag }}
         </div>
         {% if product.metafields.custom.warranty_document != blank %}
           <a href="{{ product.metafields.custom.warranty_document }}"
              class="btn-download"
-             download>
-            Download Warranty Document
+             target="_blank">
+            View Warranty Document
           </a>
         {% endif %}
       {% endif %}

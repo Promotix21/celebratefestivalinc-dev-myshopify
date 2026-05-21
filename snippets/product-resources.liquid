@@ -1,0 +1,344 @@
+{% comment %}
+  Celebrate Festival Inc - Product Resources Snippet
+  Renders a grid of professional static thumbnail icons for PDF metafields.
+{% endcomment %}
+
+{%- liquid
+  assign spec_doc = product.metafields.custom.specification.value | default: product.metafields.custom.specification
+  assign spec_sheet = product.metafields.custom.specification_sheet.value | default: product.metafields.custom.spec_sheet.value | default: product.metafields.custom.spec_sheet
+  assign manual_doc = product.metafields.custom.instructions_manual.value | default: product.metafields.custom.manual.value | default: product.metafields.custom.manual
+  assign warranty_doc = product.metafields.custom.warranty_document.value | default: product.metafields.custom.warranty_doc.value | default: product.metafields.custom.warranty_doc
+  assign service_manual = product.metafields.custom.service_manual.value | default: product.metafields.custom.service_manual
+  assign brochure = product.metafields.custom.brochure.value | default: product.metafields.custom.brochure
+  assign cleaning_guide = product.metafields.custom.cleaning_guide.value | default: product.metafields.custom.cleaning_guide
+  assign other_resources = product.metafields.custom.other_resources.value | default: product.metafields.custom.other_resources
+
+  assign has_resources = false
+  if spec_doc != blank or spec_sheet != blank or manual_doc != blank or warranty_doc != blank or service_manual != blank or brochure != blank or cleaning_guide != blank or other_resources != blank or extra_links != blank or show_demo
+    assign has_resources = true
+  endif
+-%}
+
+{%- if has_resources -%}
+  <div class="product-resources-container">
+    <div class="product-resources-grid">
+      
+      {%- if show_demo and spec_doc == blank and spec_sheet == blank -%}
+        <a href="#" class="resource-item-card">
+          <div class="resource-icon"><img src="{{ 'spec_sheet.png' | asset_url }}" alt="Spec Sheet" loading="lazy"></div>
+          <div class="resource-info"><span class="resource-label">Demo Spec Sheet</span><span class="resource-action">View PDF</span></div>
+        </a>
+        <a href="#" class="resource-item-card">
+          <div class="resource-icon"><img src="{{ 'manual.png' | asset_url }}" alt="Manual" loading="lazy"></div>
+          <div class="resource-info"><span class="resource-label">Demo Manual</span><span class="resource-action">View PDF</span></div>
+        </a>
+      {%- endif -%}
+
+      {%- comment -%} Extra Links from Section Settings {%- endcomment -%}
+      {%- if extra_links != blank -%}
+        {%- assign res_links = extra_links | split: '|' -%}
+        {%- for link in res_links -%}
+          {%- assign link_parts = link | split: '::' -%}
+          {%- if link_parts.size >= 2 -%}
+            <a href="{{ link_parts[1] | strip }}" target="_blank" class="resource-item-card">
+              <div class="resource-icon">
+                {%- assign hue_rotation = forloop.index0 | times: 45 | modulo: 360 -%}
+                <img src="{{ 'brochure.png' | asset_url }}" alt="Resource" loading="lazy" style="filter: hue-rotate({{ hue_rotation }}deg) saturate(2);">
+              </div>
+              <div class="resource-info">
+                <span class="resource-label">{{ link_parts[0] | strip | truncate: 40 }}</span>
+                <span class="resource-action">View PDF</span>
+              </div>
+            </a>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+
+      {%- comment -%} Spec Sheet {%- endcomment -%}
+      {%- if spec_sheet != blank or spec_doc != blank -%}
+        {%- liquid
+          # Prefer spec_doc for PDF as spec_sheet is often rich text
+          assign doc = spec_doc | default: spec_sheet
+          assign doc_url = ""
+          if doc.url != blank
+            assign doc_url = doc.url
+          else
+            assign doc_str = doc | append: ''
+            if doc_str contains '.pdf' or doc_str contains '.jpg' or doc_str contains '.png' or doc_str contains '.webp'
+              assign doc_url = doc_str | file_url
+            endif
+          endif
+        -%}
+        {%- if doc_url != blank -%}
+          <a href="{{ doc_url }}" target="_blank" class="resource-item-card">
+            <div class="resource-icon">
+              <img src="{{ 'spec_sheet.png' | asset_url }}" alt="Spec Sheet" loading="lazy">
+            </div>
+            <div class="resource-info">
+              <span class="resource-label">Spec Sheet</span>
+              <span class="resource-action">View PDF</span>
+            </div>
+          </a>
+        {%- endif -%}
+      {%- endif -%}
+
+      {%- comment -%} Manual {%- endcomment -%}
+      {%- if manual_doc != blank -%}
+        {%- liquid
+          assign doc = manual_doc
+          assign doc_url = ""
+          if doc.url != blank
+            assign doc_url = doc.url
+          else
+            assign doc_str = doc | append: ''
+            if doc_str contains '.pdf' or doc_str contains '.jpg' or doc_str contains '.png' or doc_str contains '.webp'
+              assign doc_url = doc_str | file_url
+            endif
+          endif
+        -%}
+        {%- if doc_url != blank -%}
+          <a href="{{ doc_url }}" target="_blank" class="resource-item-card">
+            <div class="resource-icon">
+              <img src="{{ 'manual.png' | asset_url }}" alt="Manual" loading="lazy">
+            </div>
+            <div class="resource-info">
+              <span class="resource-label">User Manual</span>
+              <span class="resource-action">View PDF</span>
+            </div>
+          </a>
+        {%- endif -%}
+      {%- endif -%}
+
+      {%- comment -%} Service Manual {%- endcomment -%}
+      {%- if service_manual != blank -%}
+        {%- liquid
+          assign doc = service_manual
+          assign doc_url = ""
+          if doc.url != blank
+            assign doc_url = doc.url
+          else
+            assign doc_str = doc | append: ''
+            if doc_str contains '.pdf' or doc_str contains '.jpg' or doc_str contains '.png' or doc_str contains '.webp'
+              assign doc_url = doc_str | file_url
+            endif
+          endif
+        -%}
+        {%- if doc_url != blank -%}
+          <a href="{{ doc_url }}" target="_blank" class="resource-item-card">
+            <div class="resource-icon">
+              <img src="{{ 'service_manual.png' | asset_url }}" alt="Service Manual" loading="lazy">
+            </div>
+            <div class="resource-info">
+              <span class="resource-label">Service Manual</span>
+              <span class="resource-action">View PDF</span>
+            </div>
+          </a>
+        {%- endif -%}
+      {%- endif -%}
+
+      {%- comment -%} Warranty {%- endcomment -%}
+      {%- if warranty_doc != blank -%}
+        {%- liquid
+          assign doc = warranty_doc
+          assign doc_url = ""
+          if doc.url != blank
+            assign doc_url = doc.url
+          else
+            assign doc_str = doc | append: ''
+            if doc_str contains '.pdf' or doc_str contains '.jpg' or doc_str contains '.png' or doc_str contains '.webp'
+              assign doc_url = doc_str | file_url
+            endif
+          endif
+        -%}
+        {%- if doc_url != blank -%}
+          <a href="{{ doc_url }}" target="_blank" class="resource-item-card">
+            <div class="resource-icon">
+              <img src="{{ 'warranty.png' | asset_url }}" alt="Warranty" loading="lazy">
+            </div>
+            <div class="resource-info">
+              <span class="resource-label">Warranty</span>
+              <span class="resource-action">View PDF</span>
+            </div>
+          </a>
+        {%- endif -%}
+      {%- endif -%}
+
+      {%- comment -%} Brochure {%- endcomment -%}
+      {%- if brochure != blank -%}
+        {%- liquid
+          assign doc = brochure
+          assign doc_url = ""
+          if doc.url != blank
+            assign doc_url = doc.url
+          else
+            assign doc_str = doc | append: ''
+            if doc_str contains '.pdf' or doc_str contains '.jpg' or doc_str contains '.png' or doc_str contains '.webp'
+              assign doc_url = doc_str | file_url
+            endif
+          endif
+        -%}
+        {%- if doc_url != blank -%}
+          <a href="{{ doc_url }}" target="_blank" class="resource-item-card">
+            <div class="resource-icon">
+              <img src="{{ 'brochure.png' | asset_url }}" alt="Brochure" loading="lazy">
+            </div>
+            <div class="resource-info">
+              <span class="resource-label">Brochure</span>
+              <span class="resource-action">View PDF</span>
+            </div>
+          </a>
+        {%- endif -%}
+      {%- endif -%}
+
+      {%- comment -%} Cleaning Guide {%- endcomment -%}
+      {%- if cleaning_guide != blank -%}
+        {%- liquid
+          assign doc = cleaning_guide
+          assign doc_url = ""
+          if doc.url != blank
+            assign doc_url = doc.url
+          else
+            assign doc_str = doc | append: ''
+            if doc_str contains '.pdf' or doc_str contains '.jpg' or doc_str contains '.png' or doc_str contains '.webp'
+              assign doc_url = doc_str | file_url
+            endif
+          endif
+        -%}
+        {%- if doc_url != blank -%}
+          <a href="{{ doc_url }}" target="_blank" class="resource-item-card">
+            <div class="resource-icon">
+              <img src="{{ 'cleaning_guide.png' | asset_url }}" alt="Cleaning Guide" loading="lazy">
+            </div>
+            <div class="resource-info">
+              <span class="resource-label">Cleaning Guide</span>
+              <span class="resource-action">View PDF</span>
+            </div>
+          </a>
+        {%- endif -%}
+      {%- endif -%}
+
+      {%- comment -%} Other Resources {%- endcomment -%}
+      {%- if other_resources != blank -%}
+        {%- liquid
+          assign resource_list = other_resources
+          if other_resources.value
+            assign resource_list = other_resources.value
+          endif
+        -%}
+        {%- for doc in resource_list -%}
+          {%- liquid
+            assign doc_url = ""
+            if doc.url != blank
+              assign doc_url = doc.url
+            else
+              assign doc_str = doc | append: ''
+              if doc_str contains '.pdf' or doc_str contains '.jpg' or doc_str contains '.png' or doc_str contains '.webp'
+                assign doc_url = doc_str | file_url
+              endif
+            endif
+          -%}
+          {%- if doc_url != blank -%}
+            <a href="{{ doc_url }}" target="_blank" class="resource-item-card">
+              <div class="resource-icon">
+                {%- liquid
+                  # Jump 155 degrees for high-contrast "opposite" colors between items
+                  # High saturation for pop, with slightly tuned brightness
+                  assign hue_rotation = forloop.index0 | times: 155 | modulo: 360
+                  assign icon_filter = 'hue-rotate(' | append: hue_rotation | append: 'deg) saturate(3) brightness(0.8)'
+                -%}
+                <img src="{{ 'brochure.png' | asset_url }}" alt="Resource" loading="lazy" style="filter: {{ icon_filter }};">
+              </div>
+              <div class="resource-info">
+                {%- liquid
+                  assign resource_name = doc.alt | default: doc.name | default: ''
+                  if resource_name == blank
+                    # Extract filename, strip extension, and clean up underscores/dashes
+                    assign filename = doc_url | split: '/' | last | split: '?' | first
+                    assign resource_name = filename | replace: '.pdf', '' | replace: '.PDF', '' | replace: '_', ' ' | replace: '-', ' '
+                  endif
+                -%}
+                <span class="resource-label">{{ resource_name | escape | truncate: 40 }}</span>
+                <span class="resource-action">View PDF</span>
+              </div>
+            </a>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+
+    </div>
+  </div>
+{%- endif -%}
+
+<style>
+.product-resources-container {
+  margin: 20px 0;
+}
+
+.product-resources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 15px;
+}
+
+.resource-item-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 15px 10px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.resource-item-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-color: #cbd5e1;
+}
+
+.resource-icon {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resource-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.resource-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.resource-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a2332;
+  line-height: 1.2;
+}
+
+.resource-action {
+  font-size: 11px;
+  font-weight: 500;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 480px) {
+  .product-resources-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+</style>

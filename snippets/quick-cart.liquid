@@ -172,6 +172,10 @@
             </select>
           </div>
           <div class="qc-se-row">
+            <label class="qc-se-label" for="qcSeProvince">Province / State</label>
+            <select class="qc-se-select" id="qcSeProvince"></select>
+          </div>
+          <div class="qc-se-row">
             <label class="qc-se-label" for="qcSeZip">ZIP / Postal Code</label>
             <input class="qc-se-input" id="qcSeZip" type="text" placeholder="e.g. 94102" maxlength="10" autocomplete="postal-code">
           </div>
@@ -776,11 +780,40 @@ function initShippingEstimator() {
   const toggle  = document.getElementById('qcSeToggle');
   const panel   = document.getElementById('qcSePanel');
   const selCo   = document.getElementById('qcSeCountry');
+  const selProv = document.getElementById('qcSeProvince');
   const inputZip = document.getElementById('qcSeZip');
   const btn     = document.getElementById('qcSeCalc');
   const results = document.getElementById('qcSeResults');
 
   if (!toggle) return;
+
+  const regions = {
+    'US': [
+      {val: 'AL', name: 'Alabama'}, {val: 'AK', name: 'Alaska'}, {val: 'AZ', name: 'Arizona'}, {val: 'AR', name: 'Arkansas'}, {val: 'CA', name: 'California'},
+      {val: 'CO', name: 'Colorado'}, {val: 'CT', name: 'Connecticut'}, {val: 'DE', name: 'Delaware'}, {val: 'DC', name: 'District of Columbia'}, {val: 'FL', name: 'Florida'},
+      {val: 'GA', name: 'Georgia'}, {val: 'HI', name: 'Hawaii'}, {val: 'ID', name: 'Idaho'}, {val: 'IL', name: 'Illinois'}, {val: 'IN', name: 'Indiana'},
+      {val: 'IA', name: 'Iowa'}, {val: 'KS', name: 'Kansas'}, {val: 'KY', name: 'Kentucky'}, {val: 'LA', name: 'Louisiana'}, {val: 'ME', name: 'Maine'},
+      {val: 'MD', name: 'Maryland'}, {val: 'MA', name: 'Massachusetts'}, {val: 'MI', name: 'Michigan'}, {val: 'MN', name: 'Minnesota'}, {val: 'MS', name: 'Mississippi'},
+      {val: 'MO', name: 'Missouri'}, {val: 'MT', name: 'Montana'}, {val: 'NE', name: 'Nebraska'}, {val: 'NV', name: 'Nevada'}, {val: 'NH', name: 'New Hampshire'},
+      {val: 'NJ', name: 'New Jersey'}, {val: 'NM', name: 'New Mexico'}, {val: 'NY', name: 'New York'}, {val: 'NC', name: 'North Carolina'}, {val: 'ND', name: 'North Dakota'},
+      {val: 'OH', name: 'Ohio'}, {val: 'OK', name: 'Oklahoma'}, {val: 'OR', name: 'Oregon'}, {val: 'PA', name: 'Pennsylvania'}, {val: 'RI', name: 'Rhode Island'},
+      {val: 'SC', name: 'South Carolina'}, {val: 'SD', name: 'South Dakota'}, {val: 'TN', name: 'Tennessee'}, {val: 'TX', name: 'Texas'}, {val: 'UT', name: 'Utah'},
+      {val: 'VT', name: 'Vermont'}, {val: 'VA', name: 'Virginia'}, {val: 'WA', name: 'Washington'}, {val: 'WV', name: 'West Virginia'}, {val: 'WI', name: 'Wisconsin'}, {val: 'WY', name: 'Wyoming'}
+    ],
+    'CA': [
+      {val: 'AB', name: 'Alberta'}, {val: 'BC', name: 'British Columbia'}, {val: 'MB', name: 'Manitoba'}, {val: 'NB', name: 'New Brunswick'}, {val: 'NL', name: 'Newfoundland and Labrador'},
+      {val: 'NT', name: 'Northwest Territories'}, {val: 'NS', name: 'Nova Scotia'}, {val: 'NU', name: 'Nunavut'}, {val: 'ON', name: 'Ontario'}, {val: 'PE', name: 'Prince Edward Island'},
+      {val: 'QC', name: 'Quebec'}, {val: 'SK', name: 'Saskatchewan'}, {val: 'YT', name: 'Yukon'}
+    ]
+  };
+
+  function updateProvinces() {
+    const country = selCo.value;
+    const provs = regions[country] || [];
+    selProv.innerHTML = provs.map(p => `<option value="${p.val}">${p.name}</option>`).join('');
+  }
+
+  updateProvinces();
 
   toggle.addEventListener('click', function() {
     const open = toggle.getAttribute('aria-expanded') === 'true';
@@ -793,12 +826,18 @@ function initShippingEstimator() {
   });
 
   selCo.addEventListener('change', function() {
+    updateProvinces();
     inputZip.value = '';
+    results.innerHTML = '';
+  });
+
+  selProv.addEventListener('change', function() {
     results.innerHTML = '';
   });
 
   btn.addEventListener('click', function() {
     const country = selCo.value;
+    const province = selProv.value;
     const zip     = inputZip.value.trim();
 
     if (!zip) {
@@ -816,7 +855,7 @@ function initShippingEstimator() {
     btn.classList.add('loading');
     results.innerHTML = '';
 
-    const url = `/cart/shipping_rates.json?shipping_address[zip]=${encodeURIComponent(zip)}&shipping_address[country]=${encodeURIComponent(country)}`;
+    const url = `/cart/shipping_rates.json?shipping_address[zip]=${encodeURIComponent(zip)}&shipping_address[country]=${encodeURIComponent(country)}&shipping_address[province]=${encodeURIComponent(province)}`;
 
     fetch(url, { credentials: 'same-origin' })
       .then(r => r.json())

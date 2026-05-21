@@ -282,6 +282,7 @@
       <div class="tabs-nav">
         <button class="tab-btn active" data-tab="specifications">Specifications</button>
         <button class="tab-btn" data-tab="details">Details</button>
+        <button class="tab-btn" data-tab="resources">Resources</button>
         <button class="tab-btn" data-tab="warranty">Warranty</button>
         <button class="tab-btn" data-tab="reviews">Reviews</button>
       </div>
@@ -290,7 +291,7 @@
       <div class="tab-content active" id="specifications">
         <div class="specs-table">
           {% if product.metafields.custom.specifications != blank and product.metafields.custom.specifications != '' %}
-            {{ product.metafields.custom.specifications }}
+            {{ product.metafields.custom.specifications | metafield_tag }}
           {% else %}
             <table>
               <thead>
@@ -309,7 +310,7 @@
                 {% if product.metafields.custom.model != blank and product.metafields.custom.model != '' %}
                 <tr>
                   <td><strong>Model</strong></td>
-                  <td>{{ product.metafields.custom.model }}</td>
+                  <td>{{ product.metafields.custom.model | metafield_tag }}</td>
                 </tr>
                 {% endif %}
                 {% if product.weight > 0 %}
@@ -332,6 +333,17 @@
           {% else %}
             <p>Product details coming soon. Please contact us for more information.</p>
           {% endif %}
+        </div>
+      </div>
+
+      <!-- Resources Tab -->
+      <div class="tab-content" id="resources">
+        <div class="resources-content">
+          {%- if product.metafields.custom.spec_sheet or product.metafields.custom.specification or product.metafields.custom.manual or product.metafields.custom.instructions_manual or product.metafields.custom.warranty_doc or product.metafields.custom.warranty_document or product.metafields.custom.service_manual or product.metafields.custom.brochure or product.metafields.custom.cleaning_guide or product.metafields.custom.other_resources -%}
+            {% render 'product-resources', product: product, extra_links: section.settings.resource_links, show_demo: section.settings.show_demo_data %}
+          {%- else -%}
+            <p>No additional resources available for this product at this time.</p>
+          {%- endif -%}
         </div>
       </div>
 

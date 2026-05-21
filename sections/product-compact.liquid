@@ -67,6 +67,17 @@
   if product.tags contains 'call-to-order'
     assign call_to_order = true
   endif
+
+  # Indian Vendors for special Out of Stock message (Task 76)
+  assign is_indian_vendor = false
+  assign indian_vendors = "Celebrate Festival Inc,Hawkins,Shaan,Kwitex,Rotoquip,Prestige,Preethi,Milton" | split: ','
+  assign vendor_check = product.vendor | strip
+  for vendor in indian_vendors
+    if vendor_check == vendor
+      assign is_indian_vendor = true
+      break
+    endif
+  endfor
 -%}
 
 {%- comment -%} CPH Variant Filtering — Build allowed variant list {%- endcomment -%}
@@ -422,6 +433,56 @@
       </div>
       {%- endif -%}
 
+      {%- comment -%} ── Carousel: Other Products from this Line ── {%- endcomment -%}
+      {%- if section.settings.show_other_products and product_line_products.value.size > 0 or show_demo -%}
+      <div class="compact-carousel-section">
+        <h3>{{ related_title }}</h3>
+        <div class="compact-carousel-wrap" id="carousel-related">
+          <button class="compact-carousel-nav prev" onclick="slideCarousel('carousel-related', -1)" aria-label="Previous">&lsaquo;</button>
+          <div class="compact-carousel-track">
+            {%- if product_line_products.value.size > 0 -%}
+              {%- for rp in product_line_products.value limit: 8 -%}
+                <div class="compact-carousel-card">
+                  <a href="{{ rp.url }}">
+                    {%- if rp.featured_image -%}
+                      <img src="{{ rp.featured_image | image_url: width: 140 }}" alt="{{ rp.title | escape }}" class="compact-carousel-card-img" loading="lazy">
+                    {%- else -%}
+                      <div class="compact-carousel-card-img" style="background:var(--g100);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--g400);">No image</div>
+                    {%- endif -%}
+                    <div class="compact-carousel-card-info">
+                      <div class="compact-carousel-card-title">{{ rp.title }}</div>
+                      <div class="compact-carousel-card-price">{{ rp.price | money }}</div>
+                    </div>
+                  </a>
+                  <div class="compact-carousel-card-actions">
+                    <input type="number" value="1" min="1" aria-label="Quantity">
+                    <button type="button" onclick="quickAdd({{ rp.variants.first.id }}, this)">Add to Cart</button>
+                  </div>
+                </div>
+              {%- endfor -%}
+            {%- elsif show_demo -%}
+              {%- for i in (1..6) -%}
+              <div class="compact-carousel-card">
+                <a href="#">
+                  <img src="https://via.placeholder.com/140x140/f7fafc/718096?text={{ i }}" alt="Demo" class="compact-carousel-card-img" loading="lazy">
+                  <div class="compact-carousel-card-info">
+                    <div class="compact-carousel-card-title">Related Product {{ i }} Name</div>
+                    <div class="compact-carousel-card-price">${{ i }}99.00</div>
+                  </div>
+                </a>
+                <div class="compact-carousel-card-actions">
+                  <input type="number" value="1" min="1" aria-label="Quantity">
+                  <button type="button">Add to Cart</button>
+                </div>
+              </div>
+              {%- endfor -%}
+            {%- endif -%}
+          </div>
+          <button class="compact-carousel-nav next" onclick="slideCarousel('carousel-related', 1)" aria-label="Next">&rsaquo;</button>
+        </div>
+      </div>
+      {%- endif -%}
+
       {%- comment -%} ── Product Description ── {%- endcomment -%}
       {%- if product.description != blank or show_demo -%}
       <div class="compact-description">
@@ -677,23 +738,6 @@
         {%- endif -%}
       {%- endif -%}
 
-      {%- comment -%} ── "You May Also Like" inline placeholder (bottom of content) ── {%- endcomment -%}
-      {%- comment -%}
-        Empty placeholder. The cf-you-may-like section (registered as
-        "cf-related" in templates/product.json) lazy-loads Shopify's
-        recommendations.products via section_id and injects the carousel
-        HTML here. Living inside .compact-content-col means the carousel
-        inherits the left content column's width — same scope as the
-        "Works With Products" carousel above. Sits at the bottom of the
-        left content area, after description / Q&A / reviews / service
-        banner — the conventional spot for "you may also like" so users
-        see alternatives only after they've finished evaluating this product.
-      {%- endcomment -%}
-      <div data-cf-related-inline
-           data-product-id="{{ product.id }}"
-           data-limit="8"
-           data-intent="related"></div>
-
     </div>{%- comment -%} end .compact-content-col {%- endcomment -%}
 
     {%- comment -%} ═══ RIGHT SIDEBAR ═══ {%- endcomment -%}
@@ -848,21 +892,7 @@
                         onchange="handleCompactVariantChange(this, '{{ section.id }}')"
                         {% if pill_sold_out %}disabled{% endif %}
                       >
-                      <label for="CompactOpt-{{ section.id }}-{{ forloop.index0 }}-{{ forloop.index }}" class="{% if option.name == 'Color' or option.name == 'color' %}compact-color-pill{% endif %}">
-                        {% if option.name == 'Color' or option.name == 'color' %}
-                          {%- liquid
-                            assign swatch_value = null
-                            if value.swatch.image
-                              assign image_url = value.swatch.image | image_url: width: 50
-                              assign swatch_value = 'url(' | append: image_url | append: ')'
-                            elsif value.swatch.color
-                              assign swatch_value = 'rgb(' | append: value.swatch.color.rgb | append: ')'
-                            endif
-                          -%}
-                          {% if swatch_value %}
-                            <span class="compact-swatch-indicator" style="background: {{ swatch_value }};"></span>
-                          {% endif %}
-                        {% endif %}
+                      <label for="CompactOpt-{{ section.id }}-{{ forloop.index0 }}-{{ forloop.index }}">
                         {{ value }}
                       </label>
                     </div>
@@ -905,7 +935,11 @@
             {%- elsif product.available -%}
               {{ section.settings.add_to_cart_text | default: "Add to Cart" }}
             {%- else -%}
-              Sold Out
+              {%- if is_indian_vendor -%}
+                Notify me when back in stock
+              {%- else -%}
+                Sold Out
+              {%- endif -%}
             {%- endif -%}
           </button>
         </form>
@@ -1040,7 +1074,7 @@
             {%- endif -%}
 
             {%- if spec_sheet != blank -%}
-              {%- assign spec_html = spec_sheet | metafield_tag -%}
+              {%- assign spec_html = spec_sheet | metafield_tag | replace: '</p>', '|' | replace: '<br>', '|' -%}
               {%- assign spec_text = spec_html | strip_html | strip -%}
               {%- assign spec_lines = spec_text | split: '|' -%}
               {%- for line in spec_lines -%}
@@ -1112,73 +1146,7 @@
             <span class="acc-icon">+</span>
           </div>
           <div class="compact-acc-content">
-            {%- if spec_doc != blank -%}
-              {%- assign spec_doc_url = spec_doc | file_url -%}
-              {%- if spec_doc_url contains '.pdf' -%}
-                <a href="{{ spec_doc_url }}" target="_blank" class="compact-resource-link">
-                  <span class="res-icon">&#128196;</span> Spec Sheet (PDF)
-                </a>
-              {%- else -%}
-                <a href="{{ spec_doc_url }}" target="_blank" class="compact-resource-link">
-                  <span class="res-icon">&#128444;</span> Spec Sheet (Image)
-                </a>
-              {%- endif -%}
-            {%- endif -%}
-
-            {%- if manual_doc != blank -%}
-              {%- assign manual_doc_url = manual_doc | file_url -%}
-              {%- if manual_doc_url contains '.pdf' -%}
-                <a href="{{ manual_doc_url }}" target="_blank" class="compact-resource-link">
-                  <span class="res-icon">&#128196;</span> Installation Manual (PDF)
-                </a>
-              {%- else -%}
-                <a href="{{ manual_doc_url }}" target="_blank" class="compact-resource-link">
-                  <span class="res-icon">&#128444;</span> Installation Manual (Image)
-                </a>
-              {%- endif -%}
-            {%- endif -%}
-
-            {%- if warranty_doc != blank -%}
-              {%- assign warranty_doc_url = warranty_doc | file_url -%}
-              <a href="{{ warranty_doc_url }}" target="_blank" class="compact-resource-link">
-                <span class="res-icon">&#128196;</span> Warranty Information
-              </a>
-            {%- endif -%}
-
-            {%- if section.settings.resource_links != blank -%}
-              {%- assign resources = section.settings.resource_links | split: '|' -%}
-              {%- for resource in resources -%}
-                {%- assign resource_parts = resource | split: '::' -%}
-                <a href="{{ resource_parts[1] }}" target="_blank" class="compact-resource-link">
-                  <span class="res-icon">&#128279;</span> {{ resource_parts[0] }}
-                </a>
-              {%- endfor -%}
-            {%- endif -%}
-
-            {%- if other_resources != blank -%}
-              {%- for resource_file in other_resources.value -%}
-                {%- assign res_url = resource_file.url -%}
-                {%- assign res_filename = resource_file.alt | default: '' -%}
-                {%- if res_filename == blank -%}
-                  {%- assign res_filename = res_url | split: '/' | last | split: '?' | first -%}
-                {%- endif -%}
-                {%- if res_url contains '.pdf' -%}
-                  <a href="{{ res_url }}" target="_blank" class="compact-resource-link">
-                    <span class="res-icon">&#128196;</span> {{ res_filename }}
-                  </a>
-                {%- else -%}
-                  <a href="{{ res_url }}" target="_blank" class="compact-resource-link">
-                    <span class="res-icon">&#128279;</span> {{ res_filename }}
-                  </a>
-                {%- endif -%}
-              {%- endfor -%}
-            {%- endif -%}
-
-            {%- if show_demo and spec_doc == blank -%}
-              <a href="#" class="compact-resource-link"><span class="res-icon">&#128196;</span> Demo Spec Sheet</a>
-              <a href="#" class="compact-resource-link"><span class="res-icon">&#128196;</span> Demo Manual</a>
-              <a href="#" class="compact-resource-link"><span class="res-icon">&#128196;</span> Demo Warranty Info</a>
-            {%- endif -%}
+            {% render 'product-resources', product: product, extra_links: section.settings.resource_links, show_demo: show_demo %}
           </div>
         </div>
         {%- endif -%}
@@ -1625,6 +1593,7 @@
 
   const isMember = {{ is_member | json }};
   const isOwnBrand = {{ is_own_brand | json }};
+  const isIndianVendor = {{ is_indian_vendor | json }};
   const enableMemberPricing = {{ enable_member_pricing | json }};
   const filterForCph = {{ filter_variants_for_cph | json }};
   const cphAllowedVariantIds = [{{ cph_variant_ids }}];
@@ -1705,7 +1674,11 @@
         atcBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> {{ section.settings.add_to_cart_text | default: "Add to Cart" }}';
       } else {
         atcBtn.disabled = true;
-        atcBtn.innerHTML = 'Sold Out';
+        let soldOutText = 'Sold Out';
+        if (isIndianVendor) {
+          soldOutText = 'Notify me when back in stock';
+        }
+        atcBtn.innerHTML = soldOutText;
       }
     }
 
@@ -2030,70 +2003,6 @@
     var cardW = card.offsetWidth + 12;
     track.scrollBy({ left: dir * cardW * 2, behavior: 'smooth' });
   };
-
-  /* Responsive table — header row may be in <thead> or directly in <tbody> as <th> */
-  document.querySelectorAll('.compact-description-body table').forEach(function(table) {
-    var firstRow = table.querySelector('tr');
-    if (!firstRow) return;
-    var headers = [];
-    firstRow.querySelectorAll('th, td').forEach(function(cell) {
-      headers.push(cell.innerText.trim().replace(/\s+/g, ' '));
-    });
-    if (!headers.length) return;
-    firstRow.setAttribute('data-cf-header-row', '1');
-    table.querySelectorAll('tr').forEach(function(row) {
-      if (row.hasAttribute('data-cf-header-row')) return;
-      row.querySelectorAll('td').forEach(function(cell, i) {
-        if (headers[i]) cell.setAttribute('data-label', headers[i]);
-        // Wrap value content so CSS can target it separately
-        if (!cell.querySelector('.cf-td-val')) {
-          var val = document.createElement('span');
-          val.className = 'cf-td-val';
-          while (cell.firstChild) val.appendChild(cell.firstChild);
-          cell.appendChild(val);
-        }
-      });
-    });
-  });
-
-  /* Mobile carousel: dots + auto-slide */
-  if (window.innerWidth <= 992) {
-    document.querySelectorAll('.compact-carousel-wrap').forEach(function(wrap) {
-      var track = wrap.querySelector('.compact-carousel-track');
-      if (!track) return;
-      var cards = Array.from(track.querySelectorAll('.compact-carousel-card'));
-      if (cards.length <= 1) return;
-
-      var dotsWrap = document.createElement('div');
-      dotsWrap.className = 'compact-carousel-dots';
-      cards.forEach(function(_, i) {
-        var dot = document.createElement('span');
-        dot.className = 'compact-carousel-dot' + (i === 0 ? ' active' : '');
-        dot.addEventListener('click', function() { goTo(i); });
-        dotsWrap.appendChild(dot);
-      });
-      wrap.insertAdjacentElement('afterend', dotsWrap);
-
-      function goTo(idx) {
-        track.scrollTo({ left: cards[idx].offsetLeft, behavior: 'smooth' });
-      }
-      function updateDots() {
-        var cardW = cards[0].offsetWidth || 1;
-        var idx = Math.min(Math.round(track.scrollLeft / cardW), cards.length - 1);
-        dotsWrap.querySelectorAll('.compact-carousel-dot').forEach(function(d, i) {
-          d.classList.toggle('active', i === idx);
-        });
-      }
-      track.addEventListener('scroll', updateDots, { passive: true });
-
-      var current = 0;
-      var timer = setInterval(function() {
-        current = (current + 1) % cards.length;
-        goTo(current);
-      }, 3500);
-      track.addEventListener('touchstart', function() { clearInterval(timer); }, { passive: true });
-    });
-  }
   window.quickAdd = function(variantId, btn) {
     if (!variantId) return;
     var qtyInput = btn.parentElement.querySelector('input[type="number"]');

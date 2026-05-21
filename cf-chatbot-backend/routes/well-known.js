@@ -39,39 +39,24 @@ router.options('*', (req, res) => {
 
 // ---------------------------------------------------------------------------
 // GET /wk/.well-known/api-catalog
-// RFC-style API catalog (inspired by IETF draft-ietf-httpapi-linkset-format)
+// RFC 9727 — application/linkset+json
 // ---------------------------------------------------------------------------
 router.get('/.well-known/api-catalog', (req, res) => {
   setDiscoveryHeaders(res);
+  res.setHeader('Content-Type', 'application/linkset+json');
   res.json({
-    schema_version: '1.0',
-    title: 'Celebrate Festival Inc API Catalog',
-    description: 'Machine-readable catalog of APIs available for the Celebrate Festival Inc B2B restaurant equipment storefront.',
-    contact: {
-      name: 'Hiraya Digital',
-      email: 'dev@hiraya.digital',
-      url: 'https://hiraya.digital'
-    },
-    apis: [
+    linkset: [
       {
-        id: 'shopify-storefront',
-        title: 'Shopify Storefront API',
-        description: 'Shopify Storefront GraphQL API for browsing products, collections, and cart management.',
-        specUrl: `${PROXY_BASE}/openapi.json`,
-        specMediaType: 'application/json',
-        docsUrl: 'https://shopify.dev/docs/api/storefront',
-        authorizationUrl: `${BASE_URL}/admin/oauth/authorize`,
-        version: '2024-10',
-        tags: ['storefront', 'products', 'cart', 'b2b', 'wholesale']
-      },
-      {
-        id: 'cf-chatbot-api',
-        title: 'Celebrate Festival AI Assistant API',
-        description: 'AI-powered product discovery, SKU lookup, and shopping assistance for B2B buyers.',
-        specUrl: `${PROXY_BASE}/openapi.json`,
-        specMediaType: 'application/json',
-        version: '1.0.0',
-        tags: ['ai', 'search', 'sku', 'assistant', 'b2b']
+        anchor: `${PROXY_BASE}/openapi.json`,
+        "service-desc": [
+          { href: `${PROXY_BASE}/openapi.json`, type: "application/json" }
+        ],
+        "service-doc": [
+          { href: "https://shopify.dev/docs/api/storefront", type: "text/html" }
+        ],
+        "status": [
+          { href: `${PROXY_BASE}/health`, type: "application/json" }
+        ]
       }
     ]
   });

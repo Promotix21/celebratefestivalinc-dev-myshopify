@@ -401,10 +401,12 @@
     {%- endunless -%}
 
     {%- comment -%} AI Agent Discovery: Link relation tags (RFC 8631 service-desc/service-doc + emerging api-catalog) {%- endcomment -%}
-    <link rel="service-desc" href="/pages/openapi" type="application/json" title="Celebrate Festival Inc API">
-    <link rel="api-catalog" href="/pages/api-catalog" type="application/json">
-    <link rel="alternate" href="/pages/agent-skills" type="application/json" title="Agent Skills">
-    <link rel="https://schema.org/WebAPI" href="/pages/mcp-server-card" type="application/json" title="MCP Server Card">
+    <link rel="service-desc" href="https://celebratefestivalinc.com/a/wk/.well-known/openapi" type="application/json" title="Celebrate Festival Inc API">
+    <link rel="service-doc" href="https://celebratefestivalinc.com/pages/api-catalog" type="text/html" title="API Documentation">
+    <link rel="api-catalog" href="https://celebratefestivalinc.com/a/wk/.well-known/api-catalog" type="application/linkset+json">
+    <link rel="alternate" href="https://celebratefestivalinc.com/a/wk/.well-known/agent-skills/index.json" type="application/json" title="Agent Skills">
+    <link rel="https://schema.org/WebAPI" href="https://celebratefestivalinc.com/a/wk/.well-known/mcp/server-card.json" type="application/json" title="MCP Server Card">
+    <link rel="https://ucp.dev/ns/universal-commerce-protocol" href="https://celebratefestivalinc.com/.well-known/ucp" type="application/json">
 
   </head>
 

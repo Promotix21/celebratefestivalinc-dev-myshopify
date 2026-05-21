@@ -567,18 +567,16 @@
     /* ── 1. Sync sticky bar disabled state with main ATC button ── */
     if (stickyBtn && mainAtcBtn) {
       function syncStickyState() {
-        var mainDisabled = mainAtcBtn.disabled;
-        var mainText = mainAtcBtn.textContent.trim();
-        var isSoldOut = mainDisabled && (mainText === 'Sold Out' || mainText.includes('Sold'));
+        stickyBtn.disabled = mainAtcBtn.disabled;
 
-        stickyBtn.disabled = mainDisabled;
-
-        if (isSoldOut) {
-          stickyBtn.textContent = 'Sold Out';
+        if (mainAtcBtn.disabled) {
+          stickyBtn.textContent = mainAtcBtn.textContent.replace(/[\n\r]+|[\s]{2,}/g, ' ').trim();
           stickyBtn.style.opacity = '0.5';
           stickyBtn.style.cursor = 'not-allowed';
-        } else if (!mainDisabled) {
-          if (stickyBtn.textContent === 'Sold Out') {
+        } else {
+          // Reset to default text if main button is enabled
+          var currentText = stickyBtn.textContent.toLowerCase();
+          if (currentText.includes('sold') || currentText.includes('contact') || currentText.includes('notify')) {
             stickyBtn.textContent = 'Add to Cart';
           }
           stickyBtn.style.opacity = '';

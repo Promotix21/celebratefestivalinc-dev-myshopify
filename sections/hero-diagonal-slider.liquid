@@ -50,6 +50,12 @@
                       {{ block.settings.secondary_btn_text }}
                     </a>
                   {% endif %}
+                  {% if block.settings.show_usecase_btn %}
+                    <a href="{{ block.settings.usecase_btn_url | default: '/pages/use-cases' }}" class="hero-diagonal__btn hero-diagonal__btn--tertiary">
+                      {{ block.settings.usecase_btn_text | default: 'See All Use Cases' }}
+                      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    </a>
+                  {% endif %}
                 </div>
               </div>
 
@@ -78,8 +84,12 @@
           {% if block.type == 'slide' and slide_has_image2 %}
             <div class="swiper-slide">
               {% if block.settings.image_url_override != blank %}
+                {%- assign final_img_url = block.settings.image_url_override -%}
+                {%- unless final_img_url contains 'http' -%}
+                  {%- assign final_img_url = final_img_url | asset_url -%}
+                {%- endunless -%}
                 <img
-                  src="{{ block.settings.image_url_override }}"
+                  src="{{ final_img_url }}"
                   sizes="55vw"
                   alt="{{ block.settings.image_alt | default: block.settings.title_highlight }}"
                   loading="eager"
@@ -205,6 +215,26 @@
     width: 85px;
     height: 85px;
   }
+}
+
+.hero-diagonal__btn--tertiary {
+  background: transparent;
+  color: rgba(255,255,255,0.75);
+  border: 1px solid rgba(255,255,255,0.3);
+  padding: 11px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 6px;
+  transition: color 0.2s ease, border-color 0.2s ease;
+  text-decoration: none;
+}
+.hero-diagonal__btn--tertiary:hover {
+  color: #d4af37;
+  border-color: #d4af37;
 }
 </style>
 
@@ -422,6 +452,32 @@ document.addEventListener('DOMContentLoaded', function() {
           "type": "url",
           "id": "secondary_btn_url",
           "label": "Secondary button URL"
+        },
+        {
+          "type": "header",
+          "content": "Use Cases Button"
+        },
+        {
+          "type": "paragraph",
+          "content": "A third ghost button linking to the Use Cases page. Hidden by default — enable when the page is ready to go live."
+        },
+        {
+          "type": "checkbox",
+          "id": "show_usecase_btn",
+          "label": "Show 'See All Use Cases' button",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "usecase_btn_text",
+          "label": "Button text",
+          "default": "See All Use Cases"
+        },
+        {
+          "type": "url",
+          "id": "usecase_btn_url",
+          "label": "Button URL",
+          "info": "Defaults to /pages/use-cases if left blank"
         }
       ]
     }

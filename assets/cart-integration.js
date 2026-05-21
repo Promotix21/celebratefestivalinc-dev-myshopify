@@ -505,21 +505,16 @@ document.head.appendChild(style);
 
     /* 1 ── Mirror sold-out / disabled state to sticky bar button ── */
     function syncStickyState() {
-      var isSoldOut = mainAtcBtn.disabled && /sold.?out/i.test(mainAtcBtn.textContent);
-      var isContact = mainAtcBtn.disabled && /contact/i.test(mainAtcBtn.textContent);
-
       stickyBtn.disabled = mainAtcBtn.disabled;
 
-      if (isSoldOut) {
-        stickyBtn.textContent    = 'Sold Out';
-        stickyBtn.style.opacity  = '0.5';
-        stickyBtn.style.cursor   = 'not-allowed';
-      } else if (isContact) {
-        stickyBtn.textContent    = 'Contact Us';
+      if (mainAtcBtn.disabled) {
+        stickyBtn.textContent = mainAtcBtn.textContent.replace(/[\n\r]+|[\s]{2,}/g, ' ').trim();
         stickyBtn.style.opacity  = '0.5';
         stickyBtn.style.cursor   = 'not-allowed';
       } else {
-        if (stickyBtn.textContent === 'Sold Out' || stickyBtn.textContent === 'Contact Us') {
+        // Reset to default text if main button is enabled
+        var currentText = stickyBtn.textContent.toLowerCase();
+        if (currentText.includes('sold') || currentText.includes('contact') || currentText.includes('notify')) {
           stickyBtn.textContent  = 'Add to Cart';
         }
         stickyBtn.style.opacity  = '';

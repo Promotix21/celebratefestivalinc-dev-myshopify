@@ -664,74 +664,13 @@
       {% endif %}
 
 <!-- Resources and Downloads - ALWAYS SHOW with defaults -->
+{%- if product.metafields.custom.spec_sheet or product.metafields.custom.specification or product.metafields.custom.manual or product.metafields.custom.instructions_manual or product.metafields.custom.warranty_doc or product.metafields.custom.warranty_document or product.metafields.custom.service_manual or product.metafields.custom.brochure or product.metafields.custom.cleaning_guide or product.metafields.custom.other_resources -%}
 <div class="sidebar-module resources-module">
   <h3 class="module-title">Resources and Downloads</h3>
-  <div class="resource-grid">
-    {% assign has_docs = false %}
-    
-    {% if product.metafields.custom.spec_sheet %}
-      {% assign has_docs = true %}
-      <a href="{{ product.metafields.custom.spec_sheet }}" class="resource-card" target="_blank" onclick="previewDocument(event, '{{ product.metafields.custom.spec_sheet }}', 'Spec Sheet')">
-        <div class="resource-icon">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-          </svg>
-        </div>
-        <span>Specsheet</span>
-      </a>
-    {% endif %}
-    
-    {% if product.metafields.custom.manual %}
-      {% assign has_docs = true %}
-      <a href="{{ product.metafields.custom.manual }}" class="resource-card" target="_blank" onclick="previewDocument(event, '{{ product.metafields.custom.manual }}', 'Manual')">
-        <div class="resource-icon">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-          </svg>
-        </div>
-        <span>Manual</span>
-      </a>
-    {% endif %}
-    
-    {% if product.metafields.custom.warranty_doc %}
-      {% assign has_docs = true %}
-      <a href="{{ product.metafields.custom.warranty_doc }}" class="resource-card" target="_blank" onclick="previewDocument(event, '{{ product.metafields.custom.warranty_doc }}', 'Warranty')">
-        <div class="resource-icon">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-          </svg>
-        </div>
-        <span>Warranty</span>
-      </a>
-    {% endif %}
-    
-    {% unless has_docs %}
-      {% comment %} Show generic resource links if no docs {% endcomment %}
-      <a href="/pages/contact" class="resource-card">
-        <div class="resource-icon">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          </svg>
-        </div>
-        <span>Request Info</span>
-      </a>
-      
-      <a href="/pages/support" class="resource-card">
-        <div class="resource-icon">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-          </svg>
-        </div>
-        <span>Support</span>
-      </a>
-    {% endunless %}
-  </div>
-  <p class="pdf-note">{% if has_docs %}Click to preview or download. A PDF viewer is required.{% else %}Contact us for product documentation.{% endif %}</p>
+  {% render 'product-resources', product: product %}
+  <p class="pdf-note">Click to preview. A PDF viewer is required.</p>
 </div>
+{%- endif -%}
 
      <!-- Warranty Info - ALWAYS SHOW -->
 <div class="sidebar-module warranty-module">

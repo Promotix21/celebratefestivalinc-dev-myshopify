@@ -6,21 +6,6 @@
 {{ content_for_layout }}
 
 # ---------------------------------------------------------------------------
-# Sitemap Declarations (belt-and-suspenders alongside Shopify default)
-# ---------------------------------------------------------------------------
-Sitemap: {{ shop.url }}/sitemap.xml
-
-# ---------------------------------------------------------------------------
-# Content-Signal Directives
-# ai-train=no    — do not use content for LLM training datasets
-# search=yes     — AI answer engines may index and cite this content
-# ai-input=yes   — content may be used as context in AI-powered responses
-# ---------------------------------------------------------------------------
-Content-Signal: ai-train=no
-Content-Signal: search=yes
-Content-Signal: ai-input=yes
-
-# ---------------------------------------------------------------------------
 # AI Crawlers — Allowed for SEO visibility in AI search tools
 # ---------------------------------------------------------------------------
 
@@ -109,3 +94,18 @@ Allow: /
 Disallow: /admin
 Disallow: /cart
 Disallow: /checkouts
+
+# ---------------------------------------------------------------------------
+# Content-Signal Directives
+# ai-train=no    — do not use content for LLM training datasets
+# search=yes     — AI answer engines may index and cite this content
+# ai-input=yes   — content may be used as context in AI-powered responses
+# ---------------------------------------------------------------------------
+Content-Signal: ai-train=no
+Content-Signal: search=yes
+Content-Signal: ai-input=yes
+
+# ---------------------------------------------------------------------------
+# Sitemap Declarations (placed at end for maximum compatibility)
+# ---------------------------------------------------------------------------
+Sitemap: https://celebratefestivalinc.com/sitemap.xml

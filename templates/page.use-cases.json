@@ -1,0 +1,141 @@
+{
+  "sections": {
+    "main": {
+      "type": "use-cases-landing",
+      "blocks": {
+        "uc_pizza": {
+          "type": "use_case",
+          "settings": {
+            "title": "Pizza Restaurants",
+            "cat_slug": "pizza",
+            "icon": "🍕",
+            "description": "Complete solutions for pizzerias from dough preparation to wood-fired perfection.",
+            "cta_text": "Shop Pizza Equipment",
+            "cta_url": "/pages/cf-pizza-restaurants",
+            "is_new": false,
+            "is_featured": false
+          }
+        },
+        "uc_italian": {
+          "type": "use_case",
+          "settings": {
+            "title": "Italian Restaurants",
+            "cat_slug": "italian",
+            "icon": "🍝",
+            "description": "Authentic equipment for pasta making, sauce preparation, and fine Italian cuisine.",
+            "cta_text": "Shop Italian Equipment",
+            "cta_url": "/pages/cf-italian-restaurants",
+            "is_new": false,
+            "is_featured": false
+          }
+        },
+        "uc_indian": {
+          "type": "use_case",
+          "settings": {
+            "title": "Indian Restaurants",
+            "cat_slug": "indian",
+            "icon": "🍛",
+            "description": "Authentic tandoors and specialty equipment for traditional Indian cooking methods.",
+            "cta_text": "Shop Indian Restaurant Equipment",
+            "cta_url": "/pages/cf-indian-restaurants",
+            "is_new": true,
+            "is_featured": true
+          }
+        },
+        "uc_fastcasual": {
+          "type": "use_case",
+          "settings": {
+            "title": "Fast Casual",
+            "cat_slug": "fast-casual",
+            "icon": "🍔",
+            "description": "High-volume equipment designed for speed and consistency in fast-casual dining.",
+            "cta_text": "Shop Fast Casual Equipment",
+            "cta_url": "/pages/cf-fast-casual",
+            "is_new": false,
+            "is_featured": false
+          }
+        },
+        "uc_bakery": {
+          "type": "use_case",
+          "settings": {
+            "title": "Bakeries & Cafes",
+            "cat_slug": "bakery",
+            "icon": "🧁",
+            "description": "Professional baking equipment and display solutions for bakeries and coffee shops.",
+            "cta_text": "Shop Bakery Equipment",
+            "cta_url": "/pages/cf-bakery-cafe",
+            "is_new": false,
+            "is_featured": false
+          }
+        },
+        "uc_hotel": {
+          "type": "use_case",
+          "settings": {
+            "title": "Hotels & Banquets",
+            "cat_slug": "hotel",
+            "icon": "🏨",
+            "description": "Large-scale catering equipment for hotels, banquet halls, and event venues.",
+            "cta_text": "Shop Hotel Equipment",
+            "cta_url": "/collections/restaurant-equipment",
+            "is_new": false,
+            "is_featured": false
+          }
+        },
+        "uc_foodtruck": {
+          "type": "use_case",
+          "settings": {
+            "title": "Food Trucks & Catering",
+            "cat_slug": "food-truck",
+            "icon": "🚚",
+            "description": "Compact, powerful equipment built for mobile kitchens and outdoor catering operations.",
+            "cta_text": "Shop Food Truck Equipment",
+            "cta_url": "/collections/restaurant-equipment",
+            "is_new": false,
+            "is_featured": false
+          }
+        },
+        "uc_french": {
+          "type": "use_case",
+          "settings": {
+            "title": "French Bistros",
+            "cat_slug": "french",
+            "icon": "🥖",
+            "description": "Precision cooking equipment for fine French cuisine and artisanal preparations.",
+            "cta_text": "Shop French Bistro Equipment",
+            "cta_url": "/pages/cf-french-bistros",
+            "is_new": false,
+            "is_featured": false
+          }
+        }
+      },
+      "block_order": [
+        "uc_pizza",
+        "uc_italian",
+        "uc_indian",
+        "uc_fastcasual",
+        "uc_bakery",
+        "uc_hotel",
+        "uc_foodtruck",
+        "uc_french"
+      ],
+      "settings": {
+        "hero_title": "Equipment Solutions by Business Type",
+        "hero_lead": "Find the right equipment for your business. Explore by industry and discover curated products, packages, and expert recommendations.",
+        "hero_btn1_text": "Browse Business Types",
+        "hero_btn2_text": "Talk to an Expert",
+        "hero_btn2_url": "/pages/contact-us",
+        "opening_title": "Opening a New Business?",
+        "opening_body": "Check out our starter packages curated for each type of business — assembled by our equipment experts.",
+        "opening_btn_text": "View Starter Packages",
+        "cta_eyebrow": "Built for hospitality professionals",
+        "cta_title": "Outfit your kitchen with confidence.",
+        "cta_body": "From a single piece of equipment to a full commercial fit-out, our specialists curate the right solution for your operation — every time.",
+        "cta_btn1_text": "Request a Quote",
+        "cta_btn1_url": "/pages/contact-us",
+        "cta_btn2_text": "Browse Catalog",
+        "cta_btn2_url": "/collections/restaurant-equipment"
+      }
+    }
+  },
+  "order": ["main"]
+}

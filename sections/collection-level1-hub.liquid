@@ -1462,6 +1462,19 @@
               endif
 
               comment
+                Indian Vendors for special Out of Stock message (Task 76)
+              endcomment
+              assign is_indian_vendor = false
+              assign indian_vendors = "Celebrate Festival Inc,Hawkins,Shaan,Kwitex,Rotoquip,Prestige,Preethi,Milton" | split: ','
+              assign vendor_check_indian = product.vendor | strip
+              for vendor in indian_vendors
+                if vendor_check_indian == vendor
+                  assign is_indian_vendor = true
+                  break
+                endif
+              endfor
+
+              comment
                 Member detection
               endcomment
               assign is_member = false
@@ -1528,7 +1541,11 @@
               <div class="add-to-cart-row">
                 <input type="number" value="1" min="1" class="qty-input" aria-label="Quantity">
                 <button type="button" class="add-to-cart-btn" data-variant-id="{{ product.variants.first.id }}"{% unless product.available %} disabled{% endunless %}>
-                  {% if product.available %}Add to Cart{% else %}Sold Out{% endif %}
+                  {% if product.available %}
+                    Add to Cart
+                  {% else %}
+                    {% if is_indian_vendor %}Notify me when back in stock{% else %}Sold Out{% endif %}
+                  {% endif %}
                 </button>
               </div>
             </div>

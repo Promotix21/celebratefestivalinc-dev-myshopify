@@ -47,8 +47,8 @@
         "slide_KdFwFm": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/0001_Slider_2.jpg",
-            "image_url_override": "",
+            "image": "shopify://shop_images/0005_Indian_Restaurant_Kitchen.jpg",
+            "image_url_override": "hero-tandoor-new.jpg",
             "image_alt": "Indian Kitchen Equipment",
             "badge_text": "Authentic Equipment",
             "title_line_1": "Authentic Indian Kitchen",

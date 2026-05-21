@@ -1,467 +1,987 @@
-{% comment %}
-  CF Industry Hub Section
-  Displays industry-specific equipment grids based on the page handle
-  Handles: pizza-restaurants, italian-restaurants, french-bistros, fast-casual, indian-restaurants, bakery-cafe
-{% endcomment %}
-
 {%- liquid
-  assign page_handle = page.handle | downcase
-  assign industry_title = page.title | default: 'Industry Equipment'
-  assign industry_subtitle = ''
+  assign page_title = section.settings.hero_title_override | default: page.title
+  assign page_lead   = section.settings.hero_lead | default: ''
 
-  # Detect which industry this is
-  assign is_pizza = false
-  assign is_italian = false
-  assign is_french = false
-  assign is_fastcasual = false
-  assign is_indian = false
-  assign is_bakery = false
+  assign has_cat_nav     = false
+  assign has_equip       = false
+  assign has_store_types = false
+  assign has_guides      = false
+  assign has_brands      = false
 
-  if page_handle contains 'pizza'
-    assign is_pizza = true
-    assign industry_title = 'Pizza Restaurant Equipment'
-    assign industry_subtitle = 'Complete solutions for pizzerias from dough preparation to wood-fired perfection'
-  elsif page_handle contains 'italian'
-    assign is_italian = true
-    assign industry_title = 'Italian Restaurant Equipment'
-    assign industry_subtitle = 'Authentic equipment for pasta making, sauce preparation, and fine Italian cuisine'
-  elsif page_handle contains 'french' or page_handle contains 'bistro'
-    assign is_french = true
-    assign industry_title = 'French Bistro Equipment'
-    assign industry_subtitle = 'Precision cooking equipment for fine French cuisine and artisanal preparations'
-  elsif page_handle contains 'fast-casual' or page_handle contains 'fastcasual'
-    assign is_fastcasual = true
-    assign industry_title = 'Fast Casual Restaurant Equipment'
-    assign industry_subtitle = 'High-volume equipment designed for speed and consistency in fast-casual dining'
-  elsif page_handle contains 'indian'
-    assign is_indian = true
-    assign industry_title = 'Indian Restaurant Equipment'
-    assign industry_subtitle = 'Authentic tandoors and specialty equipment for traditional Indian cooking methods'
-  elsif page_handle contains 'bakery' or page_handle contains 'cafe'
-    assign is_bakery = true
-    assign industry_title = 'Bakery & Cafe Equipment'
-    assign industry_subtitle = 'Professional baking equipment and display solutions for bakeries and coffee shops'
-  endif
+  for block in section.blocks
+    if block.type == 'cat_nav'
+      assign has_cat_nav = true
+    endif
+    if block.type == 'equip_section'
+      assign has_equip = true
+    endif
+    if block.type == 'store_type'
+      assign has_store_types = true
+    endif
+    if block.type == 'guide'
+      assign has_guides = true
+    endif
+    if block.type == 'brand'
+      assign has_brands = true
+    endif
+  endfor
 -%}
 
 <style>
-  .cf-industry-hub {
-    padding: 0;
-    background: var(--cf-bg-light, #f8fafc);
+  .cih {
+    --maroon: #8B1538;
+    --maroon-dark: #6E0F2B;
+    --coral: #FF6B6B;
+    --coral-soft: #FFF0EE;
+    --navy: #1A365D;
+    --navy-deep: #1B2B47;
+    --gold: #D4AF37;
+    --sale-red: #E9330C;
+    --white: #FFFFFF;
+    --gray-100: #F3F3F3;
+    --gray-200: #E8E8E8;
+    --gray-300: #D9D9D9;
+    --gray-500: #8A8A8A;
+    --gray-700: #4A4A4A;
+    --ink: #121212;
+    --dark-bg: #1B2B47;
+    --maxw: 1600px;
+    --pad-x: clamp(20px, 4vw, 56px);
+    --radius: 6px;
+    --radius-lg: 10px;
+    --shadow-hover: 0 6px 18px rgba(18,18,18,.08);
+    --font-serif: "Playfair Display", "Times New Roman", serif;
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
-  .cf-industry-hub__hero {
-    background: linear-gradient(135deg, var(--cf-deep-blue, #1a365d) 0%, #0f172a 100%);
-    padding: 60px 20px;
-    text-align: center;
+  /* ---------- Hero ---------- */
+  .cih__hero {
     position: relative;
+    background: var(--dark-bg);
+    color: var(--white);
     overflow: hidden;
   }
-
-  .cf-industry-hub__hero::before {
-    content: '';
+  .cih__hero-bg {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    opacity: 0.5;
+    inset: 0;
+    background-size: cover;
+    background-position: center right;
+    z-index: 0;
   }
-
-  .cf-industry-hub__hero-content {
-    position: relative;
-    z-index: 1;
-    max-width: 800px;
+  .cih__hero-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+      rgba(15,18,22,.92) 0%,
+      rgba(15,18,22,.82) 32%,
+      rgba(15,18,22,.45) 60%,
+      rgba(15,18,22,.05) 90%,
+      rgba(15,18,22,0) 100%);
+  }
+  .cih__hero-inner {
+    max-width: var(--maxw);
     margin: 0 auto;
+    padding: 24px var(--pad-x) 56px;
+    position: relative;
+    z-index: 2;
+    min-height: 440px;
+    display: flex;
+    flex-direction: column;
+  }
+  .cih__breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: rgba(255,255,255,.75);
+    margin-bottom: 56px;
+    letter-spacing: .01em;
+    font-family: var(--font-sans);
+  }
+  .cih__breadcrumb a { color: inherit; text-decoration: none; }
+  .cih__breadcrumb a:hover { color: var(--gold); }
+  .cih__breadcrumb .sep { opacity: .5; }
+  .cih__breadcrumb .cur { color: var(--white); }
+  .cih__hero h1 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: clamp(38px, 5.2vw, 70px);
+    line-height: 1.02;
+    letter-spacing: -.01em;
+    margin: 0 0 22px;
+    max-width: 720px;
+  }
+  .cih__lead {
+    font-size: 17px;
+    line-height: 1.55;
+    color: rgba(255,255,255,.85);
+    max-width: 460px;
+    margin: 0 0 32px;
+    font-family: var(--font-sans);
+  }
+  .cih__hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  /* ---------- Gold stripe ---------- */
+  .cih__gold-stripe {
+    height: 3px;
+    background: linear-gradient(90deg, var(--maroon) 0%, var(--maroon) 30%, var(--gold) 30%, var(--gold) 33%, var(--maroon) 33%, var(--maroon) 100%);
+    max-width: var(--maxw);
+    margin: 0 auto;
+    opacity: .9;
   }
 
-  .cf-industry-hub__icon {
-    font-size: 48px;
+  /* ---------- Buttons ---------- */
+  .cih .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    border-radius: var(--radius);
+    transition: background .18s, color .18s, border-color .18s;
+    white-space: nowrap;
+    text-decoration: none;
+    font-family: var(--font-sans);
+    cursor: pointer;
+  }
+  .cih .btn-primary { background: var(--maroon); color: var(--white); }
+  .cih .btn-primary:hover { background: var(--maroon-dark); }
+  .cih .btn-secondary {
+    background: rgba(255,255,255,.08);
+    color: var(--white);
+    border: 1px solid rgba(255,255,255,.45);
+    backdrop-filter: blur(4px);
+  }
+  .cih .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+  .cih .btn-outline {
+    background: transparent;
+    color: var(--maroon);
+    border: 1px solid var(--maroon);
+  }
+  .cih .btn-outline:hover { background: var(--maroon); color: var(--white); }
+  .cih .btn-sm { padding: 11px 18px; font-size: 13px; }
+  .cih .btn-coral { background: var(--coral); color: var(--white); }
+  .cih .btn-coral:hover { background: #ff5252; }
+
+  /* ---------- Page wrapper ---------- */
+  .cih__page {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 var(--pad-x);
+  }
+
+  /* ---------- Horizontal category nav ---------- */
+  .cih__cat-nav-wrap {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    margin-top: -28px;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 5;
+    box-shadow: 0 14px 40px rgba(18,18,18,.06);
+  }
+  .cih__cat-nav {
+    display: grid;
+    gap: 4px;
+  }
+  .cih__cat-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 20px 8px 18px;
+    text-align: center;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--gray-700);
+    border-bottom: 3px solid transparent;
+    transition: color .15s, border-color .15s;
+    line-height: 1.25;
+    text-decoration: none;
+    font-family: var(--font-sans);
+  }
+  .cih__cat-nav-item:hover { color: var(--ink); }
+  .cih__cat-nav-item.active {
+    color: var(--maroon);
+    font-weight: 600;
+    border-bottom-color: var(--maroon);
+  }
+  .cih__cat-nav-item .ci {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: currentColor;
+  }
+  .cih__cat-nav-item.active .ci { color: var(--maroon); }
+  .cih__cat-nav-item .ci svg { width: 100%; height: 100%; }
+  @media (max-width: 980px) {
+    .cih__cat-nav {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding: 4px;
+      scrollbar-width: none;
+    }
+    .cih__cat-nav::-webkit-scrollbar { display: none; }
+    .cih__cat-nav-item {
+      flex: 0 0 auto;
+      min-width: 110px;
+      scroll-snap-align: start;
+      padding: 14px 8px 12px;
+    }
+    .cih__cat-nav-item .ci { width: 32px; height: 32px; }
+  }
+
+  /* ---------- Equipment sections ---------- */
+  .cih__equip-stack { display: flex; flex-direction: column; gap: 18px; margin-bottom: 28px; }
+  .cih__equip-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    display: grid;
+    grid-template-columns: 360px 1fr 1.6fr;
+    gap: 28px;
+    align-items: stretch;
+    transition: box-shadow .2s, border-color .2s;
+  }
+  .cih__equip-card.reverse { grid-template-columns: 1fr 1.6fr 360px; }
+  .cih__equip-card:hover { box-shadow: var(--shadow-hover); border-color: var(--gray-300); }
+  .cih__equip-media {
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--gray-100);
+    aspect-ratio: 4 / 3;
+  }
+  .cih__equip-card.reverse .cih__equip-media { order: 3; }
+  .cih__equip-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cih__equip-body { display: flex; flex-direction: column; min-width: 0; }
+  .cih__equip-body h2 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 28px;
+    line-height: 1.1;
+    margin: 0 0 10px;
+    color: var(--ink);
+  }
+  .cih__equip-body p {
+    font-size: 14px;
+    color: var(--gray-700);
+    line-height: 1.55;
+    margin: 0 0 16px;
+    font-family: var(--font-sans);
+  }
+  .cih__bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .cih__bullets li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13.5px;
+    color: var(--ink);
+    font-family: var(--font-sans);
+  }
+  .cih__check { color: var(--maroon); flex-shrink: 0; margin-top: 2px; }
+  .cih__check svg { width: 14px; height: 14px; display: block; }
+  .cih__equip-cta { margin-top: auto; }
+  .cih__equip-products { min-width: 0; display: flex; flex-direction: column; }
+  .cih__equip-products-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .cih__equip-products-head h3 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 15px;
+    margin: 0;
+    letter-spacing: -.01em;
+    color: var(--ink);
+  }
+  .cih__view-all {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--maroon);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    letter-spacing: .02em;
+    text-decoration: none;
+    font-family: var(--font-sans);
+  }
+  .cih__view-all:hover { color: var(--maroon-dark); }
+  .cih__view-all::after { content: "→"; font-size: 12px; }
+  .cih__product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    flex: 1;
+  }
+  .cih__pcard { display: flex; flex-direction: column; cursor: pointer; transition: transform .15s; text-decoration: none; }
+  .cih__pcard:hover { transform: translateY(-2px); }
+  .cih__pcard-thumb {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    transition: border-color .15s;
+  }
+  .cih__pcard:hover .cih__pcard-thumb { border-color: var(--maroon); }
+  .cih__pcard-thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .cih__pcard-name {
+    margin-top: 10px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.3;
+    font-family: var(--font-sans);
+  }
+  @media (max-width: 1180px) {
+    .cih__equip-card,
+    .cih__equip-card.reverse { grid-template-columns: 320px 1fr; grid-template-rows: auto auto; }
+    .cih__equip-card.reverse .cih__equip-media { order: 0; }
+    .cih__equip-products { grid-column: 1 / -1; }
+  }
+  @media (max-width: 720px) {
+    .cih__equip-card,
+    .cih__equip-card.reverse { grid-template-columns: 1fr; gap: 18px; padding: 16px; }
+    .cih__equip-card.reverse .cih__equip-media { order: 0; }
+    .cih__equip-media { aspect-ratio: 16 / 9; }
+    .cih__equip-body h2 { font-size: 22px; }
+    .cih__product-grid {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      gap: 12px;
+      margin: 0 -16px;
+      padding: 0 16px 4px;
+      scrollbar-width: none;
+    }
+    .cih__product-grid::-webkit-scrollbar { display: none; }
+    .cih__pcard { flex: 0 0 42%; max-width: 42%; scroll-snap-align: start; }
+  }
+
+  /* ---------- Store types ---------- */
+  .cih__store-type {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 18px;
+  }
+  .cih__store-type h2 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 24px;
+    margin: 0 0 18px;
+    color: var(--ink);
+  }
+  .cih__store-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 14px; }
+  .cih__store-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: transform .15s;
+    text-decoration: none;
+  }
+  .cih__store-card:hover { transform: translateY(-3px); }
+  .cih__store-img {
+    width: 100%;
+    aspect-ratio: 16 / 11;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--gray-200);
+    position: relative;
+    background: var(--gray-100);
+  }
+  .cih__store-img::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,.25) 100%);
+  }
+  .cih__store-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cih__store-name {
+    margin-top: 8px;
+    font-size: 12.5px;
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--ink);
+    font-family: var(--font-sans);
+  }
+  @media (max-width: 980px) {
+    .cih__store-grid {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      gap: 12px;
+      margin: 0 -24px;
+      padding: 0 24px 6px;
+      scrollbar-width: none;
+    }
+    .cih__store-grid::-webkit-scrollbar { display: none; }
+    .cih__store-card { flex: 0 0 40%; max-width: 40%; scroll-snap-align: start; }
+  }
+
+  /* ---------- Guides + Help row ---------- */
+  .cih__row-two {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+  @media (max-width: 880px) { .cih__row-two { grid-template-columns: 1fr; } }
+  .cih__guides {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+  }
+  .cih__guides-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 16px;
   }
-
-  .cf-industry-hub__title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 36px;
-    font-weight: 700;
-    color: #fff;
-    margin: 0 0 12px;
-  }
-
-  .cf-industry-hub__subtitle {
-    font-size: 18px;
-    color: rgba(255, 255, 255, 0.85);
+  .cih__guides-head h2 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 22px;
     margin: 0;
-    line-height: 1.6;
+    color: var(--ink);
   }
-
-  .cf-industry-hub__container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 40px 20px;
-  }
-
-  .cf-industry-hub__section-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--cf-deep-blue, #1a365d);
-    margin: 0 0 30px;
+  .cih__guide-item {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
+    padding: 12px 0;
+    border-top: 1px solid var(--gray-100);
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .cih__guide-item:first-of-type { border-top: 0; padding-top: 6px; }
+  .cih__guide-item:hover .cih__guide-title { color: var(--maroon); }
+  .cih__guide-thumb {
+    width: 110px;
+    flex-shrink: 0;
+    aspect-ratio: 14 / 9;
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--gray-100);
+  }
+  .cih__guide-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cih__guide-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0 0 6px;
+    line-height: 1.35;
+    transition: color .15s;
+    font-family: var(--font-sans);
+  }
+  .cih__guide-meta {
+    font-size: 12px;
+    color: var(--gray-500);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    font-family: var(--font-sans);
+  }
+  .cih__help-block {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+  }
+  .cih__help-row {
+    background: var(--coral-soft);
+    border-radius: var(--radius);
+    padding: 22px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+  .cih__help-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--white);
+    border-radius: var(--radius);
+    color: var(--maroon);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .cih__help-icon svg { width: 28px; height: 28px; }
+  .cih__help-text { flex: 1; min-width: 0; }
+  .cih__help-text h3 {
+    font-family: var(--font-serif);
+    font-size: 19px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    color: var(--ink);
+  }
+  .cih__help-text p {
+    font-size: 13.5px;
+    color: var(--gray-700);
+    margin: 0 0 12px;
+    font-family: var(--font-sans);
+  }
+  .cih__brands h3 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 19px;
+    margin: 0 0 14px;
+    color: var(--ink);
+  }
+  .cih__brand-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .cih__brand {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: .02em;
+    color: var(--gray-500);
+    transition: color .15s;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .cih__brand:hover { color: var(--ink); }
+  .cih__brand.italic { font-style: italic; }
+  @media (max-width: 720px) {
+    .cih__help-row { flex-direction: column; align-items: flex-start; }
+    .cih__brand-strip { gap: 14px; }
+    .cih__brand { font-size: 15px; }
   }
 
-  .cf-industry-hub__section-title::before {
-    content: '';
-    width: 4px;
-    height: 28px;
-    background: linear-gradient(180deg, var(--cf-coral, #ff6b6b) 0%, var(--cf-navy, #2d5a87) 100%);
-    border-radius: 2px;
+  /* ---------- Expert CTA ---------- */
+  .cih__expert-cta {
+    background: var(--navy-deep);
+    color: var(--white);
+    padding: 60px var(--pad-x);
+    position: relative;
+    overflow: hidden;
+    margin-top: 32px;
+  }
+  .cih__expert-cta::before {
+    content: "";
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(212,175,55,.15) 0%, rgba(212,175,55,0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .cih__expert-cta::after {
+    content: "";
+    position: absolute;
+    bottom: -120px; left: 5%;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(139,21,56,.35) 0%, rgba(139,21,56,0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .cih__expert-cta-inner {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.4fr auto;
+    gap: 36px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+  .cih__expert-eyebrow {
+    font-size: 12px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 12px;
+    font-family: var(--font-sans);
+  }
+  .cih__expert-cta h2 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.1;
+    margin: 0 0 12px;
+    max-width: 620px;
+  }
+  .cih__expert-cta p {
+    font-size: 15.5px;
+    color: rgba(255,255,255,.7);
+    max-width: 540px;
+    margin: 0;
+    line-height: 1.55;
+    font-family: var(--font-sans);
+  }
+  .cih__expert-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  @media (max-width: 880px) {
+    .cih__expert-cta-inner { grid-template-columns: 1fr; gap: 22px; }
   }
 
-  .cf-industry-hub__grid {
+  /* ---------- Features ---------- */
+  .cih__features {
+    background: var(--white);
+    padding: 44px var(--pad-x);
+    border-top: 1px solid var(--gray-200);
+  }
+  .cih__features-inner {
+    max-width: var(--maxw);
+    margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
-    margin-bottom: 50px;
+    gap: 28px;
   }
-
-  .cf-industry-hub__grid--3col {
-    grid-template-columns: repeat(3, 1fr);
+  .cih__feature { display: flex; align-items: center; gap: 16px; }
+  .cih__feature-icon {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: var(--gray-100);
+    color: var(--maroon);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
   }
-
-  .cf-industry-hub__card {
-    background: #fff;
-    border-radius: 12px;
-    border: 1px solid var(--cf-border, #e2e8f0);
-    overflow: hidden;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: block;
-  }
-
-  .cf-industry-hub__card:hover {
-    border-color: var(--cf-navy, #2d5a87);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    transform: translateY(-4px);
-  }
-
-  .cf-industry-hub__card-image {
-    aspect-ratio: 1;
-    background: #f8fafc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .cf-industry-hub__card-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-  }
-
-  .cf-industry-hub__card:hover .cf-industry-hub__card-image img {
-    transform: scale(1.05);
-  }
-
-  /* Product Slideshow Styles */
-  .cf-industry-hub__slideshow {
-    position: relative;
-    width: 100%;
-    height: 100%;
-  }
-
-  .cf-industry-hub__slideshow-img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    opacity: 0;
-    transition: opacity 0.8s ease-in-out;
-    background: #f8fafc;
-    padding: 10px;
-  }
-
-  .cf-industry-hub__slideshow-img.active {
-    opacity: 1;
-  }
-
-  .cf-industry-hub__card:hover .cf-industry-hub__slideshow-img {
-    transform: scale(1.05);
-  }
-
-  .cf-industry-hub__card-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(26, 54, 93, 0.85);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .cf-industry-hub__card:hover .cf-industry-hub__card-overlay {
-    opacity: 1;
-  }
-
-  .cf-industry-hub__card-overlay-text {
-    color: #fff;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: 16px;
-    text-align: center;
-    padding: 10px;
-  }
-
-  .cf-industry-hub__card-content {
-    padding: 20px;
-    text-align: center;
-  }
-
-  .cf-industry-hub__card-title {
-    font-family: 'Montserrat', sans-serif;
+  .cih__feature-icon svg { width: 26px; height: 26px; }
+  .cih__feature-text h4 {
+    font-family: var(--font-sans);
+    font-weight: 600;
     font-size: 15px;
-    font-weight: 600;
-    color: var(--cf-text-dark, #0f172a);
-    margin: 0 0 12px;
+    margin: 0 0 3px;
+    color: var(--ink);
+    letter-spacing: -.01em;
   }
-
-  .cf-industry-hub__card-btn {
-    display: inline-block;
-    padding: 8px 20px;
-    background: var(--cf-navy, #2d5a87);
-    color: #fff;
-    border-radius: 20px;
+  .cih__feature-text p {
     font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background 0.3s ease;
+    color: var(--gray-500);
+    margin: 0;
+    line-height: 1.4;
+    font-family: var(--font-sans);
   }
-
-  .cf-industry-hub__card:hover .cf-industry-hub__card-btn {
-    background: var(--cf-coral, #ff6b6b);
-  }
-
-  .cf-industry-hub__cta {
-    background: linear-gradient(135deg, var(--cf-deep-blue, #1a365d) 0%, #0f172a 100%);
-    border-radius: 12px;
-    padding: 40px;
-    text-align: center;
-    margin-top: 20px;
-  }
-
-  .cf-industry-hub__cta-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 24px;
-    font-weight: 700;
-    color: #fff;
-    margin: 0 0 12px;
-  }
-
-  .cf-industry-hub__cta-text {
-    font-size: 16px;
-    color: rgba(255, 255, 255, 0.85);
-    margin: 0 0 24px;
-  }
-
-  .cf-industry-hub__cta-btn {
-    display: inline-block;
-    padding: 14px 32px;
-    background: var(--cf-coral, #ff6b6b);
-    color: #fff;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.3s ease;
-  }
-
-  .cf-industry-hub__cta-btn:hover {
-    background: #e85555;
-    transform: translateY(-2px);
-  }
-
-  /* Responsive */
-  @media (max-width: 1200px) {
-    .cf-industry-hub__grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-    .cf-industry-hub__grid--3col {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (max-width: 768px) {
-    .cf-industry-hub__hero {
-      padding: 40px 20px;
-    }
-    .cf-industry-hub__title {
-      font-size: 28px;
-    }
-    .cf-industry-hub__grid,
-    .cf-industry-hub__grid--3col {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-    }
-    .cf-industry-hub__card-content {
-      padding: 16px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .cf-industry-hub__grid,
-    .cf-industry-hub__grid--3col {
-      grid-template-columns: 1fr;
-    }
-  }
+  @media (max-width: 880px) { .cih__features-inner { grid-template-columns: repeat(2,1fr); gap: 22px; } }
+  @media (max-width: 480px) { .cih__features-inner { grid-template-columns: 1fr; } }
 </style>
 
-<section class="cf-industry-hub">
-  <div class="cf-industry-hub__hero">
-    <div class="cf-industry-hub__hero-content">
-      {% if is_pizza %}<div class="cf-industry-hub__icon">🍕</div>{% endif %}
-      {% if is_italian %}<div class="cf-industry-hub__icon">🍝</div>{% endif %}
-      {% if is_french %}<div class="cf-industry-hub__icon">🥖</div>{% endif %}
-      {% if is_fastcasual %}<div class="cf-industry-hub__icon">🍔</div>{% endif %}
-      {% if is_indian %}<div class="cf-industry-hub__icon">🍛</div>{% endif %}
-      {% if is_bakery %}<div class="cf-industry-hub__icon">🧁</div>{% endif %}
-      <h1 class="cf-industry-hub__title">{{ industry_title }}</h1>
-      {% if industry_subtitle != blank %}
-        <p class="cf-industry-hub__subtitle">{{ industry_subtitle }}</p>
-      {% endif %}
+<!-- ============ HERO ============ -->
+<section class="cih__hero cih">
+  <div class="cih__hero-bg"
+    {% if section.settings.hero_image != blank %}
+      style="background-image: url('{{ section.settings.hero_image | image_url: width: 1600 }}')"
+    {% else %}
+      style="background-image: linear-gradient(135deg, #1B2B47 0%, #0f172a 100%)"
+    {% endif %}
+    aria-hidden="true"></div>
+  <div class="cih__hero-inner">
+    <nav class="cih__breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span class="sep">›</span>
+      <a href="/pages/use-cases">Use Cases</a>
+      <span class="sep">›</span>
+      <span class="cur">{{ page_title }}</span>
+    </nav>
+    <h1>{{ page_title }}<br><span style="font-size:.75em;opacity:.85;">Equipment Solutions</span></h1>
+    {%- if page_lead != blank -%}
+      <p class="cih__lead">{{ page_lead }}</p>
+    {%- elsif page.content != blank -%}
+      <p class="cih__lead">{{ page.content | strip_html | truncate: 200 }}</p>
+    {%- endif -%}
+    <div class="cih__hero-ctas">
+      {%- if section.settings.hero_btn1_text != blank -%}
+        <a href="{{ section.settings.hero_btn1_url | default: '/collections/restaurant-equipment' }}" class="btn btn-primary cih">{{ section.settings.hero_btn1_text }}</a>
+      {%- endif -%}
+      {%- if section.settings.hero_btn2_text != blank -%}
+        <a href="{{ section.settings.hero_btn2_url | default: '/pages/contact-us' }}" class="btn btn-secondary cih">{{ section.settings.hero_btn2_text }}</a>
+      {%- endif -%}
     </div>
   </div>
+</section>
 
-  <div class="cf-industry-hub__container">
+<!-- Gold stripe -->
+<div class="cih__gold-stripe cih" aria-hidden="true"></div>
 
-    {%- comment -%}
-      If the client has added blocks via the theme editor, render those.
-      Otherwise fall back to the hardcoded industry snippets.
-    {%- endcomment -%}
+<!-- ============ MAIN CONTENT ============ -->
+<div class="cih__page cih">
 
-    {%- if section.blocks.size > 0 -%}
-
-      {%- comment %} Optional custom section heading from settings {% endcomment -%}
-      {%- if section.settings.grid_title != blank -%}
-        <h2 class="cf-industry-hub__section-title">{{ section.settings.grid_title }}</h2>
-      {%- endif -%}
-
-      <div class="cf-industry-hub__grid">
+  <!-- Horizontal category nav -->
+  {%- if has_cat_nav -%}
+    {%- assign cat_nav_count = 0 -%}
+    {%- for block in section.blocks -%}{%- if block.type == 'cat_nav' -%}{%- assign cat_nav_count = cat_nav_count | plus: 1 -%}{%- endif -%}{%- endfor -%}
+    <div class="cih__cat-nav-wrap">
+      <nav class="cih__cat-nav" aria-label="Equipment categories"
+           style="grid-template-columns: repeat({{ cat_nav_count }}, 1fr);">
         {%- for block in section.blocks -%}
-          {%- if block.type == 'category_card' -%}
-            {%- assign card_collection = collections[block.settings.collection_handle] -%}
-            {%- assign card_url = block.settings.link_url | default: '/collections/' | append: block.settings.collection_handle -%}
-            {%- assign card_title = block.settings.title | default: card_collection.title | default: block.settings.collection_handle -%}
-
-            <a href="{{ card_url }}" class="cf-industry-hub__card" {{ block.shopify_attributes }}>
-              <div class="cf-industry-hub__card-image">
-
-                {%- if block.settings.thumbnail != blank -%}
-                  {%- comment %} Admin supplied thumbnail — show it {% endcomment -%}
-                  <img src="{{ block.settings.thumbnail | image_url: width: 400, height: 400, crop: 'center' }}"
-                       alt="{{ card_title }}"
-                       loading="lazy">
-
-                {%- elsif card_collection != blank and card_collection.image -%}
-                  {%- comment %} Collection has a featured image — use it {% endcomment -%}
-                  <img src="{{ card_collection.image | image_url: width: 400, height: 400, crop: 'center' }}"
-                       alt="{{ card_title }}"
-                       loading="lazy">
-
-                {%- elsif card_collection != blank and card_collection.products_count > 0 -%}
-                  {%- comment %} No thumbnail — auto-rotate product images {% endcomment -%}
-                  <div class="cf-industry-hub__slideshow">
-                    {%- for product in card_collection.products limit: 6 -%}
-                      {%- if product.featured_image -%}
-                        <img src="{{ product.featured_image | image_url: width: 400, height: 400, crop: 'center' }}"
-                             alt="{{ product.title }}"
-                             class="cf-industry-hub__slideshow-img{% if forloop.first %} active{% endif %}"
-                             loading="lazy">
-                      {%- endif -%}
-                    {%- endfor -%}
-                  </div>
-
+          {%- if block.type == 'cat_nav' -%}
+            <a href="#{{ block.settings.anchor }}"
+               class="cih__cat-nav-item{% if forloop.first %} active{% endif %}"
+               data-anchor="{{ block.settings.anchor }}"
+               {{ block.shopify_attributes }}>
+              <span class="ci">
+                {%- if block.settings.icon_svg != blank -%}
+                  {{ block.settings.icon_svg }}
                 {%- else -%}
-                  <div style="width:100%;height:100%;background:linear-gradient(135deg,#f1f5f9 0%,#e2e8f0 100%);display:flex;align-items:center;justify-content:center;">
-                    <span style="font-size:14px;color:#94a3b8;">{{ card_title }}</span>
-                  </div>
+                  <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="20" cy="20" r="14"/></svg>
                 {%- endif -%}
+              </span>
+              {{ block.settings.label }}
+            </a>
+          {%- endif -%}
+        {%- endfor -%}
+      </nav>
+    </div>
+  {%- endif -%}
 
-                <div class="cf-industry-hub__card-overlay">
-                  <span class="cf-industry-hub__card-overlay-text">{{ card_title }}</span>
+  <!-- Equipment sections -->
+  {%- if has_equip -%}
+    <div class="cih__equip-stack">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'equip_section' -%}
+          {%- assign equip_col = collections[block.settings.featured_collection] -%}
+          <article
+            class="cih__equip-card{% if block.settings.is_reverse %} reverse{% endif %}"
+            {% if block.settings.section_id != blank %}id="{{ block.settings.section_id }}"{% endif %}
+            {{ block.shopify_attributes }}
+          >
+            <div class="cih__equip-media">
+              {%- if block.settings.image != blank -%}
+                <img src="{{ block.settings.image | image_url: width: 720 }}"
+                     alt="{{ block.settings.title }}"
+                     width="720" height="540"
+                     loading="lazy">
+              {%- else -%}
+                <div style="width:100%;height:100%;background:linear-gradient(135deg,#e2e8f0 0%,#f1f5f9 100%);"></div>
+              {%- endif -%}
+            </div>
+            <div class="cih__equip-body">
+              <h2>{{ block.settings.title }}</h2>
+              {%- if block.settings.description != blank -%}
+                <p>{{ block.settings.description }}</p>
+              {%- endif -%}
+              <ul class="cih__bullets">
+                {%- if block.settings.bullet_1 != blank -%}
+                  <li><span class="cih__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m4 12 5 5L20 6"/></svg></span>{{ block.settings.bullet_1 }}</li>
+                {%- endif -%}
+                {%- if block.settings.bullet_2 != blank -%}
+                  <li><span class="cih__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m4 12 5 5L20 6"/></svg></span>{{ block.settings.bullet_2 }}</li>
+                {%- endif -%}
+                {%- if block.settings.bullet_3 != blank -%}
+                  <li><span class="cih__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m4 12 5 5L20 6"/></svg></span>{{ block.settings.bullet_3 }}</li>
+                {%- endif -%}
+              </ul>
+              {%- if block.settings.cta_text != blank -%}
+                <div class="cih__equip-cta">
+                  <a href="{{ block.settings.cta_url | default: '/collections/restaurant-equipment' }}" class="btn btn-primary btn-sm cih">{{ block.settings.cta_text }}</a>
+                </div>
+              {%- endif -%}
+            </div>
+            {%- if block.settings.featured_collection != blank and equip_col != blank -%}
+              <div class="cih__equip-products">
+                <div class="cih__equip-products-head">
+                  <h3>Popular Products</h3>
+                  {%- if block.settings.view_all_url != blank -%}
+                    <a href="{{ block.settings.view_all_url }}" class="cih__view-all">View All</a>
+                  {%- endif -%}
+                </div>
+                <div class="cih__product-grid">
+                  {%- for product in equip_col.products limit: 4 -%}
+                    <a class="cih__pcard" href="{{ product.url }}">
+                      <div class="cih__pcard-thumb">
+                        {%- if product.featured_image != blank -%}
+                          <img src="{{ product.featured_image | image_url: width: 250 }}" alt="{{ product.title }}" width="250" height="250" loading="lazy">
+                        {%- else -%}
+                          <div style="width:100%;height:100%;background:var(--gray-100);display:flex;align-items:center;justify-content:center;font-size:28px;">📦</div>
+                        {%- endif -%}
+                      </div>
+                      <div class="cih__pcard-name">{{ product.title | truncate: 40 }}</div>
+                    </a>
+                  {%- endfor -%}
                 </div>
               </div>
-              <div class="cf-industry-hub__card-content">
-                <h3 class="cf-industry-hub__card-title">{{ card_title }}</h3>
-                {%- if block.settings.description != blank -%}
-                  <p class="cf-industry-hub__card-desc">{{ block.settings.description }}</p>
+            {%- endif -%}
+          </article>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+
+  <!-- Store types -->
+  {%- if has_store_types and section.settings.show_store_types -%}
+    <section class="cih__store-type">
+      <h2>{{ section.settings.store_types_title | default: 'Shop by Store Type' }}</h2>
+      <div class="cih__store-grid">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'store_type' -%}
+            <a class="cih__store-card" href="{{ block.settings.url | default: '#' }}" {{ block.shopify_attributes }}>
+              <div class="cih__store-img">
+                {%- if block.settings.image != blank -%}
+                  <img src="{{ block.settings.image | image_url: width: 320 }}" alt="{{ block.settings.name }}" width="320" height="220" loading="lazy">
                 {%- endif -%}
-                <span class="cf-industry-hub__card-btn">{{ block.settings.cta_text | default: 'Shop Now' }}</span>
               </div>
+              <div class="cih__store-name">{{ block.settings.name }}</div>
             </a>
           {%- endif -%}
         {%- endfor -%}
       </div>
+    </section>
+  {%- endif -%}
 
-    {%- else -%}
-
-      {%- comment %} No blocks configured — use hardcoded industry snippets {% endcomment -%}
-      {%- if is_pizza -%}
-        {%- render 'cf-industry-pizza' -%}
-      {%- elsif is_italian -%}
-        {%- render 'cf-industry-italian' -%}
-      {%- elsif is_french -%}
-        {%- render 'cf-industry-french' -%}
-      {%- elsif is_fastcasual -%}
-        {%- render 'cf-industry-fastcasual' -%}
-      {%- elsif is_indian -%}
-        {%- render 'cf-industry-indian' -%}
-      {%- elsif is_bakery -%}
-        {%- render 'cf-industry-bakery' -%}
-      {%- else -%}
-        <p style="text-align: center; color: #666;">Industry page not configured. Please check the page handle.</p>
+  <!-- Guides + Help -->
+  {%- if (has_guides and section.settings.show_guides) or section.settings.help_title != blank -%}
+    <div class="cih__row-two">
+      {%- if has_guides and section.settings.show_guides -%}
+        <div class="cih__guides">
+          <div class="cih__guides-head">
+            <h2>Buying Guides &amp; Resources</h2>
+            <a href="/blogs/news" class="cih__view-all">View All Articles</a>
+          </div>
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'guide' -%}
+              <a class="cih__guide-item" href="{{ block.settings.url | default: '#' }}" {{ block.shopify_attributes }}>
+                <div class="cih__guide-thumb">
+                  {%- if block.settings.image != blank -%}
+                    <img src="{{ block.settings.image | image_url: width: 220 }}" alt="{{ block.settings.title }}" width="140" height="90" loading="lazy">
+                  {%- endif -%}
+                </div>
+                <div>
+                  <div class="cih__guide-title">{{ block.settings.title }}</div>
+                  <div class="cih__guide-meta">{{ block.settings.meta | default: 'Guide' }}</div>
+                </div>
+              </a>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
       {%- endif -%}
 
-    {%- endif -%}
+      <div class="cih__help-block">
+        {%- if section.settings.help_title != blank -%}
+          <div class="cih__help-row">
+            <div class="cih__help-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5A8.4 8.4 0 0 1 9 19l-5 1 1-5a8.4 8.4 0 0 1-1-3.5 8.4 8.4 0 0 1 8.5-8.5 8.4 8.4 0 0 1 8.5 8.5z"/><path d="M9 10h.01M13 10h.01M17 10h.01"/></svg>
+            </div>
+            <div class="cih__help-text">
+              <h3>{{ section.settings.help_title }}</h3>
+              {%- if section.settings.help_body != blank -%}<p>{{ section.settings.help_body }}</p>{%- endif -%}
+              <a href="{{ section.settings.expert_btn1_url | default: '/pages/contact-us' }}" class="btn btn-outline cih" style="padding:10px 16px;font-size:13px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5A8.4 8.4 0 0 1 9 19l-5 1 1-5a8.4 8.4 0 0 1-1-3.5 8.4 8.4 0 0 1 8.5-8.5 8.4 8.4 0 0 1 8.5 8.5z"/></svg>
+                Contact an Expert
+              </a>
+            </div>
+          </div>
+        {%- endif -%}
+        {%- if has_brands and section.settings.show_brands -%}
+          <div class="cih__brands">
+            <h3>{{ section.settings.brands_title | default: 'Top Brands We Carry' }}</h3>
+            <div class="cih__brand-strip">
+              {%- for block in section.blocks -%}
+                {%- if block.type == 'brand' -%}
+                  <a class="cih__brand{% if block.settings.italic %} italic{% endif %}"
+                     href="{{ block.settings.url | default: '#' }}"
+                     {% if block.settings.color != blank %}style="color:{{ block.settings.color }}"{% endif %}
+                     {{ block.shopify_attributes }}>{{ block.settings.name }}</a>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  {%- endif -%}
 
-    <div class="cf-industry-hub__cta">
-      <h3 class="cf-industry-hub__cta-title">{{ section.settings.cta_title | default: 'Need Help Choosing Equipment?' }}</h3>
-      <p class="cf-industry-hub__cta-text">{{ section.settings.cta_text | default: 'Our equipment experts can help you select the perfect setup for your business.' }}</p>
-      <a href="{{ section.settings.cta_url | default: '/pages/contact-us' }}" class="cf-industry-hub__cta-btn">{{ section.settings.cta_btn_text | default: 'Get Free Consultation' }}</a>
+</div>
+
+<!-- ============ EXPERT CTA ============ -->
+{%- if section.settings.expert_title != blank -%}
+  <section class="cih__expert-cta cih">
+    <div class="cih__expert-cta-inner">
+      <div>
+        {%- if section.settings.expert_eyebrow != blank -%}<div class="cih__expert-eyebrow">{{ section.settings.expert_eyebrow }}</div>{%- endif -%}
+        <h2>{{ section.settings.expert_title }}</h2>
+        {%- if section.settings.expert_body != blank -%}<p>{{ section.settings.expert_body }}</p>{%- endif -%}
+      </div>
+      <div class="cih__expert-actions">
+        {%- if section.settings.expert_btn1_text != blank -%}
+          <a href="{{ section.settings.expert_btn1_url | default: '/pages/contact-us' }}" class="btn btn-coral cih">{{ section.settings.expert_btn1_text }}</a>
+        {%- endif -%}
+        {%- if section.settings.expert_btn2_text != blank -%}
+          <a href="{{ section.settings.expert_btn2_url | default: '/pages/contact-us' }}" class="btn btn-secondary cih">{{ section.settings.expert_btn2_text }}</a>
+        {%- endif -%}
+      </div>
+    </div>
+  </section>
+{%- endif -%}
+
+<!-- ============ FEATURES ============ -->
+<section class="cih__features cih">
+  <div class="cih__features-inner">
+    <div class="cih__feature">
+      <div class="cih__feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c.7-3.5 3.6-5.5 7-5.5s6.3 2 7 5.5"/></svg></div>
+      <div class="cih__feature-text"><h4>Expert Support</h4><p>Get help from our equipment experts</p></div>
+    </div>
+    <div class="cih__feature">
+      <div class="cih__feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/><path d="M11 8v3l2 2"/></svg></div>
+      <div class="cih__feature-text"><h4>Lowest Prices Guaranteed</h4><p>We match competitive pricing</p></div>
+    </div>
+    <div class="cih__feature">
+      <div class="cih__feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 8h11v9H2zM13 11h5l3 4v2h-8"/><circle cx="6" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/></svg></div>
+      <div class="cih__feature-text"><h4>Fast Shipping Across USA</h4><p>Quick delivery, nationwide</p></div>
+    </div>
+    <div class="cih__feature">
+      <div class="cih__feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></div>
+      <div class="cih__feature-text"><h4>Trusted by Businesses</h4><p>Thousands of satisfied customers</p></div>
     </div>
   </div>
 </section>
 
 <script>
-  // Product Image Slideshow for Industry Hub Cards
-  document.addEventListener('DOMContentLoaded', function() {
-    const slideshows = document.querySelectorAll('.cf-industry-hub__slideshow');
-
-    slideshows.forEach(function(slideshow) {
-      const images = slideshow.querySelectorAll('.cf-industry-hub__slideshow-img');
-      if (images.length <= 1) return;
-
-      let currentIndex = 0;
-      images[0].classList.add('active');
-
-      setInterval(function() {
-        images[currentIndex].classList.remove('active');
-        currentIndex = (currentIndex + 1) % images.length;
-        images[currentIndex].classList.add('active');
-      }, 2500); // Change image every 2.5 seconds
-    });
+(function() {
+  var navItems = document.querySelectorAll('.cih__cat-nav-item[data-anchor]');
+  if (!navItems.length) return;
+  var sections = [];
+  navItems.forEach(function(item) {
+    var el = document.getElementById(item.dataset.anchor);
+    if (el) sections.push({ el: el, nav: item });
   });
+  if (!sections.length) return;
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        sections.forEach(function(s) {
+          s.nav.classList.toggle('active', s.el === entry.target);
+        });
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  sections.forEach(function(s) { observer.observe(s.el); });
+})();
 </script>
 
 {% schema %}
@@ -472,98 +992,336 @@
   "settings": [
     {
       "type": "header",
-      "content": "Auto-Detection"
+      "content": "Hero"
     },
     {
-      "type": "paragraph",
-      "content": "By default, this section auto-detects the industry from the page handle and uses the built-in equipment grid. Add 'Category Card' blocks below to fully customise the cards shown on this page."
-    },
-    {
-      "type": "header",
-      "content": "Custom Grid Heading"
-    },
-    {
-      "type": "text",
-      "id": "grid_title",
-      "label": "Grid Section Title",
-      "info": "Only shown when Category Card blocks are added. Leave blank to hide."
-    },
-    {
-      "type": "header",
-      "content": "Bottom CTA"
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero background image",
+      "info": "Dark gradient overlay is applied automatically. Leave blank for solid dark gradient."
     },
     {
       "type": "text",
-      "id": "cta_title",
-      "label": "CTA Heading",
-      "default": "Need Help Choosing Equipment?"
+      "id": "hero_title_override",
+      "label": "Title override",
+      "info": "Overrides the page title shown in the hero. Leave blank to use the Shopify page title."
+    },
+    {
+      "type": "textarea",
+      "id": "hero_lead",
+      "label": "Hero lead text",
+      "info": "If blank, falls back to the page content (first 200 characters)."
     },
     {
       "type": "text",
-      "id": "cta_text",
-      "label": "CTA Body Text",
-      "default": "Our equipment experts can help you select the perfect setup for your business."
-    },
-    {
-      "type": "text",
-      "id": "cta_btn_text",
-      "label": "CTA Button Text",
-      "default": "Get Free Consultation"
+      "id": "hero_btn1_text",
+      "label": "Primary button text",
+      "default": "Shop All Equipment"
     },
     {
       "type": "url",
-      "id": "cta_url",
-      "label": "CTA Button URL"
+      "id": "hero_btn1_url",
+      "label": "Primary button URL"
+    },
+    {
+      "type": "text",
+      "id": "hero_btn2_text",
+      "label": "Secondary button text",
+      "default": "Request a Quote"
+    },
+    {
+      "type": "url",
+      "id": "hero_btn2_url",
+      "label": "Secondary button URL"
+    },
+    {
+      "type": "header",
+      "content": "Store Types Section"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_store_types",
+      "label": "Show 'Shop by Store Type' section",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "store_types_title",
+      "label": "Section title",
+      "default": "Shop by Store Type"
+    },
+    {
+      "type": "header",
+      "content": "Buying Guides"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_guides",
+      "label": "Show buying guides section",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Need Help Block"
+    },
+    {
+      "type": "text",
+      "id": "help_title",
+      "label": "Help block title",
+      "default": "Need Help Choosing the Right Equipment?"
+    },
+    {
+      "type": "textarea",
+      "id": "help_body",
+      "label": "Help block body",
+      "default": "Our experts can help you build the perfect setup for your business."
+    },
+    {
+      "type": "header",
+      "content": "Brands"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_brands",
+      "label": "Show brands section",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "brands_title",
+      "label": "Brands section title",
+      "default": "Top Brands We Carry"
+    },
+    {
+      "type": "header",
+      "content": "Expert CTA (Dark Section)"
+    },
+    {
+      "type": "text",
+      "id": "expert_eyebrow",
+      "label": "Eyebrow label",
+      "info": "Small uppercase text above the headline."
+    },
+    {
+      "type": "text",
+      "id": "expert_title",
+      "label": "CTA headline",
+      "default": "Build out your operation with confidence."
+    },
+    {
+      "type": "textarea",
+      "id": "expert_body",
+      "label": "CTA body text",
+      "default": "From a single piece of equipment to a complete kitchen fit-out, our specialists will spec the right solution for your space, traffic, and budget."
+    },
+    {
+      "type": "text",
+      "id": "expert_btn1_text",
+      "label": "Primary button text",
+      "default": "Request a Quote"
+    },
+    {
+      "type": "url",
+      "id": "expert_btn1_url",
+      "label": "Primary button URL"
+    },
+    {
+      "type": "text",
+      "id": "expert_btn2_text",
+      "label": "Secondary button text",
+      "default": "Talk to an Expert"
+    },
+    {
+      "type": "url",
+      "id": "expert_btn2_url",
+      "label": "Secondary button URL"
     }
   ],
   "blocks": [
     {
-      "type": "category_card",
-      "name": "Category Card",
+      "type": "cat_nav",
+      "name": "Category Nav Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "info": "Short label shown below the icon."
+        },
+        {
+          "type": "text",
+          "id": "anchor",
+          "label": "Section anchor ID",
+          "info": "Matches the 'Anchor ID' field on an Equipment Section block (without #). e.g. 'produce'"
+        },
+        {
+          "type": "textarea",
+          "id": "icon_svg",
+          "label": "Icon SVG",
+          "info": "Paste the full <svg> code. Use viewBox='0 0 40 40' for consistent sizing."
+        }
+      ]
+    },
+    {
+      "type": "equip_section",
+      "name": "Equipment Section",
       "settings": [
         {
           "type": "image_picker",
-          "id": "thumbnail",
-          "label": "Thumbnail Image",
-          "info": "Optional. If not set, the section will auto-rotate product images from the linked collection."
+          "id": "image",
+          "label": "Section image",
+          "info": "Displayed at 4:3 ratio."
+        },
+        {
+          "type": "text",
+          "id": "section_id",
+          "label": "Anchor ID",
+          "info": "Used by the category nav to scroll to this section. e.g. 'produce' (no #)."
+        },
+        {
+          "type": "checkbox",
+          "id": "is_reverse",
+          "label": "Image on the right side",
+          "default": false
         },
         {
           "type": "text",
           "id": "title",
-          "label": "Card Title",
-          "info": "Optional. Defaults to the collection title if left blank."
-        },
-        {
-          "type": "text",
-          "id": "collection_handle",
-          "label": "Collection Handle",
-          "info": "e.g. 'commercial-ovens'. Used to fetch the collection image and auto-rotate product images."
-        },
-        {
-          "type": "url",
-          "id": "link_url",
-          "label": "Card Link URL",
-          "info": "Optional. Defaults to /collections/{handle} if left blank."
+          "label": "Section title"
         },
         {
           "type": "textarea",
           "id": "description",
-          "label": "Short Description",
-          "info": "Optional. Shown below the title on the card."
+          "label": "Description paragraph"
+        },
+        {
+          "type": "text",
+          "id": "bullet_1",
+          "label": "Bullet point 1"
+        },
+        {
+          "type": "text",
+          "id": "bullet_2",
+          "label": "Bullet point 2"
+        },
+        {
+          "type": "text",
+          "id": "bullet_3",
+          "label": "Bullet point 3"
         },
         {
           "type": "text",
           "id": "cta_text",
-          "label": "CTA Text",
+          "label": "Button text",
           "default": "Shop Now"
+        },
+        {
+          "type": "url",
+          "id": "cta_url",
+          "label": "Button URL"
+        },
+        {
+          "type": "header",
+          "content": "Popular Products"
+        },
+        {
+          "type": "text",
+          "id": "featured_collection",
+          "label": "Collection handle",
+          "info": "e.g. 'commercial-ovens'. First 4 products appear as thumbnails."
+        },
+        {
+          "type": "url",
+          "id": "view_all_url",
+          "label": "View All link URL"
+        }
+      ]
+    },
+    {
+      "type": "store_type",
+      "name": "Store Type Card",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Card image",
+          "info": "Displayed at 16:11 ratio."
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Store type name",
+          "default": "Small Store"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Card link URL"
+        }
+      ]
+    },
+    {
+      "type": "guide",
+      "name": "Buying Guide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Thumbnail image",
+          "info": "Displayed at 14:9 ratio."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Guide title"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Guide URL"
+        },
+        {
+          "type": "text",
+          "id": "meta",
+          "label": "Label (e.g. Guide, Article, Video)",
+          "default": "Guide"
+        }
+      ]
+    },
+    {
+      "type": "brand",
+      "name": "Brand",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Brand name",
+          "default": "Turbo Air"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Brand URL",
+          "info": "e.g. /collections/vendors?q=turbo+air"
+        },
+        {
+          "type": "color",
+          "id": "color",
+          "label": "Name color",
+          "default": "#8A8A8A"
+        },
+        {
+          "type": "checkbox",
+          "id": "italic",
+          "label": "Italic style",
+          "default": false
         }
       ]
     }
   ],
   "presets": [
     {
-      "name": "CF Industry Hub",
-      "category": "Industry Pages"
+      "name": "CF Industry Hub"
     }
   ]
 }
