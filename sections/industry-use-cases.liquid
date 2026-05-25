@@ -76,21 +76,6 @@
     object-fit: cover;
   }
   
-  .use-case-card__icon {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    width: 40px;
-    height: 40px;
-    background: var(--accent-color, #f14f56);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 20px;
-  }
-  
   .use-case-card__content {
     padding: 8px 16px;
   }
@@ -322,12 +307,6 @@
                     Add Image
                   </div>
                 {% endif %}
-
-                {% if block.settings.icon %}
-                  <div class="use-case-card__icon">
-                    {{ block.settings.icon }}
-                  </div>
-                {% endif %}
               </div>
             </a>
 
@@ -468,13 +447,6 @@
         },
         {
           "type": "text",
-          "id": "icon",
-          "label": "Icon (HTML/Emoji)",
-          "info": "Use HTML entities like 🍕 or Font Awesome classes",
-          "default": "🍕"
-        },
-        {
-          "type": "text",
           "id": "title",
           "label": "Card Title"
         },
@@ -517,7 +489,6 @@
         {
           "type": "use_case",
           "settings": {
-            "icon": "🍕",
             "title": "Pizza Restaurants",
             "description": "Complete solutions for pizzerias from dough preparation to wood-fired perfection.",
             "collection_handle": "restaurant-equipment",
@@ -529,7 +500,6 @@
         {
           "type": "use_case",
           "settings": {
-            "icon": "🍝",
             "title": "Italian Restaurants",
             "description": "Authentic equipment for pasta making, sauce preparation, and fine Italian cuisine.",
             "collection_handle": "restaurant-equipment",
@@ -541,7 +511,6 @@
         {
           "type": "use_case",
           "settings": {
-            "icon": "🥖",
             "title": "French Bistros",
             "description": "Precision cooking equipment for fine French cuisine and artisanal preparations.",
             "collection_handle": "restaurant-equipment",
@@ -553,7 +522,6 @@
         {
           "type": "use_case",
           "settings": {
-            "icon": "🍔",
             "title": "Fast Casual",
             "description": "High-volume equipment designed for speed and consistency in fast-casual dining.",
             "collection_handle": "restaurant-equipment",
@@ -565,7 +533,6 @@
         {
           "type": "use_case",
           "settings": {
-            "icon": "🍛",
             "title": "Indian Restaurants",
             "description": "Authentic tandoors and specialty equipment for traditional Indian cooking methods.",
             "collection_handle": "restaurant-equipment",
@@ -577,7 +544,6 @@
         {
           "type": "use_case",
           "settings": {
-            "icon": "🧁",
             "title": "Bakeries & Cafes",
             "description": "Professional baking equipment and display solutions for bakeries and coffee shops.",
             "collection_handle": "restaurant-equipment",

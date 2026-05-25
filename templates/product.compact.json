@@ -68,9 +68,18 @@
         "help_chat_enabled": true,
         "help_additional_links": "🎥 Product Videos|❓ FAQ Section|🛠️ Installation Service"
       }
+    },
+    "cf-related": {
+      "type": "cf-you-may-like",
+      "settings": {
+        "heading": "You May Also Like",
+        "intent": "related",
+        "limit": 8
+      }
     }
   },
   "order": [
-    "main"
+    "main",
+    "cf-related"
   ]
 }

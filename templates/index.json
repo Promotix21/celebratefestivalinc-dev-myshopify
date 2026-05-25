@@ -25,7 +25,10 @@
             "primary_btn_text": "Shop Equipment",
             "primary_btn_url": "/collections/restaurant-equipment",
             "secondary_btn_text": "Request Quote",
-            "secondary_btn_url": "/pages/contact-us"
+            "secondary_btn_url": "/pages/contact-us",
+            "show_usecase_btn": false,
+            "usecase_btn_text": "See All Use Cases",
+            "usecase_btn_url": ""
           }
         },
         "slide_8T9ere": {
@@ -41,7 +44,10 @@
             "primary_btn_text": "Shop Equipment",
             "primary_btn_url": "/collections/restaurant-equipment",
             "secondary_btn_text": "Request Quote",
-            "secondary_btn_url": "/pages/contact-us"
+            "secondary_btn_url": "/pages/contact-us",
+            "show_usecase_btn": false,
+            "usecase_btn_text": "See All Use Cases",
+            "usecase_btn_url": ""
           }
         },
         "slide_KdFwFm": {
@@ -57,7 +63,10 @@
             "primary_btn_text": "Shop Equipment",
             "primary_btn_url": "/collections/restaurant-equipment",
             "secondary_btn_text": "Request Quote",
-            "secondary_btn_url": "/pages/contact-us"
+            "secondary_btn_url": "/pages/contact-us",
+            "show_usecase_btn": false,
+            "usecase_btn_text": "See All Use Cases",
+            "usecase_btn_url": ""
           }
         },
         "slide_journey": {
@@ -72,7 +81,10 @@
             "primary_btn_text": "See Our Journey",
             "primary_btn_url": "/pages/journey",
             "secondary_btn_text": "Get Started",
-            "secondary_btn_url": "/pages/contact-us"
+            "secondary_btn_url": "/pages/contact-us",
+            "show_usecase_btn": false,
+            "usecase_btn_text": "See All Use Cases",
+            "usecase_btn_url": ""
           }
         }
       },
@@ -535,7 +547,23 @@
         "link_row4_6": "/collections/vendors?q=shaan",
         "link_row4_7": "/collections/vendors?q=global+solutions",
         "link_row4_8": "/collections/vendors?q=omcan",
-        "link_row4_9": "/collections/vendors?q=thunder+group"
+        "link_row4_9": "/collections/vendors?q=thunder+group",
+        "logo_row5_1": "shopify://shop_images/brand-logo-cdn.png",
+        "logo_row5_2": "shopify://shop_images/brand-logo-empress.png",
+        "logo_row5_3": "shopify://shop_images/brand-logo-vitamix_47f2f588-7ac3-4de4-ac1a-a1cd72104c38.png",
+        "logo_row5_4": "shopify://shop_images/brand-logo-metro.png",
+        "logo_row5_5": "shopify://shop_images/brand-logo-alto-shaam.png",
+        "logo_row5_6": "shopify://shop_images/brand-logo-Comstock-Castle.png",
+        "logo_row5_7": "shopify://shop_images/brand-logo-ariane.png",
+        "logo_row5_8": "shopify://shop_images/brand-logo-porto-brasil.jpg",
+        "link_row5_1": "/collections/vendors?q=cdn",
+        "link_row5_2": "/collections/vendors?q=empress",
+        "link_row5_3": "/collections/vendors?q=vitamix",
+        "link_row5_4": "/collections/vendors?q=metro",
+        "link_row5_5": "/collections/vendors?q=alto-shaam",
+        "link_row5_6": "/collections/vendors?q=comstock+castle",
+        "link_row5_7": "/collections/vendors?q=ariane",
+        "link_row5_8": "/collections/vendors?q=porto+brasil"
       }
     },
     "category_icon_row_home": {
@@ -655,7 +683,6 @@
           "type": "use_case",
           "settings": {
             "image": "shopify://shop_images/0000_Pizza_Restaurant_Kitchen.jpg",
-            "icon": "🍕",
             "title": "Pizza Restaurants",
             "description": "Complete solutions for pizzerias from dough preparation to wood-fired perfection.",
             "collection_handle": "restaurant-equipment",
@@ -668,7 +695,6 @@
           "type": "use_case",
           "settings": {
             "image": "shopify://shop_images/0001__Italian_Restaurant_Kitchen.jpg",
-            "icon": "🍝",
             "title": "Italian Restaurants",
             "description": "Authentic equipment for pasta making, sauce preparation, and fine Italian cuisine.",
             "collection_handle": "restaurant-equipment",
@@ -681,7 +707,6 @@
           "type": "use_case",
           "settings": {
             "image": "shopify://shop_images/0003_French_Bistro_Kitchen.jpg",
-            "icon": "🥖",
             "title": "French Bistros",
             "description": "Precision cooking equipment for fine French cuisine and artisanal preparations.",
             "collection_handle": "restaurant-equipment",
@@ -694,7 +719,6 @@
           "type": "use_case",
           "settings": {
             "image": "shopify://shop_images/0002_Fast_Casual_Kitchen.jpg",
-            "icon": "🍔",
             "title": "Fast Casual",
             "description": "High-volume equipment designed for speed and consistency in fast-casual dining.",
             "collection_handle": "restaurant-equipment",
@@ -707,7 +731,6 @@
           "type": "use_case",
           "settings": {
             "image": "shopify://shop_images/0005_Indian_Restaurant_Kitchen.jpg",
-            "icon": "🍛",
             "title": "Indian Restaurants",
             "description": "Authentic tandoors and specialty equipment for traditional Indian cooking methods.",
             "collection_handle": "restaurant-equipment",
@@ -720,7 +743,6 @@
           "type": "use_case",
           "settings": {
             "image": "shopify://shop_images/0004_Bakery___Cafe_Kitchen.jpg",
-            "icon": "🧁",
             "title": "Bakeries & Cafes",
             "description": "Professional baking equipment and display solutions for bakeries and coffee shops.",
             "collection_handle": "restaurant-equipment",
@@ -733,7 +755,6 @@
           "type": "use_case",
           "settings": {
             "image": "shopify://shop_images/Gemini_Generated_Image_l29370l29370l293.png",
-            "icon": "🏨",
             "title": "Hotels & Banquets",
             "description": "Large-scale catering equipment for hotels, banquet halls, and event venues.",
             "collection_handle": "restaurant-equipment",
@@ -746,7 +767,6 @@
           "type": "use_case",
           "settings": {
             "image": "shopify://shop_images/Gemini_Generated_Image_5s17c35s17c35s17.png",
-            "icon": "🚚",
             "title": "Food Trucks & Catering",
             "description": "Compact, powerful equipment built for mobile kitchens and outdoor catering operations.",
             "collection_handle": "restaurant-equipment",

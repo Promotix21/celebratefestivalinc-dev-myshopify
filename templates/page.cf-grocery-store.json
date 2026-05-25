@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
@@ -78,7 +87,6 @@
         "equip_produce": {
           "type": "equip_section",
           "settings": {
-            "image_url": "https://placehold.co/720x540",
             "section_id": "produce-coolers",
             "is_reverse": false,
             "title": "Produce Coolers",
@@ -95,7 +103,6 @@
         "equip_hotfood": {
           "type": "equip_section",
           "settings": {
-            "image_url": "https://placehold.co/720x540",
             "section_id": "hot-food-display",
             "is_reverse": true,
             "title": "Hot Food Display",
@@ -112,7 +119,6 @@
         "equip_reachin": {
           "type": "equip_section",
           "settings": {
-            "image_url": "https://placehold.co/720x540",
             "section_id": "reach-in-refrigeration",
             "is_reverse": false,
             "title": "Reach-In Refrigeration",
@@ -129,7 +135,6 @@
         "store_convenience": {
           "type": "store_type",
           "settings": {
-            "image_url": "https://placehold.co/320x220",
             "name": "Small Convenience Store",
             "url": "/collections/restaurant-equipment"
           }
@@ -137,7 +142,6 @@
         "store_supermarket": {
           "type": "store_type",
           "settings": {
-            "image_url": "https://placehold.co/320x220",
             "name": "Supermarket",
             "url": "/collections/restaurant-equipment"
           }
@@ -145,7 +149,6 @@
         "store_asian": {
           "type": "store_type",
           "settings": {
-            "image_url": "https://placehold.co/320x220",
             "name": "Asian Grocery",
             "url": "/collections/restaurant-equipment"
           }
@@ -153,7 +156,6 @@
         "store_indian": {
           "type": "store_type",
           "settings": {
-            "image_url": "https://placehold.co/320x220",
             "name": "Indian Grocery",
             "url": "/collections/indian-specialty"
           }
@@ -161,7 +163,6 @@
         "store_organic": {
           "type": "store_type",
           "settings": {
-            "image_url": "https://placehold.co/320x220",
             "name": "Organic Market",
             "url": "/collections/restaurant-equipment"
           }
@@ -169,7 +170,6 @@
         "store_liquor": {
           "type": "store_type",
           "settings": {
-            "image_url": "https://placehold.co/320x220",
             "name": "Liquor Store",
             "url": "/collections/bar-refrigeration-all"
           }
@@ -177,7 +177,6 @@
         "store_wholesale": {
           "type": "store_type",
           "settings": {
-            "image_url": "https://placehold.co/320x220",
             "name": "Wholesale Club",
             "url": "/collections/restaurant-equipment"
           }
@@ -185,7 +184,6 @@
         "store_grabngo": {
           "type": "store_type",
           "settings": {
-            "image_url": "https://placehold.co/320x220",
             "name": "Grab-and-Go Market",
             "url": "/collections/hot-food-display-cases"
           }
@@ -193,7 +191,6 @@
         "guide_produce": {
           "type": "guide",
           "settings": {
-            "image_url": "https://placehold.co/220x140",
             "title": "How to Choose the Right Produce Cooler for Your Store",
             "url": "/blogs/news",
             "meta": "Guide"
@@ -202,7 +199,6 @@
         "guide_openair": {
           "type": "guide",
           "settings": {
-            "image_url": "https://placehold.co/220x140",
             "title": "Open Air vs Glass Door Merchandisers: What's Best for Your Grocery Store?",
             "url": "/blogs/news",
             "meta": "Guide"
@@ -211,7 +207,6 @@
         "guide_layout": {
           "type": "guide",
           "settings": {
-            "image_url": "https://placehold.co/220x140",
             "title": "Refrigeration Layout Guide for Supermarkets",
             "url": "/blogs/news",
             "meta": "Guide"
@@ -321,5 +316,7 @@
       }
     }
   },
-  "order": ["main"]
+  "order": [
+    "main"
+  ]
 }
