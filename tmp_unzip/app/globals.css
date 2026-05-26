@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui;
+  --font-serif: var(--font-serif), ui-serif, Georgia;
+  
+  --color-primary: #1a365d;
+  --color-dark: #121212;
+  --color-gold: #d4af37;
+  --color-coral: #ff6b6b;
+  --color-burgundy: #8b1538;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+}
+
+.map-container svg {
+  width: 100%;
+  height: auto;
+}
+
+.map-container svg path {
+  transition: all 0.2s ease-in-out;
+}
+
+.map-container svg path:hover {
+  opacity: 0.8;
+  cursor: pointer;
+  fill: #1a365d !important;
+}
+
+/* Disabled states hover reset */
+.map-container svg path.AK:hover,
+.map-container svg path.ME:hover,
+.map-container svg path.MS:hover,
+.map-container svg path.SD:hover,
+.map-container svg path.VT:hover {
+  fill: #e5e5e5 !important;
+  opacity: 1;
+  cursor: default;
+}
+
