@@ -25,10 +25,7 @@
             "primary_btn_text": "Shop Equipment",
             "primary_btn_url": "/collections/restaurant-equipment",
             "secondary_btn_text": "Request Quote",
-            "secondary_btn_url": "/pages/contact-us",
-            "show_usecase_btn": false,
-            "usecase_btn_text": "See All Use Cases",
-            "usecase_btn_url": ""
+            "secondary_btn_url": "/pages/contact-us"
           }
         },
         "slide_8T9ere": {
@@ -44,10 +41,7 @@
             "primary_btn_text": "Shop Equipment",
             "primary_btn_url": "/collections/restaurant-equipment",
             "secondary_btn_text": "Request Quote",
-            "secondary_btn_url": "/pages/contact-us",
-            "show_usecase_btn": false,
-            "usecase_btn_text": "See All Use Cases",
-            "usecase_btn_url": ""
+            "secondary_btn_url": "/pages/contact-us"
           }
         },
         "slide_KdFwFm": {
@@ -63,10 +57,7 @@
             "primary_btn_text": "Shop Equipment",
             "primary_btn_url": "/collections/restaurant-equipment",
             "secondary_btn_text": "Request Quote",
-            "secondary_btn_url": "/pages/contact-us",
-            "show_usecase_btn": false,
-            "usecase_btn_text": "See All Use Cases",
-            "usecase_btn_url": ""
+            "secondary_btn_url": "/pages/contact-us"
           }
         },
         "slide_journey": {
@@ -81,10 +72,7 @@
             "primary_btn_text": "See Our Journey",
             "primary_btn_url": "/pages/journey",
             "secondary_btn_text": "Get Started",
-            "secondary_btn_url": "/pages/contact-us",
-            "show_usecase_btn": false,
-            "usecase_btn_text": "See All Use Cases",
-            "usecase_btn_url": ""
+            "secondary_btn_url": "/pages/contact-us"
           }
         }
       },
@@ -549,21 +537,21 @@
         "link_row4_8": "/collections/vendors?q=omcan",
         "link_row4_9": "/collections/vendors?q=thunder+group",
         "logo_row5_1": "shopify://shop_images/brand-logo-cdn.png",
-        "logo_row5_2": "shopify://shop_images/brand-logo-empress.png",
-        "logo_row5_3": "shopify://shop_images/brand-logo-vitamix_47f2f588-7ac3-4de4-ac1a-a1cd72104c38.png",
-        "logo_row5_4": "shopify://shop_images/brand-logo-metro.png",
+        "logo_row5_2": "shopify://shop_images/brand-logo-ariane.png",
+        "logo_row5_3": "shopify://shop_images/brand-logo-porto-brasil.jpg",
+        "logo_row5_4": "shopify://shop_images/brand-logo-Comstock-Castle.png",
         "logo_row5_5": "shopify://shop_images/brand-logo-alto-shaam.png",
-        "logo_row5_6": "shopify://shop_images/brand-logo-Comstock-Castle.png",
-        "logo_row5_7": "shopify://shop_images/brand-logo-ariane.png",
-        "logo_row5_8": "shopify://shop_images/brand-logo-porto-brasil.jpg",
+        "logo_row5_6": "shopify://shop_images/brand-logo-belshaw.png",
+        "logo_row5_7": "shopify://shop_images/brand-logo-empress.png",
+        "logo_row5_8": "shopify://shop_images/brand-logo-vitamix_47f2f588-7ac3-4de4-ac1a-a1cd72104c38.png",
         "link_row5_1": "/collections/vendors?q=cdn",
-        "link_row5_2": "/collections/vendors?q=empress",
-        "link_row5_3": "/collections/vendors?q=vitamix",
-        "link_row5_4": "/collections/vendors?q=metro",
+        "link_row5_2": "/collections/vendors?q=ariane",
+        "link_row5_3": "/collections/vendors?q=porto+brasil",
+        "link_row5_4": "/collections/vendors?q=comstock+castle",
         "link_row5_5": "/collections/vendors?q=alto-shaam",
-        "link_row5_6": "/collections/vendors?q=comstock+castle",
-        "link_row5_7": "/collections/vendors?q=ariane",
-        "link_row5_8": "/collections/vendors?q=porto+brasil"
+        "link_row5_6": "/collections/vendors?q=belshaw",
+        "link_row5_7": "/collections/vendors?q=empress",
+        "link_row5_8": "/collections/vendors?q=vitamix"
       }
     },
     "category_icon_row_home": {

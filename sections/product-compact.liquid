@@ -738,6 +738,12 @@
         {%- endif -%}
       {%- endif -%}
 
+      {%- comment -%} ── "You May Also Like" inline placeholder (bottom of content) ── {%- endcomment -%}
+      <div data-cf-related-inline
+           data-product-id="{{ product.id }}"
+           data-limit="8"
+           data-intent="related"></div>
+
     </div>{%- comment -%} end .compact-content-col {%- endcomment -%}
 
     {%- comment -%} ═══ RIGHT SIDEBAR ═══ {%- endcomment -%}

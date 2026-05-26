@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
@@ -9,7 +18,7 @@
             "title": "Bakery",
             "cat_slug": "bakery",
             "icon": "🧁",
-            "image_url": "https://placehold.co/500x375",
+            "image_url": "industry-bakery.png",
             "description": "From mixing to display — premium equipment for every step of a successful bakery operation.",
             "cta_text": "Shop Bakery Equipment",
             "cta_url": "/collections/commercial-ovens",
@@ -25,7 +34,7 @@
             "title": "Pizza Restaurant",
             "cat_slug": "pizza-restaurant",
             "icon": "🍕",
-            "image_url": "https://placehold.co/500x375",
+            "image_url": "industry-pizza-restaurant.png",
             "description": "High-performance equipment engineered for every stage of pizza preparation and service.",
             "cta_text": "Shop Pizza Equipment",
             "cta_url": "/collections/refrigerated-pizza-prep-tables",
@@ -41,7 +50,7 @@
             "title": "Grocery Store",
             "cat_slug": "grocery-store",
             "icon": "🛒",
-            "image_url": "https://placehold.co/500x375",
+            "image_url": "industry-grocery-store.png",
             "description": "Durable, efficient solutions for retail and supermarket operations of every size.",
             "cta_text": "Shop Grocery Equipment",
             "cta_url": "/pages/cf-grocery-store",
@@ -57,7 +66,7 @@
             "title": "Indian Restaurant",
             "cat_slug": "indian-restaurant",
             "icon": "🍛",
-            "image_url": "https://placehold.co/500x375",
+            "image_url": "industry-indian-restaurant.png",
             "description": "Specialized equipment built for authentic Indian cuisine and high-volume kitchen demands.",
             "cta_text": "Shop Indian Restaurant Equipment",
             "cta_url": "/collections/indian-specialty",
@@ -73,7 +82,7 @@
             "title": "Café / Coffee Shop",
             "cat_slug": "cafe-coffee-shop",
             "icon": "☕",
-            "image_url": "https://placehold.co/500x375",
+            "image_url": "industry-cafe-coffee-shop.png",
             "description": "Brew, chill, and serve with equipment designed for the rhythms of a modern coffee business.",
             "cta_text": "Shop Café Equipment",
             "cta_url": "/collections/ice-machine-all-by-all-brands",
@@ -89,7 +98,7 @@
             "title": "Food Truck",
             "cat_slug": "food-truck",
             "icon": "🚚",
-            "image_url": "https://placehold.co/500x375",
+            "image_url": "industry-food-truck.png",
             "description": "Compact, reliable equipment engineered to perform in any mobile kitchen on the road.",
             "cta_text": "Shop Food Truck Equipment",
             "cta_url": "/collections/commercial-grills-and-griddles",
