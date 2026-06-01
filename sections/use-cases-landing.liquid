@@ -35,7 +35,7 @@
     background: var(--dark-bg);
     color: var(--white);
     overflow: hidden;
-    margin-bottom: 56px;
+    margin-bottom: 12px;
   }
   .ucl__hero-bg {
     position: absolute;
@@ -49,30 +49,56 @@
     position: absolute;
     inset: 0;
     background: linear-gradient(90deg,
-      rgba(18,18,22,.95) 0%,
-      rgba(18,18,22,.85) 30%,
-      rgba(18,18,22,.55) 55%,
-      rgba(18,18,22,.15) 85%,
-      rgba(18,18,22,0) 100%);
+      rgba(10,37,64, 1)    0%,
+      rgba(10,37,64, .92)  30%,
+      rgba(10,37,64, .55)  60%,
+      rgba(10,37,64, .15)  80%,
+      rgba(10,37,64, 0)    100%);
   }
   .ucl__hero-inner {
     max-width: var(--maxw);
     margin: 0 auto;
-    padding: 28px var(--pad-x) 64px;
+    padding: 14px var(--pad-x) 16px;
     position: relative;
     z-index: 2;
-    min-height: 460px;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 24px;
+  }
+  .ucl__hero-text {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
+  }
+  .ucl__hero-image {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  .ucl__hero-image img {
+    width: 100%;
+    max-width: 540px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 32px rgba(0,0,0,.35));
+  }
+  @media (max-width: 768px) {
+    .ucl__hero-inner {
+      grid-template-columns: 1fr;
+    }
+    .ucl__hero-image {
+      display: none;
+    }
   }
   .ucl__breadcrumb {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 13px;
+    font-size: 11px;
     color: rgba(255,255,255,.75);
-    margin-bottom: 56px;
+    margin-bottom: 6px;
     letter-spacing: .01em;
     font-family: var(--font-sans);
   }
@@ -83,19 +109,19 @@
   .ucl__hero h1 {
     font-family: var(--font-serif);
     font-weight: 600;
-    font-size: clamp(38px, 5.2vw, 72px);
-    line-height: 1.02;
+    font-size: clamp(18px, 2.2vw, 30px);
+    line-height: 1.1;
     letter-spacing: -.01em;
-    margin: 0 0 22px;
-    max-width: 720px;
+    margin: 0 0 6px;
+    max-width: 540px;
     color: var(--white);
   }
   .ucl__hero .lead {
-    font-size: 17px;
-    line-height: 1.55;
+    font-size: 13px;
+    line-height: 1.5;
     color: rgba(255,255,255,.82);
-    max-width: 480px;
-    margin: 0 0 32px;
+    max-width: 440px;
+    margin: 0 0 14px;
     font-family: var(--font-sans);
   }
   .ucl__hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; }
@@ -105,7 +131,7 @@
     height: 3px;
     background: linear-gradient(90deg, var(--maroon) 0%, var(--maroon) 30%, var(--gold) 30%, var(--gold) 33%, var(--maroon) 33%, var(--maroon) 100%);
     max-width: var(--maxw);
-    margin: 0 auto -56px;
+    margin: 0 auto 0;
     opacity: .9;
   }
 
@@ -150,12 +176,12 @@
     margin: 0 auto;
     padding: 0 var(--pad-x);
     display: grid;
-    grid-template-columns: 260px 1fr;
-    gap: 32px;
-    padding-bottom: 64px;
+    grid-template-columns: 240px 1fr;
+    gap: 20px;
+    padding-bottom: 28px;
   }
   @media (max-width: 980px) {
-    .ucl__page { grid-template-columns: 1fr; gap: 20px; }
+    .ucl__page { grid-template-columns: 1fr; gap: 14px; }
   }
 
   /* ---------- Mobile chip strip ---------- */
@@ -311,16 +337,16 @@
   .ucl__biz-stack {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 10px;
   }
   .ucl__biz-card {
     background: var(--white);
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-lg);
-    padding: 22px;
+    padding: 14px;
     display: grid;
-    grid-template-columns: 240px 1fr auto;
-    gap: 28px;
+    grid-template-columns: 200px 1fr auto;
+    gap: 18px;
     align-items: start;
     transition: box-shadow .2s, border-color .2s;
   }
@@ -459,14 +485,14 @@
   /* ---------- Opening strip ---------- */
   .ucl__opening-wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--pad-x); }
   .ucl__opening {
-    margin: 32px 0 48px;
+    margin: 12px 0 16px;
     background: var(--coral-soft);
     border-radius: var(--radius-lg);
     border: 1px solid #F8D7D2;
-    padding: 24px 28px;
+    padding: 14px 18px;
     display: flex;
     align-items: center;
-    gap: 22px;
+    gap: 14px;
   }
   .ucl__opening-icon {
     width: 56px;
@@ -503,7 +529,7 @@
   .ucl__dark-cta {
     background: var(--navy-deep);
     color: var(--white);
-    padding: 64px var(--pad-x);
+    padding: 32px var(--pad-x);
     position: relative;
     overflow: hidden;
     width: 100vw;
@@ -572,7 +598,7 @@
   /* ---------- Features ---------- */
   .ucl__features {
     background: var(--white);
-    padding: 48px var(--pad-x);
+    padding: 24px var(--pad-x);
     border-top: 1px solid var(--gray-200);
     width: 100vw;
     position: relative;
@@ -584,7 +610,7 @@
     margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 28px;
+    gap: 18px;
   }
   .ucl__feature { display: flex; align-items: center; gap: 16px; }
   .ucl__feature-icon {
@@ -619,31 +645,61 @@
   }
 </style>
 
+{%- if section.settings.color_maroon or section.settings.color_navy or section.settings.color_gold or section.settings.color_coral -%}
+<style>
+  .ucl {
+    {%- if section.settings.color_maroon -%}--maroon: {{ section.settings.color_maroon }};{%- endif -%}
+    {%- if section.settings.color_navy -%}--navy-deep: {{ section.settings.color_navy }}; --dark-bg: {{ section.settings.color_navy }};{%- endif -%}
+    {%- if section.settings.color_gold -%}--gold: {{ section.settings.color_gold }};{%- endif -%}
+    {%- if section.settings.color_coral -%}--coral: {{ section.settings.color_coral }};{%- endif -%}
+  }
+</style>
+{%- endif -%}
+
 <!-- ============ HERO ============ -->
 <section class="ucl__hero ucl">
   <div class="ucl__hero-bg"
     {% if section.settings.hero_image != blank %}
       style="background-image: url('{{ section.settings.hero_image | image_url: width: 1600 }}')"
     {% else %}
-      style="background-image: linear-gradient(135deg, #1B2B47 0%, #0f172a 100%)"
+      style="background-image: url('{{ 'industry-hero-bg.png' | asset_url }}')"
     {% endif %}
     aria-hidden="true"></div>
-  <div class="ucl__hero-inner">
-    <nav class="ucl__breadcrumb" aria-label="Breadcrumb">
-      <a href="/">Home</a>
-      <span class="sep">›</span>
-      <span class="cur">Use Cases</span>
-    </nav>
-    <h1>{{ hero_title }}</h1>
-    <p class="lead">{{ hero_lead }}</p>
-    <div class="ucl__hero-ctas">
-      {% if section.settings.hero_btn1_text != blank %}
-        <a href="#categories" class="btn btn-primary">{{ section.settings.hero_btn1_text }}</a>
-      {% endif %}
-      {% if section.settings.hero_btn2_text != blank %}
-        <a href="{{ section.settings.hero_btn2_url | default: '#expert' }}" class="btn btn-secondary">{{ section.settings.hero_btn2_text }}</a>
-      {% endif %}
+  <div class="ucl__hero-inner" style="padding-top:20px; padding-bottom:30px;">
+    <!-- Text column -->
+    <div class="ucl__hero-text">
+      <nav class="ucl__breadcrumb" aria-label="Breadcrumb">
+        <a href="{{ section.settings.breadcrumb_home_url | default: '/' }}">{{ section.settings.breadcrumb_home_label | default: 'Home' }}</a>
+        <span class="sep">›</span>
+        <span class="cur">{{ section.settings.breadcrumb_current_label | default: 'Use Cases' }}</span>
+      </nav>
+      <h1>{{ hero_title }}</h1>
+      <p class="lead">{{ hero_lead }}</p>
+      <div class="ucl__hero-ctas">
+        {% if section.settings.hero_btn1_text != blank %}
+          <a href="{{ section.settings.hero_btn1_url | default: '#categories' }}" class="btn btn-primary">{{ section.settings.hero_btn1_text }}</a>
+        {% endif %}
+        {% if section.settings.hero_btn2_text != blank %}
+          <a href="{{ section.settings.hero_btn2_url | default: '#expert' }}" class="btn btn-secondary">{{ section.settings.hero_btn2_text }}</a>
+        {% endif %}
+      </div>
     </div>
+    <!-- Hero image column -->
+    {%- if section.settings.show_hero_image != false -%}
+    <div class="ucl__hero-image" aria-hidden="true">
+      {%- if section.settings.hero_equipment_image != blank -%}
+        <img src="{{ section.settings.hero_equipment_image | image_url: width: 900 }}"
+             alt="Commercial kitchen equipment"
+             width="540" height="380"
+             loading="eager">
+      {%- else -%}
+        <img src="{{ 'UCPI.png' | asset_url }}"
+             alt="Commercial kitchen equipment"
+             width="540" height="380"
+             loading="eager">
+      {%- endif -%}
+    </div>
+    {%- endif -%}
   </div>
 </section>
 
@@ -656,7 +712,7 @@
   <!-- Mobile chip strip -->
   <div style="max-width:var(--ucl-maxw,1600px);margin:0 auto;padding:20px clamp(20px,4vw,56px) 0;">
     <nav class="ucl__chip-strip" aria-label="Filter by category">
-      <button class="ucl__chip active" data-cat="all">All Use Cases</button>
+      <button class="ucl__chip active" data-cat="all">{{ section.settings.chip_all_label | default: 'All Use Cases' }}</button>
       {%- for block in section.blocks -%}
         {%- if block.type == 'use_case' -%}
           <button class="ucl__chip" data-cat="{{ block.settings.cat_slug | default: block.settings.title | handleize }}">
@@ -685,14 +741,14 @@
     <!-- Sidebar -->
     <aside class="ucl__sidebar" aria-label="Browse use cases">
       <div class="ucl__sidebar-card">
-        <h2 class="ucl__sidebar-title">Browse Use Cases</h2>
+        <h2 class="ucl__sidebar-title">{{ section.settings.sidebar_title | default: 'Browse Use Cases' }}</h2>
         <ul class="ucl__cat-list">
           <li>
             <a href="#" class="active" data-cat="all">
               <span class="ucl__cat-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
               </span>
-              All Use Cases
+              {{ section.settings.chip_all_label | default: 'All Use Cases' }}
             </a>
           </li>
           {%- for block in section.blocks -%}
@@ -723,11 +779,11 @@
       </div>
 
       <div class="ucl__help-card" id="expert">
-        <h3>Need Help Choosing?</h3>
-        <p>Our equipment experts can help you find the perfect solutions for your business — at the best price.</p>
-        <a href="{{ section.settings.hero_btn2_url | default: '/pages/contact-us' }}" class="btn btn-primary btn-sm ucl">
+        <h3>{{ section.settings.sidebar_help_title | default: 'Need Help Choosing?' }}</h3>
+        <p>{{ section.settings.sidebar_help_body | default: 'Our equipment experts can help you find the perfect solutions for your business — at the best price.' }}</p>
+        <a href="{{ section.settings.sidebar_help_btn_url | default: section.settings.hero_btn2_url | default: '/pages/contact-us' }}" class="btn btn-primary btn-sm ucl">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5A8.4 8.4 0 0 1 9 19l-5 1 1-5a8.4 8.4 0 0 1-1-3.5 8.4 8.4 0 0 1 8.5-8.5 8.4 8.4 0 0 1 8.5 8.5z"/></svg>
-          Contact an Expert
+          {{ section.settings.sidebar_help_btn_text | default: 'Contact an Expert' }}
         </a>
       </div>
     </aside>
@@ -824,7 +880,7 @@
 </div>
 
 <!-- ============ OPENING STRIP ============ -->
-{%- if section.settings.opening_title != blank -%}
+{%- if section.settings.show_opening != false and section.settings.opening_title != blank -%}
   <div class="ucl__opening-wrap ucl">
     <div class="ucl__opening">
       <div class="ucl__opening-icon" aria-hidden="true">
@@ -846,7 +902,7 @@
 {%- endif -%}
 
 <!-- ============ DARK CTA ============ -->
-{%- if section.settings.cta_title != blank -%}
+{%- if section.settings.show_cta != false and section.settings.cta_title != blank -%}
   <section class="ucl__dark-cta ucl">
     <div class="ucl__dark-cta-inner">
       <div>
@@ -871,26 +927,37 @@
 {%- endif -%}
 
 <!-- ============ FEATURES ============ -->
+{%- if section.settings.show_features != false -%}
 <section class="ucl__features ucl">
   <div class="ucl__features-inner">
-    <div class="ucl__feature">
-      <div class="ucl__feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c.7-3.5 3.6-5.5 7-5.5s6.3 2 7 5.5"/></svg></div>
-      <div class="ucl__feature-text"><h4>Expert Support</h4><p>Get help from our equipment experts</p></div>
-    </div>
-    <div class="ucl__feature">
-      <div class="ucl__feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/><path d="M11 8v3l2 2"/></svg></div>
-      <div class="ucl__feature-text"><h4>Lowest Prices</h4><p>Competitive pricing guaranteed</p></div>
-    </div>
-    <div class="ucl__feature">
-      <div class="ucl__feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 8h11v9H2zM13 11h5l3 4v2h-8"/><circle cx="6" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/></svg></div>
-      <div class="ucl__feature-text"><h4>Fast Shipping</h4><p>Quick delivery across the country</p></div>
-    </div>
-    <div class="ucl__feature">
-      <div class="ucl__feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></div>
-      <div class="ucl__feature-text"><h4>Trusted by Businesses</h4><p>Thousands of satisfied customers</p></div>
-    </div>
+    {%- for i in (1..4) -%}
+      {%- assign feat_title_key = 'feat_' | append: i | append: '_title' -%}
+      {%- assign feat_text_key  = 'feat_' | append: i | append: '_text' -%}
+      {%- assign feat_title = section.settings[feat_title_key] -%}
+      {%- assign feat_text  = section.settings[feat_text_key] -%}
+      {%- if feat_title != blank -%}
+        <div class="ucl__feature">
+          <div class="ucl__feature-icon">
+            {%- if i == 1 -%}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c.7-3.5 3.6-5.5 7-5.5s6.3 2 7 5.5"/></svg>
+            {%- elsif i == 2 -%}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/><path d="M11 8v3l2 2"/></svg>
+            {%- elsif i == 3 -%}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 8h11v9H2zM13 11h5l3 4v2h-8"/><circle cx="6" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/></svg>
+            {%- elsif i == 4 -%}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
+            {%- endif -%}
+          </div>
+          <div class="ucl__feature-text">
+            <h4>{{ feat_title }}</h4>
+            {%- if feat_text != blank -%}<p>{{ feat_text }}</p>{%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
   </div>
 </section>
+{%- endif -%}
 
 <script>
 (function() {
@@ -953,10 +1020,20 @@
       "content": "Hero"
     },
     {
+      "type": "checkbox",
+      "id": "show_hero_image",
+      "label": "Show hero image",
+      "default": true
+    },
+    {
       "type": "image_picker",
       "id": "hero_image",
-      "label": "Hero background image",
-      "info": "Displays on the right side of the hero with a dark gradient overlay. Leave blank to use solid gradient."
+      "label": "Hero background image"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_equipment_image",
+      "label": "Hero equipment image"
     },
     {
       "type": "text",
@@ -977,6 +1054,12 @@
       "default": "Browse Business Types"
     },
     {
+      "type": "url",
+      "id": "hero_btn1_url",
+      "label": "Primary button URL",
+      "info": "Leave blank to default to the #categories anchor on this page."
+    },
+    {
       "type": "text",
       "id": "hero_btn2_text",
       "label": "Secondary button text",
@@ -986,55 +1069,67 @@
       "type": "url",
       "id": "hero_btn2_url",
       "label": "Secondary button URL",
-      "info": "Also used for the sidebar 'Contact an Expert' button. Defaults to /pages/contact-us."
+      "info": "Also used as the sidebar help card button URL if that field is blank."
     },
     {
       "type": "header",
-      "content": "Opening a New Business Strip"
+      "content": "Opening Strip"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_opening",
+      "label": "Show opening strip",
+      "default": true
     },
     {
       "type": "text",
       "id": "opening_title",
-      "label": "Strip title",
+      "label": "Title",
       "default": "Opening a New Business?"
     },
     {
       "type": "textarea",
       "id": "opening_body",
-      "label": "Strip body text",
+      "label": "Body text",
       "default": "Check out our starter packages curated for each type of business — assembled by our equipment experts."
     },
     {
       "type": "text",
       "id": "opening_btn_text",
-      "label": "Strip button text",
+      "label": "Button text",
       "default": "View Starter Packages"
     },
     {
       "type": "url",
       "id": "opening_btn_url",
-      "label": "Strip button URL"
+      "label": "Button URL"
     },
     {
       "type": "header",
-      "content": "Dark CTA Section"
+      "content": "Dark CTA"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show CTA section",
+      "default": true
     },
     {
       "type": "text",
       "id": "cta_eyebrow",
-      "label": "Eyebrow label (small text above title)",
+      "label": "Eyebrow text (small label above headline)",
       "default": "Built for hospitality professionals"
     },
     {
       "type": "text",
       "id": "cta_title",
-      "label": "CTA headline",
+      "label": "Headline",
       "default": "Outfit your kitchen with confidence."
     },
     {
       "type": "textarea",
       "id": "cta_body",
-      "label": "CTA body text",
+      "label": "Body text",
       "default": "From a single piece of equipment to a full commercial fit-out, our specialists curate the right solution for your operation — every time."
     },
     {
@@ -1058,6 +1153,123 @@
       "type": "url",
       "id": "cta_btn2_url",
       "label": "Secondary button URL"
+    },
+    {
+      "type": "header",
+      "content": "Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_features",
+      "label": "Show features section",
+      "default": true
+    },
+    { "type": "text", "id": "feat_1_title", "label": "Feature 1 Title", "default": "Expert Support" },
+    { "type": "text", "id": "feat_1_text", "label": "Feature 1 Text", "default": "Get help from our equipment experts" },
+    { "type": "text", "id": "feat_2_title", "label": "Feature 2 Title", "default": "Lowest Prices" },
+    { "type": "text", "id": "feat_2_text", "label": "Feature 2 Text", "default": "Competitive pricing guaranteed" },
+    { "type": "text", "id": "feat_3_title", "label": "Feature 3 Title", "default": "Fast Shipping" },
+    { "type": "text", "id": "feat_3_text", "label": "Feature 3 Text", "default": "Quick delivery across the country" },
+    { "type": "text", "id": "feat_4_title", "label": "Feature 4 Title", "default": "Trusted by Businesses" },
+    { "type": "text", "id": "feat_4_text", "label": "Feature 4 Text", "default": "Thousands of satisfied customers" },
+    {
+      "type": "header",
+      "content": "Sidebar"
+    },
+    {
+      "type": "text",
+      "id": "sidebar_title",
+      "label": "Sidebar heading",
+      "default": "Browse Use Cases"
+    },
+    {
+      "type": "text",
+      "id": "chip_all_label",
+      "label": "\"All\" filter label",
+      "default": "All Use Cases",
+      "info": "Label for the 'All' chip on mobile and the 'All' item in the sidebar nav."
+    },
+    {
+      "type": "header",
+      "content": "Sidebar — Help Card"
+    },
+    {
+      "type": "text",
+      "id": "sidebar_help_title",
+      "label": "Help card title",
+      "default": "Need Help Choosing?"
+    },
+    {
+      "type": "textarea",
+      "id": "sidebar_help_body",
+      "label": "Help card body",
+      "default": "Our equipment experts can help you find the perfect solutions for your business — at the best price."
+    },
+    {
+      "type": "text",
+      "id": "sidebar_help_btn_text",
+      "label": "Help card button text",
+      "default": "Contact an Expert"
+    },
+    {
+      "type": "url",
+      "id": "sidebar_help_btn_url",
+      "label": "Help card button URL",
+      "info": "Falls back to the secondary hero button URL if blank."
+    },
+    {
+      "type": "header",
+      "content": "Breadcrumb"
+    },
+    {
+      "type": "text",
+      "id": "breadcrumb_home_label",
+      "label": "Home link label",
+      "default": "Home"
+    },
+    {
+      "type": "url",
+      "id": "breadcrumb_home_url",
+      "label": "Home link URL"
+    },
+    {
+      "type": "text",
+      "id": "breadcrumb_current_label",
+      "label": "Current page label",
+      "default": "Use Cases",
+      "info": "Shown as the last non-clickable breadcrumb item."
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_maroon",
+      "label": "Primary color",
+      "default": "#8B1538",
+      "info": "Used for buttons, active states, and accent elements."
+    },
+    {
+      "type": "color",
+      "id": "color_navy",
+      "label": "Dark background color",
+      "default": "#1B2B47",
+      "info": "Used for the hero, dark CTA, and sidebar background."
+    },
+    {
+      "type": "color",
+      "id": "color_gold",
+      "label": "Gold accent color",
+      "default": "#D4AF37",
+      "info": "Used for the gold stripe and hover states."
+    },
+    {
+      "type": "color",
+      "id": "color_coral",
+      "label": "Highlight / coral color",
+      "default": "#FF6B6B",
+      "info": "Used for NEW badges, featured card highlights, and coral buttons."
     }
   ],
   "blocks": [

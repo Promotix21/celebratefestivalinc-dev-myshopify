@@ -73,29 +73,31 @@
     position: absolute;
     inset: 0;
     background: linear-gradient(90deg,
-      rgba(15,18,22,.92) 0%,
-      rgba(15,18,22,.82) 32%,
-      rgba(15,18,22,.45) 60%,
-      rgba(15,18,22,.05) 90%,
-      rgba(15,18,22,0) 100%);
+      rgba(10,37,64, 1)    0%,
+      rgba(10,37,64, .85)  40%,
+      rgba(10,37,64, 0)    100%);
   }
   .cih__hero-inner {
     max-width: var(--maxw);
     margin: 0 auto;
-    padding: 24px var(--pad-x) 56px;
+    padding: 20px var(--pad-x) 30px;
     position: relative;
     z-index: 2;
-    min-height: 440px;
+    min-height: 280px;
     display: flex;
     flex-direction: column;
+    justify-content: center;
+  }
+  .cih__hero-content {
+    max-width: 580px;
   }
   .cih__breadcrumb {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 13px;
+    font-size: 11px;
     color: rgba(255,255,255,.75);
-    margin-bottom: 56px;
+    margin-bottom: 6px;
     letter-spacing: .01em;
     font-family: var(--font-sans);
   }
@@ -106,19 +108,18 @@
   .cih__hero h1 {
     font-family: var(--font-serif);
     font-weight: 600;
-    font-size: clamp(38px, 5.2vw, 70px);
-    line-height: 1.02;
+    font-size: clamp(18px, 2.2vw, 30px);
+    line-height: 1.1;
     letter-spacing: -.01em;
-    margin: 0 0 22px;
-    max-width: 720px;
+    margin: 0 0 6px;
     color: var(--white);
   }
   .cih__lead {
-    font-size: 17px;
-    line-height: 1.55;
+    font-size: 13px;
+    line-height: 1.5;
     color: rgba(255,255,255,.85);
-    max-width: 460px;
-    margin: 0 0 32px;
+    max-width: 420px;
+    margin: 0 0 14px;
     font-family: var(--font-sans);
   }
   .cih__hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
@@ -567,17 +568,30 @@
     gap: 20px;
   }
   .cih__brand {
-    font-family: var(--font-serif);
-    font-weight: 700;
-    font-size: 17px;
-    letter-spacing: .02em;
-    color: var(--gray-500);
-    transition: color .15s;
-    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    background: var(--white);
+    transition: border-color .15s, box-shadow .15s;
     text-decoration: none;
   }
-  .cih__brand:hover { color: var(--ink); }
-  .cih__brand.italic { font-style: italic; }
+  .cih__brand:hover { border-color: var(--maroon); box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+  .cih__brand img {
+    height: 28px;
+    width: auto;
+    max-width: 90px;
+    object-fit: contain;
+    display: block;
+  }
+  .cih__brand-name-fallback {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-700);
+    font-family: var(--font-sans);
+  }
   @media (max-width: 720px) {
     .cih__help-row { flex-direction: column; align-items: flex-start; }
     .cih__brand-strip { gap: 14px; }
@@ -697,9 +711,24 @@
     line-height: 1.4;
     font-family: var(--font-sans);
   }
-  @media (max-width: 880px) { .cih__features-inner { grid-template-columns: repeat(2,1fr); gap: 22px; } }
-  @media (max-width: 480px) { .cih__features-inner { grid-template-columns: 1fr; } }
+  @media (max-width: 880px) { 
+    .cih__features-inner { grid-template-columns: repeat(2,1fr); gap: 22px; }
+  }
+  @media (max-width: 480px) { 
+    .cih__features-inner { grid-template-columns: 1fr; }
+  }
 </style>
+
+{%- if section.settings.color_maroon or section.settings.color_navy or section.settings.color_gold or section.settings.color_coral -%}
+<style>
+  .cih {
+    {%- if section.settings.color_maroon -%}--maroon: {{ section.settings.color_maroon }};{%- endif -%}
+    {%- if section.settings.color_navy -%}--navy-deep: {{ section.settings.color_navy }}; --dark-bg: {{ section.settings.color_navy }};{%- endif -%}
+    {%- if section.settings.color_gold -%}--gold: {{ section.settings.color_gold }};{%- endif -%}
+    {%- if section.settings.color_coral -%}--coral: {{ section.settings.color_coral }};{%- endif -%}
+  }
+</style>
+{%- endif -%}
 
 <!-- ============ HERO ============ -->
 <section class="cih__hero cih">
@@ -707,30 +736,32 @@
     {% if section.settings.hero_image != blank %}
       style="background-image: url('{{ section.settings.hero_image | image_url: width: 1600 }}')"
     {% else %}
-      style="background-image: linear-gradient(135deg, #1B2B47 0%, #0f172a 100%)"
+      style="background-image: url('{{ 'industry-hero-bg.png' | asset_url }}')"
     {% endif %}
     aria-hidden="true"></div>
   <div class="cih__hero-inner">
-    <nav class="cih__breadcrumb" aria-label="Breadcrumb">
-      <a href="/">Home</a>
-      <span class="sep">›</span>
-      <a href="/pages/use-cases">Use Cases</a>
-      <span class="sep">›</span>
-      <span class="cur">{{ page_title }}</span>
-    </nav>
-    <h1>{{ page_title }}<br><span style="font-size:.75em;opacity:.85;">Equipment Solutions</span></h1>
-    {%- if page_lead != blank -%}
-      <p class="cih__lead">{{ page_lead }}</p>
-    {%- elsif page.content != blank -%}
-      <p class="cih__lead">{{ page.content | strip_html | truncate: 200 }}</p>
-    {%- endif -%}
-    <div class="cih__hero-ctas">
-      {%- if section.settings.hero_btn1_text != blank -%}
-        <a href="{{ section.settings.hero_btn1_url | default: '/collections/restaurant-equipment' }}" class="btn btn-primary cih">{{ section.settings.hero_btn1_text }}</a>
+    <div class="cih__hero-content">
+      <nav class="cih__breadcrumb" aria-label="Breadcrumb">
+        <a href="{{ section.settings.breadcrumb_home_url | default: '/' }}">{{ section.settings.breadcrumb_home_label | default: 'Home' }}</a>
+        <span class="sep">›</span>
+        <a href="{{ section.settings.breadcrumb_parent_url | default: '/pages/use-cases' }}">{{ section.settings.breadcrumb_parent_label | default: 'Use Cases' }}</a>
+        <span class="sep">›</span>
+        <span class="cur">{{ page_title }}</span>
+      </nav>
+      <h1>{{ page_title }}</h1>
+      {%- if page_lead != blank -%}
+        <p class="cih__lead">{{ page_lead }}</p>
+      {%- elsif page.content != blank -%}
+        <p class="cih__lead">{{ page.content | strip_html | truncate: 200 }}</p>
       {%- endif -%}
-      {%- if section.settings.hero_btn2_text != blank -%}
-        <a href="{{ section.settings.hero_btn2_url | default: '/pages/contact-us' }}" class="btn btn-secondary cih">{{ section.settings.hero_btn2_text }}</a>
-      {%- endif -%}
+      <div class="cih__hero-ctas">
+        {%- if section.settings.hero_btn1_text != blank -%}
+          <a href="{{ section.settings.hero_btn1_url | default: '/collections/restaurant-equipment' }}" class="btn btn-primary cih">{{ section.settings.hero_btn1_text }}</a>
+        {%- endif -%}
+        {%- if section.settings.hero_btn2_text != blank -%}
+          <a href="{{ section.settings.hero_btn2_url | default: '/pages/contact-us' }}" class="btn btn-secondary cih">{{ section.settings.hero_btn2_text }}</a>
+        {%- endif -%}
+      </div>
     </div>
   </div>
 </section>
@@ -854,7 +885,7 @@
             {%- if block.settings.featured_collection != blank and equip_col != blank -%}
               <div class="cih__equip-products">
                 <div class="cih__equip-products-head">
-                  <h3>Popular Products</h3>
+                  <h3>{{ block.settings.popular_products_label | default: 'Popular Products' }}</h3>
                   {%- if block.settings.view_all_url != blank -%}
                     <a href="{{ block.settings.view_all_url }}" class="cih__view-all">View All</a>
                   {%- endif -%}
@@ -911,40 +942,64 @@
 
   <!-- Guides + Help -->
   {%- assign show_row_two = false -%}
-  {%- if has_guides and section.settings.show_guides -%}{%- assign show_row_two = true -%}{%- endif -%}
-  {%- if section.settings.help_title != blank -%}{%- assign show_row_two = true -%}{%- endif -%}
+  {%- if section.settings.show_guides -%}{%- assign show_row_two = true -%}{%- endif -%}
+  {%- if section.settings.show_help != false and section.settings.help_title != blank -%}{%- assign show_row_two = true -%}{%- endif -%}
   {%- if show_row_two -%}
-    <div class="cih__row-two">
-      {%- if has_guides and section.settings.show_guides -%}
+    <div class="cih__row-two" {% unless section.settings.show_guides %}style="grid-template-columns: 1fr;"{% endunless %}>
+      {%- if section.settings.show_guides -%}
         <div class="cih__guides">
           <div class="cih__guides-head">
-            <h2>Buying Guides &amp; Resources</h2>
-            <a href="/blogs/news" class="cih__view-all">View All Articles</a>
+            <h2>{{ section.settings.guides_title | default: 'Buying Guides & Resources' }}</h2>
+            <a href="{{ section.settings.guides_view_all_url | default: '/blogs/resources' }}" class="cih__view-all">{{ section.settings.guides_view_all_label | default: 'View All Articles' }}</a>
           </div>
-          {%- for block in section.blocks -%}
-            {%- if block.type == 'guide' -%}
-              <a class="cih__guide-item" href="{{ block.settings.url | default: '#' }}" {{ block.shopify_attributes }}>
-                <div class="cih__guide-thumb">
-                  {%- if block.settings.image != blank -%}
-                    <img src="{{ block.settings.image | image_url: width: 220 }}" alt="{{ block.settings.title }}" width="140" height="90" loading="lazy">
-                  {%- elsif block.settings.image_url != blank -%}
-                    {%- if block.settings.image_url contains 'http' -%}
-                      {%- assign guide_img_url = block.settings.image_url -%}
-                    {%- else -%}
-                      {%- assign guide_img_url = block.settings.image_url | asset_url -%}
+          {%- if has_guides -%}
+            {%- comment -%} Manual guide blocks override auto-pull {%- endcomment -%}
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'guide' -%}
+                <a class="cih__guide-item" href="{{ block.settings.url | default: '#' }}" {{ block.shopify_attributes }}>
+                  <div class="cih__guide-thumb">
+                    {%- if block.settings.image != blank -%}
+                      <img src="{{ block.settings.image | image_url: width: 220 }}" alt="{{ block.settings.title }}" width="140" height="90" loading="lazy">
+                    {%- elsif block.settings.image_url != blank -%}
+                      {%- if block.settings.image_url contains 'http' -%}
+                        {%- assign guide_img_url = block.settings.image_url -%}
+                      {%- else -%}
+                        {%- assign guide_img_url = block.settings.image_url | asset_url -%}
+                      {%- endif -%}
+                      <img src="{{ guide_img_url }}" alt="{{ block.settings.title }}" style="width:140px;height:90px;object-fit:cover;" loading="lazy">
                     {%- endif -%}
-                    <img src="{{ guide_img_url }}" alt="{{ block.settings.title }}" style="width:140px;height:90px;object-fit:cover;" loading="lazy">
-                  {%- endif -%}
-                </div>
-                <div>
-                  <div class="cih__guide-title">{{ block.settings.title }}</div>
-                  <div class="cih__guide-meta">{{ block.settings.meta | default: 'Guide' }}</div>
-                </div>
-              </a>
+                  </div>
+                  <div>
+                    <div class="cih__guide-title">{{ block.settings.title }}</div>
+                    <div class="cih__guide-meta">{{ block.settings.meta | default: 'Guide' }}</div>
+                  </div>
+                </a>
+              {%- endif -%}
+            {%- endfor -%}
+          {%- else -%}
+            {%- comment -%} Auto-pull 3 latest articles from resources blog {%- endcomment -%}
+            {%- assign resources_blog = blogs[section.settings.auto_blog_handle | default: 'resources'] -%}
+            {%- if resources_blog != blank -%}
+              {%- for article in resources_blog.articles limit: 3 -%}
+                <a class="cih__guide-item" href="{{ article.url }}">
+                  <div class="cih__guide-thumb">
+                    {%- if article.image != blank -%}
+                      <img src="{{ article.image | image_url: width: 220 }}" alt="{{ article.title }}" width="140" height="90" loading="lazy">
+                    {%- else -%}
+                      <div style="width:140px;height:90px;background:var(--gray-100);border-radius:4px;"></div>
+                    {%- endif -%}
+                  </div>
+                  <div>
+                    <div class="cih__guide-title">{{ article.title }}</div>
+                    <div class="cih__guide-meta">{{ article.published_at | date: '%b %d, %Y' }}</div>
+                  </div>
+                </a>
+              {%- endfor -%}
             {%- endif -%}
-          {%- endfor -%}
+          {%- endif -%}
         </div>
       {%- endif -%}
+
 
       <div class="cih__help-block">
         {%- if section.settings.help_title != blank -%}
@@ -955,9 +1010,9 @@
             <div class="cih__help-text">
               <h3>{{ section.settings.help_title }}</h3>
               {%- if section.settings.help_body != blank -%}<p>{{ section.settings.help_body }}</p>{%- endif -%}
-              <a href="{{ section.settings.expert_btn1_url | default: '/pages/contact-us' }}" class="btn btn-outline cih" style="padding:10px 16px;font-size:13px;">
+              <a href="{{ section.settings.help_btn_url | default: section.settings.expert_btn1_url | default: '/pages/contact-us' }}" class="btn btn-outline cih" style="padding:10px 16px;font-size:13px;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5A8.4 8.4 0 0 1 9 19l-5 1 1-5a8.4 8.4 0 0 1-1-3.5 8.4 8.4 0 0 1 8.5-8.5 8.4 8.4 0 0 1 8.5 8.5z"/></svg>
-                Contact an Expert
+                {{ section.settings.help_btn_text | default: 'Contact an Expert' }}
               </a>
             </div>
           </div>
@@ -968,10 +1023,62 @@
             <div class="cih__brand-strip">
               {%- for block in section.blocks -%}
                 {%- if block.type == 'brand' -%}
-                  <a class="cih__brand{% if block.settings.italic %} italic{% endif %}"
+                  {%- liquid
+                    assign brand_handle = block.settings.name | handleize
+                    assign brand_logo_file = 'brand-logo-' | append: brand_handle | append: '.png'
+                    assign brand_logo_url = brand_logo_file | asset_url
+                    case brand_handle
+                      when 'thunder-group', 'thundergroup'
+                        assign brand_logo_url = 'brand-logo-thunder-group.png' | asset_url
+                      when 'robot-coupe', 'robotcoupe'
+                        assign brand_logo_url = 'brand-logo-robot-coupe.png' | asset_url
+                      when 'turbo-air', 'turboair'
+                        assign brand_logo_url = 'brand-logo-turbo-air.png' | asset_url
+                      when 'global-solutions', 'globalsolutions'
+                        assign brand_logo_url = 'brand-logo-global-solutions.png' | asset_url
+                      when 'hamilton-beach', 'hamiltonbeach'
+                        assign brand_logo_url = 'brand-logo-hamilton-beach.png' | asset_url
+                      when 'john-boos', 'johnboos'
+                        assign brand_logo_url = 'brand-logo-john-boos.png' | asset_url
+                      when 'san-jamar', 'sanjamar'
+                        assign brand_logo_url = 'brand-logo-san-jamar.png' | asset_url
+                      when 'chef-works', 'chefworks'
+                        assign brand_logo_url = 'brand-logo-chef-works.png' | asset_url
+                      when 'ice-o-matic', 'iceomatic'
+                        assign brand_logo_url = 'brand-logo-ice-o-matic.png' | asset_url
+                      when 'la-coppera', 'lacoppera'
+                        assign brand_logo_url = 'brand-logo-la-coppera.png' | asset_url
+                      when 'nor-lake', 'norlake'
+                        assign brand_logo_url = 'brand-logo-nor-lake.png' | asset_url
+                      when 'us-cooler', 'uscooler'
+                        assign brand_logo_url = 'brand-logo-us-cooler.png' | asset_url
+                    endcase
+                  -%}
+                  <a class="cih__brand"
                      href="{{ block.settings.url | default: '#' }}"
-                     {% if block.settings.color != blank %}style="color:{{ block.settings.color }}"{% endif %}
-                     {{ block.shopify_attributes }}>{{ block.settings.name }}</a>
+                     title="{{ block.settings.name }}"
+                     {{ block.shopify_attributes }}>
+                    {%- if block.settings.brand_image != blank -%}
+                      <img src="{{ block.settings.brand_image | image_url: width: 180 }}"
+                           alt="{{ block.settings.name }}"
+                           loading="lazy">
+                    {%- elsif block.settings.brand_image_url != blank -%}
+                      {%- if block.settings.brand_image_url contains 'http' -%}
+                        {%- assign direct_brand_url = block.settings.brand_image_url -%}
+                      {%- else -%}
+                        {%- assign direct_brand_url = block.settings.brand_image_url | asset_url -%}
+                      {%- endif -%}
+                      <img src="{{ direct_brand_url }}"
+                           alt="{{ block.settings.name }}"
+                           loading="lazy">
+                    {%- else -%}
+                      <img src="{{ brand_logo_url }}"
+                           alt="{{ block.settings.name }}"
+                           loading="lazy"
+                           onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
+                      <span class="cih__brand-name-fallback" style="display:none;">{{ block.settings.name }}</span>
+                    {%- endif -%}
+                  </a>
                 {%- endif -%}
               {%- endfor -%}
             </div>
@@ -984,7 +1091,7 @@
 </div>
 
 <!-- ============ EXPERT CTA ============ -->
-{%- if section.settings.expert_title != blank -%}
+{%- if section.settings.show_expert_cta != false and section.settings.expert_title != blank -%}
   <section class="cih__expert-cta cih">
     <div class="cih__expert-cta-inner">
       <div>
@@ -1005,26 +1112,37 @@
 {%- endif -%}
 
 <!-- ============ FEATURES ============ -->
+{%- if section.settings.show_features != false -%}
 <section class="cih__features cih">
   <div class="cih__features-inner">
-    <div class="cih__feature">
-      <div class="cih__feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c.7-3.5 3.6-5.5 7-5.5s6.3 2 7 5.5"/></svg></div>
-      <div class="cih__feature-text"><h4>Expert Support</h4><p>Get help from our equipment experts</p></div>
-    </div>
-    <div class="cih__feature">
-      <div class="cih__feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/><path d="M11 8v3l2 2"/></svg></div>
-      <div class="cih__feature-text"><h4>Lowest Prices Guaranteed</h4><p>We match competitive pricing</p></div>
-    </div>
-    <div class="cih__feature">
-      <div class="cih__feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 8h11v9H2zM13 11h5l3 4v2h-8"/><circle cx="6" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/></svg></div>
-      <div class="cih__feature-text"><h4>Fast Shipping Across USA</h4><p>Quick delivery, nationwide</p></div>
-    </div>
-    <div class="cih__feature">
-      <div class="cih__feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></div>
-      <div class="cih__feature-text"><h4>Trusted by Businesses</h4><p>Thousands of satisfied customers</p></div>
-    </div>
+    {%- for i in (1..4) -%}
+      {%- assign feat_title_key = 'feat_' | append: i | append: '_title' -%}
+      {%- assign feat_text_key  = 'feat_' | append: i | append: '_text' -%}
+      {%- assign feat_title = section.settings[feat_title_key] -%}
+      {%- assign feat_text  = section.settings[feat_text_key] -%}
+      {%- if feat_title != blank -%}
+        <div class="cih__feature">
+          <div class="cih__feature-icon">
+            {%- if i == 1 -%}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c.7-3.5 3.6-5.5 7-5.5s6.3 2 7 5.5"/></svg>
+            {%- elsif i == 2 -%}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/><path d="M11 8v3l2 2"/></svg>
+            {%- elsif i == 3 -%}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 8h11v9H2zM13 11h5l3 4v2h-8"/><circle cx="6" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/></svg>
+            {%- elsif i == 4 -%}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
+            {%- endif -%}
+          </div>
+          <div class="cih__feature-text">
+            <h4>{{ feat_title }}</h4>
+            {%- if feat_text != blank -%}<p>{{ feat_text }}</p>{%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
   </div>
 </section>
+{%- endif -%}
 
 <script>
 (function() {
@@ -1066,6 +1184,11 @@
       "info": "Dark gradient overlay is applied automatically. Leave blank for solid dark gradient."
     },
     {
+      "type": "image_picker",
+      "id": "hero_right_image",
+      "label": "Hero Right-Side Equipment Image"
+    },
+    {
       "type": "text",
       "id": "hero_title_override",
       "label": "Title override",
@@ -1101,6 +1224,34 @@
     },
     {
       "type": "header",
+      "content": "Breadcrumb"
+    },
+    {
+      "type": "text",
+      "id": "breadcrumb_home_label",
+      "label": "Home link label",
+      "default": "Home"
+    },
+    {
+      "type": "url",
+      "id": "breadcrumb_home_url",
+      "label": "Home link URL"
+    },
+    {
+      "type": "text",
+      "id": "breadcrumb_parent_label",
+      "label": "Parent page label",
+      "default": "Use Cases",
+      "info": "Second breadcrumb item (e.g. 'Use Cases')."
+    },
+    {
+      "type": "url",
+      "id": "breadcrumb_parent_url",
+      "label": "Parent page URL",
+      "info": "Defaults to /pages/use-cases."
+    },
+    {
+      "type": "header",
       "content": "Store Types Section"
     },
     {
@@ -1117,17 +1268,52 @@
     },
     {
       "type": "header",
-      "content": "Buying Guides"
+      "content": "Buying Guides & Resources"
     },
     {
       "type": "checkbox",
       "id": "show_guides",
-      "label": "Show buying guides section",
+      "label": "Show guides section",
       "default": true
+    },
+    {
+      "type": "text",
+      "id": "guides_title",
+      "label": "Section title",
+      "default": "Buying Guides & Resources"
+    },
+    {
+      "type": "url",
+      "id": "guides_view_all_url",
+      "label": "'View All' link URL",
+      "info": "Defaults to /blogs/resources"
+    },
+    {
+      "type": "text",
+      "id": "guides_view_all_label",
+      "label": "'View All' link label",
+      "default": "View All Articles"
+    },
+    {
+      "type": "text",
+      "id": "auto_blog_handle",
+      "label": "Auto-pull blog handle",
+      "default": "resources",
+      "info": "When no Buying Guide blocks are added, articles are auto-pulled from this blog handle."
+    },
+    {
+      "type": "paragraph",
+      "content": "Add 'Buying Guide' blocks below to pin specific articles. If no blocks are added, the 3 latest articles from the blog above are shown automatically."
     },
     {
       "type": "header",
       "content": "Need Help Block"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_help",
+      "label": "Show 'Need Help' block",
+      "default": true
     },
     {
       "type": "text",
@@ -1140,6 +1326,18 @@
       "id": "help_body",
       "label": "Help block body",
       "default": "Our experts can help you build the perfect setup for your business."
+    },
+    {
+      "type": "text",
+      "id": "help_btn_text",
+      "label": "Help block button text",
+      "default": "Contact an Expert"
+    },
+    {
+      "type": "url",
+      "id": "help_btn_url",
+      "label": "Help block button URL",
+      "info": "Falls back to the Expert CTA primary button URL if blank."
     },
     {
       "type": "header",
@@ -1160,6 +1358,12 @@
     {
       "type": "header",
       "content": "Expert CTA (Dark Section)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_expert_cta",
+      "label": "Show Expert CTA section",
+      "default": true
     },
     {
       "type": "text",
@@ -1200,6 +1404,56 @@
       "type": "url",
       "id": "expert_btn2_url",
       "label": "Secondary button URL"
+    },
+    {
+      "type": "header",
+      "content": "Trust Features Bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_features",
+      "label": "Show features bar",
+      "default": true
+    },
+    { "type": "text", "id": "feat_1_title", "label": "Feature 1 Title", "default": "Expert Support" },
+    { "type": "text", "id": "feat_1_text",  "label": "Feature 1 Text",  "default": "Get help from our equipment experts" },
+    { "type": "text", "id": "feat_2_title", "label": "Feature 2 Title", "default": "Lowest Prices Guaranteed" },
+    { "type": "text", "id": "feat_2_text",  "label": "Feature 2 Text",  "default": "We match competitive pricing" },
+    { "type": "text", "id": "feat_3_title", "label": "Feature 3 Title", "default": "Fast Shipping Across USA" },
+    { "type": "text", "id": "feat_3_text",  "label": "Feature 3 Text",  "default": "Quick delivery, nationwide" },
+    { "type": "text", "id": "feat_4_title", "label": "Feature 4 Title", "default": "Trusted by Businesses" },
+    { "type": "text", "id": "feat_4_text",  "label": "Feature 4 Text",  "default": "Thousands of satisfied customers" },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_maroon",
+      "label": "Primary color",
+      "default": "#8B1538",
+      "info": "Used for buttons, active states, and accent elements."
+    },
+    {
+      "type": "color",
+      "id": "color_navy",
+      "label": "Dark background color",
+      "default": "#1B2B47",
+      "info": "Used for the hero and Expert CTA section."
+    },
+    {
+      "type": "color",
+      "id": "color_gold",
+      "label": "Gold accent color",
+      "default": "#D4AF37",
+      "info": "Used for the gold stripe and hover states."
+    },
+    {
+      "type": "color",
+      "id": "color_coral",
+      "label": "Highlight / coral color",
+      "default": "#FF6B6B",
+      "info": "Used for NEW badges, help row highlights, and coral buttons."
     }
   ],
   "blocks": [
@@ -1309,6 +1563,13 @@
         },
         {
           "type": "text",
+          "id": "popular_products_label",
+          "label": "Section heading",
+          "default": "Popular Products",
+          "info": "Heading shown above the product thumbnail grid."
+        },
+        {
+          "type": "text",
           "id": "featured_collection",
           "label": "Collection handle",
           "info": "e.g. 'commercial-ovens'. First 4 products appear as thumbnails."
@@ -1385,6 +1646,18 @@
       "type": "brand",
       "name": "Brand",
       "settings": [
+        {
+          "type": "image_picker",
+          "id": "brand_image",
+          "label": "Brand logo image",
+          "info": "Uploaded logo. Overrides the auto-derived filename convention."
+        },
+        {
+          "type": "text",
+          "id": "brand_image_url",
+          "label": "Brand logo URL (asset filename or external)",
+          "info": "Used if Brand logo image is blank. e.g. 'brand-logo-my-brand.png' or a full URL."
+        },
         {
           "type": "text",
           "id": "name",
