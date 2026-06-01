@@ -304,7 +304,7 @@
         "hero_btn2_url": "/pages/contact-us",
         "show_store_types": true,
         "store_types_title": "Shop by Store Type",
-        "show_guides": true,
+        "show_guides": false,
         "help_title": "Need Help Choosing the Right Equipment?",
         "help_body": "Our experts can help you build the perfect setup for your grocery store.",
         "show_brands": true,

@@ -9,6 +9,11 @@
  */
 {
   "sections": {
+    "home_restaurant_partners": {
+      "type": "home-restaurant-partners",
+      "disabled": true,
+      "settings": {}
+    },
     "hero_diagonal_slider_LqrVDw": {
       "type": "hero-diagonal-slider",
       "blocks": {
@@ -536,7 +541,7 @@
         "link_row4_7": "/collections/vendors?q=global+solutions",
         "link_row4_8": "/collections/vendors?q=omcan",
         "link_row4_9": "/collections/vendors?q=thunder+group",
-        "logo_row5_1": "shopify://shop_images/brand-logo-cdn.png",
+        "logo_row5_1": "shopify://shop_images/brand-logo-migali.jpg",
         "logo_row5_2": "shopify://shop_images/brand-logo-ariane.png",
         "logo_row5_3": "shopify://shop_images/brand-logo-porto-brasil.jpg",
         "logo_row5_4": "shopify://shop_images/brand-logo-Comstock-Castle.png",
@@ -544,7 +549,7 @@
         "logo_row5_6": "shopify://shop_images/brand-logo-belshaw.png",
         "logo_row5_7": "shopify://shop_images/brand-logo-empress.png",
         "logo_row5_8": "shopify://shop_images/brand-logo-vitamix_47f2f588-7ac3-4de4-ac1a-a1cd72104c38.png",
-        "link_row5_1": "/collections/vendors?q=cdn",
+        "link_row5_1": "/collections/vendors?q=migali",
         "link_row5_2": "/collections/vendors?q=ariane",
         "link_row5_3": "/collections/vendors?q=porto+brasil",
         "link_row5_4": "/collections/vendors?q=comstock+castle",
@@ -557,89 +562,105 @@
     "category_icon_row_home": {
       "type": "category-icon-row",
       "blocks": {
-        "icon_1": {
-          "type": "icon_item",
-          "settings": {
-            "label": "Tandoor and Parts",
-            "collection_handle": "new-theme-tandoor-and-parts",
-            "link": ""
-          }
-        },
-        "icon_2": {
-          "type": "icon_item",
-          "settings": {
-            "label": "Idli & Momo",
-            "collection_handle": "idli-momo-steamer-all",
-            "link": ""
-          }
-        },
         "icon_3": {
           "type": "icon_item",
+          "name": "Refrige",
           "settings": {
-            "label": "Pressure Cooker",
-            "collection_handle": "pressure-cooker-aluminum",
+            "label": "Refrigeration",
+            "collection_handle": "refrigeration",
+            "icon_image": "shopify://shop_images/true-mfg-general-foodservice-ts-49f-flx-hc-refrigerator-freezer-convertible-20250411162227043.webp",
             "link": ""
           }
         },
         "icon_4": {
           "type": "icon_item",
+          "name": "Griddle",
           "settings": {
-            "label": "Patila",
-            "collection_handle": "aluminium-patila",
+            "label": "Griddle",
+            "collection_handle": "new-theme-gas-griddles",
+            "icon_image": "shopify://shop_images/southbend-4725dd-3tl-restaurant-gas-range-72-w-with-5-burners-1-36-griddle-and-2-standard-ovens-333-000-btu.webp",
             "link": ""
           }
         },
         "icon_5": {
           "type": "icon_item",
+          "name": "Planetary Mixer",
           "settings": {
-            "label": "Kadai",
-            "collection_handle": "kadai-all",
+            "label": "Planetary Mixer",
+            "collection_handle": "new-theme-planetary-spiral-mixers",
+            "icon_image": "shopify://shop_images/waring-wsm20l-planetery-mixer_891e0237-c667-43e9-90e5-1b51ccf733c2.png",
+            "link": ""
+          }
+        },
+        "icon_1": {
+          "type": "icon_item",
+          "name": "Tandoor",
+          "settings": {
+            "label": "Tandoor",
+            "collection_handle": "new-theme-tandoor-and-parts",
+            "icon_image": "shopify://shop_images/44386_44285_44385_tandoor-ovens.jpg",
             "link": ""
           }
         },
         "icon_6": {
           "type": "icon_item",
+          "name": "Combi Oven",
           "settings": {
-            "label": "Biryani Lagan",
-            "collection_handle": "biryani-lagan-all",
+            "label": "Combi Oven",
+            "collection_handle": "new-theme-convection-ovens-copy",
+            "icon_image": "shopify://shop_images/iCombi-Pro-6-HS-NG-208-240V-2T.jpg",
             "link": ""
           }
         },
         "icon_7": {
           "type": "icon_item",
+          "name": "Hot Display",
           "settings": {
-            "label": "Tava / Griddle",
-            "collection_handle": "taav-all",
+            "label": "Hot Display",
+            "collection_handle": "new-theme-hot-food-display-cases",
+            "icon_image": "shopify://shop_images/ED3-48.webp",
             "link": ""
           }
         },
         "icon_8": {
           "type": "icon_item",
+          "name": "Blender",
           "settings": {
-            "label": "Chafers",
-            "collection_handle": "serve-ware-collection-chafers-accessories",
+            "label": "Blender",
+            "collection_handle": "new-theme-commercial-blenders",
             "link": ""
           }
         },
         "icon_9": {
           "type": "icon_item",
+          "name": "Fryer",
           "settings": {
-            "label": "Copper Steel",
-            "collection_handle": "copper-steel-serve-ware-collection",
+            "label": "Fryer",
+            "collection_handle": "new-theme-commercial-fryers",
+            "link": ""
+          }
+        },
+        "icon_2": {
+          "type": "icon_item",
+          "name": "Wet Grinder",
+          "settings": {
+            "label": "Wet Grinder",
+            "collection_handle": "wet-grinder",
+            "icon_image": "shopify://shop_images/ChatGPT_Image_May_29_2026_at_11_22_22_AM.png",
             "link": ""
           }
         }
       },
       "block_order": [
-        "icon_1",
-        "icon_2",
         "icon_3",
         "icon_4",
         "icon_5",
+        "icon_1",
         "icon_6",
         "icon_7",
         "icon_8",
-        "icon_9"
+        "icon_9",
+        "icon_2"
       ],
       "settings": {
         "show_section": true,
@@ -647,21 +668,6 @@
         "section_subtitle": "",
         "bg_color": "#ffffff",
         "scroll_mobile": true
-      }
-    },
-    "featured_products_grid_sale_items": {
-      "type": "featured-products-grid",
-      "name": "Sale Items",
-      "settings": {
-        "section_title": "Limited Time Sales",
-        "section_subtitle": "",
-        "view_all_link": "",
-        "product_source": "collection",
-        "featured_collection": "new-theme-staff-picks-copy",
-        "featured_products": [
-          "etl-certified-shaan-catering-tandoor-clay-oven-gas-small-26wx-31d-x-33h"
-        ],
-        "products_limit": 20
       }
     },
     "industry_use_cases_RGU3Yd": {
@@ -785,6 +791,21 @@
         "cta_subtitle": "Our equipment experts work with all types of food businesses. Get personalized recommendations for your specific needs.",
         "cta_button_text": "Get Free Consultation",
         "cta_button_url": "shopify://pages/contact-us"
+      }
+    },
+    "featured_products_grid_sale_items": {
+      "type": "featured-products-grid",
+      "name": "Sale Items",
+      "settings": {
+        "section_title": "Limited Time Sales",
+        "section_subtitle": "",
+        "view_all_link": "",
+        "product_source": "collection",
+        "featured_collection": "new-theme-staff-picks-copy",
+        "featured_products": [
+          "etl-certified-shaan-catering-tandoor-clay-oven-gas-small-26wx-31d-x-33h"
+        ],
+        "products_limit": 20
       }
     },
     "partner_section_7FDna9": {
@@ -1124,12 +1145,13 @@
     }
   },
   "order": [
+    "home_restaurant_partners",
     "hero_diagonal_slider_LqrVDw",
     "featured_categories_e6Ar6U",
     "hexagon_grid_PCtXnB",
     "category_icon_row_home",
-    "featured_products_grid_sale_items",
     "industry_use_cases_RGU3Yd",
+    "featured_products_grid_sale_items",
     "partner_section_7FDna9",
     "staff_picks_slider",
     "journey_promo_banner",

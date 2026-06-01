@@ -7,6 +7,21 @@
  * made to this file may be overwritten.
  * ------------------------------------------------------------
  */
+
+/*
+ * ⚠️  DISCARDED TEMPLATE — DO NOT USE
+ * ------------------------------------------------------------
+ * This template (page.cf-industry.json) and its section
+ * (cf-industry-hub.liquid) have been superseded by:
+ *
+ *   • Landing page : templates/page.use-cases.json
+ *                    sections/use-cases-landing.liquid
+ *   • Individual   : templates/page.cf-use-case-single.json (TBD)
+ *                    sections/industry-use-cases.liquid
+ *
+ * Kept here for reference only. Do NOT assign to any live page.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {

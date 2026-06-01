@@ -978,7 +978,8 @@
             {%- endfor -%}
           {%- else -%}
             {%- comment -%} Auto-pull 3 latest articles from resources blog {%- endcomment -%}
-            {%- assign resources_blog = blogs[section.settings.auto_blog_handle | default: 'resources'] -%}
+            {%- assign auto_blog = section.settings.auto_blog_handle | default: 'resources' -%}
+            {%- assign resources_blog = blogs[auto_blog] -%}
             {%- if resources_blog != blank -%}
               {%- for article in resources_blog.articles limit: 3 -%}
                 <a class="cih__guide-item" href="{{ article.url }}">
