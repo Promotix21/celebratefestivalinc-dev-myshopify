@@ -1,0 +1,99 @@
+{# subject: Your order {{ order.name }} has been delivered — {{ shop.name }} #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Order Delivered</title>
+  <style>
+    @media only screen and (max-width:620px){
+      .email-wrapper{padding:12px !important;}
+      .email-card{border-radius:0 !important;}
+      .email-header{padding:20px 20px !important;}
+      .email-body{padding:24px 20px !important;}
+      .email-footer{padding:20px !important;}
+      .item-img{display:none !important;}
+      .col-half{display:block !important;width:100% !important;}
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background:#f0f4f8;font-family:Arial,Helvetica,sans-serif;color:#1e293b;">
+
+  <!-- Preheader -->
+  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">Your order {{ order.name }} has been delivered. Thank you!&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</div>
+
+  <table width="100%" cellpadding="0" cellspacing="0" class="email-wrapper" style="background:#f0f4f8;padding:30px 16px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" class="email-card" style="max-width:600px;width:100%;background:#ffffff;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+
+          <!-- HEADER -->
+          <tr>
+            <td class="email-header" style="background:#1a365d;padding:28px 32px;text-align:center;">
+              <img src="https://celebratefestivalinc.com/cdn/shop/files/cf-logo-white.png" alt="Celebrate Festival Inc" width="160" style="max-width:160px;height:auto;display:block;margin:0 auto 12px;">
+              <div style="color:#94b8d8;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;">Restaurant Supply Specialists</div>
+            </td>
+          </tr>
+
+          <!-- BODY -->
+          
+      
+      <tr>
+        <td style="background:linear-gradient(135deg,#1a365d 0%,#2d5a87 100%);padding:32px;text-align:center;">
+          <div style="font-size:48px;margin-bottom:12px;">✅</div>
+          <h1 style="margin:0 0 8px;font-size:26px;font-weight:700;color:#ffffff;">Your order has been delivered!</h1>
+          <p style="margin:0;font-size:15px;color:#bfdbfe;">We hope your new equipment is everything you expected.</p>
+          
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:24px 32px 0;">
+          <p style="margin:0 0 8px;font-size:15px;color:#475569;">Hi {{ order.shipping_address.first_name }},</p>
+          <p style="margin:0;font-size:15px;color:#475569;line-height:1.6;">Your order <strong>{{ order.name }}</strong> has been delivered. Thank you for choosing Celebrate Festival Inc for your commercial kitchen needs.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:20px 32px;">
+          <div style="background:#f0fdf4;border-radius:8px;padding:20px;text-align:center;">
+            <div style="font-size:15px;font-weight:600;color:#166534;margin-bottom:8px;">How was your experience?</div>
+            <p style="margin:0 0 16px;font-size:14px;color:#475569;">Your feedback helps us serve restaurants better. It takes less than a minute.</p>
+            <a href="{{ shop.url }}/pages/contact" style="display:inline-block;padding:11px 24px;background:#1a365d;color:#fff;font-size:14px;font-weight:700;text-decoration:none;border-radius:6px;">Leave a Review</a>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:0 32px 28px;">
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;">
+            <div style="font-size:13px;color:#475569;text-align:center;line-height:1.6;">
+              <strong>Need help with your equipment?</strong><br>
+              Our team is available to assist with installation, operation questions, and parts.<br>
+              <a href="tel:4086739999" style="color:#2d5a87;font-weight:600;">(408) 673-9999</a> &nbsp;|&nbsp;
+              <a href="{{ shop.url }}/pages/contact" style="color:#2d5a87;font-weight:600;">Submit a Support Request</a>
+            </div>
+          </div>
+        </td>
+      </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td class="email-footer" style="background:#f8fafc;padding:24px 32px;border-top:1px solid #e2e8f0;text-align:center;">
+              <p style="margin:0 0 8px;font-size:13px;color:#64748b;">
+                <a href="{{ shop.url }}" style="color:#2d5a87;text-decoration:none;">{{ shop.name }}</a>
+                &nbsp;·&nbsp; Fremont, CA &nbsp;·&nbsp;
+                <a href="tel:4086739999" style="color:#2d5a87;text-decoration:none;">(408) 673-9999</a>
+              </p>
+              <p style="margin:0 0 8px;font-size:12px;color:#94a3b8;">
+                You received this email because you placed an order or have an account at {{ shop.name }}.
+              </p>
+              <p style="margin:0;font-size:12px;color:#94a3b8;">
+                &copy; {{ 'now' | date: '%Y' }} Celebrate Festival Inc. All rights reserved.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<?php
+/** @var array $task; @var array $comments; @var array $attachments; @var array $activity */
+require_once __DIR__ . '/../_icons.php';
+?>
+<div class="page-head">
+    <div>
+        <div class="muted tiny" style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><?= task_type_icon($task['task_type']) ?> Task #<?= (int)$task['id'] ?> · <?= h($task['task_type']) ?></div>
+        <h1><?= h($task['title']) ?></h1>
+        <div class="pill-row">
+            <span class="<?= status_class($task['status']) ?>"><?= h($task['status']) ?></span>
+            <span class="<?= priority_class($task['priority']) ?>"><?= h($task['priority']) ?></span>
+            <span class="muted tiny">Opened by <?= h($task['creator']) ?> · <?= fmt_rel($task['created_at']) ?></span>
+        </div>
+    </div>
+    <div class="page-head-actions">
+        <?php if (is_admin()): ?>
+            <form method="post" action="/tasks/<?= (int)$task['id'] ?>/delete" data-confirm="Delete this task? This cannot be undone." class="inline">
+                <?= csrf_field() ?>
+                <button class="btn btn-ghost btn-sm danger">Delete</button>
+            </form>
+        <?php endif; ?>
+    </div>
+</div>
+
+<div class="grid-detail">
+    <div>
+        <section class="card">
+            <div class="card-head"><h2>Description</h2>
+                <a href="#" class="link" data-toggle="#editForm">Edit</a>
+            </div>
+            <?php if ($task['description']): ?>
+                <div style="font-size:14px;color:var(--ink-700)"><?= md($task['description']) ?></div>
+            <?php else: ?>
+                <p class="muted">No description yet.</p>
+            <?php endif; ?>
+
+            <h3>Expected Behavior</h3>
+            <?php if ($task['expected_behavior']): ?>
+                <div style="font-size:14px;color:var(--ink-700)"><?= md($task['expected_behavior']) ?></div>
+            <?php else: ?>
+                <p class="muted">Not set. Required before work can start.</p>
+            <?php endif; ?>
+        </section>
+
+        <form id="editForm" method="post" action="/tasks/<?= (int)$task['id'] ?>/edit" class="card form hidden">
+            <?= csrf_field() ?>
+            <h2 style="margin-bottom:14px">Edit task</h2>
+            <label>Title<input name="title" required value="<?= h($task['title']) ?>"></label>
+            <div class="form-row">
+                <label>Type<select name="task_type">
+                    <?php foreach (['Bug','Feature','UI Change'] as $v): ?><option <?= $task['task_type']===$v?'selected':'' ?>><?= h($v) ?></option><?php endforeach; ?>
+                </select></label>
+                <label>Priority<select name="priority">
+                    <?php foreach (['Low','Medium','High'] as $v): ?><option <?= $task['priority']===$v?'selected':'' ?>><?= h($v) ?></option><?php endforeach; ?>
+                </select></label>
+            </div>
+            <label>Description<textarea name="description" rows="3"><?= h($task['description']) ?></textarea></label>
+            <label>Expected Behavior<textarea name="expected_behavior" rows="3"><?= h($task['expected_behavior']) ?></textarea></label>
+            <div class="form-actions"><button class="btn btn-accent">Save changes</button></div>
+        </form>
+
+        <section class="card" id="comments">
+            <div class="card-head"><h2>Discussion <span class="muted">(<?= count($comments) ?>)</span></h2></div>
+            <?php if (!$comments): ?>
+                <div class="empty"><div class="empty-ico"><?= icon('inbox', 22) ?></div>No comments yet. Start the conversation below.</div>
+            <?php endif; ?>
+            <?php foreach ($comments as $c): $name = $c['display_name'] ?: $c['username']; ?>
+                <div class="comment">
+                    <div class="comment-head">
+                        <div class="avatar sm"><?= h(strtoupper(substr($name, 0, 1))) ?></div>
+                        <div><strong><?= h($name) ?></strong> <span class="muted tiny"><?= h(ucfirst($c['role'])) ?> · <?= fmt_rel($c['created_at']) ?></span></div>
+                    </div>
+                    <div class="comment-body"><?= md($c['body']) ?></div>
+                </div>
+            <?php endforeach; ?>
+
+            <form method="post" action="/tasks/<?= (int)$task['id'] ?>/comments" class="comment-form">
+                <?= csrf_field() ?>
+                <textarea name="body" rows="2" placeholder="Write a comment — be specific." required></textarea>
+                <button class="btn btn-accent btn-sm">Post comment <?= icon('arrow-right', 14) ?></button>
+            </form>
+        </section>
+    </div>
+
+    <aside>
+        <section class="card">
+            <div class="card-head"><h2>Status</h2></div>
+            <form method="post" action="/tasks/<?= (int)$task['id'] ?>/status" class="form">
+                <?= csrf_field() ?>
+                <label>Move to
+                <select name="status">
+                    <?php
+                    $all = ['Pending','In Progress','Ready for Review','Needs Clarification','Completed'];
+                    $allowed = allowed_task_statuses();
+                    foreach ($all as $s):
+                        $dis = !in_array($s, $allowed, true) ? 'disabled' : '';
+                        $sel = $task['status'] === $s ? 'selected' : '';
+                    ?>
+                        <option value="<?= h($s) ?>" <?= $sel ?> <?= $dis ?>><?= h($s) ?><?= $dis?' · admin only':'' ?></option>
+                    <?php endforeach; ?>
+                </select></label>
+                <button class="btn btn-accent btn-block">Update status</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <div class="card-head"><h2>Timeline</h2></div>
+            <ul class="timeline">
+                <li class="done">
+                    <strong>Created</strong>
+                    <time><?= fmt_dt($task['created_at']) ?></time>
+                </li>
+                <li class="<?= $task['started_at'] ? 'done' : (in_array($task['status'],['In Progress','Ready for Review','Completed'])?'active':'') ?>">
+                    <strong>Started</strong>
+                    <time><?= $task['started_at'] ? fmt_dt($task['started_at']) : 'Not started' ?></time>
+                </li>
+                <li class="<?= $task['eta_date'] ? 'active' : '' ?>">
+                    <strong>Scheduled For</strong>
+                    <time><?= $task['eta_date'] ? date('M j, Y', strtotime($task['eta_date'])) : 'Not scheduled' ?></time>
+                </li>
+                <li class="<?= $task['completed_at'] ? 'done' : '' ?>">
+                    <strong>Completed</strong>
+                    <time><?= $task['completed_at'] ? fmt_dt($task['completed_at']) : 'Pending' ?></time>
+                </li>
+            </ul>
+            <div class="divider"></div>
+            <dl class="kv">
+                <dt>Scheduled</dt><dd><?= $task['eta_date'] ? date('M j, Y', strtotime($task['eta_date'])) : '—' ?></dd>
+                <dt>Set by</dt><dd><?= h($task['eta_setter'] ?? '—') ?></dd>
+            </dl>
+            <?php if (is_admin()): ?>
+                <form method="post" action="/tasks/<?= (int)$task['id'] ?>/eta" class="form" style="margin-top:14px">
+                    <?= csrf_field() ?>
+                    <label>Schedule date<input type="date" name="eta_date" value="<?= h($task['eta_date']) ?>" min="<?= date('Y-m-d') ?>" required></label>
+                    <button class="btn btn-ghost btn-sm btn-block">Save Schedule</button>
+                </form>
+            <?php endif; ?>
+        </section>
+
+        <section class="card">
+            <div class="card-head"><h2>Attachments <span class="muted">(<?= count($attachments) ?>)</span></h2></div>
+            <?php if ($attachments): ?>
+                <div class="attachments">
+                    <?php foreach ($attachments as $a): ?>
+                        <a href="/uploads/<?= h($a['filename']) ?>" target="_blank" class="attachment">
+                            <?php if (str_starts_with($a['mime_type'], 'image/')): ?>
+                                <img src="/uploads/<?= h($a['filename']) ?>" alt="">
+                            <?php else: ?>
+                                <div class="attachment-file">PDF</div>
+                            <?php endif; ?>
+                            <div class="attachment-meta">
+                                <div style="color:var(--ink-800);font-weight:500"><?= h($a['original_name']) ?></div>
+                                <div class="muted"><?= h($a['kind']) ?> · <?= round($a['size_bytes']/1024) ?> KB</div>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <p class="muted tiny">No screenshots yet — drop a before/after below.</p>
+            <?php endif; ?>
+
+            <form method="post" action="/tasks/<?= (int)$task['id'] ?>/upload" enctype="multipart/form-data" class="form" style="margin-top:8px">
+                <?= csrf_field() ?>
+                <label class="upload-drop" style="cursor:pointer;display:block">
+                    <?= icon('upload', 20) ?>
+                    <div style="margin-top:6px">Click to attach an image or PDF</div>
+                    <input type="file" name="file" required style="display:none" data-autosubmit>
+                </label>
+                <label>Kind<select name="kind"><option>other</option><option>before</option><option>after</option></select></label>
+            </form>
+        </section>
+
+        <section class="card">
+            <div class="card-head"><h2>Activity</h2></div>
+            <?php if (!$activity): ?><p class="muted tiny">No activity yet.</p><?php endif; ?>
+            <ul class="feed">
+                <?php foreach ($activity as $a): $name = $a['display_name'] ?: $a['username']; ?>
+                    <li>
+                        <div class="feed-avatar"><?= h(strtoupper(substr($name, 0, 1))) ?></div>
+                        <div class="feed-body">
+                            <strong><?= h($name) ?></strong>
+                            <span class="action"><?= h($a['action']) ?></span>
+                            <?php if ($a['detail']): ?><div class="muted tiny" style="margin-top:2px"><?= h($a['detail']) ?></div><?php endif; ?>
+                        </div>
+                        <div class="feed-time"><?= fmt_rel($a['created_at']) ?></div>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </section>
+    </aside>
+</div>

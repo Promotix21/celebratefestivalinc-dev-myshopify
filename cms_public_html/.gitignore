@@ -1,0 +1,12 @@
+
+
+# Cortex intelligence files (auto-generated)
+.cortex-context.md
+NEXT_SESSION_PROMPT.md
+NEXT-SESSION-PROMPT.md
+CORTEX_INTELLIGENCE_MASTER.md
+
+# Runtime
+data/*.sqlite
+public/uploads/*
+!public/uploads/.gitkeep

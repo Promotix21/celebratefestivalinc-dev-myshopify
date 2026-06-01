@@ -1,0 +1,138 @@
+{# subject: Your order {{ order.name }} has shipped — {{ shop.name }} #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Your Order Has Shipped</title>
+  <style>
+    @media only screen and (max-width:620px){
+      .email-wrapper{padding:12px !important;}
+      .email-card{border-radius:0 !important;}
+      .email-header{padding:20px 20px !important;}
+      .email-body{padding:24px 20px !important;}
+      .email-footer{padding:20px !important;}
+      .item-img{display:none !important;}
+      .col-half{display:block !important;width:100% !important;}
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background:#f0f4f8;font-family:Arial,Helvetica,sans-serif;color:#1e293b;">
+
+  <!-- Preheader -->
+  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">Order {{ order.name }} is on its way! Track your shipment inside.&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</div>
+
+  <table width="100%" cellpadding="0" cellspacing="0" class="email-wrapper" style="background:#f0f4f8;padding:30px 16px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" class="email-card" style="max-width:600px;width:100%;background:#ffffff;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+
+          <!-- HEADER -->
+          <tr>
+            <td class="email-header" style="background:#1a365d;padding:28px 32px;text-align:center;">
+              <img src="https://celebratefestivalinc.com/cdn/shop/files/cf-logo-white.png" alt="Celebrate Festival Inc" width="160" style="max-width:160px;height:auto;display:block;margin:0 auto 12px;">
+              <div style="color:#94b8d8;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;">Restaurant Supply Specialists</div>
+            </td>
+          </tr>
+
+          <!-- BODY -->
+          
+      
+      <tr>
+        <td style="background:linear-gradient(135deg,#1a365d 0%,#2d5a87 100%);padding:32px;text-align:center;">
+          <div style="font-size:48px;margin-bottom:12px;">🚚</div>
+          <h1 style="margin:0 0 8px;font-size:26px;font-weight:700;color:#ffffff;">Your order is on its way!</h1>
+          <p style="margin:0;font-size:15px;color:#bfdbfe;">We&apos;ve shipped your order and it&apos;s heading to you now.</p>
+          <a href="{{{{ fulfillment.tracking_url }}}}" style="display:inline-block;margin-top:20px;padding:13px 28px;background:#ff6b6b;color:#fff;font-size:15px;font-weight:700;text-decoration:none;border-radius:6px;">Track Your Shipment</a>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:24px 32px 0;">
+          <p style="margin:0 0 8px;font-size:15px;color:#475569;">Hi {{ order.shipping_address.first_name }},</p>
+          <p style="margin:0;font-size:15px;color:#475569;line-height:1.6;">Great news — your order <strong>{{ order.name }}</strong> has been shipped and is on its way to you.</p>
+        </td>
+      </tr>
+      {%- if fulfillment.tracking_number -%}
+      <tr>
+        <td style="padding:20px 32px 0;">
+          <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:16px 20px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td>
+                  <div style="font-size:12px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Tracking Number</div>
+                  <div style="font-size:18px;font-weight:700;color:#15803d;letter-spacing:1px;">{{ fulfillment.tracking_number }}</div>
+                  {%- if fulfillment.tracking_company -%}<div style="font-size:13px;color:#166534;margin-top:2px;">via {{ fulfillment.tracking_company }}</div>{%- endif -%}
+                </td>
+                <td style="text-align:right;">
+                  <a href="{{ fulfillment.tracking_url }}" style="display:inline-block;padding:10px 20px;background:#16a34a;color:#fff;font-size:13px;font-weight:700;text-decoration:none;border-radius:6px;">Track Package</a>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+      {%- endif -%}
+      <tr><td style="padding:20px 32px 4px;"><h3 style="margin:0;font-size:14px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Items Shipped</h3></td></tr>
+      
+      <tr>
+        <td style="padding:20px 32px 0;">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;padding-bottom:8px;border-bottom:2px solid #e2e8f0;">Product</td>
+              <td style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;padding-bottom:8px;border-bottom:2px solid #e2e8f0;text-align:center;width:50px;">Qty</td>
+              <td style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;padding-bottom:8px;border-bottom:2px solid #e2e8f0;text-align:right;width:80px;">Price</td>
+            </tr>
+            
+            {%- for line_item in fulfillment.fulfillment_line_items -%}
+            <tr>
+              <td style="padding:12px 0;border-bottom:1px solid #f1f5f9;vertical-align:top;">
+                <div style="font-size:14px;font-weight:600;color:#1e293b;">{{ line_item.title }}</div>
+                {%- if line_item.variant_title != 'Default Title' -%}
+                <div style="font-size:12px;color:#64748b;">{{ line_item.variant_title }}</div>
+                {%- endif -%}
+              </td>
+              <td style="padding:12px 0;border-bottom:1px solid #f1f5f9;text-align:center;font-size:14px;color:#475569;vertical-align:top;width:50px;">{{ line_item.quantity }}</td>
+              <td style="padding:12px 0;border-bottom:1px solid #f1f5f9;text-align:right;font-size:14px;font-weight:600;color:#1a365d;vertical-align:top;width:80px;">{{ line_item.price | money }}</td>
+            </tr>
+            {%- endfor -%}
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:20px 32px 28px;">
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;">
+            <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Shipping To</div>
+            <div style="font-size:14px;color:#1e293b;line-height:1.6;">
+              {{ order.shipping_address.first_name }} {{ order.shipping_address.last_name }}<br>
+              {{ order.shipping_address.address1 }}<br>
+              {%- if order.shipping_address.address2 != blank -%}{{ order.shipping_address.address2 }}<br>{%- endif -%}
+              {{ order.shipping_address.city }}, {{ order.shipping_address.province_code }} {{ order.shipping_address.zip }}<br>
+              {{ order.shipping_address.country }}
+            </div>
+          </div>
+        </td>
+      </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td class="email-footer" style="background:#f8fafc;padding:24px 32px;border-top:1px solid #e2e8f0;text-align:center;">
+              <p style="margin:0 0 8px;font-size:13px;color:#64748b;">
+                <a href="{{ shop.url }}" style="color:#2d5a87;text-decoration:none;">{{ shop.name }}</a>
+                &nbsp;·&nbsp; Fremont, CA &nbsp;·&nbsp;
+                <a href="tel:4086739999" style="color:#2d5a87;text-decoration:none;">(408) 673-9999</a>
+              </p>
+              <p style="margin:0 0 8px;font-size:12px;color:#94a3b8;">
+                You received this email because you placed an order or have an account at {{ shop.name }}.
+              </p>
+              <p style="margin:0;font-size:12px;color:#94a3b8;">
+                &copy; {{ 'now' | date: '%Y' }} Celebrate Festival Inc. All rights reserved.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

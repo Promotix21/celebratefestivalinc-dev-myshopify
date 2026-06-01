@@ -1,0 +1,42 @@
+{
+  "order-confirmation": {
+    "label": "Order Confirmation",
+    "description": "Sent immediately after a customer places an order.",
+    "subject": "Your order {{ order.name }} is confirmed \u2014 {{ shop.name }}"
+  },
+  "abandoned-checkout": {
+    "label": "Abandoned Checkout",
+    "description": "Sent when a customer leaves without completing their purchase.",
+    "subject": "You left something in your cart \u2014 {{ shop.name }}"
+  },
+  "shipping-confirmation": {
+    "label": "Shipping Confirmation",
+    "description": "Sent when an order is fulfilled and shipped.",
+    "subject": "Your order {{ order.name }} has shipped \u2014 {{ shop.name }}"
+  },
+  "out-for-delivery": {
+    "label": "Out for Delivery",
+    "description": "Sent when the carrier marks the shipment as out for delivery.",
+    "subject": "Your order {{ order.name }} is out for delivery today \u2014 {{ shop.name }}"
+  },
+  "order-delivered": {
+    "label": "Order Delivered",
+    "description": "Sent when the carrier confirms delivery.",
+    "subject": "Your order {{ order.name }} has been delivered \u2014 {{ shop.name }}"
+  },
+  "refund-notification": {
+    "label": "Refund Notification",
+    "description": "Sent when a full or partial refund is issued.",
+    "subject": "Refund processed for order {{ order.name }} \u2014 {{ shop.name }}"
+  },
+  "account-welcome": {
+    "label": "Customer Account Welcome",
+    "description": "Sent when a new customer account is created.",
+    "subject": "Welcome to {{ shop.name }}, {{ customer.first_name }}!"
+  },
+  "password-reset": {
+    "label": "Password Reset",
+    "description": "Sent when a customer requests a password reset.",
+    "subject": "Reset your {{ shop.name }} account password"
+  }
+}

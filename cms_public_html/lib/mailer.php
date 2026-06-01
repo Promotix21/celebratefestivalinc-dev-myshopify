@@ -1,0 +1,247 @@
+<?php
+declare(strict_types=1);
+
+// ── SMTP2GO Mailer ──────────────────────────────────────────────────────────
+
+define('SMTP_HOST', 'mail.smtp2go.com');
+define('SMTP_PORT', 587);
+define('SMTP_USER', 'hiraya');
+define('SMTP_PASS', 'Zjsj5NumZFPOGfrT');
+define('SMTP_FROM', 'cms@hiraya.digital');
+define('SMTP_FROM_NAME', 'Hiraya CMS');
+
+define('DEVS_EMAIL', ['rajesh_kumar@hiraya.digital', 'badal_sharma@hiraya.digital']);
+define('CLIENT_EMAIL', 'jielinz@celebratefestivalinc.com');
+define('CMS_BASE_URL', 'https://cms.hiraya.digital');
+
+function smtp_send(array $recipients, string $subject, string $htmlBody): bool {
+    $recipients = array_values(array_filter(array_map('trim', $recipients), fn($r) => $r !== ''));
+    if (!$recipients) { email_log_insert(null, $subject, 'failed', 'no_recipients'); return false; }
+
+    $error = null;
+    $fp = null;
+    try {
+        $fp = @stream_socket_client('tcp://' . SMTP_HOST . ':' . SMTP_PORT, $errno, $errstr, 10);
+        if (!$fp) { $error = "connect: {$errno} {$errstr}"; throw new \RuntimeException($error); }
+        stream_set_timeout($fp, 15);
+
+        $check = function(string $label, string $resp) use (&$error) {
+            if (!preg_match('/^(2|3)\d\d/', $resp)) { $error = "{$label}: " . trim($resp); throw new \RuntimeException($error); }
+        };
+
+        $check('banner', _smtp_read($fp));
+        $check('ehlo1',  _smtp_cmd($fp, 'EHLO cms.hiraya.digital'));
+        $check('starttls', _smtp_cmd($fp, 'STARTTLS'));
+        if (!stream_socket_enable_crypto($fp, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) { $error = 'tls_failed'; throw new \RuntimeException($error); }
+        $check('ehlo2',  _smtp_cmd($fp, 'EHLO cms.hiraya.digital'));
+        $check('auth',   _smtp_cmd($fp, 'AUTH LOGIN'));
+        $check('user',   _smtp_cmd($fp, base64_encode(SMTP_USER)));
+        $check('pass',   _smtp_cmd($fp, base64_encode(SMTP_PASS)));
+
+        // Single MAIL FROM + one RCPT TO per recipient + one DATA body — the
+        // previous version had a `break;` that dropped every recipient past the
+        // first. Now we deliver one message with every RCPT envelope.
+        $check('mail_from', _smtp_cmd($fp, 'MAIL FROM:<' . SMTP_FROM . '>'));
+        foreach ($recipients as $to) {
+            $check('rcpt:' . $to, _smtp_cmd($fp, 'RCPT TO:<' . $to . '>'));
+        }
+        $check('data', _smtp_cmd($fp, 'DATA'));
+
+        $toHeader = implode(', ', $recipients);
+        $msg  = "From: " . SMTP_FROM_NAME . " <" . SMTP_FROM . ">\r\n";
+        $msg .= "To: {$toHeader}\r\n";
+        $msg .= "Subject: =?UTF-8?B?" . base64_encode($subject) . "?=\r\n";
+        $msg .= "MIME-Version: 1.0\r\n";
+        $msg .= "Content-Type: text/html; charset=UTF-8\r\n";
+        $msg .= "X-Mailer: HirayaCMS\r\n";
+        $msg .= "\r\n";
+        $msg .= $htmlBody . "\r\n.";
+        $check('body', _smtp_cmd($fp, $msg));
+
+        _smtp_cmd($fp, 'QUIT');
+        fclose($fp);
+        foreach ($recipients as $to) email_log_insert($to, $subject, 'sent', null);
+        return true;
+    } catch (\Throwable $e) {
+        if ($fp) { @fwrite($fp, "QUIT\r\n"); @fclose($fp); }
+        $err = $error ?: $e->getMessage();
+        error_log('[mailer] smtp_send failed: ' . $err);
+        foreach ($recipients as $to) email_log_insert($to, $subject, 'failed', substr($err, 0, 240));
+        return false;
+    }
+}
+
+// Persist every send attempt so we can debug missing deliveries later.
+function email_log_insert(?string $recipient, string $subject, string $status, ?string $error): void {
+    try {
+        db()->prepare('INSERT INTO email_log (recipient, subject, status, error) VALUES (?,?,?,?)')
+            ->execute([$recipient, mb_substr($subject, 0, 255), $status, $error]);
+    } catch (\Throwable $e) {
+        error_log('[mailer] email_log insert failed: ' . $e->getMessage());
+    }
+}
+
+// Resolve a Jielin / client email from the users table; falls back to CLIENT_EMAIL constant.
+function resolve_client_emails(): array {
+    try {
+        $rows = db()->query("SELECT email FROM users WHERE role = 'client' AND email IS NOT NULL AND email != ''")->fetchAll();
+        $emails = array_values(array_filter(array_map(fn($r) => trim((string)$r['email']), $rows), fn($e) => $e !== ''));
+        if ($emails) return $emails;
+    } catch (\Throwable $e) {
+        error_log('[mailer] resolve_client_emails failed: ' . $e->getMessage());
+    }
+    return [CLIENT_EMAIL];
+}
+
+function _smtp_cmd($fp, string $cmd): string {
+    fwrite($fp, $cmd . "\r\n");
+    return _smtp_read($fp);
+}
+
+function _smtp_read($fp): string {
+    $resp = '';
+    while ($line = fgets($fp, 512)) {
+        $resp .= $line;
+        if (strlen($line) >= 4 && $line[3] === ' ') break;
+    }
+    return $resp;
+}
+
+// ── Notification helpers ────────────────────────────────────────────────────
+
+function notify_task_event(array $actor, int $taskId, string $taskTitle, string $action, string $detail = ''): void {
+    $isClient = ($actor['role'] === 'client');
+    $actorName = $actor['display_name'] ?? $actor['username'];
+    $taskUrl   = CMS_BASE_URL . '/tasks/' . $taskId;
+
+    $actionLabels = [
+        'created'   => 'created a new task',
+        'commented' => 'added a comment',
+        'status'    => 'updated the task status',
+        'edited'    => 'edited task details',
+        'eta'       => 'scheduled a delivery date',
+        'uploaded'  => 'uploaded an attachment',
+    ];
+    $actionLabel = $actionLabels[$action] ?? $action;
+
+    if ($isClient) {
+        // Jielin acted → notify developers
+        smtp_send(
+            DEVS_EMAIL,
+            "[CMS] Client update on #{$taskId}: {$taskTitle}",
+            email_dev($actorName, $actionLabel, $taskId, $taskTitle, $taskUrl, $detail, $action)
+        );
+    } else {
+        // Developer acted → notify client(s). Recipient pulled from users.email
+        // so we can manage the address via the DB instead of redeploying.
+        smtp_send(
+            resolve_client_emails(),
+            "[Hiraya] Update on your task: {$taskTitle}",
+            email_client($actorName, $actionLabel, $taskId, $taskTitle, $taskUrl, $detail, $action)
+        );
+    }
+}
+
+// ── Developer-facing email (technical, actionable) ──────────────────────────
+function email_dev(string $actor, string $action, int $taskId, string $title, string $url, string $detail, string $actionKey): string {
+    $badge = match($actionKey) {
+        'created'   => '<span style="background:#dbeafe;color:#1e40af;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:600;">NEW TASK</span>',
+        'commented' => '<span style="background:#fef9c3;color:#854d0e;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:600;">NEW COMMENT</span>',
+        'status'    => '<span style="background:#dcfce7;color:#166534;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:600;">STATUS CHANGE</span>',
+        'uploaded'  => '<span style="background:#f3e8ff;color:#6b21a8;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:600;">ATTACHMENT</span>',
+        default     => '<span style="background:#f1f5f9;color:#475569;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:600;">UPDATE</span>',
+    };
+
+    $detailBlock = $detail ? '
+        <div style="background:#f8fafc;border-left:3px solid #2d5a87;padding:12px 16px;margin:16px 0;border-radius:0 6px 6px 0;font-size:13px;color:#334155;white-space:pre-wrap;">'
+        . htmlspecialchars($detail) . '</div>' : '';
+
+    return <<<HTML
+<!DOCTYPE html><html><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f0f2f5;font-family:'Segoe UI',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="padding:28px 0;">
+<tr><td align="center">
+<table width="580" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);">
+  <tr><td style="background:#1a365d;padding:20px 28px;display:flex;align-items:center;justify-content:space-between;">
+    <span style="color:#fff;font-size:16px;font-weight:700;">Hiraya CMS</span>
+    <span style="color:#93c5fd;font-size:12px;">Developer Notification</span>
+  </td></tr>
+  <tr><td style="padding:24px 28px 8px;">
+    <div style="margin-bottom:14px;">{$badge}</div>
+    <p style="margin:0 0 4px;font-size:13px;color:#64748b;">Client activity from <strong>{$actor}</strong></p>
+    <p style="margin:0 0 18px;font-size:18px;font-weight:700;color:#0f172a;">{$action}</p>
+    <div style="border:1px solid #e2e8f0;border-radius:8px;padding:14px 18px;margin-bottom:4px;background:#f8fafc;">
+      <p style="margin:0 0 3px;font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;">Task #{$taskId}</p>
+      <p style="margin:0;font-size:15px;font-weight:600;color:#1a365d;">{$title}</p>
+    </div>
+    {$detailBlock}
+  </td></tr>
+  <tr><td style="padding:8px 28px 24px;">
+    <a href="{$url}" style="display:inline-block;background:#1a365d;color:#fff;padding:10px 22px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:600;">Open Task in CMS →</a>
+  </td></tr>
+  <tr><td style="background:#f1f5f9;padding:14px 28px;border-top:1px solid #e2e8f0;">
+    <p style="margin:0;font-size:11px;color:#94a3b8;">Hiraya Digital · cms.hiraya.digital · Auto-notification</p>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body></html>
+HTML;
+}
+
+// ── Client-facing email (friendly, non-technical) ───────────────────────────
+function email_client(string $actor, string $action, int $taskId, string $title, string $url, string $detail, string $actionKey): string {
+    $intro = match($actionKey) {
+        'status'  => "Good news — your task has a status update.",
+        'eta'     => "Your task has been scheduled — see the delivery date below.",
+        'commented' => "The development team has left a note on your task.",
+        'created' => "A new task has been logged for you.",
+        default   => "There's an update on one of your tasks.",
+    };
+
+    $statusColor = match($actionKey) {
+        'status'    => '#10b981',
+        'eta'       => '#2d5a87',
+        'commented' => '#d4af37',
+        default     => '#1a365d',
+    };
+
+    $detailBlock = $detail ? '
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px 18px;margin:16px 0;font-size:14px;color:#166534;">'
+        . htmlspecialchars($detail) . '</div>' : '';
+
+    return <<<HTML
+<!DOCTYPE html><html><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f0f2f5;font-family:'Segoe UI',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="padding:28px 0;">
+<tr><td align="center">
+<table width="580" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);">
+  <tr><td style="background:linear-gradient(135deg,#1a365d 0%,#2d5a87 100%);padding:28px 32px;">
+    <p style="margin:0 0 4px;color:#93c5fd;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Celebrate Festival · Project Update</p>
+    <p style="margin:0;color:#fff;font-size:20px;font-weight:700;">Task Update from Hiraya Digital</p>
+  </td></tr>
+  <tr><td style="padding:28px 32px;">
+    <p style="margin:0 0 20px;font-size:15px;color:#334155;">Hi Jielin,</p>
+    <p style="margin:0 0 20px;font-size:15px;color:#334155;">{$intro}</p>
+    <div style="border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;margin-bottom:20px;">
+      <div style="background:{$statusColor};padding:10px 18px;">
+        <span style="color:#fff;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">{$action}</span>
+      </div>
+      <div style="padding:16px 18px;background:#f8fafc;">
+        <p style="margin:0 0 3px;font-size:11px;color:#94a3b8;">Task #{$taskId}</p>
+        <p style="margin:0;font-size:16px;font-weight:700;color:#0f172a;">{$title}</p>
+      </div>
+    </div>
+    {$detailBlock}
+    <p style="margin:0 0 20px;font-size:13px;color:#64748b;">You can view the full details and leave any comments directly in the project tracker.</p>
+    <a href="{$url}" style="display:inline-block;background:#ff6b6b;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700;">View Task →</a>
+  </td></tr>
+  <tr><td style="background:#f8fafc;padding:16px 32px;border-top:1px solid #e2e8f0;">
+    <p style="margin:0;font-size:12px;color:#94a3b8;">Hiraya Digital · This is an automated update from your project workspace.</p>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body></html>
+HTML;
+}

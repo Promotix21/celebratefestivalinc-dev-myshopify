@@ -1,0 +1,243 @@
+{{ 'restaurant-partners.css' | asset_url | stylesheet_tag }}
+
+{% assign partner_data_json = '{"CA":{"partners":18,"locations":44,"tags":"Bakery • Indian • Pizza"},"TX":{"partners":12,"locations":32,"tags":"BBQ • Mexican • Bakery"},"NY":{"partners":15,"locations":38,"tags":"Deli • Pizza • Bakery"},"IL":{"partners":8,"locations":21,"tags":"Pizza • Diner • Fast Casual"},"FL":{"partners":10,"locations":25,"tags":"Seafood • Latin • Fast Food"},"GA":{"partners":7,"locations":18,"tags":"Southern • Bakery • Cafe"},"NJ":{"partners":9,"locations":22,"tags":"Diner • Italian • Indian"},"NV":{"partners":5,"locations":12,"tags":"Buffet • Korean • Fast Food"},"MA":{"partners":6,"locations":14,"tags":"Seafood • Coffee • Pub"},"CT":{"partners":4,"locations":9,"tags":"Pizza • Coffee • Diner"}}' %}
+
+<div class="rp-wrapper">
+
+  <!-- HERO SECTION -->
+  <section class="rp-section-bg-white">
+    <div class="rp-container">
+      <div class="rp-hero">
+        
+        <!-- Left Content -->
+        <div class="rp-hero-content">
+          <div class="rp-hero-breadcrumb"><a href="/">Home</a> &rsaquo; Our Restaurant Partners</div>
+          <h1 class="rp-heading-serif">Trusted by Restaurants<br>Across the&nbsp;U.S.</h1>
+          <p>We provide high-performance commercial kitchen solutions for the nation&#8217;s leading restaurant groups and culinary pioneers.</p>
+          
+          <div class="rp-hero-stats">
+            <div class="rp-hero-stat">
+              <div class="rp-hero-stat-val">50+</div>
+              <div class="rp-hero-stat-lbl">Locations</div>
+            </div>
+            <div class="rp-hero-stat">
+              <div class="rp-hero-stat-val">150+</div>
+              <div class="rp-hero-stat-lbl">Brands</div>
+            </div>
+            <div class="rp-hero-stat">
+              <div class="rp-hero-stat-val">48</div>
+              <div class="rp-hero-stat-lbl">States</div>
+            </div>
+            <div class="rp-hero-stat">
+              <div class="rp-hero-stat-val">10+</div>
+              <div class="rp-hero-stat-lbl">Years</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Map -->
+        <div class="rp-hero-map" id="rp-map-wrap" data-partner='{{ partner_data_json | replace: "'", "&#39;" }}'>
+          {% render 'usa-interactive-map', id: 'landing-page-map', active_states: 'CA,TX,NY,IL,FL,GA,NJ,NV,MA,CT', partner_data: partner_data_json %}
+          
+          <div class="rp-hero-map-legend">
+            <div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:2px;background:#8b1538;"></div> Active Partners</div>
+            <div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:2px;background:#e05a6d;"></div> Hub Regions</div>
+            <div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:2px;background:#d1d5db;border:1px solid #9ca3af;"></div> Coming Soon</div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </section>
+
+  <!-- FILTERING + SEARCH (Static layout, can be wired via JS if needed) -->
+  <section class="rp-section-bg-white" style="border-bottom: 1px solid #e5e5e5;">
+    <div class="rp-container">
+      <div class="rp-filter-bar">
+        
+        <div class="rp-filter-group">
+          <div class="rp-select-wrap">
+            <select class="rp-select">
+              <option>Filter by State</option>
+              <option>CA</option>
+              <option>TX</option>
+              <option>NY</option>
+            </select>
+            <div class="rp-select-arrow">▼</div>
+          </div>
+          <div class="rp-chips">
+            <button class="rp-chip active">All States</button>
+            <button class="rp-chip">CA</button>
+            <button class="rp-chip">TX</button>
+            <button class="rp-chip">NY</button>
+            <button class="rp-chip">FL</button>
+            <button class="rp-chip">IL</button>
+          </div>
+        </div>
+
+        <div class="rp-filter-group">
+          <div class="rp-search-wrap">
+            <div class="rp-search-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </div>
+            <input type="text" placeholder="Search restaurant or brand..." class="rp-search-input">
+          </div>
+          
+          <div class="rp-select-wrap">
+            <select class="rp-select">
+              <option>Recently Added</option>
+              <option>Alphabetical</option>
+              <option>Most Locations</option>
+            </select>
+            <div class="rp-select-arrow">▼</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- PARTNER GRID -->
+  <section class="rp-grid-section">
+    <div class="rp-container">
+      {% if section.blocks.size == 0 %}
+        <div class="rp-empty">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 1rem;"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"/></svg>
+          <h3>No partners found</h3>
+          <p>Try adjusting your filters or searching for a different brand.</p>
+          <button>Clear all filters</button>
+        </div>
+      {% else %}
+        <div class="rp-grid">
+          {% for block in section.blocks %}
+            <a href="{{ block.settings.link | default: '#' }}" class="rp-card" {{ block.shopify_attributes }}>
+              
+              <div class="rp-card-img-wrap">
+                {% if block.settings.image != blank %}
+                  <img src="{{ block.settings.image | image_url: width: 400 }}" alt="{{ block.settings.title }}" class="rp-card-img" loading="lazy">
+                {% else %}
+                  <img src="https://picsum.photos/seed/{{ block.id }}img/400/200" alt="{{ block.settings.title }}" class="rp-card-img" loading="lazy">
+                {% endif %}
+                <div class="rp-card-gradient"></div>
+                <div class="rp-card-logo-box">
+                  {% if block.settings.logo != blank %}
+                    <img src="{{ block.settings.logo | image_url: width: 80 }}" alt="{{ block.settings.title }} Logo" loading="lazy">
+                  {% else %}
+                    <img src="https://picsum.photos/seed/{{ block.id }}logo/80/80" alt="{{ block.settings.title }} Logo" loading="lazy">
+                  {% endif %}
+                </div>
+                <div class="rp-card-name-overlay">{{ block.settings.title }}</div>
+              </div>
+
+              <div class="rp-card-body">
+                <div class="rp-card-header">
+                  <div>
+                    <div class="rp-card-cuisine">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                      {{ block.settings.cuisine }}
+                    </div>
+                    <h3 class="rp-card-title">{{ block.settings.title }}</h3>
+                  </div>
+                  <div class="rp-card-badge">{{ block.settings.locations }} Locations</div>
+                </div>
+                
+                <div class="rp-card-regions">
+                  <span>Regions:</span> {{ block.settings.states }}
+                </div>
+
+                <div class="rp-card-footer">
+                  <span>View Details &rarr;</span>
+                  <div class="rp-card-arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                  </div>
+                </div>
+              </div>
+
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- BOTTOM CTA -->
+  <section class="rp-cta-strip">
+    <div class="rp-container">
+      <div class="rp-cta-inner">
+        <div class="rp-cta-text">
+          <span class="rp-cta-title">Planning a new location?</span>
+          <span class="rp-cta-desc">Our experts are here to help you build a kitchen that works.</span>
+        </div>
+        <button class="rp-btn-primary">Request a Quote</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+{% schema %}
+{
+  "name": "Main Restaurant Partners",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "partner",
+      "name": "Partner",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Cover Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Logo"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Restaurant Name",
+          "default": "Paris Baguette"
+        },
+        {
+          "type": "text",
+          "id": "cuisine",
+          "label": "Cuisine / Type",
+          "default": "Bakery Café"
+        },
+        {
+          "type": "text",
+          "id": "states",
+          "label": "States",
+          "default": "CA, TX, NY"
+        },
+        {
+          "type": "number",
+          "id": "locations",
+          "label": "Number of Locations",
+          "default": 42
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link to Details"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Main Restaurant Partners",
+      "blocks": [
+        { "type": "partner", "settings": { "title": "Paris Baguette", "cuisine": "Bakery Café", "states": "CA, TX, NY", "locations": 42 } },
+        { "type": "partner", "settings": { "title": "Tous les Jours", "cuisine": "Bakery", "states": "CA, TX, NY", "locations": 36 } },
+        { "type": "partner", "settings": { "title": "Curry Pizza House", "cuisine": "Pizza", "states": "CA, TX", "locations": 12 } },
+        { "type": "partner", "settings": { "title": "Hashtag India", "cuisine": "Indian", "states": "CA", "locations": 6 } },
+        { "type": "partner", "settings": { "title": "Mylapore", "cuisine": "South Indian", "states": "CA", "locations": 3 } },
+        { "type": "partner", "settings": { "title": "Deccan Morsels", "cuisine": "Indian", "states": "TX", "locations": 2 } }
+      ]
+    }
+  ]
+}
+{% endschema %}

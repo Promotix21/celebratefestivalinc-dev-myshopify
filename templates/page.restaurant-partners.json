@@ -1,0 +1,74 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-restaurant-partners",
+      "blocks": {
+        "partner_1": {
+          "type": "partner",
+          "settings": {
+            "title": "Paris Baguette",
+            "cuisine": "Bakery Café",
+            "states": "CA, TX, NY, NJ, IL",
+            "locations": 42
+          }
+        },
+        "partner_2": {
+          "type": "partner",
+          "settings": {
+            "title": "Tous les Jours",
+            "cuisine": "Bakery",
+            "states": "CA, TX, NY, GA",
+            "locations": 36
+          }
+        },
+        "partner_3": {
+          "type": "partner",
+          "settings": {
+            "title": "Curry Pizza House",
+            "cuisine": "Pizza",
+            "states": "CA, TX",
+            "locations": 12
+          }
+        },
+        "partner_4": {
+          "type": "partner",
+          "settings": {
+            "title": "Hashtag India",
+            "cuisine": "Indian Cuisine",
+            "states": "CA",
+            "locations": 6
+          }
+        },
+        "partner_5": {
+          "type": "partner",
+          "settings": {
+            "title": "Mylapore",
+            "cuisine": "South Indian Cuisine",
+            "states": "CA",
+            "locations": 3
+          }
+        },
+        "partner_6": {
+          "type": "partner",
+          "settings": {
+            "title": "Deccan Morsels",
+            "cuisine": "Indian Cuisine",
+            "states": "TX",
+            "locations": 2
+          }
+        }
+      },
+      "block_order": [
+        "partner_1",
+        "partner_2",
+        "partner_3",
+        "partner_4",
+        "partner_5",
+        "partner_6"
+      ]
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

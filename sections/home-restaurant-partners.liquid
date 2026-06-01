@@ -1,0 +1,188 @@
+{{ 'restaurant-partners.css' | asset_url | stylesheet_tag }}
+
+{% assign partner_data_json = '{"CA":{"partners":18,"locations":44,"tags":"Bakery • Indian • Pizza"},"TX":{"partners":12,"locations":32,"tags":"BBQ • Mexican • Bakery"},"NY":{"partners":15,"locations":38,"tags":"Deli • Pizza • Bakery"},"IL":{"partners":8,"locations":21,"tags":"Pizza • Diner • Fast Casual"},"FL":{"partners":10,"locations":25,"tags":"Seafood • Latin • Fast Food"},"GA":{"partners":7,"locations":18,"tags":"Southern • Bakery • Cafe"},"NJ":{"partners":9,"locations":22,"tags":"Diner • Italian • Indian"},"NV":{"partners":5,"locations":12,"tags":"Buffet • Korean • Fast Food"},"MA":{"partners":6,"locations":14,"tags":"Seafood • Coffee • Pub"},"CT":{"partners":4,"locations":9,"tags":"Pizza • Coffee • Diner"}}' %}
+
+<section class="rp-wrapper rp-home-section">
+  <div class="rp-container">
+    
+    <div class="rp-home-header">
+      <h4>Trusted Partners</h4>
+      <h2 class="rp-heading-serif">Trusted by Restaurants Across the U.S.</h2>
+      <p>Proudly supporting independent restaurants and growing chains with reliable commercial kitchen solutions nationwide.</p>
+    </div>
+
+    <div class="rp-home-grid">
+      
+      <!-- Left Map -->
+      <div class="rp-map-container">
+        {% render 'usa-interactive-map', id: 'home-page-map', active_states: 'CA,TX,NY,IL,FL,GA,NJ,NV,MA,CT', partner_data: partner_data_json %}
+        <div class="rp-map-legend">
+          <div class="rp-map-legend-item">
+            <div class="rp-map-legend-color" style="background-color: #d63f3a;"></div>
+            States We Serve
+          </div>
+          <div class="rp-map-legend-item">
+            <div class="rp-map-legend-color" style="background-color: #e5e5e5;"></div>
+            States Coming Soon
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Partner List -->
+      <div class="rp-partner-list">
+        {% for block in section.blocks %}
+          <a href="{{ block.settings.link | default: '#' }}" class="rp-partner-item" {{ block.shopify_attributes }}>
+            <div class="rp-partner-logo">
+              {% if block.settings.logo != blank %}
+                <img src="{{ block.settings.logo | image_url: width: 120 }}" alt="{{ block.settings.title }}" loading="lazy">
+              {% else %}
+                <img src="https://picsum.photos/seed/{{ block.id }}/120/120" alt="{{ block.settings.title }}" loading="lazy">
+              {% endif %}
+            </div>
+            
+            <div class="rp-partner-info">
+              <h3>{{ block.settings.title }}</h3>
+              <div class="rp-partner-meta">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                <span style="color: #d63f3a; font-weight: 600;">{{ block.settings.cuisine }}</span>
+              </div>
+              <div class="rp-partner-meta">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ block.settings.states }}
+              </div>
+            </div>
+
+            <div class="rp-partner-badge">
+              <div class="rp-partner-badge-num">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"/></svg>
+                {{ block.settings.locations }}
+              </div>
+              <div class="rp-partner-badge-label">Locations</div>
+            </div>
+            
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1rem;height:1rem;"><path d="m9 18 6-6-6-6"/></svg>
+          </a>
+        {% endfor %}
+
+        <div class="rp-view-all">
+          <a href="/pages/restaurant-partners">
+            View all restaurant partners 
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- Stats Row -->
+    <div class="rp-stats-row">
+      <div class="rp-stats-grid">
+        
+        <div class="rp-stat-item">
+          <div class="rp-stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="rp-stat-info">
+            <span class="rp-stat-value">50+</span>
+            <span class="rp-stat-title">Restaurant Locations</span>
+            <span class="rp-stat-desc">Supported Nationwide</span>
+          </div>
+        </div>
+
+        <div class="rp-stat-item">
+          <div class="rp-stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"/></svg>
+          </div>
+          <div class="rp-stat-info">
+            <span class="rp-stat-value">150+</span>
+            <span class="rp-stat-title">Restaurant Brands</span>
+            <span class="rp-stat-desc">Trust Our Equipment</span>
+          </div>
+        </div>
+
+        <div class="rp-stat-item">
+          <div class="rp-stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18H3c-.6 0-1-.4-1-1V7c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v11"/><path d="M14 9h4l4 4v5c0 .6-.4 1-1 1h-2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
+          </div>
+          <div class="rp-stat-info">
+            <span class="rp-stat-value">48</span>
+            <span class="rp-stat-title">States Covered</span>
+            <span class="rp-stat-desc">Coast to Coast</span>
+          </div>
+        </div>
+
+        <div class="rp-stat-item">
+          <div class="rp-stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+          </div>
+          <div class="rp-stat-info">
+            <span class="rp-stat-value">10+</span>
+            <span class="rp-stat-title">Years of Partnership</span>
+            <span class="rp-stat-desc">Supporting Food Businesses</span>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Home Restaurant Partners",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "partner",
+      "name": "Partner",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Logo"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Restaurant Name",
+          "default": "Paris Baguette"
+        },
+        {
+          "type": "text",
+          "id": "cuisine",
+          "label": "Cuisine / Type",
+          "default": "Bakery Café"
+        },
+        {
+          "type": "text",
+          "id": "states",
+          "label": "States",
+          "default": "California, Texas"
+        },
+        {
+          "type": "number",
+          "id": "locations",
+          "label": "Number of Locations",
+          "default": 12
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link to Details"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Home Restaurant Partners",
+      "blocks": [
+        { "type": "partner", "settings": { "title": "Curry Pizza House", "cuisine": "Pizza", "states": "California, Texas", "locations": 12 } },
+        { "type": "partner", "settings": { "title": "Hashtag Indian", "cuisine": "Indian Cuisine", "states": "California", "locations": 6 } },
+        { "type": "partner", "settings": { "title": "Mylapore", "cuisine": "South Indian", "states": "California", "locations": 3 } }
+      ]
+    }
+  ]
+}
+{% endschema %}

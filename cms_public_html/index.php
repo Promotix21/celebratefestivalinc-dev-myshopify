@@ -1,0 +1,548 @@
+<?php
+declare(strict_types=1);
+
+// --- Static file passthrough for PHP built-in server ---------------------
+if (PHP_SAPI === 'cli-server') {
+    $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
+    $file = __DIR__ . '/public' . $path;
+    if ($path !== '/' && is_file($file)) return false;
+}
+
+// --- Session & bootstrap --------------------------------------------------
+$isHttps = ($_SERVER['HTTPS'] ?? '') === 'on' || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path'     => '/',
+    'secure'   => $isHttps,
+    'httponly' => true,
+    'samesite' => 'Lax',
+]);
+session_name('PTSID');
+session_start();
+
+require __DIR__ . '/lib/db.php';
+require __DIR__ . '/lib/helpers.php';
+require __DIR__ . '/lib/auth.php';
+require __DIR__ . '/lib/activity.php';
+require __DIR__ . '/lib/mailer.php';
+
+db(); // ensure schema
+
+$method = $_SERVER['REQUEST_METHOD'];
+$uri    = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
+$uri    = '/' . trim($uri, '/');
+
+// CSRF enforced on all POST except login form (login checks its own).
+if ($method === 'POST' && $uri !== '/login') csrf_check();
+
+// --- Public routes --------------------------------------------------------
+if ($uri === '/login') {
+    if ($method === 'POST') {
+        csrf_check();
+        $ok = attempt_login((string)post('username', ''), (string)post('password', ''));
+        if ($ok) redirect('/');
+        flash('Invalid credentials or too many attempts. Try again in a minute.', 'error');
+        redirect('/login');
+    }
+    render('login', ['title' => 'Sign in', 'bare' => true]);
+    exit;
+}
+
+if ($uri === '/logout') {
+    logout();
+    redirect('/login');
+}
+
+// --- Protected routes -----------------------------------------------------
+$me = require_login();
+
+if ($uri === '/') {
+    $pdo = db();
+    $counts = $pdo->query("
+        SELECT
+          SUM(status='Pending') AS pending,
+          SUM(status='In Progress') AS in_progress,
+          SUM(status='Ready for Review') AS ready,
+          SUM(status='Completed') AS completed,
+          COUNT(*) AS total
+        FROM tasks
+    ")->fetch();
+    $recent_features = $pdo->query("SELECT * FROM features ORDER BY id DESC LIMIT 4")->fetchAll();
+    $upcoming = $pdo->query("
+        SELECT id, title, status, deadline FROM tasks
+        WHERE status='In Progress' AND deadline IS NOT NULL
+        ORDER BY deadline ASC LIMIT 5
+    ")->fetchAll();
+    $activity = activity_recent(8);
+    render('dashboard', compact('counts', 'recent_features', 'upcoming', 'activity') + ['title' => 'Dashboard']);
+    exit;
+}
+
+// --- Tasks ----------------------------------------------------------------
+if ($uri === '/tasks/export' && $method === 'GET') {
+    $sql = 'SELECT t.*, u.display_name AS creator FROM tasks t JOIN users u ON u.id = t.created_by WHERE 1=1';
+    $args = [];
+    if ($s = q('status'))   { $sql .= ' AND t.status = ?';    $args[] = $s; }
+    if ($tp = q('type'))    { $sql .= ' AND t.task_type = ?'; $args[] = $tp; }
+    if ($p = q('priority')) { $sql .= ' AND t.priority = ?';  $args[] = $p; }
+    $sql .= ' ORDER BY t.id ASC';
+    $stmt = db()->prepare($sql);
+    $stmt->execute($args);
+    $rows = $stmt->fetchAll();
+
+    $filename = 'tasks-' . date('Y-m-d') . '.csv';
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Cache-Control: no-store');
+
+    $out = fopen('php://output', 'w');
+    fwrite($out, "\xEF\xBB\xBF"); // UTF-8 BOM so Excel auto-detects encoding
+    fputcsv($out, [
+        'ID','Title','Type','Priority','Status','Expected Behavior',
+        'ETA Date','Created','Started','Completed','Creator','Description',
+    ]);
+    foreach ($rows as $r) {
+        fputcsv($out, [
+            $r['id'], $r['title'], $r['task_type'], $r['priority'], $r['status'],
+            $r['expected_behavior'], $r['eta_date'], $r['deadline'],
+            $r['created_at'], $r['started_at'], $r['completed_at'],
+            $r['creator'], $r['description'],
+        ]);
+    }
+    fclose($out);
+    exit;
+}
+
+if ($uri === '/tasks' && $method === 'GET') {
+    $sql = 'SELECT t.*, u.display_name AS creator FROM tasks t JOIN users u ON u.id = t.created_by WHERE 1=1';
+    $args = [];
+    if ($s = q('status'))   { $sql .= ' AND t.status = ?';    $args[] = $s; }
+    if ($t = q('type'))     { $sql .= ' AND t.task_type = ?'; $args[] = $t; }
+    if ($p = q('priority')) { $sql .= ' AND t.priority = ?';  $args[] = $p; }
+    $sql .= ' ORDER BY CASE t.status
+        WHEN "Needs Clarification" THEN 0
+        WHEN "In Progress" THEN 1
+        WHEN "Ready for Review" THEN 2
+        WHEN "Pending" THEN 3
+        WHEN "Completed" THEN 4 END, t.id DESC';
+    $stmt = db()->prepare($sql);
+    $stmt->execute($args);
+    render('tasks/list', ['tasks' => $stmt->fetchAll(), 'title' => 'Tasks']);
+    exit;
+}
+
+if ($uri === '/tasks/new') {
+    render('tasks/form', ['task' => null, 'title' => 'New Task']);
+    exit;
+}
+
+if ($uri === '/tasks' && $method === 'POST') { /* unreachable due to earlier match */ }
+
+if (preg_match('#^/tasks/(\d+)$#', $uri, $m)) {
+    $id = (int)$m[1];
+    $stmt = db()->prepare('SELECT t.*, u.display_name AS creator, s.display_name AS eta_setter FROM tasks t JOIN users u ON u.id = t.created_by LEFT JOIN users s ON s.id = t.eta_set_by WHERE t.id = ?');
+    $stmt->execute([$id]);
+    $task = $stmt->fetch();
+    if (!$task) { http_response_code(404); exit('Task not found'); }
+
+    $cstmt = db()->prepare('SELECT c.*, u.display_name, u.username, u.role FROM comments c JOIN users u ON u.id = c.user_id WHERE c.task_id = ? ORDER BY c.id ASC');
+    $cstmt->execute([$id]);
+    $comments = $cstmt->fetchAll();
+
+    $astmt = db()->prepare('SELECT * FROM attachments WHERE task_id = ? ORDER BY id DESC');
+    $astmt->execute([$id]);
+    $attachments = $astmt->fetchAll();
+
+    $activity = activity_recent(20, 'task', $id);
+    render('tasks/detail', compact('task', 'comments', 'attachments', 'activity') + ['title' => 'Task #' . $id]);
+    exit;
+}
+
+if ($uri === '/tasks' && $method === 'POST') {
+    // fallthrough intentionally unreachable — POST /tasks handled below via explicit check
+}
+
+if ($method === 'POST' && $uri === '/tasks') {
+    $title = trim((string)post('title', ''));
+    if ($title === '') { flash('Title is required.', 'error'); redirect('/tasks/new'); }
+    $stmt = db()->prepare('INSERT INTO tasks (title, description, task_type, priority, expected_behavior, created_by) VALUES (?,?,?,?,?,?)');
+    $stmt->execute([
+        $title,
+        (string)post('description', ''),
+        (string)post('task_type', 'Feature'),
+        (string)post('priority', 'Medium'),
+        (string)post('expected_behavior', ''),
+        $me['id'],
+    ]);
+    $newId = (int)db()->lastInsertId();
+    activity_log('task', $newId, 'created', $title);
+    notify_task_event($me, $newId, $title, 'created');
+
+    // Multi-file attachments on create (images / video / pdf, incl. pasted screenshots)
+    if (!empty($_FILES['files']) && is_array($_FILES['files']['name'])) {
+        $count = count($_FILES['files']['name']);
+        $errors = [];
+        for ($i = 0; $i < $count; $i++) {
+            if (empty($_FILES['files']['tmp_name'][$i])) continue;
+            $single = [
+                'tmp_name' => $_FILES['files']['tmp_name'][$i],
+                'name'     => $_FILES['files']['name'][$i],
+                'size'     => (int)$_FILES['files']['size'][$i],
+                'error'    => (int)$_FILES['files']['error'][$i],
+                'type'     => $_FILES['files']['type'][$i] ?? '',
+            ];
+            [$ok, $msg] = save_task_attachment($single, $newId, $me['id']);
+            if ($ok) activity_log('task', $newId, 'uploaded', $single['name']);
+            else $errors[] = $msg;
+        }
+        if ($errors) flash('Created, but some files skipped: ' . implode(' · ', $errors), 'error');
+        else flash('Task created.', 'success');
+    } else {
+        flash('Task created.', 'success');
+    }
+
+    redirect('/tasks/' . $newId);
+}
+
+if ($method === 'POST' && preg_match('#^/tasks/(\d+)/edit$#', $uri, $m)) {
+    $id = (int)$m[1];
+    $stmt = db()->prepare('UPDATE tasks SET title=?, description=?, task_type=?, priority=?, expected_behavior=? WHERE id=?');
+    $stmt->execute([
+        (string)post('title', ''),
+        (string)post('description', ''),
+        (string)post('task_type', 'Feature'),
+        (string)post('priority', 'Medium'),
+        (string)post('expected_behavior', ''),
+        $id,
+    ]);
+    activity_log('task', $id, 'edited', 'Metadata updated');
+    flash('Task updated.', 'success');
+    redirect('/tasks/' . $id);
+}
+
+if ($method === 'POST' && preg_match('#^/tasks/(\d+)/status$#', $uri, $m)) {
+    $id = (int)$m[1];
+    $new = (string)post('status', '');
+    $valid = ['Pending', 'In Progress', 'Ready for Review', 'Needs Clarification', 'Completed'];
+    if (!in_array($new, $valid, true)) { http_response_code(400); exit('Invalid status'); }
+
+    // Server-side role enforcement. Non-admins can only set statuses their
+    // users.can_mark_complete flag and role allow (see lib/auth.php).
+    $allowedForMe = allowed_task_statuses($me);
+    if (!in_array($new, $allowedForMe, true)) {
+        http_response_code(403);
+        flash('You do not have permission to set that status.', 'error');
+        redirect('/tasks/' . $id);
+    }
+
+    $stmt = db()->prepare('SELECT * FROM tasks WHERE id = ?');
+    $stmt->execute([$id]);
+    $task = $stmt->fetch();
+    if (!$task) { http_response_code(404); exit('Not found'); }
+
+    if ($new === 'In Progress') {
+        if (empty(trim((string)$task['expected_behavior']))) { flash('Set Expected Behavior before starting.', 'error'); redirect('/tasks/' . $id); }
+        if (empty($task['eta_date'])) { flash('Set an ETA date before starting.', 'error'); redirect('/tasks/' . $id); }
+    }
+
+    $sets = ['status = ?']; $args = [$new];
+    if ($new === 'In Progress' && empty($task['started_at'])) {
+        $sets[] = "started_at = datetime('now')";
+        $sets[] = "deadline = eta_date";
+    }
+    if ($new === 'Completed' && empty($task['completed_at'])) {
+        $sets[] = "completed_at = datetime('now')";
+    }
+    $args[] = $id;
+    $sql = 'UPDATE tasks SET ' . implode(', ', $sets) . ' WHERE id = ?';
+    $stmt = db()->prepare($sql);
+    $stmt->execute($args);
+
+    activity_log('task', $id, 'status:' . $new, $task['status'] . ' → ' . $new);
+    notify_task_event($me, $id, $task['title'], 'status', $task['status'] . ' → ' . $new);
+    flash('Status updated to ' . $new, 'success');
+    redirect('/tasks/' . $id);
+}
+
+if ($method === 'POST' && preg_match('#^/tasks/(\d+)/eta$#', $uri, $m)) {
+    require_admin();
+    $id = (int)$m[1];
+    $etaDate = trim((string)post('eta_date', ''));
+    if (!$etaDate || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $etaDate)) { flash('Please select a valid date.', 'error'); redirect('/tasks/' . $id); }
+    $stmt = db()->prepare('UPDATE tasks SET eta_date=?, eta_set_by=?, deadline=? WHERE id=?');
+    $stmt->execute([$etaDate, $me['id'], $etaDate, $id]);
+    activity_log('task', $id, 'eta', 'Scheduled for ' . date('M j, Y', strtotime($etaDate)));
+    $etaTask = db()->prepare('SELECT title FROM tasks WHERE id=?'); $etaTask->execute([$id]); $etaRow = $etaTask->fetch();
+    if ($etaRow) notify_task_event($me, $id, $etaRow['title'], 'eta', 'Scheduled for ' . date('M j, Y', strtotime($etaDate)));
+    flash('ETA set to ' . date('M j, Y', strtotime($etaDate)), 'success');
+    redirect('/tasks/' . $id);
+}
+
+if ($method === 'POST' && preg_match('#^/tasks/(\d+)/delete$#', $uri, $m)) {
+    require_admin();
+    $id = (int)$m[1];
+    db()->prepare('DELETE FROM tasks WHERE id = ?')->execute([$id]);
+    activity_log('task', $id, 'deleted');
+    flash('Task deleted.', 'success');
+    redirect('/tasks');
+}
+
+if ($method === 'POST' && preg_match('#^/tasks/(\d+)/comments$#', $uri, $m)) {
+    $id = (int)$m[1];
+    $body = trim((string)post('body', ''));
+    if ($body === '') { flash('Comment cannot be empty.', 'error'); redirect('/tasks/' . $id); }
+    db()->prepare('INSERT INTO comments (task_id, user_id, body) VALUES (?,?,?)')
+        ->execute([$id, $me['id'], $body]);
+    activity_log('task', $id, 'commented', mb_substr($body, 0, 80));
+    $cTask = db()->prepare('SELECT title FROM tasks WHERE id=?'); $cTask->execute([$id]); $cRow = $cTask->fetch();
+    if ($cRow) notify_task_event($me, $id, $cRow['title'], 'commented', $body);
+    redirect('/tasks/' . $id . '#comments');
+}
+
+if ($method === 'POST' && preg_match('#^/tasks/(\d+)/upload$#', $uri, $m)) {
+    $id = (int)$m[1];
+    if (empty($_FILES['file']['tmp_name'])) { flash('No file uploaded.', 'error'); redirect('/tasks/' . $id); }
+    $f = $_FILES['file'];
+    if ($f['error'] !== UPLOAD_ERR_OK) { flash('Upload failed.', 'error'); redirect('/tasks/' . $id); }
+    if ($f['size'] > 5 * 1024 * 1024) { flash('Max size is 5 MB.', 'error'); redirect('/tasks/' . $id); }
+    $allowed = ['image/png' => 'png', 'image/jpeg' => 'jpg', 'image/gif' => 'gif', 'image/webp' => 'webp', 'application/pdf' => 'pdf'];
+    $mime = mime_content_type($f['tmp_name']) ?: '';
+    if (!isset($allowed[$mime])) { flash('File type not allowed.', 'error'); redirect('/tasks/' . $id); }
+    $ext = $allowed[$mime];
+    $name = bin2hex(random_bytes(8)) . '.' . $ext;
+    $dest = __DIR__ . '/public/uploads/' . $name;
+    if (!move_uploaded_file($f['tmp_name'], $dest)) { flash('Could not save file.', 'error'); redirect('/tasks/' . $id); }
+    $kind = in_array(post('kind', 'other'), ['before', 'after', 'other'], true) ? post('kind') : 'other';
+    db()->prepare('INSERT INTO attachments (task_id, filename, original_name, mime_type, size_bytes, kind, uploaded_by) VALUES (?,?,?,?,?,?,?)')
+        ->execute([$id, $name, $f['name'], $mime, $f['size'], $kind, $me['id']]);
+    activity_log('task', $id, 'uploaded', $f['name']);
+    flash('Attachment uploaded.', 'success');
+    redirect('/tasks/' . $id);
+}
+
+// --- Features -------------------------------------------------------------
+if ($uri === '/features' && $method === 'GET') {
+    $rows = db()->query('SELECT * FROM features ORDER BY id DESC')->fetchAll();
+    render('features/list', ['features' => $rows, 'title' => 'Features']);
+    exit;
+}
+if ($uri === '/features/new') {
+    render('features/form', ['feature' => null, 'title' => 'New Feature']);
+    exit;
+}
+if ($method === 'POST' && $uri === '/features') {
+    $stmt = db()->prepare('INSERT INTO features (title, description, status, demo_url, completion_date, created_by) VALUES (?,?,?,?,?,?)');
+    $stmt->execute([
+        (string)post('title', ''),
+        (string)post('description', ''),
+        (string)post('status', 'Planned'),
+        (string)post('demo_url', '') ?: null,
+        (string)post('completion_date', '') ?: null,
+        $me['id'],
+    ]);
+    $fid = (int)db()->lastInsertId();
+    activity_log('feature', $fid, 'created', post('title'));
+    flash('Feature added.', 'success');
+    redirect('/features/' . $fid);
+}
+if (preg_match('#^/features/(\d+)$#', $uri, $m)) {
+    $id = (int)$m[1];
+    $stmt = db()->prepare('SELECT f.*, u.display_name AS creator FROM features f JOIN users u ON u.id = f.created_by WHERE f.id = ?');
+    $stmt->execute([$id]);
+    $feature = $stmt->fetch();
+    if (!$feature) { http_response_code(404); exit('Feature not found'); }
+    render('features/detail', compact('feature') + ['title' => $feature['title']]);
+    exit;
+}
+if ($method === 'POST' && preg_match('#^/features/(\d+)/edit$#', $uri, $m)) {
+    $id = (int)$m[1];
+    $stmt = db()->prepare('UPDATE features SET title=?, description=?, status=?, demo_url=?, completion_date=? WHERE id=?');
+    $stmt->execute([
+        (string)post('title', ''),
+        (string)post('description', ''),
+        (string)post('status', 'Planned'),
+        (string)post('demo_url', '') ?: null,
+        (string)post('completion_date', '') ?: null,
+        $id,
+    ]);
+    activity_log('feature', $id, 'edited');
+    flash('Feature updated.', 'success');
+    redirect('/features/' . $id);
+}
+
+// --- Docs -----------------------------------------------------------------
+if ($uri === '/docs' && $method === 'GET') {
+    $rows = db()->query('SELECT * FROM docs ORDER BY category, id DESC')->fetchAll();
+    render('docs/list', ['docs' => $rows, 'title' => 'Documentation']);
+    exit;
+}
+if ($uri === '/docs/new') {
+    require_admin();
+    render('docs/form', ['doc' => null, 'title' => 'New Doc']);
+    exit;
+}
+if ($method === 'POST' && $uri === '/docs') {
+    require_admin();
+    $stmt = db()->prepare('INSERT INTO docs (title, content, category, created_by) VALUES (?,?,?,?)');
+    $stmt->execute([(string)post('title', ''), (string)post('content', ''), (string)post('category', 'Other'), $me['id']]);
+    $did = (int)db()->lastInsertId();
+    activity_log('doc', $did, 'created', post('title'));
+    flash('Doc created.', 'success');
+    redirect('/docs/' . $did);
+}
+if (preg_match('#^/docs/(\d+)$#', $uri, $m)) {
+    $id = (int)$m[1];
+    $stmt = db()->prepare('SELECT d.*, u.display_name AS creator FROM docs d JOIN users u ON u.id = d.created_by WHERE d.id = ?');
+    $stmt->execute([$id]);
+    $doc = $stmt->fetch();
+    if (!$doc) { http_response_code(404); exit('Doc not found'); }
+    render('docs/detail', compact('doc') + ['title' => $doc['title']]);
+    exit;
+}
+if ($method === 'POST' && preg_match('#^/docs/(\d+)/edit$#', $uri, $m)) {
+    require_admin();
+    $id = (int)$m[1];
+    $stmt = db()->prepare('UPDATE docs SET title=?, content=?, category=?, updated_at=datetime("now") WHERE id=?');
+    $stmt->execute([(string)post('title', ''), (string)post('content', ''), (string)post('category', 'Other'), $id]);
+    activity_log('doc', $id, 'edited');
+    flash('Doc updated.', 'success');
+    redirect('/docs/' . $id);
+}
+
+// --- Content Calendar -----------------------------------------------------
+if ($uri === '/calendar' && $method === 'GET') {
+    $month = q('m', date('Y-m'));
+    if (!preg_match('/^\d{4}-\d{2}$/', (string)$month)) $month = date('Y-m');
+    $start = $month . '-01';
+    $end   = date('Y-m-t', strtotime($start));
+    $stmt = db()->prepare("SELECT c.*, u.display_name AS creator FROM content_items c JOIN users u ON u.id = c.created_by WHERE (c.scheduled_for IS NOT NULL AND c.scheduled_for BETWEEN ? AND ?) OR (c.scheduled_for IS NULL AND strftime('%Y-%m', c.created_at) = ?) ORDER BY COALESCE(c.scheduled_for, date(c.created_at)) ASC, c.id DESC");
+    $stmt->execute([$start, $end, $month]);
+    $items = $stmt->fetchAll();
+    // Also pull media for thumb previews
+    $media = [];
+    if ($items) {
+        $ids = array_column($items, 'id');
+        $in = implode(',', array_fill(0, count($ids), '?'));
+        $mStmt = db()->prepare("SELECT * FROM content_media WHERE content_id IN ($in) ORDER BY id ASC");
+        $mStmt->execute($ids);
+        foreach ($mStmt->fetchAll() as $m) { $media[$m['content_id']][] = $m; }
+    }
+    render('calendar/month', compact('month','start','end','items','media') + ['title' => 'Content Calendar']);
+    exit;
+}
+if ($uri === '/calendar/new' && $method === 'GET') {
+    render('calendar/form', ['item' => null, 'title' => 'New Content']);
+    exit;
+}
+if ($method === 'POST' && $uri === '/calendar') {
+    $stmt = db()->prepare('INSERT INTO content_items (title, caption, hashtags, media_type, platform, status, scheduled_for, link, created_by) VALUES (?,?,?,?,?,?,?,?,?)');
+    $stmt->execute([
+        (string)post('title', ''),
+        (string)post('caption', ''),
+        (string)post('hashtags', ''),
+        (string)post('media_type', 'Post'),
+        (string)post('platform', 'Instagram'),
+        (string)post('status', 'Idea'),
+        (string)post('scheduled_for', '') ?: null,
+        (string)post('link', '') ?: null,
+        $me['id'],
+    ]);
+    $id = (int)db()->lastInsertId();
+    activity_log('content', $id, 'created', post('title'));
+    flash('Content added.', 'success');
+    redirect('/calendar/' . $id);
+}
+if (preg_match('#^/calendar/(\d+)$#', $uri, $m)) {
+    $id = (int)$m[1];
+    $stmt = db()->prepare('SELECT c.*, u.display_name AS creator FROM content_items c JOIN users u ON u.id = c.created_by WHERE c.id = ?');
+    $stmt->execute([$id]);
+    $item = $stmt->fetch();
+    if (!$item) { http_response_code(404); exit('Content not found'); }
+    $mStmt = db()->prepare('SELECT * FROM content_media WHERE content_id = ? ORDER BY id ASC');
+    $mStmt->execute([$id]);
+    $media = $mStmt->fetchAll();
+    render('calendar/detail', compact('item', 'media') + ['title' => $item['title']]);
+    exit;
+}
+if ($method === 'POST' && preg_match('#^/calendar/(\d+)/edit$#', $uri, $m)) {
+    $id = (int)$m[1];
+    $stmt = db()->prepare('UPDATE content_items SET title=?, caption=?, hashtags=?, media_type=?, platform=?, status=?, scheduled_for=?, link=?, updated_at=datetime("now") WHERE id=?');
+    $stmt->execute([
+        (string)post('title', ''),
+        (string)post('caption', ''),
+        (string)post('hashtags', ''),
+        (string)post('media_type', 'Post'),
+        (string)post('platform', 'Instagram'),
+        (string)post('status', 'Idea'),
+        (string)post('scheduled_for', '') ?: null,
+        (string)post('link', '') ?: null,
+        $id,
+    ]);
+    if (post('status') === 'Published' && empty(post('published_at'))) {
+        db()->prepare('UPDATE content_items SET published_at=datetime("now") WHERE id=? AND published_at IS NULL')->execute([$id]);
+    }
+    activity_log('content', $id, 'edited');
+    flash('Content updated.', 'success');
+    redirect('/calendar/' . $id);
+}
+if ($method === 'POST' && preg_match('#^/calendar/(\d+)/upload$#', $uri, $m)) {
+    $id = (int)$m[1];
+    if (empty($_FILES['file']['tmp_name'])) { flash('No file uploaded.', 'error'); redirect('/calendar/' . $id); }
+    $f = $_FILES['file'];
+    if ($f['error'] !== UPLOAD_ERR_OK) { flash('Upload failed.', 'error'); redirect('/calendar/' . $id); }
+    if ($f['size'] > 25 * 1024 * 1024) { flash('Max size is 25 MB.', 'error'); redirect('/calendar/' . $id); }
+    $allowed = [
+        'image/png' => 'png', 'image/jpeg' => 'jpg', 'image/gif' => 'gif', 'image/webp' => 'webp',
+        'video/mp4' => 'mp4', 'video/quicktime' => 'mov', 'video/webm' => 'webm',
+    ];
+    $mime = mime_content_type($f['tmp_name']) ?: '';
+    if (!isset($allowed[$mime])) { flash('File type not allowed.', 'error'); redirect('/calendar/' . $id); }
+    $ext = $allowed[$mime];
+    $name = 'c_' . bin2hex(random_bytes(8)) . '.' . $ext;
+    $dest = __DIR__ . '/public/uploads/' . $name;
+    if (!move_uploaded_file($f['tmp_name'], $dest)) { flash('Could not save file.', 'error'); redirect('/calendar/' . $id); }
+    db()->prepare('INSERT INTO content_media (content_id, filename, original_name, mime_type, size_bytes, uploaded_by) VALUES (?,?,?,?,?,?)')
+        ->execute([$id, $name, $f['name'], $mime, $f['size'], $me['id']]);
+    activity_log('content', $id, 'media', $f['name']);
+    flash('Media attached.', 'success');
+    redirect('/calendar/' . $id);
+}
+if ($method === 'POST' && preg_match('#^/calendar/(\d+)/delete$#', $uri, $m)) {
+    require_admin();
+    $id = (int)$m[1];
+    db()->prepare('DELETE FROM content_items WHERE id = ?')->execute([$id]);
+    activity_log('content', $id, 'deleted');
+    flash('Content deleted.', 'success');
+    redirect('/calendar');
+}
+
+// --- Activity -------------------------------------------------------------
+if ($uri === '/activity') {
+    $rows = activity_recent(100);
+    render('activity', ['rows' => $rows, 'title' => 'Activity']);
+    exit;
+}
+
+
+
+// --- Email Notification Templates ----------------------------------------
+if ($uri === '/notifications') {
+    require_login();
+    $tpl_dir = __DIR__ . '/data/email-templates';
+    $manifest = json_decode(file_get_contents($tpl_dir . '/manifest.json'), true);
+    render('notifications/index', ['title' => 'Email Templates', 'manifest' => $manifest]);
+    exit;
+}
+if ($uri === '/notifications/download' && $method === 'GET') {
+    require_login();
+    $file = preg_replace('#[^a-z0-9\-]#', '', $_GET['file'] ?? '');
+    $path = __DIR__ . '/data/email-templates/' . $file . '.liquid';
+    if (!is_file($path)) { http_response_code(404); exit('Not found'); }
+    header('Content-Type: text/plain; charset=utf-8');
+    header('Content-Disposition: attachment; filename=$file.liquid');
+    readfile($path);
+    exit;
+}
+// --- 404 ------------------------------------------------------------------
+http_response_code(404);
+render('404', ['title' => 'Not found']);

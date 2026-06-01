@@ -1,0 +1,48 @@
+Options -Indexes
+DirectoryIndex index.php
+ServerSignature Off
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Force HTTPS
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+    # Expose assets from /public at the site root
+    RewriteRule ^([^/]+\.(css|js|png|jpe?g|gif|webp|svg|ico|woff2?))$ public/$1 [L]
+    RewriteRule ^uploads/(.*)$ public/uploads/$1 [L]
+
+    # Block direct access to sensitive folders
+    RewriteRule ^(lib|views|data)(/|$) - [F,L]
+
+    # Block hidden files / common sensitive files
+    RewriteRule ^\.(.*)$ - [F,L]
+    RewriteRule (^|/)(composer\.(json|lock)|package\.json|\.env)$ - [F,L]
+
+    # Front controller: any non-file, non-dir request → index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    Header set X-XSS-Protection "0"
+    # Lean CSP: self + Google Fonts for the layout
+    Header set Content-Security-Policy "default-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self'; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
+    Header unset X-Powered-By
+</IfModule>
+
+# Hard-block the SQLite file and any hidden files
+<FilesMatch "\.(sqlite|sqlite-journal|md|log)$">
+    Require all denied
+</FilesMatch>
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
