@@ -747,6 +747,9 @@
               {%- elsif cert_name == 'ETL, US & Canada' -%}
                 {%- assign cert_image = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/elt.png?v=1763021315' -%}
                 {%- assign cert_description = 'This product has been certified by ETL, a division of the Intertek Group, to meet applicable electrical product safety standards required for use in the United States and Canada.' -%}
+              {%- elsif cert_name == 'SGS' -%}
+                {%- assign cert_image = 'SGS.webp' | asset_url -%}
+                {%- assign cert_description = 'This product is certified by SGS to applicable U.S. and Canadian safety standards' -%}
               {%- endif -%}
               
               {%- if cert_image != '' -%}

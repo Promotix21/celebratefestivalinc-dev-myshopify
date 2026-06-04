@@ -545,6 +545,9 @@
           {%- elsif cert_name == 'ETL, US & Canada' -%}
             {%- assign cert_image = 'https://cdn.shopify.com/s/files/1/0562/3483/6013/files/elt.png?v=1763021315' -%}
             {%- assign cert_desc = 'Certified by ETL for US & Canada.' -%}
+          {%- elsif cert_name == 'SGS' -%}
+            {%- assign cert_image = 'SGS.webp' | asset_url -%}
+            {%- assign cert_desc = 'This product is certified by SGS to applicable U.S. and Canadian safety standards' -%}
           {%- endif -%}
           {%- if cert_image != '' -%}
           <div class="compact-cert-card">
