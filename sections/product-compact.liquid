@@ -993,15 +993,7 @@
       </div>{%- comment -%} end .pricing-card {%- endcomment -%}
 
       {%- comment -%} ── Shipping Info ── {%- endcomment -%}
-      <div class="compact-shipping-box">
-        {%- comment -%} Freight shipping alert hidden — needs more accurate logic {%- endcomment -%}
-
-        {%- if free_shipping -%}
-          <div class="compact-free-shipping-pill">&#10003; FREE SHIPPING</div>
-        {%- endif -%}
-
-        {%- comment -%} Shipping info list removed — inventory box above handles shipping status {%- endcomment -%}
-      </div>
+      {%- comment -%} Free shipping pill removed (task 90): duplicate of the "Free Shipping" badge in the pricing card badge row above. {%- endcomment -%}
 
       {%- comment -%} ── Vendor Row ── {%- endcomment -%}
       {%- if product.vendor -%}
