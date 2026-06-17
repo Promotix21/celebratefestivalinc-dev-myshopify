@@ -15,7 +15,7 @@
       
       <!-- Left Map -->
       <div class="rp-map-container">
-        {% render 'usa-interactive-map', id: 'home-page-map', active_states: 'CA,TX,NY,IL,FL,GA,NJ,NV,MA,CT', partner_data: partner_data_json %}
+        {% render 'usa-interactive-map', id: 'home-page-map', coming_soon: 'AK,ME,MS,SD,VT', partner_data: partner_data_json %}
         <div class="rp-map-legend">
           <div class="rp-map-legend-item">
             <div class="rp-map-legend-color" style="background-color: #d63f3a;"></div>
@@ -36,7 +36,7 @@
               {% if block.settings.logo != blank %}
                 <img src="{{ block.settings.logo | image_url: width: 120 }}" alt="{{ block.settings.title }}" loading="lazy">
               {% else %}
-                <img src="https://picsum.photos/seed/{{ block.id }}/120/120" alt="{{ block.settings.title }}" loading="lazy">
+                <div class="rp-logo-placeholder">{{ block.settings.title | slice: 0 | upcase }}</div>
               {% endif %}
             </div>
             

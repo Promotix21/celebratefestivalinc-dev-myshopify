@@ -37,12 +37,11 @@
 
         <!-- Right Map -->
         <div class="rp-hero-map" id="rp-map-wrap" data-partner='{{ partner_data_json | replace: "'", "&#39;" }}'>
-          {% render 'usa-interactive-map', id: 'landing-page-map', active_states: 'CA,TX,NY,IL,FL,GA,NJ,NV,MA,CT', partner_data: partner_data_json %}
-          
+          {% render 'usa-interactive-map', id: 'landing-page-map', coming_soon: 'AK,ME,MS,SD,VT', partner_data: partner_data_json %}
+
           <div class="rp-hero-map-legend">
-            <div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:2px;background:#8b1538;"></div> Active Partners</div>
-            <div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:2px;background:#e05a6d;"></div> Hub Regions</div>
-            <div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:2px;background:#d1d5db;border:1px solid #9ca3af;"></div> Coming Soon</div>
+            <div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:2px;background:#d63f3a;"></div> States We Serve</div>
+            <div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:2px;background:#e5e7eb;border:1px solid #cbd5e1;"></div> States Coming Soon</div>
           </div>
         </div>
         
@@ -116,14 +115,16 @@
                 {% if block.settings.image != blank %}
                   <img src="{{ block.settings.image | image_url: width: 400 }}" alt="{{ block.settings.title }}" class="rp-card-img" loading="lazy">
                 {% else %}
-                  <img src="https://picsum.photos/seed/{{ block.id }}img/400/200" alt="{{ block.settings.title }}" class="rp-card-img" loading="lazy">
+                  <div class="rp-card-img rp-img-placeholder" aria-label="{{ block.settings.title }} storefront placeholder">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/></svg>
+                  </div>
                 {% endif %}
                 <div class="rp-card-gradient"></div>
                 <div class="rp-card-logo-box">
                   {% if block.settings.logo != blank %}
                     <img src="{{ block.settings.logo | image_url: width: 80 }}" alt="{{ block.settings.title }} Logo" loading="lazy">
                   {% else %}
-                    <img src="https://picsum.photos/seed/{{ block.id }}logo/80/80" alt="{{ block.settings.title }} Logo" loading="lazy">
+                    <div class="rp-logo-placeholder">{{ block.settings.title | slice: 0 | upcase }}</div>
                   {% endif %}
                 </div>
                 <div class="rp-card-name-overlay">{{ block.settings.title }}</div>

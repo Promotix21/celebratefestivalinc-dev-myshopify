@@ -772,3 +772,35 @@
 .rp-btn-primary:hover {
   box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
 }
+
+/* ── Placeholders (shown until real cover photos / brand logos are uploaded) ── */
+.rp-img-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  color: #94a3b8;
+}
+.rp-img-placeholder svg {
+  width: 3rem;
+  height: 3rem;
+}
+/* Brand-initial chip used for card logo box (page) and partner logo (home) */
+.rp-logo-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  color: #d63f3a;
+  background: #fff;
+  line-height: 1;
+}
+.rp-card-logo-box .rp-logo-placeholder { font-size: 1rem; }
+.rp-partner-logo .rp-logo-placeholder {
+  font-size: 1.4rem;
+  border-radius: 50%;
+  background: #fef2f2;
+}
