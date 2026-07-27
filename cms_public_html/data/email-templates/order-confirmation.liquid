@@ -30,18 +30,20 @@
           <!-- HEADER -->
           <tr>
             <td class="email-header" style="background:#1a365d;padding:28px 32px;text-align:center;">
-              <img src="https://celebratefestivalinc.com/cdn/shop/files/cf-logo-white.png" alt="Celebrate Festival Inc" width="160" style="max-width:160px;height:auto;display:block;margin:0 auto 12px;">
+              {%- if shop.email_logo_url -%}
+              <img src="{{ shop.email_logo_url }}" alt="{{ shop.name }}" width="160" style="max-width:160px;height:auto;display:block;margin:0 auto 12px;">
+              {%- else -%}
+              <div style="font-family:'Montserrat',Arial,sans-serif;font-size:22px;font-weight:800;color:#ffffff;letter-spacing:0.5px;margin:0 auto 8px;">CELEBRATE FESTIVAL INC</div>
+              {%- endif -%}
               <div style="color:#94b8d8;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;">Restaurant Supply Specialists</div>
             </td>
           </tr>
 
           <!-- BODY -->
-          
-      
+
       <tr>
         <td style="background:linear-gradient(135deg,#1a365d 0%,#2d5a87 100%);padding:32px;text-align:center;">
-          <div style="font-size:48px;margin-bottom:12px;">🎉</div>
-          <h1 style="margin:0 0 8px;font-size:26px;font-weight:700;color:#ffffff;">Order Confirmed!</h1>
+          <h1 style="margin:0 0 8px;font-size:26px;font-weight:700;color:#ffffff;">Order Confirmed</h1>
           <p style="margin:0;font-size:15px;color:#bfdbfe;">Thank you — we&apos;ve received your order and it&apos;s being processed.</p>
           <a href="{{ order.customer_url }}" style="display:inline-block;margin-top:20px;padding:13px 28px;background:#ff6b6b;color:#fff;font-size:15px;font-weight:700;text-decoration:none;border-radius:6px;">Track Your Order</a>
         </td>
@@ -68,8 +70,63 @@
           </table>
         </td>
       </tr>
+
+      <!-- DELIVERY & PAYMENT (moved above item lines) -->
+      <tr><td style="padding:24px 32px 8px;"><h3 style="margin:0;font-size:14px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Delivery &amp; Payment</h3></td></tr>
+      <tr>
+        <td style="padding:0 32px 4px;">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td class="col-half" style="width:48%;vertical-align:top;padding-right:16px;">
+                <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;">
+                  <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Shipping Address</div>
+                  <div style="font-size:14px;color:#1e293b;line-height:1.6;">
+                    {{ order.shipping_address.first_name }} {{ order.shipping_address.last_name }}<br>
+                    {{ order.shipping_address.address1 }}<br>
+                    {%- if order.shipping_address.address2 != blank -%}{{ order.shipping_address.address2 }}<br>{%- endif -%}
+                    {{ order.shipping_address.city }}, {{ order.shipping_address.province_code }} {{ order.shipping_address.zip }}<br>
+                    {{ order.shipping_address.country }}
+                  </div>
+                </div>
+              </td>
+              <td class="col-half" style="width:48%;vertical-align:top;">
+                <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;">
+                  <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Payment</div>
+                  <div style="font-size:14px;color:#1e293b;line-height:1.6;">
+                    {%- if order.payment_details.credit_card_company -%}
+                    {{ order.payment_details.credit_card_company }}<br>ending in {{ order.payment_details.credit_card_last_four_digits }}
+                    {%- else -%}
+                    {{ order.financial_status | capitalize }}
+                    {%- endif -%}
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <!-- ORDER SUMMARY -->
       <tr><td style="padding:20px 32px 4px;"><h3 style="margin:0;font-size:14px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Order Summary</h3></td></tr>
-      
+
+      <!-- ORDER STATUS ALERT (split-shipment notice) -->
+      <tr>
+        <td style="padding:12px 32px 0;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e2e8f0;border-radius:6px;background:#ffffff;">
+            <tr>
+              <td style="padding:16px 6px 16px 18px;vertical-align:middle;width:40px;">
+                <table cellpadding="0" cellspacing="0"><tr>
+                  <td style="width:34px;height:34px;border:2px solid #dc2626;border-radius:50%;text-align:center;vertical-align:middle;color:#dc2626;font-size:22px;font-weight:700;line-height:30px;font-family:Arial,Helvetica,sans-serif;">!</td>
+                </tr></table>
+              </td>
+              <td style="padding:16px 18px 16px 8px;vertical-align:middle;font-size:13px;color:#334155;line-height:1.6;">
+                Not all items will be charged and shipped together. Items ship based on availability. Charges will appear as <strong style="color:#1a365d;">&quot;Celebrate Festival Inc&quot;</strong> on your credit card statement.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
       <tr>
         <td style="padding:20px 32px 0;">
           <table width="100%" cellpadding="0" cellspacing="0">
@@ -78,7 +135,7 @@
               <td style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;padding-bottom:8px;border-bottom:2px solid #e2e8f0;text-align:center;width:50px;">Qty</td>
               <td style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;padding-bottom:8px;border-bottom:2px solid #e2e8f0;text-align:right;width:80px;">Price</td>
             </tr>
-            
+
             {%- for line_item in order.line_items -%}
             <tr>
               <td style="padding:12px 0;border-bottom:1px solid #f1f5f9;vertical-align:top;">
@@ -106,7 +163,7 @@
           </table>
         </td>
       </tr>
-      
+
       <tr>
         <td style="padding:0 32px 24px;">
           <table width="100%" cellpadding="0" cellspacing="0">
@@ -147,40 +204,7 @@
           </table>
         </td>
       </tr>
-      <tr><td style="padding:0 32px 8px;"><h3 style="margin:0;font-size:14px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Delivery &amp; Payment</h3></td></tr>
-      
-      <tr>
-        <td style="padding:0 32px 28px;">
-          <table width="100%" cellpadding="0" cellspacing="0">
-            <tr>
-              <td class="col-half" style="width:48%;vertical-align:top;padding-right:16px;">
-                <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;">
-                  <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Shipping Address</div>
-                  <div style="font-size:14px;color:#1e293b;line-height:1.6;">
-                    {{ order.shipping_address.first_name }} {{ order.shipping_address.last_name }}<br>
-                    {{ order.shipping_address.address1 }}<br>
-                    {%- if order.shipping_address.address2 != blank -%}{{ order.shipping_address.address2 }}<br>{%- endif -%}
-                    {{ order.shipping_address.city }}, {{ order.shipping_address.province_code }} {{ order.shipping_address.zip }}<br>
-                    {{ order.shipping_address.country }}
-                  </div>
-                </div>
-              </td>
-              <td class="col-half" style="width:48%;vertical-align:top;">
-                <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;">
-                  <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Payment</div>
-                  <div style="font-size:14px;color:#1e293b;line-height:1.6;">
-                    {%- if order.payment_details.credit_card_company -%}
-                    {{ order.payment_details.credit_card_company }}<br>ending in {{ order.payment_details.credit_card_last_four_digits }}
-                    {%- else -%}
-                    {{ order.financial_status | capitalize }}
-                    {%- endif -%}
-                  </div>
-                </div>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
+
       <tr>
         <td style="padding:0 32px 28px;text-align:center;">
           <a href="{{ order.customer_url }}" style="display:inline-block;padding:13px 32px;background:#1a365d;color:#fff;font-size:14px;font-weight:700;text-decoration:none;border-radius:6px;">View Full Order Details</a>
