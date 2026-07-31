@@ -1622,7 +1622,7 @@
             {% for item in search.results %}
               {% if item.object_type == 'product' %}
                 {% assign product = item %}
-                {% render 'product-card', product: product %}
+                {% render 'product-card', product: product, show_free_shipping: true %}
               {% endif %}
             {% endfor %}
           </div>
@@ -1976,6 +1976,13 @@ window.applySearchMobileFilters = function() {
       "label": "Compact Mode (5 columns)",
       "default": true,
       "info": "Show 5 products per row with smaller cards"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_card_free_shipping",
+      "label": "Show \"Free Shipping\" badge on product cards",
+      "default": false,
+      "info": "Adds a small green Free Shipping chip next to the category label for products with the Free shipping metafield turned on. Off by default to keep cards compact."
     }
   ],
   "presets": [

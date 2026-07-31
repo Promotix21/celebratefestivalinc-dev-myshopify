@@ -70,7 +70,7 @@
 
   # Indian Vendors for special Out of Stock message (Task 76)
   assign is_indian_vendor = false
-  assign indian_vendors = "Celebrate Festival Inc,Hawkins,Shaan,Kwitex,Rotoquip,Prestige,Preethi,Milton" | split: ','
+  assign indian_vendors = "Celebrate Festival Inc,Hawkins,Shaan,Kwitex,Rotoquip,Prestige,Preethi,Milton,Servewell" | split: ','
   assign vendor_check = product.vendor | strip
   for vendor in indian_vendors
     if vendor_check == vendor
@@ -1214,6 +1214,12 @@
                 <span class="qty-unit">{{ section.settings.price_unit | default: "Each" }}</span>
               </div>
               {%- endunless -%}
+              {%- if product.available == false and is_indian_vendor -%}
+              <button type="button" class="btn btn-add-cart btn-contact-details" id="add-to-cart-btn-{{ section.id }}" onclick="document.getElementById('cf-contact-popup').style.display='flex'">
+                <i class="fas fa-phone-alt"></i>
+                Contact us for more details
+              </button>
+              {%- else -%}
               <button type="submit" class="btn btn-add-cart" id="add-to-cart-btn-{{ section.id }}" {% if current_variant.price == 0 or product.available == false %}disabled{% endif %}>
                 <i class="fas fa-shopping-cart"></i>
                 {%- if current_variant.price == 0 -%}
@@ -1221,13 +1227,10 @@
                 {%- elsif product.available -%}
                   {{ section.settings.add_to_cart_text | default: "Add to Cart" }}
                 {%- else -%}
-                  {%- if is_indian_vendor -%}
-                    Notify me when back in stock
-                  {%- else -%}
-                    Sold Out
-                  {%- endif -%}
+                  Sold Out
                 {%- endif -%}
               </button>
+              {%- endif -%}
               <button
                 type="button"
                 class="btn btn-add-list"
@@ -1274,7 +1277,8 @@
         {%- endif -%}
 
 
-        <!-- Instant Access Shipping -->
+        <!-- Instant Access Shipping — hidden for OOS Indian-vendor products -->
+        {%- unless is_indian_vendor and product.available == false -%}
         {%- if section.settings.show_shipping_info or shipment_text != blank -%}
         <div class="instant-access-box">
           <div class="instant-access-title">🚀 {{ section.settings.shipping_info_title | default: "Shipping Information" }}</div>
@@ -1302,6 +1306,7 @@
           {%- endif -%}
         </div>
         {%- endif -%}
+        {%- endunless -%}
 
         <!-- Brand Box with Logo (Clean - no background) -->
         {%- if product.vendor -%}
@@ -1975,12 +1980,23 @@
         addToCartBtn.disabled = false;
         addToCartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> {{ section.settings.add_to_cart_text | default: "Add to Cart" }}';
       } else {
-        addToCartBtn.disabled = true;
-        let soldOutText = 'Sold Out';
         if (isIndianVendor) {
-          soldOutText = 'Notify me when back in stock';
+          addToCartBtn.disabled = false;
+          addToCartBtn.type = 'button';
+          addToCartBtn.classList.add('btn-contact-details');
+          addToCartBtn.innerHTML = '<i class="fas fa-phone-alt"></i> Contact us for more details';
+          addToCartBtn.onclick = function() { document.getElementById('cf-contact-popup').style.display = 'flex'; };
+          const shipBox = document.querySelector('.instant-access-box');
+          if (shipBox) shipBox.style.display = 'none';
+        } else {
+          addToCartBtn.disabled = true;
+          addToCartBtn.type = 'submit';
+          addToCartBtn.classList.remove('btn-contact-details');
+          addToCartBtn.onclick = null;
+          addToCartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Sold Out';
+          const shipBox = document.querySelector('.instant-access-box');
+          if (shipBox) shipBox.style.display = '';
         }
-        addToCartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> ' + soldOutText;
       }
     }
 
@@ -2924,6 +2940,29 @@
   });
 })();
 </script>
+
+{%- if is_indian_vendor -%}
+<div id="cf-contact-popup" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,0.55);align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;padding:32px 28px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.25);position:relative;font-family:'Inter',Arial,sans-serif;">
+    <button onclick="document.getElementById('cf-contact-popup').style.display='none'" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:22px;color:#94a3b8;cursor:pointer;line-height:1;">&times;</button>
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="width:52px;height:52px;background:#eff6ff;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+        <i class="fas fa-info-circle" style="font-size:22px;color:#2d5a87;"></i>
+      </div>
+      <h3 style="margin:0 0 6px;font-size:18px;font-weight:700;color:#1a365d;">Contact Us for More Details</h3>
+      <p style="margin:0;font-size:14px;color:#64748b;line-height:1.5;">This item is currently unavailable online. Our team can help with availability, lead times, and pricing.</p>
+    </div>
+    <a href="tel:+14086739999" style="display:flex;align-items:center;gap:12px;background:#1a365d;color:#fff;text-decoration:none;padding:14px 18px;border-radius:10px;margin-bottom:12px;font-weight:600;font-size:15px;">
+      <i class="fas fa-phone" style="font-size:16px;"></i>
+      <span>Call (408) 673-9999</span>
+    </a>
+    <a href="/pages/contact-us" style="display:flex;align-items:center;gap:12px;background:#f1f5f9;color:#1a365d;text-decoration:none;padding:14px 18px;border-radius:10px;font-weight:600;font-size:15px;border:1px solid #e2e8f0;">
+      <i class="fas fa-envelope" style="font-size:16px;"></i>
+      <span>Send Us a Message</span>
+    </a>
+  </div>
+</div>
+{%- endif -%}
 
 {% schema %}
 {

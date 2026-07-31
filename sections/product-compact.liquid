@@ -70,7 +70,7 @@
 
   # Indian Vendors for special Out of Stock message (Task 76)
   assign is_indian_vendor = false
-  assign indian_vendors = "Celebrate Festival Inc,Hawkins,Shaan,Kwitex,Rotoquip,Prestige,Preethi,Milton" | split: ','
+  assign indian_vendors = "Celebrate Festival Inc,Hawkins,Shaan,Kwitex,Rotoquip,Prestige,Preethi,Milton,Servewell" | split: ','
   assign vendor_check = product.vendor | strip
   for vendor in indian_vendors
     if vendor_check == vendor
@@ -207,6 +207,7 @@
   assign specs_table = product.metafields.custom.specs_table_pic_pdf
   assign material = product.metafields.custom.material
   assign free_shipping = product.metafields.custom.free_shipping
+  assign shipping_note = product.metafields.custom.shipping_note
   assign feature_sections = product.metafields.custom.feature_sections
   assign works_with_products = product.metafields.custom.works_with_products
   assign product_line_products = product.metafields.custom.product_line
@@ -794,6 +795,8 @@
         <div class="compact-badge-row">
           {%- if free_shipping -%}
             <span class="compact-badge compact-badge--shipping">Free Shipping</span>
+          {%- elsif shipping_note != blank -%}
+            <span class="compact-badge compact-badge--shipping-note">{{ shipping_note }}</span>
           {%- endif -%}
           {%- comment -%} Member badge removed — redundant with "Member Price" label in price box {%- endcomment -%}
           {%- if has_compare_price -%}
@@ -943,7 +946,7 @@
             </a>
           </div>
         {%- else -%}
-        <form action="/cart/add" method="post" enctype="multipart/form-data" id="compact-product-form-{{ section.id }}" class="compact-cart-row">
+        <form action="/cart/add" method="post" enctype="multipart/form-data" id="compact-product-form-{{ section.id }}" class="compact-cart-row"{% if current_variant.price == 0 %} style="display:none;"{% endif %}>
           <input type="hidden" name="id" id="compact-variant-id-{{ section.id }}" value="{{ current_variant.id }}">
           {%- unless current_variant.price == 0 -%}
           <div class="compact-qty-wrap">
@@ -951,6 +954,11 @@
             <span class="compact-qty-unit">{{ section.settings.price_unit | default: "Each" }}</span>
           </div>
           {%- endunless -%}
+          {%- if product.available == false and is_indian_vendor -%}
+          <button type="button" class="compact-atc-btn compact-atc-btn--contact" id="compact-atc-btn-{{ section.id }}" onclick="document.getElementById('cf-contact-popup').style.display='flex'">
+            <i class="fas fa-phone-alt"></i> Contact us for more details
+          </button>
+          {%- else -%}
           <button type="submit" class="compact-atc-btn" id="compact-atc-btn-{{ section.id }}" {% if current_variant.price == 0 or product.available == false %}disabled{% endif %}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
             {%- if current_variant.price == 0 -%}
@@ -958,14 +966,24 @@
             {%- elsif product.available -%}
               {{ section.settings.add_to_cart_text | default: "Add to Cart" }}
             {%- else -%}
-              {%- if is_indian_vendor -%}
-                Notify me when back in stock
-              {%- else -%}
-                Sold Out
-              {%- endif -%}
+              Sold Out
             {%- endif -%}
           </button>
+          {%- endif -%}
         </form>
+
+        {%- comment -%} Zero-price CTA (task #104): two live buttons — Contact Us (message modal) + Call Us {%- endcomment -%}
+        <div class="compact-zero-cta" id="compact-zero-cta-{{ section.id }}"{% unless current_variant.price == 0 %} style="display:none;"{% endunless %}>
+          <button type="button" class="compact-zero-btn compact-zero-btn--primary" onclick="document.getElementById('cf-compact-contact-modal').classList.add('active')">
+            <svg width="14" height="14" viewBox="0 0 512 512" fill="currentColor"><path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48H48zM0 176V384c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V176L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z"/></svg>
+            Contact Us
+          </button>
+          <a href="tel:+14086739999" class="compact-zero-btn compact-zero-btn--secondary">
+            <svg width="14" height="14" viewBox="0 0 512 512" fill="currentColor"><path d="M164.9 24.6c-7.7-18.6-28-28.5-47.4-23.2l-88 24C12.1 30.2 0 46 0 64C0 311.4 200.6 512 448 512c18 0 33.8-12.1 38.6-29.5l24-88c5.3-19.4-4.6-39.7-23.2-47.4l-96-40c-16.3-6.8-35.2-2.1-46.3 11.6L304.7 368C234.3 334.7 177.3 277.7 144 207.3L193.3 167c13.7-11.2 18.4-30 11.6-46.3l-40-96z"/></svg>
+            Call Us
+          </a>
+        </div>
+
         <button
           type="button"
           class="compact-wishlist-btn"
@@ -1312,6 +1330,147 @@
 @media (max-width:600px) { .cf-aq-dialog{width:95%;max-width:none;} .cf-aq-row{grid-template-columns:1fr;} .cf-aq-header{padding:18px 20px;} .cf-aq-body{padding:16px 20px 20px;} }
 </style>
 {%- endif -%}
+
+{%- comment -%}
+  ════════════════════════════════════════════
+  PART D-3 — Zero-Price Contact Us Modal (task #104)
+  Always rendered (independent of enable_qa) so $0 products can be contacted.
+  ════════════════════════════════════════════
+{%- endcomment -%}
+<div id="cf-compact-contact-modal" class="cf-aq-modal">
+  <div class="cf-aq-overlay" onclick="document.getElementById('cf-compact-contact-modal').classList.remove('active')"></div>
+  <div class="cf-aq-dialog">
+    <button class="cf-aq-close" onclick="document.getElementById('cf-compact-contact-modal').classList.remove('active')" aria-label="Close">&times;</button>
+    <div class="cf-aq-header">
+      <h3>Contact Us</h3>
+      <p>Request a price for: <strong>{{ product.title | escape }}</strong></p>
+    </div>
+    <div class="cf-aq-body" id="cf-compact-contact-form-body">
+      {% form 'contact', class: 'cf-aq-form', id: 'cf-compact-contact-form' %}
+        {% if form.posted_successfully? %}
+          <script>window.__cfCompactContactSuccess = true;</script>
+        {% endif %}
+        <input type="hidden" name="contact[inquiry_type]" value="Price / Availability Request">
+        <input type="hidden" name="contact[product_title]" value="{{ product.title | escape }}">
+        <input type="hidden" name="contact[product_url]" value="{{ shop.url }}{{ product.url }}">
+        <input type="hidden" name="contact[product_sku]" value="{{ product.variants.first.sku | escape }}">
+        <input type="hidden" name="contact[product_vendor]" value="{{ product.vendor | escape }}">
+
+        <div class="cf-aq-product-tag">
+          {% if product.featured_image %}
+            <img src="{{ product.featured_image | image_url: width: 100 }}" alt="{{ product.title | escape }}">
+          {% endif %}
+          <div>
+            <span class="cf-aq-product-name">{{ product.title }}</span>
+            {% if product.variants.first.sku != blank %}
+              <span class="cf-aq-product-sku">SKU: {{ product.variants.first.sku }}</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="cf-aq-row">
+          <div class="cf-aq-field">
+            <label>Name <span class="cf-aq-req">*</span></label>
+            <input type="text" name="contact[name]" required {% if customer %}value="{{ customer.name | escape }}"{% endif %} placeholder="Your name">
+          </div>
+          <div class="cf-aq-field">
+            <label>Email <span class="cf-aq-req">*</span></label>
+            <input type="email" name="contact[email]" required {% if customer %}value="{{ customer.email | escape }}"{% endif %} placeholder="your@email.com">
+          </div>
+        </div>
+
+        <div class="cf-aq-field">
+          <label>Phone</label>
+          <input type="tel" name="contact[phone]" {% if customer %}value="{{ customer.phone | default: customer.default_address.phone | escape }}"{% endif %} placeholder="(408) 000-0000">
+        </div>
+
+        <div class="cf-aq-field">
+          <label>How can we help?</label>
+          <select name="contact[question_category]">
+            <option value="pricing" selected>Pricing &amp; Availability</option>
+            <option value="specs">Specifications &amp; Features</option>
+            <option value="compatibility">Compatibility &amp; Sizing</option>
+            <option value="shipping">Shipping &amp; Delivery</option>
+            <option value="warranty">Warranty &amp; Returns</option>
+            <option value="installation">Installation &amp; Setup</option>
+            <option value="general">General Question</option>
+          </select>
+        </div>
+
+        <div class="cf-aq-field">
+          <label>Your Message <span class="cf-aq-req">*</span></label>
+          <textarea name="contact[body]" required placeholder="Let us know what you'd like to order or ask..." rows="4">{% if customer %}I'm interested in this product. Please send me pricing and availability.{% endif %}</textarea>
+        </div>
+
+        <button type="submit" class="cf-aq-submit">Send Message</button>
+        <p style="text-align:center;font-size:12px;color:#718096;margin:10px 0 0;">Prefer to call? <a href="tel:+14086739999" style="color:#2d5a87;font-weight:600;">(408) 673-9999</a></p>
+      {% endform %}
+    </div>
+  </div>
+</div>
+
+<style>
+/* Zero-price CTA buttons (task #104) */
+.compact-zero-cta { display:grid; grid-template-columns:1fr 1fr; gap:8px; width:100%; }
+.compact-zero-btn { display:flex; align-items:center; justify-content:center; gap:6px; padding:9px 12px; border-radius:6px; font-size:13px; font-weight:700; cursor:pointer; text-decoration:none; text-align:center; transition:transform .15s,box-shadow .2s; box-sizing:border-box; }
+.compact-zero-btn svg { flex:0 0 auto; }
+.compact-zero-btn--primary { background:linear-gradient(135deg,#1a365d 0%,#2d5a87 100%); color:#fff; border:2px solid transparent; }
+.compact-zero-btn--primary:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(26,54,93,.28); }
+.compact-zero-btn--secondary { background:#fff; color:#1a365d; border:2px solid #1a365d; }
+.compact-zero-btn--secondary:hover { transform:translateY(-1px); background:#f7fafc; }
+@media (max-width:480px) { .compact-zero-cta { grid-template-columns:1fr; } }
+
+/* Fallback modal styles (in case Ask-a-Question modal is disabled and its CSS isn't emitted) */
+.cf-aq-modal { display:none; position:fixed; inset:0; z-index:9999; align-items:center; justify-content:center; }
+.cf-aq-modal.active { display:flex; }
+.cf-aq-overlay { position:fixed; inset:0; background:rgba(26,54,93,.6); backdrop-filter:blur(3px); }
+.cf-aq-dialog { position:relative; background:#fff; border-radius:12px; width:90%; max-width:520px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.2); z-index:1; }
+.cf-aq-close { position:absolute; top:12px; right:14px; background:none; border:none; font-size:24px; color:#fff; cursor:pointer; width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:50%; z-index:2; }
+.cf-aq-header { background:linear-gradient(135deg,#1a365d,#2d5a87); padding:16px 20px; border-radius:12px 12px 0 0; color:#fff; }
+.cf-aq-header h3 { font-family:'Montserrat',sans-serif; font-size:18px; font-weight:700; margin:0 0 4px 0; color:#fff !important; }
+.cf-aq-header p { font-size:13px; opacity:.9; margin:0; line-height:1.4; }
+.cf-aq-header p strong { color:#fff; }
+.cf-aq-body { padding:16px 20px 20px; }
+.cf-aq-product-tag { display:flex; align-items:center; gap:12px; background:#f7fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px 14px; margin-bottom:18px; }
+.cf-aq-product-tag img { width:48px; height:48px; object-fit:contain; border-radius:6px; background:#fff; border:1px solid #e2e8f0; }
+.cf-aq-product-name { display:block; font-size:13px; font-weight:600; color:#1a365d; line-height:1.3; }
+.cf-aq-product-sku { display:block; font-size:11px; color:#718096; margin-top:2px; }
+.cf-aq-form { display:flex; flex-direction:column; gap:12px; }
+.cf-aq-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.cf-aq-field { display:flex; flex-direction:column; }
+.cf-aq-field label { font-size:12px; font-weight:600; color:#2d3748; margin-bottom:5px; }
+.cf-aq-req { color:#ff6b6b; }
+.cf-aq-field input,.cf-aq-field textarea,.cf-aq-field select { padding:8px 12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:13px; font-family:inherit; color:#2d3748; }
+.cf-aq-field input:focus,.cf-aq-field textarea:focus,.cf-aq-field select:focus { outline:none; border-color:#ff6b6b; box-shadow:0 0 0 3px rgba(255,107,107,.1); }
+.cf-aq-field textarea { resize:vertical; min-height:90px; }
+.cf-aq-submit { background:linear-gradient(135deg,#ff6b6b,#e85a4f); color:#fff; border:none; padding:12px 24px; font-size:14px; font-weight:600; border-radius:8px; cursor:pointer; margin-top:2px; }
+@media (max-width:600px) { .cf-aq-dialog{width:95%;max-width:none;} .cf-aq-row{grid-template-columns:1fr;} }
+</style>
+
+<script>
+(function() {
+  if (window.__cfCompactContactSuccess) {
+    document.addEventListener('DOMContentLoaded', function() {
+      var modal = document.getElementById('cf-compact-contact-modal');
+      var body = document.getElementById('cf-compact-contact-form-body');
+      if (modal && body) {
+        body.innerHTML = '<div style="text-align:center;padding:30px 20px;">' +
+          '<div style="width:56px;height:56px;background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;color:#fff;">&#10003;</div>' +
+          '<h4 style="font-family:Montserrat,sans-serif;font-size:16px;color:#1a365d;margin:0 0 8px 0;">Message Sent!</h4>' +
+          '<p style="font-size:13px;color:#718096;margin:0;line-height:1.5;">Thank you! Our team will get back to you with pricing within 24 hours.</p>' +
+          '</div>';
+        modal.classList.add('active');
+      }
+    });
+  }
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      var modal = document.getElementById('cf-compact-contact-modal');
+      if (modal) modal.classList.remove('active');
+    }
+  });
+})();
+</script>
 
 {%- comment -%}
   ════════════════════════════════════════════
@@ -1675,6 +1834,12 @@
     // Toggle zero-price notice
     var zeroPriceNotice = document.getElementById('zero-price-notice-' + sectionId);
     if (zeroPriceNotice) zeroPriceNotice.style.display = isZeroPrice ? '' : 'none';
+
+    // Toggle cart form vs. zero-price CTA (task #104)
+    var cartForm = document.getElementById('compact-product-form-' + sectionId);
+    if (cartForm) cartForm.style.display = isZeroPrice ? 'none' : '';
+    var zeroCta = document.getElementById('compact-zero-cta-' + sectionId);
+    if (zeroCta) zeroCta.style.display = isZeroPrice ? '' : 'none';
 
     // Toggle qty wrapper
     var qtyWrap = document.querySelector('.compact-qty-wrap');
@@ -2349,6 +2514,29 @@ if ('requestIdleCallback' in window) requestIdleCallback(d); else setTimeout(d, 
   ]
 }
 </script>
+
+{%- if is_indian_vendor -%}
+<div id="cf-contact-popup" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,0.55);align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;padding:32px 28px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.25);position:relative;font-family:'Inter',Arial,sans-serif;">
+    <button onclick="document.getElementById('cf-contact-popup').style.display='none'" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:22px;color:#94a3b8;cursor:pointer;line-height:1;">&times;</button>
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="width:52px;height:52px;background:#eff6ff;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+        <i class="fas fa-info-circle" style="font-size:22px;color:#2d5a87;"></i>
+      </div>
+      <h3 style="margin:0 0 6px;font-size:18px;font-weight:700;color:#1a365d;">Contact Us for More Details</h3>
+      <p style="margin:0;font-size:14px;color:#64748b;line-height:1.5;">This item is currently unavailable online. Our team can help with availability, lead times, and pricing.</p>
+    </div>
+    <a href="tel:+14086739999" style="display:flex;align-items:center;gap:12px;background:#1a365d;color:#fff;text-decoration:none;padding:14px 18px;border-radius:10px;margin-bottom:12px;font-weight:600;font-size:15px;">
+      <i class="fas fa-phone" style="font-size:16px;"></i>
+      <span>Call (408) 673-9999</span>
+    </a>
+    <a href="/pages/contact-us" style="display:flex;align-items:center;gap:12px;background:#f1f5f9;color:#1a365d;text-decoration:none;padding:14px 18px;border-radius:10px;font-weight:600;font-size:15px;border:1px solid #e2e8f0;">
+      <i class="fas fa-envelope" style="font-size:16px;"></i>
+      <span>Send Us a Message</span>
+    </a>
+  </div>
+</div>
+{%- endif -%}
 
 {% schema %}
 {

@@ -458,7 +458,7 @@
 
           # Indian Vendors for special Out of Stock message (Task 76)
           assign is_indian_vendor = false
-          assign indian_vendors = "Celebrate Festival Inc,Hawkins,Shaan,Kwitex,Rotoquip,Prestige,Preethi,Milton" | split: ','
+          assign indian_vendors = "Celebrate Festival Inc,Hawkins,Shaan,Kwitex,Rotoquip,Prestige,Preethi,Milton,Servewell" | split: ','
           assign vendor_check = product.vendor | strip
           for vendor in indian_vendors
             if vendor_check == vendor
@@ -522,9 +522,14 @@
                   <a href="{{ product.url }}" class="spc-select-opts">Select Options</a>
                 {%- endif -%}
               {%- else -%}
-                <button class="spc-atc" disabled style="background:#94a3b8;cursor:not-allowed;">
-                  {%- if is_indian_vendor -%}Notify me when back in stock{%- else -%}Sold Out{%- endif -%}
+                {%- if is_indian_vendor -%}
+                <button class="spc-atc spc-atc--contact"
+                  onclick="(function(el){var m=document.getElementById('cf-card-contact-popup');if(m){m.querySelector('#cf-popup-product-name').textContent='{{ product.title | escape }}';m.style.display='flex';}})(this)">
+                  <i class="fas fa-phone-alt"></i> Contact us for more details
                 </button>
+                {%- else -%}
+                <button class="spc-atc" disabled style="background:#94a3b8;cursor:not-allowed;">Sold Out</button>
+                {%- endif -%}
               {%- endif -%}
             </div>
           </div>
@@ -553,7 +558,7 @@
 
           # Indian Vendors for special Out of Stock message (Task 76)
           assign is_indian_vendor = false
-          assign indian_vendors = "Celebrate Festival Inc,Hawkins,Shaan,Kwitex,Rotoquip,Prestige,Preethi,Milton" | split: ','
+          assign indian_vendors = "Celebrate Festival Inc,Hawkins,Shaan,Kwitex,Rotoquip,Prestige,Preethi,Milton,Servewell" | split: ','
           assign vendor_check = product.vendor | strip
           for vendor in indian_vendors
             if vendor_check == vendor
@@ -611,9 +616,14 @@
                   <a href="{{ product.url }}" class="spc-select-opts" tabindex="-1">Select Options</a>
                 {%- endif -%}
               {%- else -%}
-                <button class="spc-atc" disabled style="background:#94a3b8;cursor:not-allowed;" tabindex="-1">
-                  {%- if is_indian_vendor -%}Notify me when back in stock{%- else -%}Sold Out{%- endif -%}
+                {%- if is_indian_vendor -%}
+                <button class="spc-atc spc-atc--contact" tabindex="-1"
+                  onclick="(function(el){var m=document.getElementById('cf-card-contact-popup');if(m){m.querySelector('#cf-popup-product-name').textContent='{{ product.title | escape }}';m.style.display='flex';}})(this)">
+                  <i class="fas fa-phone-alt"></i> Contact us for more details
                 </button>
+                {%- else -%}
+                <button class="spc-atc" disabled style="background:#94a3b8;cursor:not-allowed;" tabindex="-1">Sold Out</button>
+                {%- endif -%}
               {%- endif -%}
             </div>
           </div>
@@ -691,6 +701,20 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
+
+<div id="cf-card-contact-popup" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,0.55);align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:#fff;border-radius:14px;padding:32px 28px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.25);position:relative;font-family:'Inter',Arial,sans-serif;">
+    <button onclick="document.getElementById('cf-card-contact-popup').style.display='none'" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:22px;color:#94a3b8;cursor:pointer;line-height:1;">&times;</button>
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="width:52px;height:52px;background:#eff6ff;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;"><i class="fas fa-info-circle" style="font-size:22px;color:#2d5a87;"></i></div>
+      <h3 style="margin:0 0 6px;font-size:18px;font-weight:700;color:#1a365d;">Contact Us for More Details</h3>
+      <p id="cf-popup-product-name" style="margin:0 0 4px;font-size:13px;font-weight:600;color:#2d5a87;"></p>
+      <p style="margin:0;font-size:14px;color:#64748b;line-height:1.5;">This item is currently unavailable. Our team can help with availability, lead times, and pricing.</p>
+    </div>
+    <a href="tel:+14086739999" style="display:flex;align-items:center;gap:12px;background:#1a365d;color:#fff;text-decoration:none;padding:14px 18px;border-radius:10px;margin-bottom:12px;font-weight:600;font-size:15px;"><i class="fas fa-phone" style="font-size:16px;"></i><span>Call (408) 673-9999</span></a>
+    <a href="/pages/contact-us" style="display:flex;align-items:center;gap:12px;background:#f1f5f9;color:#1a365d;text-decoration:none;padding:14px 18px;border-radius:10px;font-weight:600;font-size:15px;border:1px solid #e2e8f0;"><i class="fas fa-envelope" style="font-size:16px;"></i><span>Send Us a Message</span></a>
+  </div>
+</div>
 
 {% schema %}
 {

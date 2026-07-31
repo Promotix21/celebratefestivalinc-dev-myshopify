@@ -2331,7 +2331,7 @@
             {%- for product in sub_coll.products limit: 8 -%}
               {%- if products_shown < items_per_page -%}
                 {%- assign products_shown = products_shown | plus: 1 -%}
-                {% render 'product-card', product: product, collection_ref: sub_coll %}
+                {% render 'product-card', product: product, collection_ref: sub_coll, show_free_shipping: true %}
               {%- endif -%}
             {%- endfor -%}
           {%- endif -%}
@@ -2349,7 +2349,7 @@
         {%- if collection.products.size > 0 -%}
           {%- for product in collection.products -%}
             {%- if product.price == 0 -%}{%- continue -%}{%- endif -%}
-            {% render 'product-card', product: product, collection_ref: collection %}
+            {% render 'product-card', product: product, collection_ref: collection, show_free_shipping: true %}
           {%- endfor -%}
         {%- else -%}
           <div class="l3-collection-empty">
@@ -3360,4 +3360,4 @@
     }
   ]
 }
-{% endschema %}
+{% endschema %}

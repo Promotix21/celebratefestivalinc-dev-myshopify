@@ -533,7 +533,8 @@ window.cfBrandLogos = {
   }
 
   var CACHE_KEY = 'cf_brand_vendors';
-  var CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+  var CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 1 week
+  var HIDDEN_VENDORS = {{ section.settings.hidden_vendors | default: '' | split: '\n' | map: 'strip' | reject: 'blank' | json }};
 
   function getCached() {
     try {
@@ -551,7 +552,7 @@ window.cfBrandLogos = {
 
   async function fetchAllVendors() {
     var cached = getCached();
-    if (cached) return cached;
+    if (cached) return HIDDEN_VENDORS.length ? cached.filter(function(v) { return !HIDDEN_VENDORS.some(function(h) { return h.toLowerCase() === v.toLowerCase(); }); }) : cached;
 
     const vendors = new Set();
     let page = 1;
@@ -564,7 +565,9 @@ window.cfBrandLogos = {
       if (products.length < 250) break;
       page++;
     }
-    var sorted = [...vendors].sort(function(a, b) { return a.localeCompare(b); });
+    var sorted = [...vendors]
+      .filter(function(v) { return !HIDDEN_VENDORS.some(function(h) { return h.toLowerCase() === v.toLowerCase(); }); })
+      .sort(function(a, b) { return a.localeCompare(b); });
     setCache(sorted);
     return sorted;
   }
@@ -637,6 +640,12 @@ window.cfBrandLogos = {
       "id": "page_subtitle",
       "label": "Page Subtitle",
       "default": "Browse our extensive collection of trusted brands in commercial restaurant equipment and supplies."
+    },
+    {
+      "type": "textarea",
+      "id": "hidden_vendors",
+      "label": "Hidden Vendors (one per line)",
+      "info": "Vendor names listed here will NOT appear on the All Brands page. Case-insensitive. Example: Webstaurant"
     }
   ],
   "presets": [

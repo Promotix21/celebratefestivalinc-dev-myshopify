@@ -2180,7 +2180,7 @@
       {% if collection.products_count > 0 %}
         <div class="cf-plp__grid" id="product-grid">
           {% for product in collection.products %}
-            {% render 'product-card', product: product, collection_ref: collection %}
+            {% render 'product-card', product: product, collection_ref: collection, show_free_shipping: true %}
           {% endfor %}
         </div>
 
@@ -2629,6 +2629,13 @@ window.applyMobileFilters = function() {
       "label": "Use Load More (instead of pagination)",
       "default": true,
       "info": "Replace pagination with a Load More button that appends products via AJAX."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_card_free_shipping",
+      "label": "Show \"Free Shipping\" badge on product cards",
+      "default": false,
+      "info": "Adds a small green Free Shipping chip next to the category label for products with the Free shipping metafield turned on. Off by default to keep cards compact."
     }
   ],
   "presets": [
