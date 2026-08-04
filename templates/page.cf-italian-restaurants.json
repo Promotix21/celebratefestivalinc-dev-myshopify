@@ -1,0 +1,323 @@
+{
+  "sections": {
+    "main": {
+      "type": "cf-industry-hub",
+      "blocks": {
+        "nav_ranges": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Commercial Ranges",
+            "anchor": "commercial-ranges",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "nav_cookware": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Cookware",
+            "anchor": "cookware",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "nav_wine": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Wine & Beverage",
+            "anchor": "wine-beverage",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "nav_steam": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Steam Tables",
+            "anchor": "steam-tables",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "nav_refrigeration": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Refrigeration",
+            "anchor": "refrigeration",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "nav_more": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "More Equipment",
+            "anchor": "more-equipment",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "equip_ranges": {
+          "type": "equip_section",
+          "settings": {
+            "image_url": "",
+            "section_id": "commercial-ranges",
+            "is_reverse": false,
+            "title": "Commercial Ranges",
+            "description": "Heavy-duty gas and electric ranges engineered for the long, intense service hours of an Italian kitchen.",
+            "bullet_1": "6-Burner & 8-Burner Gas Ranges",
+            "bullet_2": "Combination Range/Oven Units",
+            "bullet_3": "Countertop Induction Ranges",
+            "cta_text": "Shop Commercial Ranges",
+            "cta_url": "/collections/new-theme-ranges",
+            "popular_products_label": "Popular Products",
+            "featured_collection": "new-theme-ranges",
+            "view_all_url": "/collections/new-theme-ranges"
+          }
+        },
+        "equip_cookware": {
+          "type": "equip_section",
+          "settings": {
+            "image_url": "",
+            "section_id": "cookware",
+            "is_reverse": true,
+            "title": "Pasta & Sauce Cookware",
+            "description": "Stock pots, saute pans, and sauce pans sized for every pasta dish and sauce on your menu.",
+            "bullet_1": "Commercial Stock Pots",
+            "bullet_2": "Saute Pans & Skillets",
+            "bullet_3": "Sauce Pans & Rondeau Pots",
+            "cta_text": "Shop Cookware",
+            "cta_url": "/collections/new-theme-stock-pots",
+            "popular_products_label": "Popular Products",
+            "featured_collection": "new-theme-stock-pots",
+            "view_all_url": "/collections/new-theme-stock-pots"
+          }
+        },
+        "equip_wine": {
+          "type": "equip_section",
+          "settings": {
+            "image_url": "",
+            "section_id": "wine-beverage",
+            "is_reverse": false,
+            "title": "Wine & Beverage Service",
+            "description": "Keep your wine cellar and bar program running smoothly with reliable beverage refrigeration.",
+            "bullet_1": "Wine Coolers & Chillers",
+            "bullet_2": "Back Bar Refrigerators",
+            "bullet_3": "Glass Frosters",
+            "cta_text": "Shop Wine & Beverage",
+            "cta_url": "/collections/new-theme-wine-coolers",
+            "popular_products_label": "Popular Products",
+            "featured_collection": "new-theme-wine-coolers",
+            "view_all_url": "/collections/new-theme-wine-coolers"
+          }
+        },
+        "st_trattoria": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Trattoria",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "st_ristorante": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Ristorante",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "st_osteria": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Osteria",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "st_italian_cafe": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Italian Café",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "st_catering": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Italian Catering",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "st_pizzarestaurant": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Pizza Restaurant",
+            "url": "/pages/cf-pizza-restaurants"
+          },
+          "disabled": true
+        },
+        "guide_ranges": {
+          "type": "guide",
+          "settings": {
+            "image_url": "",
+            "title": "Choosing the Right Commercial Range for an Italian Kitchen",
+            "url": "/blogs/resources",
+            "meta": "Guide"
+          }
+        },
+        "guide_cookware": {
+          "type": "guide",
+          "settings": {
+            "image_url": "",
+            "title": "Stock Pots & Saute Pans: What Every Italian Kitchen Needs",
+            "url": "/blogs/resources",
+            "meta": "Guide"
+          }
+        },
+        "guide_wine_ref": {
+          "type": "guide",
+          "settings": {
+            "image_url": "",
+            "title": "Wine Refrigeration Guide for Restaurants: Capacity, Temperature & Brands",
+            "url": "/blogs/resources",
+            "meta": "Guide"
+          }
+        },
+        "brand_robotcoupe": {
+          "type": "brand",
+          "settings": {
+            "brand_image_url": "",
+            "name": "Robot Coupe",
+            "url": "/pages/robot-coupe",
+            "color": "#8a8a8a",
+            "italic": false
+          }
+        },
+        "brand_vollrath": {
+          "type": "brand",
+          "settings": {
+            "brand_image_url": "",
+            "name": "Vollrath",
+            "url": "/collections/restaurant-equipment",
+            "color": "#8a8a8a",
+            "italic": false
+          }
+        },
+        "brand_winco": {
+          "type": "brand",
+          "settings": {
+            "brand_image_url": "",
+            "name": "Winco",
+            "url": "/collections/restaurant-equipment",
+            "color": "#8a8a8a",
+            "italic": false
+          }
+        },
+        "brand_americanmetal": {
+          "type": "brand",
+          "settings": {
+            "brand_image_url": "",
+            "name": "American Metalcraft",
+            "url": "/collections/restaurant-equipment",
+            "color": "#8a8a8a",
+            "italic": false
+          }
+        },
+        "brand_vulcan": {
+          "type": "brand",
+          "settings": {
+            "brand_image_url": "",
+            "name": "Vulcan",
+            "url": "/collections/restaurant-equipment",
+            "color": "#8a8a8a",
+            "italic": false
+          }
+        }
+      },
+      "block_order": [
+        "nav_ranges",
+        "nav_cookware",
+        "nav_wine",
+        "nav_steam",
+        "nav_refrigeration",
+        "nav_more",
+        "equip_ranges",
+        "equip_cookware",
+        "equip_wine",
+        "st_trattoria",
+        "st_ristorante",
+        "st_osteria",
+        "st_italian_cafe",
+        "st_catering",
+        "st_pizzarestaurant",
+        "guide_ranges",
+        "guide_cookware",
+        "guide_wine_ref",
+        "brand_robotcoupe",
+        "brand_vollrath",
+        "brand_winco",
+        "brand_americanmetal",
+        "brand_vulcan"
+      ],
+      "settings": {
+        "breadcrumb_home_label": "Home",
+        "breadcrumb_home_url": "",
+        "breadcrumb_parent_label": "Use Cases",
+        "breadcrumb_parent_url": "/pages/use-cases",
+        "hero_btn2_text": "Request a Quote",
+        "hero_btn2_url": "/pages/contact-us",
+        "show_store_types": true,
+        "store_types_title": "Shop by Store Type",
+        "show_guides": true,
+        "guides_title": "Buying Guides & Resources",
+        "guides_view_all_url": "",
+        "guides_view_all_label": "View All Articles",
+        "auto_blog_handle": "resources",
+        "show_help": true,
+        "help_title": "Need Help Choosing the Right Equipment?",
+        "help_btn_text": "Contact an Expert",
+        "help_btn_url": "/pages/contact-us",
+        "show_brands": true,
+        "brands_title": "Top Brands We Carry",
+        "show_expert_cta": true,
+        "expert_btn1_text": "Request a Quote",
+        "expert_btn1_url": "/pages/contact-us",
+        "expert_btn2_text": "Talk to an Expert",
+        "expert_btn2_url": "/pages/contact-us",
+        "show_features": true,
+        "feat_1_title": "Expert Support",
+        "feat_1_text": "Get help from our equipment experts",
+        "feat_2_title": "Lowest Prices Guaranteed",
+        "feat_2_text": "We match competitive pricing",
+        "feat_3_title": "Fast Shipping Across USA",
+        "feat_3_text": "Quick delivery, nationwide",
+        "feat_4_title": "Trusted by Businesses",
+        "feat_4_text": "Thousands of satisfied customers",
+        "color_maroon": "#8b1538",
+        "color_navy": "#1b2b47",
+        "color_gold": "#d4af37",
+        "color_coral": "#ff6b6b",
+        "hero_title_override": "Italian Restaurant Equipment Solutions",
+        "hero_lead": "Authentic equipment for pasta, risotto, and fine Italian cuisine — built for high-volume service and traditional technique.",
+        "hero_btn1_text": "Shop All Italian Equipment",
+        "hero_btn1_url": "/collections/restaurant-equipment",
+        "expert_eyebrow": "Designed for Italian restaurant professionals",
+        "expert_title": "Equip your trattoria with confidence.",
+        "expert_body": "From a single commercial range to a complete Italian kitchen spec, our specialists will find the right equipment for your cuisine and service style.",
+        "help_body": "Our experts can help you select the right ranges, cookware, and refrigeration for your Italian restaurant."
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

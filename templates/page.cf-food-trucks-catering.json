@@ -1,0 +1,323 @@
+{
+  "sections": {
+    "main": {
+      "type": "cf-industry-hub",
+      "blocks": {
+        "nav_cooking": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Cooking Equipment",
+            "anchor": "cooking-equipment",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "nav_holding": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Food Holding",
+            "anchor": "food-holding",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "nav_refrigeration": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Refrigeration",
+            "anchor": "refrigeration",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "nav_fryers": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Fryers",
+            "anchor": "fryers",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "nav_griddles": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Griddles",
+            "anchor": "griddles",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "nav_more": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "More Equipment",
+            "anchor": "more-equipment",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "equip_cooking": {
+          "type": "equip_section",
+          "settings": {
+            "image_url": "industry-food-truck.png",
+            "section_id": "cooking-equipment",
+            "is_reverse": false,
+            "title": "Compact Cooking Equipment",
+            "description": "Countertop and space-saving fryers, griddles, and charbroilers built for confined kitchen footprints.",
+            "bullet_1": "Countertop Fryers",
+            "bullet_2": "Gas & Electric Griddles",
+            "bullet_3": "Countertop Charbroilers",
+            "cta_text": "Shop Cooking Equipment",
+            "cta_url": "/collections/new-theme-electric-fryer",
+            "popular_products_label": "Popular Products",
+            "featured_collection": "new-theme-electric-fryer",
+            "view_all_url": "/collections/new-theme-electric-fryer"
+          }
+        },
+        "equip_holding": {
+          "type": "equip_section",
+          "settings": {
+            "image_url": "",
+            "section_id": "food-holding",
+            "is_reverse": true,
+            "title": "Food Holding & Warmers",
+            "description": "Keep food service-ready during transport and on-site events with portable holding and warming equipment.",
+            "bullet_1": "Heated Holding Cabinets",
+            "bullet_2": "Heat Lamps & Strip Warmers",
+            "bullet_3": "Chafer Dishes & Portable Buffet",
+            "cta_text": "Shop Food Holding",
+            "cta_url": "/collections/new-theme-heated-cabinets",
+            "popular_products_label": "Popular Products",
+            "featured_collection": "new-theme-heated-cabinets",
+            "view_all_url": "/collections/new-theme-heated-cabinets"
+          }
+        },
+        "equip_refrigeration": {
+          "type": "equip_section",
+          "settings": {
+            "image_url": "",
+            "section_id": "refrigeration",
+            "is_reverse": false,
+            "title": "Mobile Refrigeration",
+            "description": "Compact undercounter and countertop refrigerators built to fit in any food truck or trailer layout.",
+            "bullet_1": "Undercounter Refrigerators",
+            "bullet_2": "Countertop Refrigerators",
+            "bullet_3": "Portable Ice Bins",
+            "cta_text": "Shop Refrigeration",
+            "cta_url": "/collections/reach-in-refrigerators-all",
+            "popular_products_label": "Popular Products",
+            "featured_collection": "reach-in-refrigerators-all",
+            "view_all_url": "/collections/reach-in-refrigerators-all"
+          }
+        },
+        "st_food_truck": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Food Truck",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "st_pop_up": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Pop-Up Restaurant",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "st_catering": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Off-Site Catering",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "st_festival": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Festival & Events",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "st_ghost": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Ghost Kitchen",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "st_trailer": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Catering Trailer",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "guide_truck": {
+          "type": "guide",
+          "settings": {
+            "image_url": "",
+            "title": "Food Truck Equipment Checklist: What Every Mobile Kitchen Needs",
+            "url": "/blogs/resources",
+            "meta": "Guide"
+          }
+        },
+        "guide_compact": {
+          "type": "guide",
+          "settings": {
+            "image_url": "",
+            "title": "Compact Fryers vs. Full-Size: What Fits in a Food Truck?",
+            "url": "/blogs/resources",
+            "meta": "Guide"
+          }
+        },
+        "guide_power": {
+          "type": "guide",
+          "settings": {
+            "image_url": "",
+            "title": "Gas vs Electric Equipment for Food Trucks: Pros, Cons & Generator Load",
+            "url": "/blogs/resources",
+            "meta": "Guide"
+          }
+        },
+        "brand_avantco": {
+          "type": "brand",
+          "settings": {
+            "brand_image_url": "",
+            "name": "Avantco",
+            "url": "/collections/restaurant-equipment",
+            "color": "#8a8a8a",
+            "italic": false
+          }
+        },
+        "brand_vulcan": {
+          "type": "brand",
+          "settings": {
+            "brand_image_url": "",
+            "name": "Vulcan",
+            "url": "/collections/restaurant-equipment",
+            "color": "#8a8a8a",
+            "italic": false
+          }
+        },
+        "brand_hatco": {
+          "type": "brand",
+          "settings": {
+            "brand_image_url": "",
+            "name": "Hatco",
+            "url": "/collections/restaurant-equipment",
+            "color": "#8a8a8a",
+            "italic": false
+          }
+        },
+        "brand_vollrath": {
+          "type": "brand",
+          "settings": {
+            "brand_image_url": "",
+            "name": "Vollrath",
+            "url": "/collections/restaurant-equipment",
+            "color": "#8a8a8a",
+            "italic": false
+          }
+        },
+        "brand_cambro": {
+          "type": "brand",
+          "settings": {
+            "brand_image_url": "",
+            "name": "Cambro",
+            "url": "/collections/restaurant-equipment",
+            "color": "#8a8a8a",
+            "italic": false
+          }
+        }
+      },
+      "block_order": [
+        "nav_cooking",
+        "nav_holding",
+        "nav_refrigeration",
+        "nav_fryers",
+        "nav_griddles",
+        "nav_more",
+        "equip_cooking",
+        "equip_holding",
+        "equip_refrigeration",
+        "st_food_truck",
+        "st_pop_up",
+        "st_catering",
+        "st_festival",
+        "st_ghost",
+        "st_trailer",
+        "guide_truck",
+        "guide_compact",
+        "guide_power",
+        "brand_avantco",
+        "brand_vulcan",
+        "brand_hatco",
+        "brand_vollrath",
+        "brand_cambro"
+      ],
+      "settings": {
+        "breadcrumb_home_label": "Home",
+        "breadcrumb_home_url": "",
+        "breadcrumb_parent_label": "Use Cases",
+        "breadcrumb_parent_url": "/pages/use-cases",
+        "hero_btn2_text": "Request a Quote",
+        "hero_btn2_url": "/pages/contact-us",
+        "show_store_types": true,
+        "store_types_title": "Shop by Store Type",
+        "show_guides": true,
+        "guides_title": "Buying Guides & Resources",
+        "guides_view_all_url": "",
+        "guides_view_all_label": "View All Articles",
+        "auto_blog_handle": "resources",
+        "show_help": true,
+        "help_title": "Need Help Choosing the Right Equipment?",
+        "help_btn_text": "Contact an Expert",
+        "help_btn_url": "/pages/contact-us",
+        "show_brands": true,
+        "brands_title": "Top Brands We Carry",
+        "show_expert_cta": true,
+        "expert_btn1_text": "Request a Quote",
+        "expert_btn1_url": "/pages/contact-us",
+        "expert_btn2_text": "Talk to an Expert",
+        "expert_btn2_url": "/pages/contact-us",
+        "show_features": true,
+        "feat_1_title": "Expert Support",
+        "feat_1_text": "Get help from our equipment experts",
+        "feat_2_title": "Lowest Prices Guaranteed",
+        "feat_2_text": "We match competitive pricing",
+        "feat_3_title": "Fast Shipping Across USA",
+        "feat_3_text": "Quick delivery, nationwide",
+        "feat_4_title": "Trusted by Businesses",
+        "feat_4_text": "Thousands of satisfied customers",
+        "color_maroon": "#8b1538",
+        "color_navy": "#1b2b47",
+        "color_gold": "#d4af37",
+        "color_coral": "#ff6b6b",
+        "hero_title_override": "Food Truck & Catering Equipment Solutions",
+        "hero_lead": "Compact, reliable equipment engineered to perform in mobile kitchens, pop-up events, and off-site catering operations.",
+        "hero_btn1_text": "Shop All Food Truck Equipment",
+        "hero_btn1_url": "/collections/commercial-grills-and-griddles",
+        "expert_eyebrow": "Designed for mobile & catering professionals",
+        "expert_title": "Build your food truck kitchen with confidence.",
+        "expert_body": "From a compact fryer and griddle combo to a full catering trailer spec, our specialists will find the right compact equipment for your space and menu.",
+        "help_body": "Our experts can help you select the right compact cooking, holding, and refrigeration equipment for your food truck or catering operation."
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

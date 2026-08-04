@@ -1,0 +1,323 @@
+{
+  "sections": {
+    "main": {
+      "type": "cf-industry-hub",
+      "blocks": {
+        "nav_combi_ovens": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Combination Ovens",
+            "anchor": "combination-ovens",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "nav_cookware": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Cookware",
+            "anchor": "cookware",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "nav_wine": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Wine & Beverage",
+            "anchor": "wine-beverage",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "nav_steamers": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Steamers",
+            "anchor": "steamers",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "nav_scales": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Precision Scales",
+            "anchor": "precision-scales",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "nav_more": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "More Equipment",
+            "anchor": "more-equipment",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "equip_combi": {
+          "type": "equip_section",
+          "settings": {
+            "image_url": "",
+            "section_id": "combination-ovens",
+            "is_reverse": false,
+            "title": "Combination & Convection Ovens",
+            "description": "Precision temperature control for roasting, steaming, and braising — the heart of a French kitchen.",
+            "bullet_1": "Combination Steam/Convection Ovens",
+            "bullet_2": "Convection Ovens",
+            "bullet_3": "Retherm & Cook-Hold Ovens",
+            "cta_text": "Shop Combination Ovens",
+            "cta_url": "/collections/new-theme-convection-ovens-copy",
+            "popular_products_label": "Popular Products",
+            "featured_collection": "new-theme-convection-ovens-copy",
+            "view_all_url": "/collections/new-theme-convection-ovens-copy"
+          }
+        },
+        "equip_cookware": {
+          "type": "equip_section",
+          "settings": {
+            "image_url": "",
+            "section_id": "cookware",
+            "is_reverse": true,
+            "title": "Cookware & Saute Pans",
+            "description": "Heavy-gauge pans, rondeau pots, and saute pans built for the classic French cooking methods.",
+            "bullet_1": "Saute Pans & Skillets",
+            "bullet_2": "Sauce Pans & Rondeau",
+            "bullet_3": "Saute Pan Sets & Lids",
+            "cta_text": "Shop Cookware",
+            "cta_url": "/collections/new-theme-saute-pans",
+            "popular_products_label": "Popular Products",
+            "featured_collection": "new-theme-saute-pans",
+            "view_all_url": "/collections/new-theme-saute-pans"
+          }
+        },
+        "equip_wine": {
+          "type": "equip_section",
+          "settings": {
+            "image_url": "",
+            "section_id": "wine-beverage",
+            "is_reverse": false,
+            "title": "Wine & Beverage Service",
+            "description": "Maintain your sommelier standards with reliable wine refrigeration and beverage service equipment.",
+            "bullet_1": "Wine Coolers & Chillers",
+            "bullet_2": "Back Bar Refrigerators",
+            "bullet_3": "Beverage Dispensers",
+            "cta_text": "Shop Wine & Beverage",
+            "cta_url": "/collections/new-theme-wine-coolers",
+            "popular_products_label": "Popular Products",
+            "featured_collection": "new-theme-wine-coolers",
+            "view_all_url": "/collections/new-theme-wine-coolers"
+          }
+        },
+        "st_bistro": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Classic Bistro",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "st_brasserie": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Brasserie",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "st_fine_dining": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Fine Dining",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "st_patisserie": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Patisserie",
+            "url": "/pages/cf-bakery-cafe"
+          },
+          "disabled": true
+        },
+        "st_wine_bar": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Wine Bar",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "st_catering": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "French Catering",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "guide_combi": {
+          "type": "guide",
+          "settings": {
+            "image_url": "",
+            "title": "Combination Ovens for Fine Dining: Features, Brands & ROI",
+            "url": "/blogs/resources",
+            "meta": "Guide"
+          }
+        },
+        "guide_cookware": {
+          "type": "guide",
+          "settings": {
+            "image_url": "",
+            "title": "Heavy-Gauge Cookware Guide: What Every French Kitchen Needs",
+            "url": "/blogs/resources",
+            "meta": "Guide"
+          }
+        },
+        "guide_wine": {
+          "type": "guide",
+          "settings": {
+            "image_url": "",
+            "title": "Wine Refrigeration for Restaurants: Temperature Zones Explained",
+            "url": "/blogs/resources",
+            "meta": "Guide"
+          }
+        },
+        "brand_robotcoupe": {
+          "type": "brand",
+          "settings": {
+            "brand_image_url": "",
+            "name": "Robot Coupe",
+            "url": "/pages/robot-coupe",
+            "color": "#8a8a8a",
+            "italic": false
+          }
+        },
+        "brand_waring": {
+          "type": "brand",
+          "settings": {
+            "brand_image_url": "",
+            "name": "Waring",
+            "url": "/pages/waring",
+            "color": "#8a8a8a",
+            "italic": false
+          }
+        },
+        "brand_vollrath": {
+          "type": "brand",
+          "settings": {
+            "brand_image_url": "",
+            "name": "Vollrath",
+            "url": "/collections/restaurant-equipment",
+            "color": "#8a8a8a",
+            "italic": false
+          }
+        },
+        "brand_rational": {
+          "type": "brand",
+          "settings": {
+            "brand_image_url": "",
+            "name": "Rational",
+            "url": "/collections/restaurant-equipment",
+            "color": "#8a8a8a",
+            "italic": false
+          }
+        },
+        "brand_winco": {
+          "type": "brand",
+          "settings": {
+            "brand_image_url": "",
+            "name": "Winco",
+            "url": "/collections/restaurant-equipment",
+            "color": "#8a8a8a",
+            "italic": false
+          }
+        }
+      },
+      "block_order": [
+        "nav_combi_ovens",
+        "nav_cookware",
+        "nav_wine",
+        "nav_steamers",
+        "nav_scales",
+        "nav_more",
+        "equip_combi",
+        "equip_cookware",
+        "equip_wine",
+        "st_bistro",
+        "st_brasserie",
+        "st_fine_dining",
+        "st_patisserie",
+        "st_wine_bar",
+        "st_catering",
+        "guide_combi",
+        "guide_cookware",
+        "guide_wine",
+        "brand_robotcoupe",
+        "brand_waring",
+        "brand_vollrath",
+        "brand_rational",
+        "brand_winco"
+      ],
+      "settings": {
+        "breadcrumb_home_label": "Home",
+        "breadcrumb_home_url": "",
+        "breadcrumb_parent_label": "Use Cases",
+        "breadcrumb_parent_url": "/pages/use-cases",
+        "hero_btn2_text": "Request a Quote",
+        "hero_btn2_url": "/pages/contact-us",
+        "show_store_types": true,
+        "store_types_title": "Shop by Store Type",
+        "show_guides": true,
+        "guides_title": "Buying Guides & Resources",
+        "guides_view_all_url": "",
+        "guides_view_all_label": "View All Articles",
+        "auto_blog_handle": "resources",
+        "show_help": true,
+        "help_title": "Need Help Choosing the Right Equipment?",
+        "help_btn_text": "Contact an Expert",
+        "help_btn_url": "/pages/contact-us",
+        "show_brands": true,
+        "brands_title": "Top Brands We Carry",
+        "show_expert_cta": true,
+        "expert_btn1_text": "Request a Quote",
+        "expert_btn1_url": "/pages/contact-us",
+        "expert_btn2_text": "Talk to an Expert",
+        "expert_btn2_url": "/pages/contact-us",
+        "show_features": true,
+        "feat_1_title": "Expert Support",
+        "feat_1_text": "Get help from our equipment experts",
+        "feat_2_title": "Lowest Prices Guaranteed",
+        "feat_2_text": "We match competitive pricing",
+        "feat_3_title": "Fast Shipping Across USA",
+        "feat_3_text": "Quick delivery, nationwide",
+        "feat_4_title": "Trusted by Businesses",
+        "feat_4_text": "Thousands of satisfied customers",
+        "color_maroon": "#8b1538",
+        "color_navy": "#1b2b47",
+        "color_gold": "#d4af37",
+        "color_coral": "#ff6b6b",
+        "hero_title_override": "French Bistro & Fine Dining Equipment",
+        "hero_lead": "Precision equipment for authentic French cuisine — from combination ovens and copper cookware to wine service and pastry.",
+        "hero_btn1_text": "Shop All French Bistro Equipment",
+        "hero_btn1_url": "/collections/restaurant-equipment",
+        "expert_eyebrow": "Designed for fine dining & French cuisine",
+        "expert_title": "Equip your bistro with precision.",
+        "expert_body": "From combi ovens to copper saute pans, our specialists will spec the right equipment for your menu complexity and service level.",
+        "help_body": "Our experts can help you select the right combination ovens, cookware, and wine service equipment for your bistro."
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

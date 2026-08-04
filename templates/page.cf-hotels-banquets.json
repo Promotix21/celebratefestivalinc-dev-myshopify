@@ -1,0 +1,323 @@
+{
+  "sections": {
+    "main": {
+      "type": "cf-industry-hub",
+      "blocks": {
+        "nav_holding": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Holding Cabinets",
+            "anchor": "holding-cabinets",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "nav_buffet": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Buffet & Steam",
+            "anchor": "buffet-steam",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "nav_chafers": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Chafing Dishes",
+            "anchor": "chafing-dishes",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "nav_dishwash": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Warewashing",
+            "anchor": "warewashing",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "nav_carts": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "Banquet Carts",
+            "anchor": "banquet-carts",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "nav_more": {
+          "type": "cat_nav",
+          "settings": {
+            "label": "More Equipment",
+            "anchor": "more-equipment",
+            "icon_image_url": "",
+            "icon_svg": ""
+          }
+        },
+        "equip_holding": {
+          "type": "equip_section",
+          "settings": {
+            "image_url": "",
+            "section_id": "holding-cabinets",
+            "is_reverse": false,
+            "title": "Heated Holding Cabinets",
+            "description": "Keep large batches of food at safe, serve-ready temperature throughout your event or service.",
+            "bullet_1": "Full-Size Holding Cabinets",
+            "bullet_2": "Half-Size Holding Cabinets",
+            "bullet_3": "Proofing & Holding Combos",
+            "cta_text": "Shop Holding Cabinets",
+            "cta_url": "/collections/new-theme-heated-cabinets",
+            "popular_products_label": "Popular Products",
+            "featured_collection": "new-theme-heated-cabinets",
+            "view_all_url": "/collections/new-theme-heated-cabinets"
+          }
+        },
+        "equip_buffet": {
+          "type": "equip_section",
+          "settings": {
+            "image_url": "",
+            "section_id": "buffet-steam",
+            "is_reverse": true,
+            "title": "Steam Tables & Buffet Lines",
+            "description": "Modular steam tables and buffet systems designed for continuous service at any event scale.",
+            "bullet_1": "Electric Steam Tables",
+            "bullet_2": "Drop-In Wells",
+            "bullet_3": "Sneeze Guards & Buffet Accessories",
+            "cta_text": "Shop Steam Tables",
+            "cta_url": "/collections/new-theme-steam-tables",
+            "popular_products_label": "Popular Products",
+            "featured_collection": "new-theme-steam-tables",
+            "view_all_url": "/collections/new-theme-steam-tables"
+          }
+        },
+        "equip_warewash": {
+          "type": "equip_section",
+          "settings": {
+            "image_url": "",
+            "section_id": "warewashing",
+            "is_reverse": false,
+            "title": "Warewashing Equipment",
+            "description": "High-speed commercial dishwashers and glass washers to keep up with banquet-volume serviceware.",
+            "bullet_1": "Rack Conveyor Dishwashers",
+            "bullet_2": "Under-Counter Dishwashers",
+            "bullet_3": "Glass Washers",
+            "cta_text": "Shop Warewashing",
+            "cta_url": "/collections/restaurant-equipment",
+            "popular_products_label": "Popular Products",
+            "featured_collection": "restaurant-equipment",
+            "view_all_url": "/collections/restaurant-equipment"
+          }
+        },
+        "st_hotel_rest": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Hotel Restaurant",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "st_conference": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Conference & Meetings",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "st_wedding": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Wedding Venue",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "st_corporate": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Corporate Catering",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "st_event": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Event Catering Hall",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "st_country": {
+          "type": "store_type",
+          "settings": {
+            "image_url": "",
+            "name": "Country Club",
+            "url": "/collections/restaurant-equipment"
+          },
+          "disabled": true
+        },
+        "guide_holding": {
+          "type": "guide",
+          "settings": {
+            "image_url": "",
+            "title": "Heated Holding Cabinet Guide: Capacity, Humidity & Brands",
+            "url": "/blogs/resources",
+            "meta": "Guide"
+          }
+        },
+        "guide_buffet": {
+          "type": "guide",
+          "settings": {
+            "image_url": "",
+            "title": "Steam Table Buying Guide: Size, Wells & Electric vs Gas",
+            "url": "/blogs/resources",
+            "meta": "Guide"
+          }
+        },
+        "guide_dishwash": {
+          "type": "guide",
+          "settings": {
+            "image_url": "",
+            "title": "Commercial Dishwasher Guide for Hotels: Rack vs Conveyor",
+            "url": "/blogs/resources",
+            "meta": "Guide"
+          }
+        },
+        "brand_vollrath": {
+          "type": "brand",
+          "settings": {
+            "brand_image_url": "",
+            "name": "Vollrath",
+            "url": "/collections/restaurant-equipment",
+            "color": "#8a8a8a",
+            "italic": false
+          }
+        },
+        "brand_cambro": {
+          "type": "brand",
+          "settings": {
+            "brand_image_url": "",
+            "name": "Cambro",
+            "url": "/collections/restaurant-equipment",
+            "color": "#8a8a8a",
+            "italic": false
+          }
+        },
+        "brand_hatco": {
+          "type": "brand",
+          "settings": {
+            "brand_image_url": "",
+            "name": "Hatco",
+            "url": "/collections/restaurant-equipment",
+            "color": "#8a8a8a",
+            "italic": false
+          }
+        },
+        "brand_waring": {
+          "type": "brand",
+          "settings": {
+            "brand_image_url": "",
+            "name": "Waring",
+            "url": "/pages/waring",
+            "color": "#8a8a8a",
+            "italic": false
+          }
+        },
+        "brand_winco": {
+          "type": "brand",
+          "settings": {
+            "brand_image_url": "",
+            "name": "Winco",
+            "url": "/collections/restaurant-equipment",
+            "color": "#8a8a8a",
+            "italic": false
+          }
+        }
+      },
+      "block_order": [
+        "nav_holding",
+        "nav_buffet",
+        "nav_chafers",
+        "nav_dishwash",
+        "nav_carts",
+        "nav_more",
+        "equip_holding",
+        "equip_buffet",
+        "equip_warewash",
+        "st_hotel_rest",
+        "st_conference",
+        "st_wedding",
+        "st_corporate",
+        "st_event",
+        "st_country",
+        "guide_holding",
+        "guide_buffet",
+        "guide_dishwash",
+        "brand_vollrath",
+        "brand_cambro",
+        "brand_hatco",
+        "brand_waring",
+        "brand_winco"
+      ],
+      "settings": {
+        "breadcrumb_home_label": "Home",
+        "breadcrumb_home_url": "",
+        "breadcrumb_parent_label": "Use Cases",
+        "breadcrumb_parent_url": "/pages/use-cases",
+        "hero_btn2_text": "Request a Quote",
+        "hero_btn2_url": "/pages/contact-us",
+        "show_store_types": true,
+        "store_types_title": "Shop by Store Type",
+        "show_guides": true,
+        "guides_title": "Buying Guides & Resources",
+        "guides_view_all_url": "",
+        "guides_view_all_label": "View All Articles",
+        "auto_blog_handle": "resources",
+        "show_help": true,
+        "help_title": "Need Help Choosing the Right Equipment?",
+        "help_btn_text": "Contact an Expert",
+        "help_btn_url": "/pages/contact-us",
+        "show_brands": true,
+        "brands_title": "Top Brands We Carry",
+        "show_expert_cta": true,
+        "expert_btn1_text": "Request a Quote",
+        "expert_btn1_url": "/pages/contact-us",
+        "expert_btn2_text": "Talk to an Expert",
+        "expert_btn2_url": "/pages/contact-us",
+        "show_features": true,
+        "feat_1_title": "Expert Support",
+        "feat_1_text": "Get help from our equipment experts",
+        "feat_2_title": "Lowest Prices Guaranteed",
+        "feat_2_text": "We match competitive pricing",
+        "feat_3_title": "Fast Shipping Across USA",
+        "feat_3_text": "Quick delivery, nationwide",
+        "feat_4_title": "Trusted by Businesses",
+        "feat_4_text": "Thousands of satisfied customers",
+        "color_maroon": "#8b1538",
+        "color_navy": "#1b2b47",
+        "color_gold": "#d4af37",
+        "color_coral": "#ff6b6b",
+        "hero_title_override": "Hotel & Banquet Equipment Solutions",
+        "hero_lead": "High-capacity solutions for hotel restaurants, catering halls, and large-scale banquet operations — built to handle any event size.",
+        "hero_btn1_text": "Shop All Hotel & Banquet Equipment",
+        "hero_btn1_url": "/collections/restaurant-equipment",
+        "expert_eyebrow": "Designed for hotel & banquet professionals",
+        "expert_title": "Equip your banquet operation with confidence.",
+        "expert_body": "From a single chafing dish order to a complete banquet kitchen spec, our team will build the right equipment package for your event volume and service style.",
+        "help_body": "Our experts can help you select the right holding, buffet, and warewashing equipment for your hotel or banquet facility."
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
