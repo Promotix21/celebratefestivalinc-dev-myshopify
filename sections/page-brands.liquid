@@ -446,13 +446,222 @@
   </div>
 
   <div class="cf-brands__container">
+{%- capture cf_brand_data -%}
+  1880hg|1880 HG
+  accutemp|AccuTemp
+  acopa|Acopa
+  adcraft|Adcraft
+  admiral-craft|Admiral Craft
+  advance-tabco|Advance Tabco
+  alpine-industries|Alpine Industries
+  amana-commercial|Amana Commercial
+  american-metalcraft|American Metalcraft
+  american-range|American Range
+  ammex|Ammex
+  anets|Anets
+  angaar|Angaar Tandoor
+  apw|APW Wyott
+  arctic-air|Arctic Air
+  atosa|Atosa
+  bakers-pride|Bakers Pride
+  bally|Bally Refrigeration
+  belshaw|Belshaw
+  bissell|Bissell
+  bizerba|Bizerba
+  bk-resources|BK Resources
+  black-diamond|Black Diamond
+  bunn|Bunn
+  cac|CAC China
+  cambro|Cambro
+  captiveaire|CaptiveAire
+  castle-comstock|Castle & Comstock
+  cci-industries|CCI Industries
+  celebrate-festival-inc|Celebrate Festival Inc
+  cellucap|Cellucap
+  champion|Champion
+  channel-mfg|Channel Mfg
+  chase-doors|Chase Doors
+  chef-master|Chef Master
+  chef-specialties|Chef Specialties
+  chef-works|Chef Works
+  chefs-choice|Chef's Choice
+  china-pacific|China Pacific
+  choice|Choice
+  cleveland-range|Cleveland Range
+  cma-dishmachines|CMA Dishmachines
+  coldline|Coldline
+  continental|Continental
+  cooktek|CookTek
+  crestware|Crestware
+  crown-steam|Crown Steam
+  ddisystem|DDI System
+  dexter-russell|Dexter Russell
+  disco|Disco
+  dormont|Dormont
+  doyon|Doyon
+  doyon-nu-vu|Doyon Nu-Vu
+  dukers|Dukers
+  dynamic|Dynamic
+  eastern|Eastern
+  edlund|Edlund
+  empress|Empress
+  equipex|Equipex
+  eurodib|EuroDib
+  everest|Everest
+  everpure|Everpure
+  federal|Federal Industries
+  fetco|Fetco
+  fogel|Fogel
+  fri-jado|Fri-Jado
+  get-enterprises|GET Enterprises
+  global-solutions|Global Solutions
+  globe|Globe
+  gmcw|GMCW
+  grosfillex|Grosfillex
+  gsw|GSW
+  hamilton-beach|Hamilton Beach
+  hatco|Hatco
+  hawkins|Hawkins
+  hoshizaki|Hoshizaki
+  hospeco|Hospeco
+  howard-mccray|Howard McCray
+  hubbell|Hubbell
+  hydrakool|HydraKool
+  ice-o-matic|Ice-O-Matic
+  impact|Impact
+  imperial|Imperial
+  insinger|Insinger
+  iti|ITI
+  jackson|Jackson
+  john-boos|John Boos
+  john-ritzenthaler|John Ritzenthaler
+  kitchenaid|KitchenAid
+  krowne|Krowne
+  kwitex|Kwitex
+  la-coppera|La Coppera
+  la-rosa|La Rosa
+  larkin|Larkin
+  lavex|Lavex
+  legacy-companies|Legacy Companies
+  lincoln|Lincoln
+  lloydpans|LloydPans
+  louis-tellier|Louis Tellier
+  lunar-ice|Lunar Ice
+  magikitchen|Magikitchen
+  marsal|Marsal
+  menu-solutions|Menu Solutions
+  mercer|Mercer
+  mercer-culinary|Mercer Culinary
+  metro|Metro
+  micro-matic|Micro Matic
+  middleby|Middleby
+  migali|Migali
+  mkld|MKLD
+  moffat|Moffat
+  mts-seating|MTS Seating
+  mundial|Mundial
+  naks|Naks
+  nemco|Nemco
+  newton|Newton
+  nextstep|NextStep
+  ninja|Ninja
+  nor-lake|Nor-Lake
+  nova|Nova
+  oak-street|Oak Street
+  omcan|Omcan
+  pacific|Pacific
+  panasonic|Panasonic
+  perfect-fry|Perfect Fry
+  piper-products|Piper Products
+  pitco|Pitco
+  pizza-group|Pizza Group
+  precision-pour|Precision Pour
+  preethi|Preethi
+  prestige|Prestige
+  quantum-foodservice|Quantum Foodservice
+  radius|Radius
+  rational|Rational
+  regency|Regency
+  rf-hunter|RF Hunter
+  rj-schinner|RJ Schinner
+  robot-coupe|Robot Coupe
+  rotoquip|Rotoquip
+  royal-industries|Royal Industries
+  royal-range|Royal Range
+  sammic|Sammic
+  san-jamar|San Jamar
+  sapphire|Sapphire
+  seco-select|Seco Select
+  senneca|Senneca
+  serv-ware|Serv-Ware
+  servewell|Servewell
+  shaan|Shaan Tandoor
+  sharp|Sharp
+  simplehuman|simplehuman
+  somerset|Somerset
+  southbend|Southbend
+  spaceman|Spaceman
+  spill-stop|Spill Stop
+  star|Star
+  steelton|Steelton
+  steril-sil|Steril-Sil
+  sterno|Sterno
+  ts-brass|T&S Brass
+  tablecraft|Tablecraft
+  taylor|Taylor
+  texican|Texican
+  thunder-group|Thunder Group
+  thunderbird|Thunderbird
+  toastmaster|Toastmaster
+  town|Town Food Service
+  true|True
+  turbo-air|Turbo Air
+  u-star|U-Star
+  uniworld|Uni-World
+  unified|Unified
+  unipro|Unipro
+  univex|Univex
+  unox|Unox
+  us-cooler|US Cooler
+  vertex|Vertex
+  victorinox|Victorinox
+  visvardis|Visvardis
+  vitamix|Vitamix
+  vollrath|Vollrath
+  vulcan|Vulcan
+  waring|Waring
+  wells|Wells
+  winco|Winco
+  wolf|Wolf
+  world-dryer|World Dryer
+  yanco|Yanco
+  yanco-china|Yanco China
+{%- endcapture -%}
+{%- assign cf_brand_hidden = section.settings.hidden_vendors | default: '' | downcase | split: '\n' -%}
+
     <div class="cf-brands__layout">
 
-      <!-- Sidebar — filled by JS -->
+      <!-- Sidebar — hardcoded A-Z, renders server-side -->
       <aside class="cf-brands__sidebar" id="brands-sidebar">
         <div class="cf-brands__sidebar-header">All Brands</div>
         <ul class="cf-brands__sidebar-list" id="brands-sidebar-list">
-          <li style="padding:16px;color:var(--text-light);font-size:13px;">Loading…</li>
+          {%- assign cf_brand_lines = cf_brand_data | split: '\n' -%}
+          {%- for cf_entry in cf_brand_lines -%}
+            {%- assign cf_parts = cf_entry | split: '|' -%}
+            {%- assign cf_bname = cf_parts[1] | strip -%}
+            {%- unless cf_bname == blank -%}
+              {%- assign cf_bname_lower = cf_bname | downcase -%}
+              {%- assign cf_hidden_match = false -%}
+              {%- for cf_hv in cf_brand_hidden -%}
+                {%- assign cf_hv_clean = cf_hv | strip -%}
+                {%- if cf_hv_clean != blank and cf_bname_lower == cf_hv_clean -%}{%- assign cf_hidden_match = true -%}{%- endif -%}
+              {%- endfor -%}
+              {%- unless cf_hidden_match -%}
+                {%- assign cf_bhandle = cf_parts[0] | strip -%}
+                <li><a href="/collections/vendors?q={{ cf_bname | url_encode }}">{{ cf_bname }}</a></li>
+              {%- endunless -%}
+            {%- endunless -%}
+          {%- endfor -%}
         </ul>
       </aside>
 
@@ -501,7 +710,34 @@
       </div>
 
       <div class="cf-brands__all-grid" id="all-brands-grid">
-        <p>Loading brands…</p>
+        {%- assign cf_brand_lines = cf_brand_data | split: '\n' -%}
+        {%- for cf_entry in cf_brand_lines -%}
+          {%- assign cf_parts = cf_entry | split: '|' -%}
+          {%- assign cf_bhandle = cf_parts[0] | strip -%}
+          {%- assign cf_bname   = cf_parts[1] | strip -%}
+          {%- unless cf_bname == blank -%}
+            {%- assign cf_bname_lower = cf_bname | downcase -%}
+            {%- assign cf_hidden_match = false -%}
+            {%- for cf_hv in cf_brand_hidden -%}
+              {%- assign cf_hv_clean = cf_hv | strip -%}
+              {%- if cf_hv_clean != blank and cf_bname_lower == cf_hv_clean -%}{%- assign cf_hidden_match = true -%}{%- endif -%}
+            {%- endfor -%}
+            {%- unless cf_hidden_match -%}
+              {%- assign cf_letter = cf_bname | upcase | slice: 0 -%}
+              <a href="/collections/vendors?q={{ cf_bname | url_encode }}"
+                 class="cf-brands__small-card"
+                 data-brand="{{ cf_bname | escape }}"
+                 data-letter="{{ cf_letter }}"
+                 id="brand-card-{{ cf_bhandle }}">
+                <img src="{{ 'brand-logo-' | append: cf_bhandle | append: '.png' | asset_url }}"
+                     alt="{{ cf_bname | escape }}"
+                     loading="lazy"
+                     onerror="this.style.display='none';this.nextElementSibling.style.removeProperty('display')">
+                <span class="cf-brands__text-logo" style="display:none">{{ cf_bname }}</span>
+              </a>
+            {%- endunless -%}
+          {%- endunless -%}
+        {%- endfor -%}
       </div>
     </section>
 
@@ -520,106 +756,19 @@
 </div>
 
 <script>
-// Liquid-generated map: vendor handle -> full asset URL (includes ?v= hash — required by Shopify CDN)
-window.cfBrandLogos = {
-  {% assign logo_handles = '1880hg,accutemp,acopa,adcraft,admiral-craft,advance-tabco,amana-commercial,american-metalcraft,american-range,ammex,anets,apw,arctic-air,ariane,astra,atosa,bakers-pride,bally,belshaw,bissell,bizerba,black-diamond,bobrick,botinkit,bunn,cac,cambro,captiveaire,castle-comstock,cci-industries,celebrate-festival-inc,cellucap,champion,channel-mfg,chase-doors,chef-master,chefs-choice,chef-specialties,chef-works,choice,cma-dishmachines,continental,cooktek,crestware,crown-steam,ddisystem,dexter-russell,disco,dormont,doyon,doyon-nu-vu,dukers,dynamic,eastern,edlund,empress,eurodib,everpure,federal,fetco,fogel,get-enterprises,global-solutions,globe,gmcw,grista,grosfillex,gsw,hamilton-beach,hatco,hawkins,hoshizaki,hospeco,howard-mccray,hubbell,hydrakool,ice-o-matic,impact,imperial,insinger,iti,jackson,john-boos,john-ritzenthaler,just-chairs,kitchenaid,krowne,kwitex,la-coppera,larkin,la-rosa,lavex,legacy-companies,lincoln,lloydpans,louis-tellier,lunar-ice,magikitchen,marsal,menu-solutions,mercer,mercer-culinary,metro,micro-matic,middleby,mkld,moffat,mts-seating,mundial,naks,nemco,newton,nextstep,nor-lake,oak-street,omcan,pacific,panasonic,perfect-fry,piper-products,pitco,pizza-group,porto-brasil,precision-pour,preethi,prestige,quantum-foodservice,radius,rational,regency,rf-hunter,rj-schinner,robot-coupe,rotoquip,royal-industries,sammic,san-jamar,seco-select,senneca,serv-ware,shaan,sharp,simplehuman,somerset,southbend,spaceman,spill-stop,star,steelton,steril-sil,sterno,tablecraft,taylor,texican,thunderbird,thunder-group,toastmaster,town,true,ts-brass,turbo-air,unified,unipro,univex,uniworld,unox,us-cooler,u-star,vertex,victorinox,visvardis,vitamix,vollrath,waring,wells,winco,world-dryer,yanco,yanco-china' | split: ',' %}
-  {% for h in logo_handles %}"{{ h }}": {{ 'brand-logo-' | append: h | append: '.png' | asset_url | json }}{% unless forloop.last %},{% endunless %}
-  {% endfor %}
-};
-
 (function () {
-  function toHandle(vendor) {
-    return vendor.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  }
-
-  var CACHE_KEY = 'cf_brand_vendors';
-  var CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 1 week
-  var HIDDEN_VENDORS = {{ section.settings.hidden_vendors | default: '' | split: '\n' | map: 'strip' | reject: 'blank' | json }};
-
-  function getCached() {
-    try {
-      var raw = localStorage.getItem(CACHE_KEY);
-      if (!raw) return null;
-      var entry = JSON.parse(raw);
-      if (Date.now() - entry.ts > CACHE_TTL) { localStorage.removeItem(CACHE_KEY); return null; }
-      return entry.vendors;
-    } catch (e) { return null; }
-  }
-
-  function setCache(vendors) {
-    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), vendors: vendors })); } catch (e) {}
-  }
-
-  async function fetchAllVendors() {
-    var cached = getCached();
-    if (cached) return HIDDEN_VENDORS.length ? cached.filter(function(v) { return !HIDDEN_VENDORS.some(function(h) { return h.toLowerCase() === v.toLowerCase(); }); }) : cached;
-
-    const vendors = new Set();
-    let page = 1;
-    while (true) {
-      const res = await fetch('/products.json?limit=250&page=' + page + '&fields=vendor');
-      if (!res.ok) break;
-      const { products } = await res.json();
-      if (!products || !products.length) break;
-      products.forEach(function(p) { if (p.vendor) vendors.add(p.vendor); });
-      if (products.length < 250) break;
-      page++;
-    }
-    var sorted = [...vendors]
-      .filter(function(v) { return !HIDDEN_VENDORS.some(function(h) { return h.toLowerCase() === v.toLowerCase(); }); })
-      .sort(function(a, b) { return a.localeCompare(b); });
-    setCache(sorted);
-    return sorted;
-  }
-
-  function renderBrands(vendors) {
-    const grid = document.getElementById('all-brands-grid');
-    const sidebarList = document.getElementById('brands-sidebar-list');
-    if (!vendors.length) { grid.innerHTML = '<p>No brands found.</p>'; return; }
-
-    const logos = window.cfBrandLogos || {};
-
-    // Render A-Z grid
-    grid.innerHTML = vendors.map(function(vendor) {
-      const handle = toHandle(vendor);
-      const letter = vendor.charAt(0).toUpperCase();
-      const logoUrl = logos[handle];
-      const imgHtml = logoUrl
-        ? '<img src="' + logoUrl + '" alt="' + vendor + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.removeProperty(\'display\')">'
-        : '';
-      const textStyle = logoUrl ? 'display:none' : '';
-      return '<a href="/collections/vendors?q=' + encodeURIComponent(vendor) + '"'
-        + ' class="cf-brands__small-card" data-brand="' + vendor + '" data-letter="' + letter + '" id="brand-card-' + handle + '">'
-        + imgHtml
-        + '<span class="cf-brands__text-logo" style="' + textStyle + '">' + vendor + '</span>'
-        + '</a>';
-    }).join('');
-
-    // Render sidebar list
-    sidebarList.innerHTML = vendors.map(function(vendor) {
-      const handle = toHandle(vendor);
-      return '<li><a href="/collections/vendors?q=' + encodeURIComponent(vendor) + '">' + vendor + '</a></li>';
-    }).join('');
-
-    // Bind alphabet filter
-    const btns = document.querySelectorAll('.cf-brands__filter-btn');
-    btns.forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        btns.forEach(function(b) { b.classList.remove('active'); });
-        this.classList.add('active');
-        const letter = this.dataset.letter;
-        document.querySelectorAll('.cf-brands__small-card').forEach(function(card) {
-          card.style.display = (letter === 'all' || card.dataset.letter === letter) ? 'flex' : 'none';
-        });
+  // Alphabet filter — cards rendered server-side, just show/hide
+  var btns = document.querySelectorAll('.cf-brands__filter-btn');
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      btns.forEach(function (b) { b.classList.remove('active'); });
+      this.classList.add('active');
+      var letter = this.dataset.letter;
+      document.querySelectorAll('.cf-brands__small-card').forEach(function (card) {
+        card.style.display = (letter === 'all' || card.dataset.letter === letter) ? 'flex' : 'none';
       });
     });
-  }
-
-  fetchAllVendors()
-    .then(renderBrands)
-    .catch(function() {
-      document.getElementById('all-brands-grid').innerHTML = '<p>Failed to load brands — please refresh.</p>';
-    });
+  });
 })();
 </script>
 
