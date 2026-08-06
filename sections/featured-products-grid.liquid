@@ -8,7 +8,7 @@
 
 <style>
 .fpg-section {
-  padding: 60px 0;
+  padding: 36px 0;
   background: #ffffff;
 }
 
@@ -24,7 +24,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 32px;
+  margin-bottom: 20px;
 }
 
 .fpg-title {
@@ -136,8 +136,8 @@
 }
 
 .fpg-slide .product-card .card-image {
-  padding: 12px;
-  height: 140px;
+  padding: 8px;
+  height: 120px;
   aspect-ratio: auto !important;
   display: flex !important;
   align-items: center !important;
@@ -153,13 +153,27 @@
 }
 
 .fpg-slide .product-card .card-content {
-  padding: 12px;
+  padding: 10px;
+}
+
+.fpg-slide .product-card .cf-plp__meta-row {
+  margin-bottom: 2px;
+}
+
+.fpg-slide .product-card .card-category {
+  margin-bottom: 2px;
 }
 
 .fpg-slide .product-card .card-title {
   font-size: 12px;
-  min-height: 36px;
+  min-height: 32px;
+  line-height: 1.35;
+  margin-bottom: 4px;
   -webkit-line-clamp: 2;
+}
+
+.fpg-slide .product-card .card-sku {
+  margin-bottom: 4px;
 }
 
 .fpg-slide .product-card .sku {
@@ -169,11 +183,25 @@
 .fpg-slide .product-card .price-single,
 .fpg-slide .product-card .price-dual,
 .fpg-slide .product-card .price-member-view {
-  padding: 8px 6px;
-  min-height: 92px;
+  padding: 6px;
+  min-height: 68px;
+  margin-bottom: 6px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+.fpg-slide .product-card .price-label-single,
+.fpg-slide .product-card .member-view-label {
+  margin-bottom: 2px;
+}
+
+.fpg-slide .product-card .compare-price-strike {
+  margin-bottom: 0;
+}
+
+.fpg-slide .product-card .sale-savings-tag {
+  margin-top: 2px;
 }
 
 .fpg-slide .product-card .price-amount-single,
@@ -196,17 +224,18 @@
 }
 
 .fpg-slide .product-card .card-actions {
-  padding: 0 12px 12px;
+  padding: 0;
+  gap: 6px;
 }
 
 .fpg-slide .product-card .qty-input {
-  width: 50px;
-  height: 34px;
+  width: 44px;
+  height: 32px;
   font-size: 12px;
 }
 
 .fpg-slide .product-card .add-to-cart {
-  height: 34px;
+  height: 32px;
   font-size: 11px;
 }
 
@@ -222,8 +251,9 @@
   display: block;
   width: 100%;
   box-sizing: border-box;
-  margin-top: 6px;
-  padding: 5px 8px;
+  margin-top: 0;
+  margin-bottom: 6px;
+  padding: 4px 6px;
   border-radius: 6px;
   font-size: 9px;
   font-weight: 600;
@@ -290,7 +320,7 @@
   }
 
   .fpg-slide .product-card .card-image {
-    height: 120px;
+    height: 110px;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -335,8 +365,8 @@
   .fpg-slide .product-card .price-single,
   .fpg-slide .product-card .price-dual,
   .fpg-slide .product-card .price-member-view {
-    padding: 6px 5px;
-    min-height: 60px;
+    padding: 5px;
+    min-height: 56px;
   }
 
   .fpg-slide .product-card .price-amount-single,
@@ -354,7 +384,7 @@
   }
 
   .fpg-slide .product-card .card-actions {
-    padding: 0 8px 8px;
+    padding: 0;
   }
 
   .fpg-slide .product-card .qty-input {
