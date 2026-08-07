@@ -1,12 +1,3 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
     "main": {
@@ -15,97 +6,149 @@
         "uc_bakery": {
           "type": "use_case",
           "settings": {
+            "image_url": "industry-bakery.png",
             "title": "Bakery",
             "cat_slug": "bakery",
+            "icon_image_url": "",
             "icon": "🧁",
-            "image_url": "industry-bakery.png",
             "description": "From mixing to display — premium equipment for every step of a successful bakery operation.",
-            "cta_text": "Shop Bakery Equipment",
-            "cta_url": "/collections/commercial-ovens",
-            "featured_collection": "commercial-ovens",
-            "view_all_url": "/collections/commercial-ovens",
             "is_new": false,
-            "is_featured": false
+            "is_featured": false,
+            "cta_text": "Shop Bakery Equipment",
+            "cta_url": "\/collections\/commercial-ovens",
+            "thumb_1_title": "",
+            "thumb_1_url": "",
+            "thumb_2_title": "",
+            "thumb_2_url": "",
+            "thumb_3_title": "",
+            "thumb_3_url": "",
+            "thumb_4_title": "",
+            "thumb_4_url": "",
+            "view_all_url": "\/collections\/commercial-ovens"
           }
         },
         "uc_pizza": {
           "type": "use_case",
           "settings": {
+            "image_url": "industry-pizza-restaurant.png",
             "title": "Pizza Restaurant",
             "cat_slug": "pizza-restaurant",
+            "icon_image_url": "",
             "icon": "🍕",
-            "image_url": "industry-pizza-restaurant.png",
             "description": "High-performance equipment engineered for every stage of pizza preparation and service.",
-            "cta_text": "Shop Pizza Equipment",
-            "cta_url": "/collections/refrigerated-pizza-prep-tables",
-            "featured_collection": "refrigerated-pizza-prep-tables",
-            "view_all_url": "/collections/refrigerated-pizza-prep-tables",
             "is_new": false,
-            "is_featured": false
+            "is_featured": false,
+            "cta_text": "Shop Pizza Equipment",
+            "cta_url": "\/collections\/refrigerated-pizza-prep-tables",
+            "thumb_1_image": "shopify:\/\/shop_images\/Pizza_Oven.webp",
+            "thumb_1_title": "Pizza Ovens",
+            "thumb_1_url": "shopify:\/\/collections\/pizza-restaurant-pizza-ovens",
+            "thumb_2_image": "shopify:\/\/shop_images\/tpr-67sd-n_right_open-1-700x700.jpg",
+            "thumb_2_title": "Prep Tables",
+            "thumb_2_url": "shopify:\/\/collections\/pizza-restaurant-prep-tables",
+            "thumb_3_image": "shopify:\/\/shop_images\/CDR-600F-1.jpg",
+            "thumb_3_title": "Dough Sheeters",
+            "thumb_3_url": "shopify:\/\/collections\/pizza-restaurant-dough-sheeters",
+            "thumb_4_image": "shopify:\/\/shop_images\/080-emp30.webp",
+            "thumb_4_title": "Mixers",
+            "thumb_4_url": "shopify:\/\/collections\/pizza-restaurant-mixers",
+            "view_all_url": "\/collections\/refrigerated-pizza-prep-tables"
           }
         },
         "uc_grocery": {
           "type": "use_case",
           "settings": {
+            "image_url": "industry-grocery-store.png",
             "title": "Grocery Store",
             "cat_slug": "grocery-store",
+            "icon_image_url": "",
             "icon": "🛒",
-            "image_url": "industry-grocery-store.png",
             "description": "Durable, efficient solutions for retail and supermarket operations of every size.",
-            "cta_text": "Shop Grocery Equipment",
-            "cta_url": "/pages/cf-grocery-store",
-            "featured_collection": "reach-in-refrigerators-all",
-            "view_all_url": "/pages/cf-grocery-store",
             "is_new": false,
-            "is_featured": false
+            "is_featured": false,
+            "cta_text": "Shop Grocery Equipment",
+            "cta_url": "\/pages\/cf-grocery-store",
+            "thumb_1_title": "",
+            "thumb_1_url": "",
+            "thumb_2_title": "",
+            "thumb_2_url": "",
+            "thumb_3_title": "",
+            "thumb_3_url": "",
+            "thumb_4_title": "",
+            "thumb_4_url": "",
+            "view_all_url": "\/pages\/cf-grocery-store"
           }
         },
         "uc_indian": {
           "type": "use_case",
           "settings": {
+            "image_url": "industry-indian-restaurant.png",
             "title": "Indian Restaurant",
             "cat_slug": "indian-restaurant",
+            "icon_image_url": "",
             "icon": "🍛",
-            "image_url": "industry-indian-restaurant.png",
             "description": "Specialized equipment built for authentic Indian cuisine and high-volume kitchen demands.",
-            "cta_text": "Shop Indian Restaurant Equipment",
-            "cta_url": "/collections/indian-specialty",
-            "featured_collection": "indian-specialty",
-            "view_all_url": "/collections/indian-specialty",
             "is_new": true,
-            "is_featured": true
+            "is_featured": true,
+            "cta_text": "Shop Indian Restaurant Equipment",
+            "cta_url": "\/collections\/indian-specialty",
+            "thumb_1_title": "",
+            "thumb_1_url": "",
+            "thumb_2_title": "",
+            "thumb_2_url": "",
+            "thumb_3_title": "",
+            "thumb_3_url": "",
+            "thumb_4_title": "",
+            "thumb_4_url": "",
+            "view_all_url": "\/collections\/indian-specialty"
           }
         },
         "uc_cafe": {
           "type": "use_case",
           "settings": {
-            "title": "Café / Coffee Shop",
-            "cat_slug": "cafe-coffee-shop",
-            "icon": "☕",
             "image_url": "industry-cafe-coffee-shop.png",
+            "title": "Café \/ Coffee Shop",
+            "cat_slug": "cafe-coffee-shop",
+            "icon_image_url": "",
+            "icon": "☕",
             "description": "Brew, chill, and serve with equipment designed for the rhythms of a modern coffee business.",
-            "cta_text": "Shop Café Equipment",
-            "cta_url": "/collections/ice-machine-all-by-all-brands",
-            "featured_collection": "ice-machine-all-by-all-brands",
-            "view_all_url": "/collections/ice-machine-all-by-all-brands",
             "is_new": false,
-            "is_featured": false
+            "is_featured": false,
+            "cta_text": "Shop Café Equipment",
+            "cta_url": "\/collections\/ice-machine-all-by-all-brands",
+            "thumb_1_title": "",
+            "thumb_1_url": "",
+            "thumb_2_title": "",
+            "thumb_2_url": "",
+            "thumb_3_title": "",
+            "thumb_3_url": "",
+            "thumb_4_title": "",
+            "thumb_4_url": "",
+            "view_all_url": "\/collections\/ice-machine-all-by-all-brands"
           }
         },
         "uc_foodtruck": {
           "type": "use_case",
           "settings": {
+            "image_url": "industry-food-truck.png",
             "title": "Food Truck",
             "cat_slug": "food-truck",
+            "icon_image_url": "",
             "icon": "🚚",
-            "image_url": "industry-food-truck.png",
             "description": "Compact, reliable equipment engineered to perform in any mobile kitchen on the road.",
-            "cta_text": "Shop Food Truck Equipment",
-            "cta_url": "/collections/commercial-grills-and-griddles",
-            "featured_collection": "commercial-grills-and-griddles",
-            "view_all_url": "/collections/commercial-grills-and-griddles",
             "is_new": false,
-            "is_featured": false
+            "is_featured": false,
+            "cta_text": "Shop Food Truck Equipment",
+            "cta_url": "\/collections\/commercial-grills-and-griddles",
+            "thumb_1_title": "",
+            "thumb_1_url": "",
+            "thumb_2_title": "",
+            "thumb_2_url": "",
+            "thumb_3_title": "",
+            "thumb_3_url": "",
+            "thumb_4_title": "",
+            "thumb_4_url": "",
+            "view_all_url": "\/collections\/commercial-grills-and-griddles"
           }
         }
       },
@@ -118,23 +161,52 @@
         "uc_foodtruck"
       ],
       "settings": {
+        "show_hero_image": true,
         "hero_title": "Equipment Solutions by Business Type",
         "hero_lead": "Find the right equipment for your business. Explore by industry and discover curated products, packages, and expert recommendations.",
         "hero_btn1_text": "Browse Business Types",
+        "hero_btn1_url": "",
         "hero_btn2_text": "Talk to an Expert",
-        "hero_btn2_url": "/pages/contact-us",
+        "hero_btn2_url": "\/pages\/contact-us",
+        "show_opening": true,
         "opening_title": "Opening a New Business?",
         "opening_body": "Check out our starter packages curated for each type of business — assembled by our equipment experts.",
         "opening_btn_text": "View Starter Packages",
+        "opening_btn_url": "",
+        "show_cta": true,
         "cta_eyebrow": "Built for hospitality professionals",
         "cta_title": "Outfit your kitchen with confidence.",
         "cta_body": "From a single piece of equipment to a full commercial fit-out, our specialists curate the right solution for your operation — every time.",
         "cta_btn1_text": "Request a Quote",
-        "cta_btn1_url": "/pages/contact-us",
+        "cta_btn1_url": "\/pages\/contact-us",
         "cta_btn2_text": "Browse Catalog",
-        "cta_btn2_url": "/collections/restaurant-equipment"
+        "cta_btn2_url": "\/collections\/restaurant-equipment",
+        "show_features": true,
+        "feat_1_title": "Expert Support",
+        "feat_1_text": "Get help from our equipment experts",
+        "feat_2_title": "Lowest Prices",
+        "feat_2_text": "Competitive pricing guaranteed",
+        "feat_3_title": "Fast Shipping",
+        "feat_3_text": "Quick delivery across the country",
+        "feat_4_title": "Trusted by Businesses",
+        "feat_4_text": "Thousands of satisfied customers",
+        "sidebar_title": "Browse Use Cases",
+        "chip_all_label": "All Use Cases",
+        "sidebar_help_title": "Need Help Choosing?",
+        "sidebar_help_body": "Our equipment experts can help you find the perfect solutions for your business — at the best price.",
+        "sidebar_help_btn_text": "Contact an Expert",
+        "sidebar_help_btn_url": "",
+        "breadcrumb_home_label": "Home",
+        "breadcrumb_home_url": "",
+        "breadcrumb_current_label": "Use Cases",
+        "color_maroon": "#8b1538",
+        "color_navy": "#1b2b47",
+        "color_gold": "#d4af37",
+        "color_coral": "#ff6b6b"
       }
     }
   },
-  "order": ["main"]
+  "order": [
+    "main"
+  ]
 }

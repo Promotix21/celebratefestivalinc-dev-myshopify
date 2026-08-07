@@ -13,8 +13,22 @@
   }
 
   .industry-use-cases__header {
-    text-align: center;
-    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    text-align: left;
+    margin-bottom: 12px;
+  }
+
+  .industry-use-cases__header-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .industry-use-cases__view-all--header {
+    flex-shrink: 0;
+    margin-top: 0;
   }
 
   .industry-use-cases__title {
@@ -41,6 +55,16 @@
     }
     .industry-use-cases__subtitle {
       font-size: 16px;
+    }
+    .industry-use-cases__header {
+      flex-direction: column;
+      text-align: center;
+    }
+    .industry-use-cases__view-all--header {
+      display: none;
+    }
+    .industry-use-cases__view-all-wrap--mobile {
+      display: block;
     }
   }
   
@@ -112,14 +136,15 @@
   }
   
   .use-case-card__tags {
-    display: none; /* Hidden for launch - client unable to link all tags */
+    display: flex;
     flex-wrap: wrap;
     gap: 8px;
     margin-bottom: 25px;
   }
   
   .use-case-card__tag {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     padding: 6px 14px;
     background: #f1f5f9;
     color: var(--primary-color, #244469);
@@ -129,6 +154,14 @@
     text-decoration: none;
     transition: all 0.2s ease;
     border: 1px solid transparent;
+    gap: 8px;
+  }
+
+  .use-case-card__tag-image {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
   }
   
   .use-case-card__tag:hover {
@@ -206,7 +239,41 @@
     width: 18px;
     height: 18px;
   }
-  
+
+  .industry-use-cases__view-all-wrap {
+    text-align: center;
+    margin-top: 40px;
+  }
+
+  .industry-use-cases__view-all-wrap--mobile {
+    display: none;
+  }
+
+  .industry-use-cases__view-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--primary-color, #244469);
+    color: #fff;
+    padding: 15px 34px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .industry-use-cases__view-all:hover {
+    background: #1b3350;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(36, 68, 105, 0.35);
+  }
+
+  .industry-use-cases__view-all svg {
+    width: 16px;
+    height: 16px;
+  }
+
   /* Tablet Styles - 2x4 grid */
   @media (max-width: 1024px) {
     .industry-use-cases__grid {
@@ -286,8 +353,18 @@
   <div class="industry-use-cases__container">
     <!-- Header -->
     <div class="industry-use-cases__header">
-      <h2 class="industry-use-cases__title">{{ section.settings.title }}</h2>
-      <p class="industry-use-cases__subtitle">{{ section.settings.subtitle }}</p>
+      <div class="industry-use-cases__header-text">
+        <h2 class="industry-use-cases__title">{{ section.settings.title }}</h2>
+        <p class="industry-use-cases__subtitle">{{ section.settings.subtitle }}</p>
+      </div>
+      {% if section.settings.show_view_all %}
+        <a href="{{ section.settings.view_all_url | default: '/pages/use-cases' }}" class="industry-use-cases__view-all industry-use-cases__view-all--header">
+          {{ section.settings.view_all_text | default: 'View All Use Cases' }}
+          <svg fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+            <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd"></path>
+          </svg>
+        </a>
+      {% endif %}
     </div>
     
     <!-- Use Cases Grid -->
@@ -316,24 +393,30 @@
               </a>
               <p class="use-case-card__description">{{ block.settings.description }}</p>
 
-              {% if block.settings.tags != blank %}
-                <div class="use-case-card__tags">
-                  {% assign tags_array = block.settings.tags | split: ',' %}
-                  {% for tag_item in tags_array %}
-                    {% assign tag_parts = tag_item | split: '|' %}
-                    {% assign tag_name = tag_parts[0] | strip %}
-                    {% assign tag_url = tag_parts[1] | strip %}
-                    {% if tag_url == blank %}
-                      {% assign tag_url = '/collections/' | append: tag_name | handleize %}
-                    {% elsif tag_url contains '/' %}
-                      {% comment %} URL is already a path {% endcomment %}
-                    {% else %}
-                      {% assign tag_url = '/collections/' | append: tag_url %}
-                    {% endif %}
+              {% assign subitems_exist = false %}
+              {% if block.settings.subitem_1_title != blank or block.settings.subitem_2_title != blank or block.settings.subitem_3_title != blank or block.settings.subitem_4_title != blank %}
+                {% assign subitems_exist = true %}
+              {% endif %}
 
-                    <a href="{{ tag_url }}" class="use-case-card__tag">
-                      {{ tag_name }}
-                    </a>
+              {% if subitems_exist %}
+                <div class="use-case-card__tags">
+                  {% for i in (1..4) %}
+                    {% capture image_key %}subitem_{{ i }}_image{% endcapture %}
+                    {% capture title_key %}subitem_{{ i }}_title{% endcapture %}
+                    {% capture collection_key %}subitem_{{ i }}_collection{% endcapture %}
+                    
+                    {% assign subitem_image = block.settings[image_key] %}
+                    {% assign subitem_title = block.settings[title_key] %}
+                    {% assign subitem_collection = block.settings[collection_key] %}
+                    
+                    {% if subitem_title != blank %}
+                      <a href="{{ subitem_collection.url | default: '#' }}" class="use-case-card__tag">
+                        {% if subitem_image != blank %}
+                          <img src="{{ subitem_image | image_url: width: 48 }}" alt="{{ subitem_title | escape }}" class="use-case-card__tag-image" loading="lazy" width="24" height="24">
+                        {% endif %}
+                        <span class="use-case-card__tag-text">{{ subitem_title }}</span>
+                      </a>
+                    {% endif %}
                   {% endfor %}
                 </div>
               {% endif %}
@@ -351,7 +434,19 @@
         {% endif %}
       {% endfor %}
     </div>
-    
+
+    <!-- View All Use Cases Button (mobile — shown at bottom) -->
+    {% if section.settings.show_view_all %}
+      <div class="industry-use-cases__view-all-wrap industry-use-cases__view-all-wrap--mobile">
+        <a href="{{ section.settings.view_all_url | default: '/pages/use-cases' }}" class="industry-use-cases__view-all">
+          {{ section.settings.view_all_text | default: 'View All Use Cases' }}
+          <svg fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+            <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    {% endif %}
+
     <!-- Bottom CTA Section -->
     {% if section.settings.show_bottom_cta %}
       <div class="industry-use-cases__cta">
@@ -433,6 +528,28 @@
       "type": "url",
       "id": "cta_button_url",
       "label": "CTA Button URL"
+    },
+    {
+      "type": "header",
+      "content": "View All Use Cases Button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View All Use Cases' Button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "Button Text",
+      "default": "View All Use Cases"
+    },
+    {
+      "type": "url",
+      "id": "view_all_url",
+      "label": "Button URL",
+      "info": "Defaults to /pages/use-cases"
     }
   ],
   "blocks": [
@@ -463,10 +580,80 @@
           "default": "all"
         },
         {
-          "type": "textarea",
-          "id": "tags",
-          "label": "Equipment Tags",
-          "info": "Format: 'Display Name|/collections/handle' or 'Display Name|handle' (e.g., 'Pizza Ovens|/collections/pizza-ovens, Dough Mixers|dough-mixers')"
+          "type": "header",
+          "content": "Subitem 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "subitem_1_image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "subitem_1_title",
+          "label": "Title"
+        },
+        {
+          "type": "collection",
+          "id": "subitem_1_collection",
+          "label": "Collection"
+        },
+        {
+          "type": "header",
+          "content": "Subitem 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "subitem_2_image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "subitem_2_title",
+          "label": "Title"
+        },
+        {
+          "type": "collection",
+          "id": "subitem_2_collection",
+          "label": "Collection"
+        },
+        {
+          "type": "header",
+          "content": "Subitem 3"
+        },
+        {
+          "type": "image_picker",
+          "id": "subitem_3_image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "subitem_3_title",
+          "label": "Title"
+        },
+        {
+          "type": "collection",
+          "id": "subitem_3_collection",
+          "label": "Collection"
+        },
+        {
+          "type": "header",
+          "content": "Subitem 4"
+        },
+        {
+          "type": "image_picker",
+          "id": "subitem_4_image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "subitem_4_title",
+          "label": "Title"
+        },
+        {
+          "type": "collection",
+          "id": "subitem_4_collection",
+          "label": "Collection"
         },
         {
           "type": "text",
@@ -492,7 +679,6 @@
             "title": "Pizza Restaurants",
             "description": "Complete solutions for pizzerias from dough preparation to wood-fired perfection.",
             "collection_handle": "restaurant-equipment",
-            "tags": "Pizza Ovens|pizza-ovens, Dough Mixers|dough-mixers, Prep Tables|prep-tables, Refrigerated Units|refrigerated-units",
             "cta_text": "View Equipment",
             "cta_url": "/collections/pizza-equipment"
           }
@@ -503,7 +689,6 @@
             "title": "Italian Restaurants",
             "description": "Authentic equipment for pasta making, sauce preparation, and fine Italian cuisine.",
             "collection_handle": "restaurant-equipment",
-            "tags": "Pasta Machines|pasta-machines, Sauce Kettles|sauce-kettles, Wine Storage|wine-storage, Specialty Cookware|specialty-cookware",
             "cta_text": "View Equipment",
             "cta_url": "/collections/italian-restaurant-equipment"
           }
@@ -514,7 +699,6 @@
             "title": "French Bistros",
             "description": "Precision cooking equipment for fine French cuisine and artisanal preparations.",
             "collection_handle": "restaurant-equipment",
-            "tags": "Combi Ovens|combi-ovens, Precision Cookers|precision-cookers, Pastry Equipment|pastry-equipment, Sous Vide|sous-vide",
             "cta_text": "View Equipment",
             "cta_url": "/collections/french-bistro-equipment"
           }
@@ -525,7 +709,6 @@
             "title": "Fast Casual",
             "description": "High-volume equipment designed for speed and consistency in fast-casual dining.",
             "collection_handle": "restaurant-equipment",
-            "tags": "Speed Ovens|speed-ovens, Rapid Fryers|rapid-fryers, Automated Equipment|automated-equipment, Holding Stations|holding-stations",
             "cta_text": "View Equipment",
             "cta_url": "/collections/fast-casual-equipment"
           }
@@ -536,7 +719,6 @@
             "title": "Indian Restaurants",
             "description": "Authentic tandoors and specialty equipment for traditional Indian cooking methods.",
             "collection_handle": "restaurant-equipment",
-            "tags": "Tandoor Ovens|tandoor-ovens, Specialty Cookware|specialty-cookware, Rice Cookers|rice-cookers, Spice Grinders|spice-grinders",
             "cta_text": "View Equipment",
             "cta_url": "/collections/indian-restaurant-equipment"
           }
@@ -547,7 +729,6 @@
             "title": "Bakeries & Cafes",
             "description": "Professional baking equipment and display solutions for bakeries and coffee shops.",
             "collection_handle": "restaurant-equipment",
-            "tags": "Deck Ovens|deck-ovens, Mixers|mixers, Display Cases|display-cases, Coffee Equipment|coffee-equipment",
             "cta_text": "View Equipment",
             "cta_url": "/collections/bakery-cafe-equipment"
           }

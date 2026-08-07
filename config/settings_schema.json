@@ -1,13 +1,12 @@
 [
   {
-  "name": "theme_info",
-  "theme_name": "Celebrate Festival",
-  "theme_author": "Rajesh Kumar",
-  "theme_version": "1.0.0",
- 
-  "theme_documentation_url": "https://hiraya.digital",
-  "theme_support_url": "https://hiraya.digital"
-},
+    "name": "theme_info",
+    "theme_name": "Celebrate Festival",
+    "theme_author": "Rajesh Kumar",
+    "theme_version": "1.0.0",
+    "theme_documentation_url": "https:\/\/hiraya.digital",
+    "theme_support_url": "https:\/\/hiraya.digital"
+  },
   {
     "name": "t:settings_schema.logo.name",
     "settings": [

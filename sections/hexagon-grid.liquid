@@ -420,7 +420,7 @@
       {% assign link_url = section.settings[link_key] %}
 
       {%- assign brand_idx = forloop.index0 | plus: 34 -%}
-      {%- assign default_brand_link = brand_links[brand_idx] | default: '/pages/brands-1' -%}
+      {%- assign default_brand_link = brand_links[brand_idx] | default: '/pages/brands' -%}
       {% assign hex_link = link_url | default: default_brand_link %}
       <a href="{{ hex_link }}" class="hexagon-link{% if i > 6 %} hide-on-mobile{% endif %}">
         <div class="hexagon-item">
@@ -453,7 +453,7 @@
 
     <!-- Stats Section -->
     <div class="stats-section">
-      <a href="{{ section.settings.stat1_url | default: '/pages/brands-1' }}" class="stat-item">
+      <a href="{{ section.settings.stat1_url | default: '/pages/brands' }}" class="stat-item">
         <div class="stat-number">{{ section.settings.stat1_number }}</div>
         <div class="stat-label">{{ section.settings.stat1_label }}</div>
       </a>

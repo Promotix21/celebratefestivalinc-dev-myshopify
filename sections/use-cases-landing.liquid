@@ -848,24 +848,39 @@
             </div>
 
             <!-- Product thumbnails -->
-            {%- assign thumb_col = collections[block.settings.featured_collection] -%}
-            {%- if block.settings.featured_collection != blank and thumb_col != blank -%}
+            {% assign has_thumbs = false %}
+            {% if block.settings.thumb_1_title != blank or block.settings.thumb_2_title != blank or block.settings.thumb_3_title != blank or block.settings.thumb_4_title != blank %}
+              {% assign has_thumbs = true %}
+            {% endif %}
+
+            {%- if has_thumbs -%}
               <div class="ucl__biz-products">
-                {%- for product in thumb_col.products limit: 4 -%}
-                  <a class="ucl__product" href="{{ product.url }}">
-                    <div class="ucl__product-thumb">
-                      {%- if product.featured_image != blank -%}
-                        <img src="{{ product.featured_image | image_url: width: 250 }}"
-                             alt="{{ product.title }}"
-                             width="250" height="250"
-                             loading="lazy">
-                      {%- else -%}
-                        <div style="width:100%;height:100%;background:var(--gray-100);display:flex;align-items:center;justify-content:center;font-size:28px;">📦</div>
-                      {%- endif -%}
-                    </div>
-                    <div class="ucl__product-name">{{ product.type | default: product.title | truncate: 25 }}</div>
-                  </a>
-                {%- endfor -%}
+                {% for i in (1..4) %}
+                  {% capture img_key %}thumb_{{ i }}_image{% endcapture %}
+                  {% capture title_key %}thumb_{{ i }}_title{% endcapture %}
+                  {% capture url_key %}thumb_{{ i }}_url{% endcapture %}
+                  
+                  {% assign thumb_img = block.settings[img_key] %}
+                  {% assign thumb_title = block.settings[title_key] %}
+                  {% assign thumb_url = block.settings[url_key] %}
+
+                  {% if thumb_title != blank %}
+                    <a class="ucl__product" href="{{ thumb_url | default: '#' }}">
+                      <div class="ucl__product-thumb">
+                        {%- if thumb_img != blank -%}
+                          <img src="{{ thumb_img | image_url: width: 250 }}"
+                               alt="{{ thumb_title | escape }}"
+                               width="250" height="250"
+                               loading="lazy">
+                        {%- else -%}
+                          <div style="width:100%;height:100%;background:var(--gray-100);display:flex;align-items:center;justify-content:center;font-size:28px;">📦</div>
+                        {%- endif -%}
+                      </div>
+                      <div class="ucl__product-name">{{ thumb_title | truncate: 25 }}</div>
+                    </a>
+                  {% endif %}
+                {% endfor %}
+
                 {%- if block.settings.view_all_url != blank -%}
                   <a href="{{ block.settings.view_all_url }}" class="ucl__view-all">View All</a>
                 {%- endif -%}
@@ -1355,10 +1370,80 @@
           "content": "Product Thumbnails"
         },
         {
+          "type": "header",
+          "content": "Thumbnail 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "thumb_1_image",
+          "label": "Image 1"
+        },
+        {
           "type": "text",
-          "id": "featured_collection",
-          "label": "Collection handle",
-          "info": "e.g. 'commercial-ovens'. The first 4 products from this collection will appear as thumbnails."
+          "id": "thumb_1_title",
+          "label": "Title 1"
+        },
+        {
+          "type": "url",
+          "id": "thumb_1_url",
+          "label": "Link 1"
+        },
+        {
+          "type": "header",
+          "content": "Thumbnail 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "thumb_2_image",
+          "label": "Image 2"
+        },
+        {
+          "type": "text",
+          "id": "thumb_2_title",
+          "label": "Title 2"
+        },
+        {
+          "type": "url",
+          "id": "thumb_2_url",
+          "label": "Link 2"
+        },
+        {
+          "type": "header",
+          "content": "Thumbnail 3"
+        },
+        {
+          "type": "image_picker",
+          "id": "thumb_3_image",
+          "label": "Image 3"
+        },
+        {
+          "type": "text",
+          "id": "thumb_3_title",
+          "label": "Title 3"
+        },
+        {
+          "type": "url",
+          "id": "thumb_3_url",
+          "label": "Link 3"
+        },
+        {
+          "type": "header",
+          "content": "Thumbnail 4"
+        },
+        {
+          "type": "image_picker",
+          "id": "thumb_4_image",
+          "label": "Image 4"
+        },
+        {
+          "type": "text",
+          "id": "thumb_4_title",
+          "label": "Title 4"
+        },
+        {
+          "type": "url",
+          "id": "thumb_4_url",
+          "label": "Link 4"
         },
         {
           "type": "url",

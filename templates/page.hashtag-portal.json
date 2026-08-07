@@ -1,12 +1,3 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
     "main": {
@@ -41,7 +32,7 @@
         "gate_button": "Log In",
         "hero_badge_text": "Hashtag Member Portal",
         "hero_greeting": "Welcome back,",
-        "hero_title": "Your Hashtag<br><span>Equipment Hub</span>",
+        "hero_title": "Your Hashtag<br><span>Equipment Hub<\/span>",
         "hero_description": "Your exclusive portal for Hashtag restaurant equipment. Browse curated collections at your member-only pricing.",
         "stat_1_value": "50+",
         "stat_1_label": "Premium Brands",
@@ -51,9 +42,9 @@
         "stat_3_label": "Shipping on Orders",
         "stat_4_value": "Priority",
         "stat_4_label": "Dedicated Support Line",
-        "benefits_title": "Premium Member <em>Benefits</em>",
+        "benefits_title": "Premium Member <em>Benefits<\/em>",
         "benefits_subtitle": "Everything that comes with your Hashtag membership.",
-        "support_heading": "Your Dedicated <em>Premium Line</em>",
+        "support_heading": "Your Dedicated <em>Premium Line<\/em>",
         "support_title": "Your Dedicated Premium Line",
         "support_desc": "As a Premium member, you have priority access to our dedicated support team for orders, quotes, and product inquiries.",
         "support_phone": "4086739999",

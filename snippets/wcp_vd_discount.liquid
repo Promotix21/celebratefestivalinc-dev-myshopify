@@ -52,6 +52,12 @@
               {% endif %}
           {% endfor %}         
         {% endif %}
+	{% when 'm' %}
+        {% if wcp_vd_metafield_data contains selected_product.id %}
+        	{% assign wcp_apply_vd = "true" %}
+			{% assign Discounts_values_with_qty = wcp_vd_data |split: "~~" %}			
+			{% assign Discounts_values_with_qty = Discounts_values_with_qty[1] | split: "," %}  
+        {% endif %}  
 {% endcase %}
 {% if wcp_apply_vd == "true" %}
   {% if wcp_vd_on == 'v' %}
@@ -80,6 +86,10 @@
                  {% assign wcp_vd_Current_Prd_quantity = wcp_vd_Current_Prd_quantity | plus:CartItem.quantity%}                    
              {% endif %}               
           {% endif %}
+	  {% when 'm' %}
+        {% if wcp_vd_metafield_data contains CartItem.product_id %}
+          {% assign wcp_vd_Current_Prd_quantity = wcp_vd_Current_Prd_quantity | plus:CartItem.quantity%}
+        {% endif %} 
     {% endcase %}
   {% endfor %}
 {% endif %}

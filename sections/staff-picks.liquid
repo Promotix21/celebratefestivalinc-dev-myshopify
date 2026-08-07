@@ -405,6 +405,7 @@
               show_rating: false,
               show_sale_badge: true,
               show_shipping_badge: true,
+              show_free_shipping: section.settings.show_card_free_shipping,
               show_sku: true,
               show_qty_input: true,
               homepage_pricing_mode: true
@@ -487,6 +488,13 @@ document.addEventListener('DOMContentLoaded', function() {
       "max": 20,
       "step": 1,
       "default": 10
+    },
+    {
+      "type": "checkbox",
+      "id": "show_card_free_shipping",
+      "label": "Show \"Free Shipping\" badge on product cards",
+      "default": false,
+      "info": "Adds a small green Free Shipping chip next to the category label for products with the Free shipping metafield turned on. Off by default to keep cards compact."
     }
   ],
   "presets": [
@@ -495,4 +503,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   ]
 }
-{% endschema %}
+{% endschema %}

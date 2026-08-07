@@ -48,3 +48,6 @@ NEXT-SESSION-PROMPT.md
 CORTEX_INTELLIGENCE_MASTER.md
 
 GEMINI.md
+
+# Ignore generated documentation
+docs/

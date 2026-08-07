@@ -1,12 +1,3 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
     "main": {
@@ -22,7 +13,7 @@
         "category_2": {
           "type": "product_category",
           "settings": {
-            "title": "UK MADE ROTOQUIP NAAN/BREAD OVEN",
+            "title": "UK MADE ROTOQUIP NAAN\/BREAD OVEN",
             "link_url": ""
           }
         },
@@ -136,24 +127,24 @@
         "category_15"
       ],
       "settings": {
-        "hero_background_image": "shopify://shop_images/Gemini_Generated_Image_9kl4ry9kl4ry9kl4.png",
+        "hero_background_image": "shopify:\/\/shop_images\/Gemini_Generated_Image_9kl4ry9kl4ry9kl4.png",
         "hero_overlay_opacity": 90,
         "hero_tagline_pill": "Est. Since Day One",
         "hero_title": "About Celebrate Festival Inc",
         "hero_subtitle": "Your Trusted Partner in Restaurant Equipment Excellence",
         "hero_cta_text": "Explore Our Products",
-        "hero_cta_url": "/collections/restaurant-equipment",
+        "hero_cta_url": "\/collections\/restaurant-equipment",
         "hero_secondary_cta": "Contact Us",
         "welcome_label": "Who We Are",
         "welcome_title": "Welcome to Celebrate Festival Inc",
         "welcome_paragraph_1": "Welcome to Celebrate Festival Inc - restaurant equipment company, your trusted partner in the world of restaurant equipment and solutions. With a passion for culinary excellence and a commitment to helping your food establishment thrive, we have been serving the needs of restaurateurs, bakers, deli owners, and culinary enthusiasts nationwide.",
         "welcome_paragraph_2": "At Celebrate Festival Inc, we understand that each restaurant, bakery, and deli is unique, with distinct requirements and aspirations. That's why we offer a comprehensive range of top-quality restaurant products tailored to suit every facet of your culinary venture. Whether you're setting up a cozy cafe, a bustling bakery, or an elegant fine-dining establishment, we've got you covered.",
-        "welcome_image": "shopify://shop_images/Gemini_Generated_Image_wm55b8wm55b8wm55.png",
+        "welcome_image": "shopify:\/\/shop_images\/Gemini_Generated_Image_wm55b8wm55b8wm55.png",
         "expertise_label": "Our Expertise",
         "expertise_title": "Specialists in Indian Restaurant Equipment",
         "expertise_paragraph_1": "While we take pride in catering to a wide spectrum of culinary businesses, our true expertise shines in a specific niche – the vibrant and diverse world of Indian restaurants. With a deep understanding of the intricacies of Indian cuisine and a commitment to sourcing authentic and innovative products, we have earned the trust of countless Indian restaurant owners and chefs across the country.",
         "expertise_paragraph_2": "Our vast network of satisfied customers stands as a testament to our unwavering dedication to excellence.",
-        "expertise_image": "shopify://shop_images/ChatGPT_Image_Jun_27_2025_05_07_38_PM.png",
+        "expertise_image": "shopify:\/\/shop_images\/ChatGPT_Image_Jun_27_2025_05_07_38_PM.png",
         "stat_1_number": "1000+",
         "stat_1_label": "Satisfied Customers",
         "stat_2_number": "500+",

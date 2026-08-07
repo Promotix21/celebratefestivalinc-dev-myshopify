@@ -1,12 +1,3 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
     "main": {
@@ -157,22 +148,22 @@
         "promo_1": {
           "type": "promo_widget",
           "settings": {
-            "icon": "\ud83e\uddee",
+            "icon": "🧮",
             "title": "Recipe Converter",
             "description": "Scale your recipes up or down with our free recipe conversion calculator.",
             "link_text": "Try the Calculator",
-            "link_url": "/pages/recipe-converter",
+            "link_url": "\/pages\/recipe-converter",
             "bg_color": "#f0f9ff"
           }
         },
         "promo_2": {
           "type": "promo_widget",
           "settings": {
-            "icon": "\ud83d\udcdd",
+            "icon": "📝",
             "title": "Blog",
             "description": "Stay up to date with the latest food service industry news and trends.",
             "link_text": "Visit the Blog",
-            "link_url": "/blogs/resources",
+            "link_url": "\/blogs\/resources",
             "bg_color": "#fef3f2"
           }
         }

@@ -51,6 +51,12 @@
           {% break %}
         {% endif %}
       {% endfor %}
+	  {% when 'm' %}
+        {% if wcp_vd_metafield_data contains wcp_table_current_variant.id %}
+        	{% assign wcp_apply_vd = "true" %}
+			{% assign Discounts_values_with_qty = wcp_vd_data |split: "~~" %}			
+			{% assign Discounts_values_with_qty = Discounts_values_with_qty[1] | split: "," %}  
+        {% endif %}  
     {% endcase %}  
 	{% if wcp_apply_vd == "true" %}      
 		{% assign Discount_Price = 0 %}		

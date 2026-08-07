@@ -31,6 +31,21 @@
 {% if shop.metafields.wcp_status.wcp_status != 'disabled' and customer %}
   {% assign p_discount_value = 0 %}
   {% for discount_key in active_discounts_array %}
+    {% assign excluded_itmes = shop.metafields.wcp_excludeItems[discount_key] %}
+    {% assign skip_discount = false %}
+    {% if excluded_itmes contains 'product' and excluded_itmes contains wcp_discount.id %}
+      {% continue %}
+    {% elsif excluded_itmes contains 'collection' %}
+      {% for c in wcp_discount.collections %}
+        {% if excluded_itmes contains c.id %}
+          {% assign skip_discount = true %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    {% if skip_discount %}
+      {% continue %}
+    {% endif %}
     {% assign key_split = discount_key | split: '-' %}
     {% assign key_split_length = key_split | size %}
     {% if key_split_length > 2 %}

@@ -1,12 +1,3 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
     "main": {
@@ -17,7 +8,8 @@
           "settings": {
             "label": "Produce Coolers",
             "anchor": "produce-coolers",
-            "icon_image_url": "icon-produce-coolers.png"
+            "icon_image_url": "icon-produce-coolers.png",
+            "icon_svg": ""
           }
         },
         "nav_openair": {
@@ -25,7 +17,8 @@
           "settings": {
             "label": "Open Air Merchandisers",
             "anchor": "open-air-merchandisers",
-            "icon_image_url": "icon-open-air-merchandisers.png"
+            "icon_image_url": "icon-open-air-merchandisers.png",
+            "icon_svg": ""
           }
         },
         "nav_reachin": {
@@ -33,7 +26,8 @@
           "settings": {
             "label": "Reach-In Refrigeration",
             "anchor": "reach-in-refrigeration",
-            "icon_image_url": "icon-reach-in-refrigeration.png"
+            "icon_image_url": "icon-reach-in-refrigeration.png",
+            "icon_svg": ""
           }
         },
         "nav_freezers": {
@@ -41,7 +35,8 @@
           "settings": {
             "label": "Freezers",
             "anchor": "freezers",
-            "icon_image_url": "icon-freezers.png"
+            "icon_image_url": "icon-freezers.png",
+            "icon_svg": ""
           }
         },
         "nav_hotfood": {
@@ -49,7 +44,8 @@
           "settings": {
             "label": "Hot Food Display",
             "anchor": "hot-food-display",
-            "icon_image_url": "icon-hot-food-display.png"
+            "icon_image_url": "icon-hot-food-display.png",
+            "icon_svg": ""
           }
         },
         "nav_deli": {
@@ -57,7 +53,8 @@
           "settings": {
             "label": "Deli Cases",
             "anchor": "deli-cases",
-            "icon_image_url": "icon-deli-cases.png"
+            "icon_image_url": "icon-deli-cases.png",
+            "icon_svg": ""
           }
         },
         "nav_shelving": {
@@ -65,7 +62,8 @@
           "settings": {
             "label": "Shelving & Storage",
             "anchor": "shelving-storage",
-            "icon_image_url": "icon-shelving-storage.png"
+            "icon_image_url": "icon-shelving-storage.png",
+            "icon_svg": ""
           }
         },
         "nav_checkout": {
@@ -73,7 +71,8 @@
           "settings": {
             "label": "Checkout Counters",
             "anchor": "checkout-counters",
-            "icon_image_url": "icon-checkout-counters.png"
+            "icon_image_url": "icon-checkout-counters.png",
+            "icon_svg": ""
           }
         },
         "nav_more": {
@@ -81,12 +80,14 @@
           "settings": {
             "label": "More Equipment",
             "anchor": "more-equipment",
-            "icon_image_url": "icon-more-equipment.png"
+            "icon_image_url": "icon-more-equipment.png",
+            "icon_svg": ""
           }
         },
         "equip_produce": {
           "type": "equip_section",
           "settings": {
+            "image_url": "industry-produce-coolers.png",
             "section_id": "produce-coolers",
             "is_reverse": false,
             "title": "Produce Coolers",
@@ -95,15 +96,16 @@
             "bullet_2": "Refrigerated Produce Cases",
             "bullet_3": "Island Produce Coolers",
             "cta_text": "Shop Produce Coolers",
-            "cta_url": "/collections/refrigerated-open-merchandizer-all",
-            "image_url": "industry-produce-coolers.png",
+            "cta_url": "\/collections\/refrigerated-open-merchandizer-all",
+            "popular_products_label": "Popular Products",
             "featured_collection": "refrigerated-open-merchandizer-all",
-            "view_all_url": "/collections/refrigerated-open-merchandizer-all"
+            "view_all_url": "\/collections\/refrigerated-open-merchandizer-all"
           }
         },
         "equip_hotfood": {
           "type": "equip_section",
           "settings": {
+            "image_url": "industry-hot-food-display.png",
             "section_id": "hot-food-display",
             "is_reverse": true,
             "title": "Hot Food Display",
@@ -112,15 +114,16 @@
             "bullet_2": "Heated Merchandisers",
             "bullet_3": "Pizza & Food Warmers",
             "cta_text": "Shop Hot Food Display",
-            "cta_url": "/collections/new-theme-hot-food-display-cases",
-            "image_url": "industry-hot-food-display.png",
+            "cta_url": "\/collections\/new-theme-hot-food-display-cases",
+            "popular_products_label": "Popular Products",
             "featured_collection": "new-theme-hot-food-display-cases",
-            "view_all_url": "/collections/new-theme-hot-food-display-cases"
+            "view_all_url": "\/collections\/new-theme-hot-food-display-cases"
           }
         },
         "equip_reachin": {
           "type": "equip_section",
           "settings": {
+            "image_url": "industry-reach-in-refrigeration.png",
             "section_id": "reach-in-refrigeration",
             "is_reverse": false,
             "title": "Reach-In Refrigeration",
@@ -129,137 +132,168 @@
             "bullet_2": "Glass Door Merchandisers",
             "bullet_3": "Specialty Refrigerators",
             "cta_text": "Shop Reach-In Refrigeration",
-            "cta_url": "/collections/reach-in-refrigerators-all",
-            "image_url": "industry-reach-in-refrigeration.png",
+            "cta_url": "\/collections\/reach-in-refrigerators-all",
+            "popular_products_label": "Popular Products",
             "featured_collection": "reach-in-refrigerators-all",
-            "view_all_url": "/collections/reach-in-refrigerators-all"
+            "view_all_url": "\/collections\/reach-in-refrigerators-all"
           }
         },
         "store_convenience": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
+            "image_url": "",
             "name": "Small Convenience Store",
-            "url": "/collections/restaurant-equipment"
+            "url": "\/collections\/restaurant-equipment"
           }
         },
         "store_supermarket": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
+            "image_url": "",
             "name": "Supermarket",
-            "url": "/collections/restaurant-equipment"
+            "url": "\/collections\/restaurant-equipment"
           }
         },
         "store_asian": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
+            "image_url": "",
             "name": "Asian Grocery",
-            "url": "/collections/restaurant-equipment"
+            "url": "\/collections\/restaurant-equipment"
           }
         },
         "store_indian": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
+            "image_url": "",
             "name": "Indian Grocery",
-            "url": "/collections/indian-specialty"
+            "url": "\/collections\/indian-specialty"
           }
         },
         "store_organic": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
+            "image_url": "",
             "name": "Organic Market",
-            "url": "/collections/restaurant-equipment"
+            "url": "\/collections\/restaurant-equipment"
           }
         },
         "store_liquor": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
+            "image_url": "",
             "name": "Liquor Store",
-            "url": "/collections/bar-refrigeration-all"
+            "url": "\/collections\/bar-refrigeration-all"
           }
         },
         "store_wholesale": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
+            "image_url": "",
             "name": "Wholesale Club",
-            "url": "/collections/restaurant-equipment"
+            "url": "\/collections\/restaurant-equipment"
           }
         },
         "store_grabngo": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
+            "image_url": "",
             "name": "Grab-and-Go Market",
-            "url": "/collections/new-theme-hot-food-display-cases"
+            "url": "\/collections\/new-theme-hot-food-display-cases"
           }
         },
         "guide_produce": {
           "type": "guide",
           "settings": {
+            "image_url": "",
             "title": "How to Choose the Right Produce Cooler for Your Store",
-            "url": "/blogs/news",
+            "url": "\/blogs\/news",
             "meta": "Guide"
           }
         },
         "guide_openair": {
           "type": "guide",
           "settings": {
+            "image_url": "",
             "title": "Open Air vs Glass Door Merchandisers: What's Best for Your Grocery Store?",
-            "url": "/blogs/news",
+            "url": "\/blogs\/news",
             "meta": "Guide"
           }
         },
         "guide_layout": {
           "type": "guide",
           "settings": {
+            "image_url": "",
             "title": "Refrigeration Layout Guide for Supermarkets",
-            "url": "/blogs/news",
+            "url": "\/blogs\/news",
             "meta": "Guide"
           }
         },
         "brand_turboair": {
           "type": "brand",
           "settings": {
+            "brand_image_url": "",
             "name": "Turbo Air",
-            "url": "/pages/turbo-air",
+            "url": "\/pages\/turbo-air",
+            "color": "#8a8a8a",
             "italic": false
           }
         },
         "brand_true": {
           "type": "brand",
           "settings": {
+            "brand_image_url": "",
             "name": "True",
-            "url": "/collections/reach-in-refrigerators-all",
+            "url": "\/collections\/reach-in-refrigerators-all",
+            "color": "#8a8a8a",
             "italic": false
           }
         },
         "brand_beverageair": {
           "type": "brand",
           "settings": {
-            "name": "Beverage-Air",
-            "url": "/collections/reach-in-refrigerators-all",
+            "brand_image_url": "",
+            "name": "Migali",
+            "url": "\/collections\/reach-in-refrigerators-all",
+            "color": "#8a8a8a",
             "italic": false
           }
         },
         "brand_atosa": {
           "type": "brand",
           "settings": {
+            "brand_image_url": "",
             "name": "Atosa",
-            "url": "/collections/reach-in-refrigerators-all",
+            "url": "\/collections\/reach-in-refrigerators-all",
+            "color": "#8a8a8a",
             "italic": false
           }
         },
         "brand_hatco": {
           "type": "brand",
           "settings": {
-            "name": "Hatco",
-            "url": "/collections/new-theme-hot-food-display-cases",
+            "brand_image_url": "",
+            "name": "Dukers",
+            "url": "\/collections\/new-theme-hot-food-display-cases",
+            "color": "#8a8a8a",
             "italic": false
           }
         },
         "brand_vulcan": {
           "type": "brand",
           "settings": {
-            "name": "Vulcan",
-            "url": "/collections/new-theme-hot-food-display-cases",
+            "brand_image_url": "",
+            "name": "Arctic Air",
+            "url": "\/collections\/new-theme-hot-food-display-cases",
+            "color": "#8a8a8a",
             "italic": false
           }
         }
@@ -299,23 +333,48 @@
         "hero_title_override": "Grocery Store Equipment Solutions",
         "hero_lead": "Everything you need to run an efficient grocery store — from refrigeration to checkout counters, we've got you covered.",
         "hero_btn1_text": "Shop All Grocery Equipment",
-        "hero_btn1_url": "/collections/reach-in-refrigerators-all",
+        "hero_btn1_url": "\/collections\/reach-in-refrigerators-all",
         "hero_btn2_text": "Request a Quote",
-        "hero_btn2_url": "/pages/contact-us",
+        "hero_btn2_url": "\/pages\/contact-us",
+        "breadcrumb_home_label": "Home",
+        "breadcrumb_home_url": "",
+        "breadcrumb_parent_label": "Use Cases",
+        "breadcrumb_parent_url": "",
         "show_store_types": true,
         "store_types_title": "Shop by Store Type",
         "show_guides": false,
+        "guides_title": "Buying Guides & Resources",
+        "guides_view_all_url": "",
+        "guides_view_all_label": "View All Articles",
+        "auto_blog_handle": "resources",
+        "show_help": true,
         "help_title": "Need Help Choosing the Right Equipment?",
         "help_body": "Our experts can help you build the perfect setup for your grocery store.",
+        "help_btn_text": "Contact an Expert",
+        "help_btn_url": "",
         "show_brands": true,
         "brands_title": "Top Brands We Carry",
+        "show_expert_cta": true,
         "expert_eyebrow": "Designed for grocery operations",
         "expert_title": "Build out your store with confidence.",
         "expert_body": "From a single cooler to a complete refrigeration package, our specialists will spec the right equipment for your space, traffic, and budget.",
         "expert_btn1_text": "Request a Quote",
-        "expert_btn1_url": "/pages/contact-us",
+        "expert_btn1_url": "\/pages\/contact-us",
         "expert_btn2_text": "Talk to an Expert",
-        "expert_btn2_url": "/pages/contact-us"
+        "expert_btn2_url": "\/pages\/contact-us",
+        "show_features": true,
+        "feat_1_title": "Expert Support",
+        "feat_1_text": "Get help from our equipment experts",
+        "feat_2_title": "Lowest Prices Guaranteed",
+        "feat_2_text": "We match competitive pricing",
+        "feat_3_title": "Fast Shipping Across USA",
+        "feat_3_text": "Quick delivery, nationwide",
+        "feat_4_title": "Trusted by Businesses",
+        "feat_4_text": "Thousands of satisfied customers",
+        "color_maroon": "#8b1538",
+        "color_navy": "#1b2b47",
+        "color_gold": "#d4af37",
+        "color_coral": "#ff6b6b"
       }
     }
   },

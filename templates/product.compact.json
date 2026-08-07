@@ -1,12 +1,3 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
     "main": {
@@ -25,7 +16,7 @@
         "login_prompt_not_logged_in": "Login to see member pricing",
         "login_button_logged_in": "Learn About Membership",
         "login_button_not_logged_in": "Login to Your Account",
-        "membership_learn_more_url": "/pages/membership",
+        "membership_learn_more_url": "\/pages\/membership",
         "shipping_alert_text": "This item ships via freight. Additional time and fees may apply.",
         "show_shipping_info": true,
         "shipping_info_title": "Shipping Information",
@@ -49,16 +40,16 @@
         "qa_heading": "Questions & Answers",
         "qa_items": "",
         "qa_button_text": "Ask a Question",
-        "qa_button_link": "/pages/contact",
+        "qa_button_link": "\/pages\/contact",
         "enable_reviews": true,
         "reviews_heading": "Customer Reviews",
         "show_service_banner": true,
         "service_banner_icon": "🏆",
         "service_banner_title": "Parts & Service",
         "service_banner_description": "We stock genuine replacement parts and provide expert technical support.",
-        "service_banner_list": "<strong>Services Available:</strong><br>• Genuine OEM Parts<br>• Technical Support<br>• Installation Assistance<br>• Warranty Service",
+        "service_banner_list": "<strong>Services Available:<\/strong><br>• Genuine OEM Parts<br>• Technical Support<br>• Installation Assistance<br>• Warranty Service",
         "service_banner_button_text": "Find Parts & Manuals",
-        "service_banner_button_url": "/pages/parts-and-service",
+        "service_banner_button_url": "\/pages\/parts-and-service",
         "show_resources": true,
         "resource_links": "",
         "show_help_box": true,

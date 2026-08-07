@@ -430,7 +430,7 @@
         "stats_number_color": "#f85454",
         "stats_label_color": "#999999",
         "button_text": "View All Brands",
-        "button_url": "shopify://pages/brands-1",
+        "button_url": "shopify://pages/brands",
         "button_background_color": "#f85454",
         "button_text_color": "#ffffff",
         "button_hover_color": "#e74545",
