@@ -69,10 +69,10 @@
             "bullet_2": "Gas Griddles & Flat Tops",
             "bullet_3": "Charbroilers & Salamanders",
             "cta_text": "Shop Cooking Equipment",
-            "cta_url": "/collections/new-theme-electric-fryer",
+            "cta_url": "\/collections\/new-theme-electric-fryer",
             "popular_products_label": "Popular Products",
             "featured_collection": "new-theme-electric-fryer",
-            "view_all_url": "/collections/new-theme-electric-fryer"
+            "view_all_url": "\/collections\/new-theme-electric-fryer"
           }
         },
         "equip_holding": {
@@ -87,10 +87,10 @@
             "bullet_2": "Heated Holding Cabinets",
             "bullet_3": "Heat Lamps & Strip Warmers",
             "cta_text": "Shop Food Holding",
-            "cta_url": "/collections/new-theme-hot-food-display-cases",
+            "cta_url": "\/collections\/new-theme-hot-food-display-cases",
             "popular_products_label": "Popular Products",
             "featured_collection": "new-theme-hot-food-display-cases",
-            "view_all_url": "/collections/new-theme-hot-food-display-cases"
+            "view_all_url": "\/collections\/new-theme-hot-food-display-cases"
           }
         },
         "equip_prep": {
@@ -105,72 +105,108 @@
             "bullet_2": "Undercounter Refrigerators",
             "bullet_3": "Pizza & Bain Marie Prep Units",
             "cta_text": "Shop Prep Refrigerators",
-            "cta_url": "/collections/new-theme-sandwich-and-salad-preparation-refrigerators",
+            "cta_url": "\/collections\/new-theme-sandwich-and-salad-preparation-refrigerators",
             "popular_products_label": "Popular Products",
             "featured_collection": "new-theme-sandwich-and-salad-preparation-refrigerators",
-            "view_all_url": "/collections/new-theme-sandwich-and-salad-preparation-refrigerators"
+            "view_all_url": "\/collections\/new-theme-sandwich-and-salad-preparation-refrigerators"
+          }
+        },
+        "equip_section_mKYCfJ": {
+          "type": "equip_section",
+          "settings": {
+            "image_url": "",
+            "section_id": "fryers",
+            "is_reverse": true,
+            "title": "Fryers",
+            "description": "Cook crispy, delicious foods with commercial fryers built for busy kitchens.",
+            "bullet_1": "Fast heat recovery",
+            "bullet_2": "Even, consistent frying",
+            "bullet_3": "Built for high-volume use",
+            "cta_text": "Shop Food Holding",
+            "cta_url": "shopify:\/\/collections\/new-theme-commercial-fryers",
+            "popular_products_label": "Popular Products",
+            "featured_collection": "new-theme-commercial-fryers",
+            "view_all_url": "shopify:\/\/collections\/new-theme-commercial-fryers"
+          }
+        },
+        "equip_section_KLAz4w": {
+          "type": "equip_section",
+          "settings": {
+            "image_url": "",
+            "section_id": "griddles",
+            "is_reverse": false,
+            "title": "Griddles",
+            "description": "Cook evenly with powerful commercial gas griddles.",
+            "bullet_1": "Fast, even heat distribution",
+            "bullet_2": "Ideal for high-volume cooking",
+            "bullet_3": "Durable stainless steel construction",
+            "cta_text": "Shop Prep Refrigerators",
+            "cta_url": "shopify:\/\/collections\/new-theme-gas-griddles",
+            "popular_products_label": "Popular Products",
+            "featured_collection": "new-theme-gas-griddles",
+            "view_all_url": "shopify:\/\/collections\/new-theme-gas-griddles"
           }
         },
         "st_burger": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
             "image_url": "",
             "name": "Burger Joint",
-            "url": "/collections/restaurant-equipment"
-          },
-          "disabled": true
+            "url": "\/collections\/restaurant-equipment"
+          }
         },
         "st_burrito": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
             "image_url": "",
             "name": "Burrito Bar",
-            "url": "/collections/restaurant-equipment"
-          },
-          "disabled": true
+            "url": "\/collections\/restaurant-equipment"
+          }
         },
         "st_poke": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
             "image_url": "",
             "name": "Poke Bowl",
-            "url": "/collections/restaurant-equipment"
-          },
-          "disabled": true
+            "url": "\/collections\/restaurant-equipment"
+          }
         },
         "st_sandwich": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
             "image_url": "",
             "name": "Sandwich Shop",
-            "url": "/collections/restaurant-equipment"
-          },
-          "disabled": true
+            "url": "\/collections\/restaurant-equipment"
+          }
         },
         "st_salad": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
             "image_url": "",
             "name": "Salad Bar",
-            "url": "/collections/restaurant-equipment"
-          },
-          "disabled": true
+            "url": "\/collections\/restaurant-equipment"
+          }
         },
         "st_chicken": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
             "image_url": "",
             "name": "Chicken & Wings",
-            "url": "/collections/restaurant-equipment"
-          },
-          "disabled": true
+            "url": "\/collections\/restaurant-equipment"
+          }
         },
         "guide_fryers": {
           "type": "guide",
           "settings": {
             "image_url": "",
             "title": "Commercial Fryer Buying Guide: Capacity, BTU & Oil Types",
-            "url": "/blogs/resources",
+            "url": "\/blogs\/resources",
             "meta": "Guide"
           }
         },
@@ -179,7 +215,7 @@
           "settings": {
             "image_url": "",
             "title": "Gas vs Electric Griddles for Fast Casual: Which Is Right for You?",
-            "url": "/blogs/resources",
+            "url": "\/blogs\/resources",
             "meta": "Guide"
           }
         },
@@ -188,7 +224,7 @@
           "settings": {
             "image_url": "",
             "title": "Food Holding Equipment Guide: Cabinets, Warmers & Display Cases",
-            "url": "/blogs/resources",
+            "url": "\/blogs\/resources",
             "meta": "Guide"
           }
         },
@@ -197,7 +233,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Vulcan",
-            "url": "/collections/restaurant-equipment",
+            "url": "\/collections\/restaurant-equipment",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -207,7 +243,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Hatco",
-            "url": "/collections/restaurant-equipment",
+            "url": "\/collections\/restaurant-equipment",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -217,7 +253,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "True",
-            "url": "/collections/restaurant-equipment",
+            "url": "\/collections\/restaurant-equipment",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -227,7 +263,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Avantco",
-            "url": "/collections/restaurant-equipment",
+            "url": "\/collections\/restaurant-equipment",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -237,7 +273,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Waring",
-            "url": "/pages/waring",
+            "url": "\/pages\/waring",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -253,6 +289,8 @@
         "equip_cooking",
         "equip_holding",
         "equip_prep",
+        "equip_section_mKYCfJ",
+        "equip_section_KLAz4w",
         "st_burger",
         "st_burrito",
         "st_poke",
@@ -269,12 +307,16 @@
         "brand_waring"
       ],
       "settings": {
+        "hero_title_override": "Fast Casual Restaurant Equipment",
+        "hero_lead": "Speed, consistency, and volume — equipment engineered for the high-throughput demands of fast casual and counter-service operations.",
+        "hero_btn1_text": "Shop All Fast Casual Equipment",
+        "hero_btn1_url": "\/collections\/restaurant-equipment",
+        "hero_btn2_text": "Request a Quote",
+        "hero_btn2_url": "\/pages\/contact-us",
         "breadcrumb_home_label": "Home",
         "breadcrumb_home_url": "",
         "breadcrumb_parent_label": "Use Cases",
-        "breadcrumb_parent_url": "/pages/use-cases",
-        "hero_btn2_text": "Request a Quote",
-        "hero_btn2_url": "/pages/contact-us",
+        "breadcrumb_parent_url": "\/pages\/use-cases",
         "show_store_types": true,
         "store_types_title": "Shop by Store Type",
         "show_guides": true,
@@ -284,15 +326,19 @@
         "auto_blog_handle": "resources",
         "show_help": true,
         "help_title": "Need Help Choosing the Right Equipment?",
+        "help_body": "Our experts can help you choose the right cooking, holding, and prep equipment for your fast casual operation.",
         "help_btn_text": "Contact an Expert",
-        "help_btn_url": "/pages/contact-us",
+        "help_btn_url": "\/pages\/contact-us",
         "show_brands": true,
         "brands_title": "Top Brands We Carry",
         "show_expert_cta": true,
+        "expert_eyebrow": "Designed for fast casual & counter service",
+        "expert_title": "Build your fast casual kitchen with confidence.",
+        "expert_body": "From single fryer stations to complete fast casual kitchen builds, our specialists will spec the right equipment for your throughput, menu, and footprint.",
         "expert_btn1_text": "Request a Quote",
-        "expert_btn1_url": "/pages/contact-us",
+        "expert_btn1_url": "\/pages\/contact-us",
         "expert_btn2_text": "Talk to an Expert",
-        "expert_btn2_url": "/pages/contact-us",
+        "expert_btn2_url": "\/pages\/contact-us",
         "show_features": true,
         "feat_1_title": "Expert Support",
         "feat_1_text": "Get help from our equipment experts",
@@ -305,15 +351,7 @@
         "color_maroon": "#8b1538",
         "color_navy": "#1b2b47",
         "color_gold": "#d4af37",
-        "color_coral": "#ff6b6b",
-        "hero_title_override": "Fast Casual Restaurant Equipment",
-        "hero_lead": "Speed, consistency, and volume — equipment engineered for the high-throughput demands of fast casual and counter-service operations.",
-        "hero_btn1_text": "Shop All Fast Casual Equipment",
-        "hero_btn1_url": "/collections/restaurant-equipment",
-        "expert_eyebrow": "Designed for fast casual & counter service",
-        "expert_title": "Build your fast casual kitchen with confidence.",
-        "expert_body": "From single fryer stations to complete fast casual kitchen builds, our specialists will spec the right equipment for your throughput, menu, and footprint.",
-        "help_body": "Our experts can help you choose the right cooking, holding, and prep equipment for your fast casual operation."
+        "color_coral": "#ff6b6b"
       }
     }
   },

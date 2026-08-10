@@ -60,7 +60,7 @@
         "equip_ovens": {
           "type": "equip_section",
           "settings": {
-            "image_url": "industry-bakery.png",
+            "image_url": "",
             "section_id": "convection-ovens",
             "is_reverse": false,
             "title": "Convection Ovens",
@@ -69,10 +69,10 @@
             "bullet_2": "Full-Size Convection Ovens",
             "bullet_3": "Double-Deck Convection Ovens",
             "cta_text": "Shop Convection Ovens",
-            "cta_url": "/collections/new-theme-convection-ovens",
+            "cta_url": "\/collections\/new-theme-convection-ovens",
             "popular_products_label": "Popular Products",
             "featured_collection": "new-theme-convection-ovens",
-            "view_all_url": "/collections/new-theme-convection-ovens"
+            "view_all_url": "\/collections\/new-theme-convection-ovens"
           }
         },
         "equip_mixers": {
@@ -87,90 +87,126 @@
             "bullet_2": "30 Qt Planetary Mixers",
             "bullet_3": "60 Qt Planetary Mixers",
             "cta_text": "Shop Mixers",
-            "cta_url": "/collections/new-theme-planetary-spiral-mixers",
+            "cta_url": "\/collections\/new-theme-planetary-spiral-mixers",
             "popular_products_label": "Popular Products",
             "featured_collection": "new-theme-planetary-spiral-mixers",
-            "view_all_url": "/collections/new-theme-planetary-spiral-mixers"
+            "view_all_url": "\/collections\/new-theme-planetary-spiral-mixers"
+          }
+        },
+        "equip_section_WQTz3b": {
+          "type": "equip_section",
+          "settings": {
+            "image_url": "",
+            "section_id": "baking-pans",
+            "is_reverse": false,
+            "title": "Baking Pans",
+            "description": "Bake with durable commercial baking pans for consistent results",
+            "bullet_1": "Even heat distribution",
+            "bullet_2": "Durable commercial-grade construction",
+            "bullet_3": "Available in multiple sizes",
+            "cta_text": "Shop Convection Ovens",
+            "cta_url": "shopify:\/\/collections\/new-theme-baking-pans",
+            "popular_products_label": "Popular Products",
+            "featured_collection": "new-theme-baking-pans",
+            "view_all_url": "\/collections\/new-theme-convection-ovens"
+          }
+        },
+        "equip_section_AtNibQ": {
+          "type": "equip_section",
+          "settings": {
+            "image_url": "",
+            "section_id": "display-cases",
+            "is_reverse": true,
+            "title": "Bakery Display Cases",
+            "description": "Display chilled baked goods while keeping them fresh",
+            "bullet_1": "Maintains optimal cooling",
+            "bullet_2": "Enhances product presentation",
+            "bullet_3": "Ideal for bakeries and cafés",
+            "cta_text": "Shop Display Cases",
+            "cta_url": "shopify:\/\/collections\/bakeries-cafes-refrigerated-bakery-display-case",
+            "popular_products_label": "Popular Products",
+            "featured_collection": "bakeries-cafes-refrigerated-bakery-display-case",
+            "view_all_url": "shopify:\/\/collections\/bakeries-cafes-refrigerated-bakery-display-case"
           }
         },
         "equip_display": {
           "type": "equip_section",
           "settings": {
-            "image_url": "industry-cafe-coffee-shop.png",
-            "section_id": "display-cases",
+            "image_url": "",
+            "section_id": "dough-equipment",
             "is_reverse": false,
-            "title": "Bakery Display Cases",
-            "description": "Showcase your pastries, cakes, and baked goods in refrigerated and ambient display cases that drive impulse purchases.",
-            "bullet_1": "Refrigerated Bakery Cases",
-            "bullet_2": "Ambient Pastry Cases",
-            "bullet_3": "Curved Glass Display Cases",
-            "cta_text": "Shop Display Cases",
-            "cta_url": "/collections/new-theme-refrigerated-bakery-cases",
+            "title": "Dough Equipments",
+            "description": "Roll dough evenly for faster, consistent baking",
+            "bullet_1": "Uniform dough thickness",
+            "bullet_2": "Saves time and labor",
+            "bullet_3": "Ideal for bakeries and pizzerias",
+            "cta_text": "Shop Dough Equipments",
+            "cta_url": "shopify:\/\/collections\/bakeries-cafes-dough-sheeter",
             "popular_products_label": "Popular Products",
-            "featured_collection": "new-theme-refrigerated-bakery-cases",
-            "view_all_url": "/collections/new-theme-refrigerated-bakery-cases"
+            "featured_collection": "bakeries-cafes-dough-sheeter",
+            "view_all_url": "shopify:\/\/collections\/bakeries-cafes-dough-sheeter"
           }
         },
         "st_artisan": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
             "image_url": "",
             "name": "Artisan Bakery",
-            "url": "/collections/restaurant-equipment"
-          },
-          "disabled": true
+            "url": "\/collections\/restaurant-equipment"
+          }
         },
         "st_cafe": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
             "image_url": "",
-            "name": "Café / Coffee Shop",
-            "url": "/collections/restaurant-equipment"
-          },
-          "disabled": true
+            "name": "Café \/ Coffee Shop",
+            "url": "\/collections\/restaurant-equipment"
+          }
         },
         "st_pastry": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
             "image_url": "",
             "name": "Pastry Shop",
-            "url": "/collections/restaurant-equipment"
-          },
-          "disabled": true
+            "url": "\/collections\/restaurant-equipment"
+          }
         },
         "st_wedding": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
             "image_url": "",
             "name": "Wedding Cake Studio",
-            "url": "/collections/restaurant-equipment"
-          },
-          "disabled": true
+            "url": "\/collections\/restaurant-equipment"
+          }
         },
         "st_bread": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
             "image_url": "",
             "name": "Bread Bakery",
-            "url": "/collections/restaurant-equipment"
-          },
-          "disabled": true
+            "url": "\/collections\/restaurant-equipment"
+          }
         },
         "st_donut": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
             "image_url": "",
             "name": "Donut Shop",
-            "url": "/collections/restaurant-equipment"
-          },
-          "disabled": true
+            "url": "\/collections\/restaurant-equipment"
+          }
         },
         "guide_ovens": {
           "type": "guide",
           "settings": {
             "image_url": "",
             "title": "Convection Oven Buying Guide for Bakeries: Capacity & Deck Options",
-            "url": "/blogs/resources",
+            "url": "\/blogs\/resources",
             "meta": "Guide"
           }
         },
@@ -179,7 +215,7 @@
           "settings": {
             "image_url": "",
             "title": "Planetary vs Spiral Mixers: Which Is Right for Your Bakery?",
-            "url": "/blogs/resources",
+            "url": "\/blogs\/resources",
             "meta": "Guide"
           }
         },
@@ -188,7 +224,7 @@
           "settings": {
             "image_url": "",
             "title": "Bakery Display Case Guide: Refrigerated vs Ambient & Sizing Tips",
-            "url": "/blogs/resources",
+            "url": "\/blogs\/resources",
             "meta": "Guide"
           }
         },
@@ -197,7 +233,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Robot Coupe",
-            "url": "/pages/robot-coupe",
+            "url": "\/pages\/robot-coupe",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -207,7 +243,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Waring",
-            "url": "/pages/waring",
+            "url": "\/pages\/waring",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -217,7 +253,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Vollrath",
-            "url": "/collections/restaurant-equipment",
+            "url": "\/collections\/restaurant-equipment",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -227,7 +263,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Winco",
-            "url": "/collections/restaurant-equipment",
+            "url": "\/collections\/restaurant-equipment",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -237,7 +273,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Vulcan",
-            "url": "/collections/restaurant-equipment",
+            "url": "\/collections\/restaurant-equipment",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -252,6 +288,8 @@
         "nav_more",
         "equip_ovens",
         "equip_mixers",
+        "equip_section_WQTz3b",
+        "equip_section_AtNibQ",
         "equip_display",
         "st_artisan",
         "st_cafe",
@@ -269,12 +307,16 @@
         "brand_vulcan"
       ],
       "settings": {
+        "hero_title_override": "Bakery & Café Equipment Solutions",
+        "hero_lead": "From mixing to display — premium equipment for every step of a successful bakery or café operation.",
+        "hero_btn1_text": "Shop All Bakery Equipment",
+        "hero_btn1_url": "\/collections\/restaurant-equipment",
+        "hero_btn2_text": "Request a Quote",
+        "hero_btn2_url": "\/pages\/contact-us",
         "breadcrumb_home_label": "Home",
         "breadcrumb_home_url": "",
         "breadcrumb_parent_label": "Use Cases",
-        "breadcrumb_parent_url": "/pages/use-cases",
-        "hero_btn2_text": "Request a Quote",
-        "hero_btn2_url": "/pages/contact-us",
+        "breadcrumb_parent_url": "\/pages\/use-cases",
         "show_store_types": true,
         "store_types_title": "Shop by Store Type",
         "show_guides": true,
@@ -284,15 +326,19 @@
         "auto_blog_handle": "resources",
         "show_help": true,
         "help_title": "Need Help Choosing the Right Equipment?",
+        "help_body": "Our experts can help you choose the right ovens, mixers, and display cases for your bakery or café.",
         "help_btn_text": "Contact an Expert",
-        "help_btn_url": "/pages/contact-us",
+        "help_btn_url": "\/pages\/contact-us",
         "show_brands": true,
         "brands_title": "Top Brands We Carry",
         "show_expert_cta": true,
+        "expert_eyebrow": "Designed for bakery & café professionals",
+        "expert_title": "Build your bakery with confidence.",
+        "expert_body": "From a single convection oven to a complete bakery or café fit-out, our specialists will spec the right equipment for your production volume and menu.",
         "expert_btn1_text": "Request a Quote",
-        "expert_btn1_url": "/pages/contact-us",
+        "expert_btn1_url": "\/pages\/contact-us",
         "expert_btn2_text": "Talk to an Expert",
-        "expert_btn2_url": "/pages/contact-us",
+        "expert_btn2_url": "\/pages\/contact-us",
         "show_features": true,
         "feat_1_title": "Expert Support",
         "feat_1_text": "Get help from our equipment experts",
@@ -305,15 +351,7 @@
         "color_maroon": "#8b1538",
         "color_navy": "#1b2b47",
         "color_gold": "#d4af37",
-        "color_coral": "#ff6b6b",
-        "hero_title_override": "Bakery & Café Equipment Solutions",
-        "hero_lead": "From mixing to display — premium equipment for every step of a successful bakery or café operation.",
-        "hero_btn1_text": "Shop All Bakery Equipment",
-        "hero_btn1_url": "/collections/restaurant-equipment",
-        "expert_eyebrow": "Designed for bakery & café professionals",
-        "expert_title": "Build your bakery with confidence.",
-        "expert_body": "From a single convection oven to a complete bakery or café fit-out, our specialists will spec the right equipment for your production volume and menu.",
-        "help_body": "Our experts can help you choose the right ovens, mixers, and display cases for your bakery or café."
+        "color_coral": "#ff6b6b"
       }
     }
   },
