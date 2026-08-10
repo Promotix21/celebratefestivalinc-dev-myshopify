@@ -502,7 +502,7 @@
             <div class="thumbnail-column">
               {%- if product.images.size > 1 -%}
                 {%- for image in product.images limit: 6 -%}
-                  <div class="thumbnail {% if forloop.first %}active{% endif %}" data-image-index="{{ forloop.index0 }}">
+                  <div class="thumbnail {% if forloop.first %}active{% endif %}" data-image-index="{{ forloop.index0 }}" data-image-id="{{ image.id }}">
                     <img src="{{ image | image_url: width: 70 }}" alt="{{ image.alt | escape }}">
                   </div>
                 {%- endfor -%}
@@ -1746,6 +1746,9 @@
     thumbnails.forEach((thumb, i) => {
       thumb.classList.toggle('active', i === 0);
     });
+
+    // Expose globally so updateVariantDisplay can trigger proper image switch
+    window.switchProductImageByIndex = switchImage;
   }
 
   function createLightbox(mainImage) {
@@ -2222,36 +2225,33 @@
 
     // Update main image if variant has a featured image
     if (selectedVariant.featured_image && mainImage) {
-      const variantImageUrl = selectedVariant.featured_image.src;
-
-      // Use modern Shopify URL format via shared helper
-      // Must update BOTH src AND srcset — browser uses srcset over src
-      var getSizedUrl = window.cfGetShopifySizedUrl || function(u) { return u; };
-      var sizedUrl = getSizedUrl(variantImageUrl, 800);
-      mainImage.src = sizedUrl;
-      mainImage.srcset = getSizedUrl(variantImageUrl, 400) + ' 400w, ' +
-                         getSizedUrl(variantImageUrl, 600) + ' 600w, ' +
-                         getSizedUrl(variantImageUrl, 800) + ' 800w, ' +
-                         getSizedUrl(variantImageUrl, 1000) + ' 1000w';
-      mainImage.alt = selectedVariant.featured_image.alt || selectedVariant.title;
-
-      // Match variant image to thumbnail using base URL comparison
-      var variantBase = (window.cfGetBaseUrl || function(u) { return u; })(variantImageUrl);
+      var featuredImageId = String(selectedVariant.featured_image.id);
       var thumbnails = document.querySelectorAll('.thumbnail');
       var foundMatch = false;
 
+      // Match by image ID (stable) — avoids URL format mismatch between
+      // product|json CDN URLs and image_url Liquid filter CDN URLs
       thumbnails.forEach(function(thumb, index) {
-        var thumbImg = thumb.querySelector('img');
-        if (thumbImg) {
-          var thumbBase = (window.cfGetBaseUrl || function(u) { return u; })(thumbImg.src);
-          if (thumbBase === variantBase) {
-            thumb.classList.add('active');
-            foundMatch = true;
-          } else {
-            thumb.classList.remove('active');
+        if (String(thumb.dataset.imageId) === featuredImageId) {
+          foundMatch = true;
+          if (window.switchProductImageByIndex) {
+            window.switchProductImageByIndex(index);
           }
         }
       });
+
+      // Fallback: variant image is beyond the 6-thumbnail limit — update main image directly
+      if (!foundMatch) {
+        var getSizedUrl = window.cfGetShopifySizedUrl || function(u) { return u; };
+        var variantImageUrl = selectedVariant.featured_image.src;
+        mainImage.src = getSizedUrl(variantImageUrl, 800);
+        mainImage.srcset = getSizedUrl(variantImageUrl, 400) + ' 400w, ' +
+                           getSizedUrl(variantImageUrl, 600) + ' 600w, ' +
+                           getSizedUrl(variantImageUrl, 800) + ' 800w, ' +
+                           getSizedUrl(variantImageUrl, 1000) + ' 1000w';
+        mainImage.alt = selectedVariant.featured_image.alt || selectedVariant.title;
+        thumbnails.forEach(function(thumb) { thumb.classList.remove('active'); });
+      }
     }
 
     // Update URL without page reload
