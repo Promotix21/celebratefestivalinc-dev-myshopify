@@ -1883,7 +1883,28 @@
 {%- liquid
   assign sort_by = collection.sort_by | default: collection.default_sort_by
   assign products_per_page = section.settings.products_per_page | default: 24
+
+  # Oversized-collection detection (Task #109 — Dinnerware Storefront API fallback).
+  # Shopify suppresses native storefront filtering once a collection exceeds ~5,000
+  # products: collection.filters comes back empty AND filter.* URL params are ignored.
+  # Evidence-based gate (NOT a hardcoded handle): a level-2-mega page (pills enabled)
+  # whose Liquid filters are empty while the real product count is over the threshold.
+  # When true, JS supplies the sidebar + filtered results via the Storefront API.
+  assign cf_is_oversized = false
+  if section.settings.show_subcategory_pills and collection.filters.size == 0 and collection.products_count > 5000
+    assign cf_is_oversized = true
+  endif
 -%}
+
+{%- if cf_is_oversized -%}
+  <script>
+    window.cfOversized = {
+      handle: {{ collection.handle | json }},
+      count: {{ collection.products_count }},
+      base: {{ collection.url | json }}
+    };
+  </script>
+{%- endif -%}
 
 {% comment %} Vendor Brand Hero - Shows on /collections/vendors?q=BRAND {% endcomment %}
 {% if collection.handle == 'vendors' %}
@@ -2484,6 +2505,8 @@ window.handleCollectionSort = function(value) {
   const url = new URL(window.location);
   url.searchParams.set('sort_by', value);
   url.searchParams.delete('page');
+  // Oversized Dinnerware "All Products": sort is served by the Storefront API.
+  if (window.cfOversized && window.cfOversized.route && window.cfOversized.route('sort')) return;
   if (typeof cfL2 !== 'undefined' && cfL2 && cfL2.active) { cfL2.applyDisplayUrl(url); return; }
   window.location = url;
 };
@@ -2603,9 +2626,18 @@ document.addEventListener('DOMContentLoaded', window.cfInitLoadMore);
 
 // Apply mobile filters - collects all checked state and navigates
 window.applyMobileFilters = function() {
-  const url = new URL(window.location.href);
   const content = document.getElementById('mobile-filter-content');
   if (!content) return;
+
+  // Oversized Dinnerware "All Products": collect filter state from the cloned
+  // API sidebar and let the Storefront API module render the filtered results.
+  if (window.cfOversized && window.cfOversized.applyFromContainer && window.cfOversized.isAllProducts && window.cfOversized.isAllProducts()) {
+    closeCollectionMobileFilters();
+    window.cfOversized.applyFromContainer(content);
+    return;
+  }
+
+  const url = new URL(window.location.href);
 
   const keysToRemove = [];
   for (const key of url.searchParams.keys()) {
@@ -2705,6 +2737,11 @@ var cfL2 = (function() {
       var g = document.getElementById('product-grid');
       if (g) g.classList.add('list-view');
     }
+    // Returning to oversized "All Products" (empty-filters Liquid sidebar) — rebuild
+    // the Storefront-API filter sidebar that Liquid cannot provide here.
+    if (window.cfOversized && window.cfOversized.onReturnToAllProducts) {
+      window.cfOversized.onReturnToAllProducts();
+    }
   }
 
   function swap(sub, params, displayUrl, push) {
@@ -2771,10 +2808,14 @@ var cfL2 = (function() {
     selectPill(pill.getAttribute('data-l3-handle') || '');
   });
 
-  // Back / forward
+  // Back / forward.
+  // For the oversized collection, the no-"sub" (All Products) history states are
+  // owned by the cfOversized module (Storefront-API filtering) — bail here so the
+  // two popstate handlers never race on the same region.
   window.addEventListener('popstate', function() {
     var sp = new URLSearchParams(window.location.search);
     var sub = sp.get('sub') || null;
+    if (!sub && window.cfOversized) { setActivePill(null); return; }
     swap(sub, stripPage(collectScopedParams(sp)), null, false);
     setActivePill(sub);
   });
@@ -2786,7 +2827,735 @@ var cfL2 = (function() {
     swap(initSub, stripPage(collectScopedParams(sp0)), null, false);
   }
 
-  return { active: true, applyDisplayUrl: applyDisplayUrl, selectPill: selectPill };
+  // Non-pushing restore of the native (Liquid) All-Products listing — used by the
+  // cfOversized popstate handler so Back/Forward doesn't create extra history.
+  function restoreAllProducts() { return swap(null, [], null, false); }
+
+  return { active: true, applyDisplayUrl: applyDisplayUrl, selectPill: selectPill, restoreAllProducts: restoreAllProducts };
+})();
+
+/* ========================================================================
+   OVERSIZED COLLECTION FILTERING (Task #109 — Dinnerware >5,000 products)
+   Shopify suppresses native Liquid filtering above ~5,000 products: the sidebar
+   is empty and filter.* URL params are ignored. For the Dinnerware L2 "All
+   Products" view ONLY, this module supplies the filter sidebar AND the filtered
+   product results from the public Storefront API (tokenless, 2026-07).
+
+   Contained by design:
+   - Activates only when window.cfOversized is set (evidence-based Liquid gate)
+     AND the "All Products" pill is active. Any L3 pill selection hands back to
+     the native cfL2 system (those L3 collections are under the limit).
+   - JS-rendered cards are derived from snippets/product-card.liquid so the
+     shared CSS, data-cf-* (BDR), wishlist and Add-to-Cart delegated handlers all
+     work unchanged. After every render we fire the same reinit path as cfL2.
+   - Cursor pagination only; never downloads the full catalogue or builds a
+     client-side index. Facet inputs are passed verbatim from FilterValue.input.
+   ======================================================================== */
+(function () {
+  if (!window.cfOversized) return;
+
+  var CFG = window.cfOversized;
+  var API = '/api/2026-07/graphql.json';
+  var PAGE = 100;
+
+  var pillBar = document.querySelector('.cf-plp__subcategory-pills[data-l2-ajax]');
+  var abortCtrl = null;      // in-flight request, so stale filter changes are cancelled
+  var state = {
+    filters: [],             // array of parsed ProductFilter input objects (+ price)
+    sort: 'manual',
+    cursor: null,
+    hasNext: false,
+    inputKeyMap: {}          // url-key -> exact input object (for shareable URL round-trip)
+  };
+
+  /* ---------- small helpers ---------- */
+  function gidNum(gid) { return gid ? String(gid).split('/').pop() : ''; }
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function handleize(s) {
+    return String(s || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  }
+  function cfMoney(dollars) {
+    var n = parseFloat(dollars) || 0;
+    var withDec = n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    var noDec = Math.round(n).toLocaleString('en-US');
+    var fmt = window.WPDMoneyFormat || ('$' + '{' + '{amount}}');  // split so Liquid leaves the amount placeholder intact
+    return fmt
+      .replace(/\{\{\s*amount\s*\}\}/g, withDec)
+      .replace(/\{\{\s*amount_no_decimals\s*\}\}/g, noDec)
+      .replace(/\{\{\s*amount_with_comma_separator\s*\}\}/g, withDec)
+      .replace(/\{\{\s*amount_no_decimals_with_comma_separator\s*\}\}/g, noDec);
+  }
+  function toCents(dollars) { return Math.round((parseFloat(dollars) || 0) * 100); }
+
+  function previewParam() {
+    return new URLSearchParams(window.location.search).get('preview_theme_id');
+  }
+  function isAllProducts() {
+    // No L3 selected: the "All Products" pill is active (or there is no pill bar).
+    if (!pillBar) return true;
+    var active = pillBar.querySelector('.cf-plp__subcategory-pill.is-active');
+    return !active || !(active.getAttribute('data-l3-handle') || '');
+  }
+  function isMember() {
+    var tags = (window.wcp_customer && window.wcp_customer.tags) || [];
+    if (!Array.isArray(tags)) tags = [];
+    return tags.some(function (t) {
+      t = String(t).toLowerCase();
+      return t.indexOf('wholesale') > -1 || t.indexOf('plus') > -1 || t.indexOf('member') > -1 ||
+             t.indexOf('cph') > -1 || t.indexOf('rou') > -1 || t.indexOf('margin') > -1;
+    });
+  }
+
+  /* ---------- sort mapping ---------- */
+  function sortFor(value) {
+    switch (value) {
+      case 'best-selling':      return { key: 'BEST_SELLING', reverse: false };
+      case 'price-ascending':   return { key: 'PRICE', reverse: false };
+      case 'price-descending':  return { key: 'PRICE', reverse: true };
+      case 'title-ascending':   return { key: 'TITLE', reverse: false };
+      case 'title-descending':  return { key: 'TITLE', reverse: true };
+      case 'created-descending': return { key: 'CREATED', reverse: true };
+      default:                  return { key: 'MANUAL', reverse: false }; // Featured
+    }
+  }
+
+  /* ---------- URL round-trip encoding for a ProductFilter input ---------- */
+  // Returns [key, value] for the shareable URL, or null if not URL-representable.
+  function inputToParam(input) {
+    if (!input) return null;
+    if (input.productVendor != null)  return ['filter.p.vendor', input.productVendor];
+    if (input.productType != null)    return ['filter.p.product_type', input.productType];
+    if (input.tag != null)            return ['filter.p.tag', input.tag];
+    if (input.available != null)      return ['filter.v.availability', input.available ? '1' : '0'];
+    if (input.variantOption)          return ['filter.v.option.' + input.variantOption.name, input.variantOption.value];
+    return null; // price handled separately
+  }
+
+  /* ---------- GraphQL ---------- */
+  var QUERY =
+    'query($f:[ProductFilter!],$s:ProductCollectionSortKeys,$r:Boolean,$a:String){' +
+    ' collection(handle:$h_INLINE){' +
+    '  products(first:' + PAGE + ',after:$a,sortKey:$s,reverse:$r,filters:$f){' +
+    '   pageInfo{hasNextPage endCursor}' +
+    '   filters{id label type values{label count input}}' +
+    '   nodes{id title handle vendor productType availableForSale tags' +
+    '    priceRange{minVariantPrice{amount}maxVariantPrice{amount}}' +
+    '    compareAtPriceRange{maxVariantPrice{amount}}' +
+    '    featuredImage{url altText}' +
+    '    images(first:2){nodes{url altText}}' +
+    '    options{name optionValues{name}}' +
+    '    variants(first:4){nodes{id price{amount}compareAtPrice{amount}availableForSale sku}}' +
+    '    collections(first:12){nodes{id}}' +
+    '   }' +
+    '  }' +
+    ' }' +
+    '}';
+
+  function buildQuery() {
+    // handle is interpolated safely (JSON-encoded) rather than templated into $h.
+    return QUERY.replace('$h_INLINE', JSON.stringify(CFG.handle));
+  }
+
+  function fetchPage(opts) {
+    var s = sortFor(state.sort);
+    var vars = {
+      f: (opts && opts.filters) || [],
+      s: s.key,
+      r: s.reverse,
+      a: (opts && opts.cursor) || null
+    };
+    if (abortCtrl) abortCtrl.abort();
+    abortCtrl = new AbortController();
+    return fetch(API, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: buildQuery(), variables: vars }),
+      signal: abortCtrl.signal
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (json) {
+        if (json.errors && (!json.data || !json.data.collection)) {
+          throw new Error(json.errors[0] && json.errors[0].message);
+        }
+        return json.data.collection.products;
+      });
+  }
+
+  /* ---------- card renderer (mirrors snippets/product-card.liquid) ---------- */
+  function renderCard(n) {
+    var pid = gidNum(n.id);
+    var variants = (n.variants && n.variants.nodes) || [];
+    var firstAvail = null;
+    for (var i = 0; i < variants.length; i++) { if (variants[i].availableForSale) { firstAvail = variants[i]; break; } }
+    var v = firstAvail || variants[0] || {};
+    var vid = gidNum(v.id);
+
+    var priceMin = parseFloat(n.priceRange.minVariantPrice.amount) || 0;
+    var priceMax = parseFloat(n.priceRange.maxVariantPrice.amount) || 0;
+    var compareMax = parseFloat(n.compareAtPriceRange && n.compareAtPriceRange.maxVariantPrice.amount) || 0;
+    var priceVaries = priceMin !== priceMax;
+    var onSale = compareMax > 0 && compareMax > priceMax;
+    var vPrice = parseFloat(v.price && v.price.amount) || priceMin;
+    var vCompare = parseFloat(v.compareAtPrice && v.compareAtPrice.amount) || 0;
+
+    var tags = (n.tags || []).map(function (t) { return String(t).toLowerCase(); });
+    var callToOrder = tags.indexOf('call-to-order') > -1;
+    var callForPrice = tags.indexOf('call-for-price') > -1 || vPrice === 0;
+
+    var vendorLower = String(n.vendor || '').toLowerCase();
+    var isOwnBrand = vendorLower.indexOf('cf inc') > -1 || vendorLower.indexOf('celebrate festival') > -1;
+    var member = isMember();
+
+    // collection ids (numeric, csv) for BDR
+    var collIds = ((n.collections && n.collections.nodes) || []).map(function (c) { return gidNum(c.id); }).join(',');
+
+    // variations badge
+    var totalCombos = 1;
+    (n.options || []).forEach(function (o) { totalCombos *= Math.max(1, (o.optionValues || []).length); });
+    var multiVariant = totalCombos > 1;
+    var variationList = (n.options || []).map(function (o) {
+      return o.name + ': ' + (o.optionValues || []).map(function (x) { return x.name; }).join(', ');
+    }).join(' | ');
+
+    // voltage badge
+    var voltage = '';
+    for (var t = 0; t < tags.length; t++) {
+      if (/volt|115v|208v|220v|240v/.test(tags[t])) { voltage = n.tags[t]; break; }
+    }
+
+    var url = '/products/' + n.handle;
+    var img = n.featuredImage ? n.featuredImage.url : '';
+    var imgAlt = (n.featuredImage && n.featuredImage.altText) || n.title;
+    var hoverImg = (n.images && n.images.nodes && n.images.nodes[1]) ? n.images.nodes[1].url : '';
+    var category = (n.productType || '').slice(0, 25);
+
+    var h = '';
+    h += '<div class="product-card cf-plp__card"' +
+      ' data-product-id="' + pid + '"' +
+      ' data-vendor="' + esc(handleize(n.vendor)) + '"' +
+      ' data-vendor-raw="' + esc(n.vendor) + '"' +
+      ' data-type="' + esc(handleize(n.productType)) + '"' +
+      ' data-type-raw="' + esc(n.productType) + '"' +
+      ' data-price="' + toCents(vPrice) + '"' +
+      ' data-available="' + (n.availableForSale ? 'true' : 'false') + '"' +
+      ' data-title="' + esc(n.title) + '"' +
+      ' data-cf-product-id="' + pid + '"' +
+      ' data-cf-variant-id="' + vid + '"' +
+      ' data-cf-price="' + toCents(vPrice) + '"' +
+      ' data-cf-compare-at-price="' + (vCompare > 0 ? toCents(vCompare) : '') + '"' +
+      ' data-cf-handle="' + esc(n.handle) + '"' +
+      ' data-cf-collection-ids="' + esc(collIds) + '">';
+
+    h += '<a href="' + esc(url) + (vid ? '?variant=' + vid : '') + '" class="product-link">';
+    h += '<div class="card-image product-image cf-plp__card-image-wrap">';
+    if (img) {
+      h += '<img class="cf-plp__card-image" src="' + esc(img) + '" alt="' + esc(imgAlt) + '" loading="lazy" width="200" height="200">';
+      if (hoverImg) h += '<img src="' + esc(hoverImg) + '" alt="' + esc(imgAlt) + '" loading="lazy" class="product-image-hover">';
+    } else {
+      h += '<div style="display:flex;align-items:center;justify-content:center;font-size:40px;color:#94a3b8;width:100%;height:100%;">&#128230;</div>';
+    }
+    // badges
+    h += '<div class="badge-container product-badges cf-plp__card-badge">';
+    if (voltage) h += '<span class="voltage-badge">' + esc(voltage) + '</span>';
+    if (tags.indexOf('best-seller') > -1 || tags.indexOf('featured') > -1) {
+      h += '<span class="badge best-seller-badge">Best Seller</span>';
+    } else if (onSale) {
+      h += '<span class="badge sale-badge">Sale</span>';
+    }
+    if (tags.indexOf('new') > -1) h += '<span class="badge new-badge">New</span>';
+    h += '</div>';
+    if (multiVariant) {
+      h += '<span class="variations-badge cf-plp__variants-badge" title="' + esc(variationList.slice(0, 150)) + '">&#128230; ' + totalCombos + ' Variations</span>';
+    }
+    // wishlist
+    h += '<button type="button" class="wishlist-btn" data-wishlist-btn' +
+      ' data-product-id="' + pid + '" data-variant-id="' + vid + '"' +
+      ' data-product-title="' + esc(n.title) + '" data-product-handle="' + esc(n.handle) + '"' +
+      ' data-product-image="' + esc(img) + '" data-product-price="' + toCents(vPrice) + '"' +
+      ' data-product-compare-price="' + (vCompare > 0 ? toCents(vCompare) : '') + '"' +
+      ' data-product-url="' + esc(url) + '" aria-label="Add to wishlist">' +
+      '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>' +
+      '</button>';
+    h += '</div></a>';
+
+    h += '<div class="card-content product-info cf-plp__card-content">';
+    if (category) {
+      h += '<div class="cf-plp__meta-row" style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;">' +
+        '<span class="card-category product-brand cf-plp__card-category">' + esc(category) + '</span></div>';
+    }
+    h += '<a href="' + esc(url) + (vid ? '?variant=' + vid : '') + '" class="product-title-link" data-full-title="' + esc(n.title) + '">' +
+      '<h3 class="card-title product-title cf-plp__card-title">' + esc(n.title) + '</h3></a>';
+    if (v.sku) h += '<div class="card-sku product-sku cf-plp__card-sku">#' + esc(v.sku) + '</div>';
+
+    // pricing
+    if (callForPrice) {
+      h += '<div class="price-single price-box cf-plp__price-box">' +
+        '<div class="price-label-single price-label cf-plp__price-label">Contact Us</div>' +
+        '<a href="' + esc(url) + '" class="price-amount-single" style="font-size:18px;color:#2d5a87;text-decoration:none;">Call for Best Price</a></div>';
+    } else if (priceVaries) {
+      h += '<div class="price-single price-box cf-plp__price-box">';
+      if (onSale) {
+        h += '<div class="compare-price-strike cf-plp__price-original"><s>' + cfMoney(compareMax) + '</s></div>' +
+          '<div class="price-label-single price-label cf-plp__price-label">Sale Price</div>';
+      } else {
+        h += '<div class="price-label-single price-label cf-plp__price-label">Price</div>';
+      }
+      h += '<div class="price-amount-single current-price cf-plp__price-main">' + cfMoney(priceMin) + ' &ndash; ' + cfMoney(priceMax) + '</div>';
+      if (onSale) {
+        var svR = compareMax - priceMin;
+        if (svR > 0) h += '<div class="sale-savings-tag cf-plp__sale-savings">Save up to ' + Math.round(svR * 100 / compareMax) + '%</div>';
+      }
+      h += '</div>';
+    } else {
+      h += '<div class="price-single price-box cf-plp__price-box">';
+      if (onSale && vCompare > vPrice) {
+        h += '<div class="compare-price-strike cf-plp__price-original"><s>' + cfMoney(vCompare) + '</s></div>' +
+          '<div class="price-label-single price-label cf-plp__price-label">Sale Price</div>';
+      } else {
+        h += '<div class="price-label-single price-label cf-plp__price-label">Price</div>';
+      }
+      h += '<div class="price-amount-single current-price cf-plp__price-main">' + cfMoney(vPrice) + '<span class="price-unit cf-plp__price-unit">/Each</span></div>';
+      if (onSale && vCompare > vPrice) {
+        h += '<div class="sale-savings-tag cf-plp__sale-savings">Save ' + Math.round((vCompare - vPrice) * 100 / vCompare) + '%</div>';
+      }
+      h += '</div>';
+    }
+
+    // vendor CTA (non-members, real price)
+    if (!member && !callForPrice && vPrice !== 0) {
+      if (isOwnBrand) {
+        var rp = encodeURIComponent(window.location.pathname + window.location.search);
+        h += '<a href="/account/login?return_url=' + rp + '" class="login-member-pricing-link cf-plp__login-prompt" style="display:block;width:100%;box-sizing:border-box;text-align:center;">' +
+          '<span class="lock-icon">&#128274;</span><span>Login for Member Pricing</span></a>';
+      } else {
+        h += '<a href="tel:+14086739999" class="call-for-details-link cf-plp__call-prompt" style="display:block;width:100%;box-sizing:border-box;text-align:center;">' +
+          '<span class="phone-icon">&#128222;</span><span>Call for More Details - (408) 673-9999</span></a>';
+      }
+    }
+
+    // Add to cart row
+    h += '<div class="card-actions product-actions cf-plp__cart-row">';
+    if (callToOrder) {
+      h += '<a href="tel:+14086739999" class="cf-plp__add-btn cf-plp__call-to-order-btn" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;background:linear-gradient(135deg,#1a365d 0%,#2d5a87 100%);color:#fff;height:38px;border-radius:6px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;"><span>&#128222;</span> Call to Order</a>';
+    } else if (callForPrice) {
+      h += '<a href="' + esc(url) + '" class="cf-plp__add-btn" style="flex:1;display:flex;align-items:center;justify-content:center;text-decoration:none;background:linear-gradient(135deg,#475569 0%,#334155 100%);color:#fff;height:38px;border-radius:6px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">View Details</a>';
+    } else if (n.availableForSale && vid) {
+      h += '<input type="number" class="qty-input cf-plp__qty-input" value="1" min="1" aria-label="Quantity" data-product-id="' + pid + '">' +
+        '<button type="button" class="add-to-cart add-to-cart-btn quick-add-btn cf-plp__add-btn" data-product-id="' + pid + '" data-variant-id="' + vid + '">Add to Cart</button>';
+    } else {
+      h += '<button class="add-to-cart cf-plp__add-btn" disabled>Sold Out</button>';
+    }
+    h += '</div>';   // /cart-row
+    h += '</div>';   // /card-content
+    h += '</div>';   // /card
+    return h;
+  }
+
+  /* ---------- sidebar renderer (mirrors the Liquid sidebar markup) ---------- */
+  function activeUrlKeys() {
+    // Set of "key=value" strings for currently active filters (for checkbox state).
+    var keys = {};
+    state.filters.forEach(function (inp) {
+      var p = inputToParam(inp);
+      if (p) keys[p[0] + '=' + p[1]] = true;
+    });
+    return keys;
+  }
+
+  function buildSidebar(facets) {
+    state.inputKeyMap = {};
+    var activeKeys = activeUrlKeys();
+    var priceFilter = state.filters.filter(function (f) { return f.price; })[0];
+
+    // Brand group first, then the rest in API order.
+    var ordered = facets.slice().sort(function (a, b) {
+      var av = /vendor/.test(a.id) ? 0 : 1, bv = /vendor/.test(b.id) ? 0 : 1;
+      return av - bv;
+    });
+
+    var html = '<h2 class="cf-plp__filters-title">Filters</h2>';
+    var anyActive = state.filters.length > 0;
+
+    ordered.forEach(function (group) {
+      if (group.type === 'PRICE_RANGE') {
+        var minV = priceFilter ? priceFilter.price.min : '';
+        var maxV = priceFilter ? priceFilter.price.max : '';
+        html += '<div class="cf-plp__filter-group">' +
+          '<h3 class="cf-plp__filter-title cf-plp__filter-toggle" onclick="toggleFilterCollapse(this)">' + esc(group.label) +
+          '<svg class="cf-plp__filter-arrow" width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M8 11L3 6h10l-5 5z"/></svg></h3>' +
+          '<div class="cf-plp__filter-price-range"><div class="cf-plp__price-inputs">' +
+          '<div class="cf-plp__price-input-group"><span class="cf-plp__price-currency">$</span>' +
+          '<input type="number" class="cf-plp__price-range-input cf-plp__ov-price-min" placeholder="Min" min="0"' + (minV !== '' ? ' value="' + esc(minV) + '"' : '') + '></div>' +
+          '<span class="cf-plp__price-dash">&ndash;</span>' +
+          '<div class="cf-plp__price-input-group"><span class="cf-plp__price-currency">$</span>' +
+          '<input type="number" class="cf-plp__price-range-input cf-plp__ov-price-max" placeholder="Max" min="0"' + (maxV !== '' ? ' value="' + esc(maxV) + '"' : '') + '></div>' +
+          '<button type="button" class="cf-plp__price-go" onclick="window.cfOversized.onPriceApply()">Go</button>' +
+          '</div></div></div>';
+        return;
+      }
+      // LIST group
+      var values = (group.values || []).filter(function (v) {
+        var p = inputToParam(safeParse(v.input));
+        var isActive = p && activeKeys[p[0] + '=' + p[1]];
+        return v.count > 0 || isActive;
+      });
+      if (!values.length) return;
+      values.sort(function (a, b) { return a.label.localeCompare(b.label); });
+
+      html += '<div class="cf-plp__filter-group">' +
+        '<h3 class="cf-plp__filter-title cf-plp__filter-toggle" onclick="toggleFilterCollapse(this)">' + esc(group.label) +
+        '<svg class="cf-plp__filter-arrow" width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M8 11L3 6h10l-5 5z"/></svg></h3>' +
+        '<ul class="cf-plp__filter-options">';
+      var total = values.length;
+      values.forEach(function (v, idx) {
+        var inputObj = safeParse(v.input);
+        var p = inputToParam(inputObj);
+        var keyStr = p ? p[0] + '=' + p[1] : v.input;
+        if (p) state.inputKeyMap[p[0] + '=' + p[1]] = inputObj;
+        var checked = p && activeKeys[keyStr] ? ' checked' : '';
+        var hidden = (idx >= 8 && total > 10) ? ' class="cf-plp__filter-hidden"' : '';
+        html += '<li' + hidden + '><label class="cf-plp__filter-option">' +
+          '<input type="checkbox" data-ov-input="' + esc(v.input) + '"' + checked +
+          ' onchange="window.cfOversized.onFilterChange()">' + esc(v.label) +
+          ' <span class="cf-plp__filter-count">(' + v.count + ')</span></label></li>';
+      });
+      if (total > 8) {
+        html += '<li class="cf-plp__filter-view-more-li"><button type="button" class="cf-plp__filter-view-more" onclick="toggleFilterViewMore(this)">View More (' + (total - 8) + ')</button></li>';
+      }
+      html += '</ul></div>';
+    });
+
+    if (anyActive) {
+      html += '<div class="cf-plp__sidebar-clear"><a href="#" class="cf-plp__clear-all-link" onclick="window.cfOversized.clearAll();return false;">Clear All Filters</a></div>';
+    }
+    return html;
+  }
+
+  function safeParse(str) { try { return JSON.parse(str); } catch (e) { return null; } }
+
+  /* ---------- collect active filters from a sidebar/container ---------- */
+  function collectFilters(container) {
+    var scope = container || document.querySelector('.cf-plp__sidebar');
+    var out = [];
+    if (!scope) return out;
+    scope.querySelectorAll('input[type="checkbox"][data-ov-input]:checked').forEach(function (cb) {
+      var obj = safeParse(cb.getAttribute('data-ov-input'));
+      if (obj) out.push(obj);
+    });
+    var minEl = scope.querySelector('.cf-plp__ov-price-min');
+    var maxEl = scope.querySelector('.cf-plp__ov-price-max');
+    var min = minEl && minEl.value !== '' ? parseFloat(minEl.value) : null;
+    var max = maxEl && maxEl.value !== '' ? parseFloat(maxEl.value) : null;
+    if ((min != null && min > 0) || (max != null && max > 0)) {
+      var price = {};
+      if (min != null && min > 0) price.min = min;
+      if (max != null && max > 0) price.max = max;
+      out.push({ price: price });
+    }
+    return out;
+  }
+
+  /* ---------- URL state ---------- */
+  function buildUrl() {
+    var u = new URL(CFG.base, window.location.origin);
+    state.filters.forEach(function (f) {
+      if (f.price) {
+        if (f.price.min != null) u.searchParams.append('filter.v.price.gte', f.price.min);
+        if (f.price.max != null) u.searchParams.append('filter.v.price.lte', f.price.max);
+        return;
+      }
+      var p = inputToParam(f);
+      if (p) u.searchParams.append(p[0], p[1]);
+    });
+    if (state.sort && state.sort !== 'manual') u.searchParams.set('sort_by', state.sort);
+    var pv = previewParam();
+    if (pv) u.searchParams.set('preview_theme_id', pv);
+    return u.toString();
+  }
+
+  function filtersFromUrl(sp) {
+    var out = [];
+    var price = {};
+    sp.forEach(function (val, key) {
+      if (key === 'filter.v.price.gte') price.min = parseFloat(val);
+      else if (key === 'filter.v.price.lte') price.max = parseFloat(val);
+      else if (key.indexOf('filter.') === 0) {
+        var mapped = state.inputKeyMap[key + '=' + val];
+        if (mapped) { out.push(mapped); return; }
+        // Fallbacks when the facet map is not yet built for this key.
+        if (key === 'filter.p.vendor') out.push({ productVendor: val });
+        else if (key === 'filter.p.product_type') out.push({ productType: val });
+        else if (key === 'filter.p.tag') out.push({ tag: val });
+        else if (key === 'filter.v.availability') out.push({ available: val === '1' });
+        else if (key.indexOf('filter.v.option.') === 0) out.push({ variantOption: { name: key.slice('filter.v.option.'.length), value: val } });
+      }
+    });
+    if (price.min != null || price.max != null) out.push({ price: price });
+    return out;
+  }
+
+  /* ---------- rendering the results region ---------- */
+  function loadingOn() {
+    var region = document.getElementById('cf-plp-results');
+    if (region) region.classList.add('is-loading');
+  }
+  function loadingOff() {
+    var region = document.getElementById('cf-plp-results');
+    if (region) region.classList.remove('is-loading');
+  }
+
+  function reinit() {
+    document.dispatchEvent(new CustomEvent('cf:products-added'));
+    if (typeof window.cfWholesalePricingInit === 'function') window.cfWholesalePricingInit();
+    if (window.CelebrateFestivalWishlist && typeof window.CelebrateFestivalWishlist.updateAllIcons === 'function') {
+      window.CelebrateFestivalWishlist.updateAllIcons();
+    }
+    var activeView = document.querySelector('.cf-plp__view-btn.active');
+    if (activeView && activeView.dataset.view === 'list') {
+      var g = document.getElementById('product-grid');
+      if (g) g.classList.add('list-view');
+    }
+  }
+
+  function renderResults(page) {
+    var region = document.getElementById('cf-plp-results');
+    if (!region) return;
+    state.cursor = page.pageInfo.endCursor;
+    state.hasNext = page.pageInfo.hasNextPage;
+
+    var cards = page.nodes.map(renderCard).join('');
+    var html = '' +
+      '<div class="cf-plp__ajax-overlay" aria-hidden="true"><div class="cf-plp__ajax-spinner"></div></div>';
+    if (page.nodes.length) {
+      html += '<div class="cf-plp__grid" id="product-grid">' + cards + '</div>';
+      html += '<div class="cf-plp__load-more-wrap">' +
+        '<button type="button" class="cf-plp__load-more-btn" id="load-more-btn" data-lm-bound="1"' + (state.hasNext ? '' : ' disabled') + '>' +
+        '<span class="cf-plp__load-more-spinner"></span>' + (state.hasNext ? 'Load More Products' : 'All Products Loaded') + '</button>' +
+        '<div class="cf-plp__load-more-progress" id="load-more-progress">Showing <span id="load-more-shown">' + page.nodes.length + '</span> products</div>' +
+        '</div>';
+    } else {
+      html += '<div class="cf-plp__empty"><div class="cf-plp__empty-icon">&#128230;</div><h2>No products found</h2><p>Try removing a filter.</p></div>';
+    }
+    region.innerHTML = html;
+
+    // Bind our own Load-More (native cfInitLoadMore no-ops because data-lm-bound="1").
+    var btn = document.getElementById('load-more-btn');
+    if (btn && state.hasNext) {
+      btn.addEventListener('click', function () { loadMore(btn); });
+    } else if (btn) {
+      btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+    }
+
+    // Rebuild sidebar facets (narrowed counts, active state preserved).
+    var sidebar = document.querySelector('.cf-plp__sidebar');
+    if (sidebar && page.filters) sidebar.innerHTML = buildSidebar(page.filters);
+
+    // Results count + active-filter chips in the toolbar.
+    updateToolbar(page);
+    reinit();
+  }
+
+  function updateToolbar(page) {
+    var countEl = document.querySelector('.cf-plp__results-count');
+    if (countEl) {
+      var shown = page.nodes.length + (state.hasNext ? '+' : '');
+      countEl.innerHTML = '<strong>' + shown + '</strong> products' + (state.hasNext ? ' (filtered)' : '');
+    }
+    // active filter chips
+    var left = document.querySelector('.cf-plp__toolbar-compact__left');
+    if (!left) return;
+    var existing = left.querySelector('.cf-plp__active-filters-inline');
+    if (existing) existing.remove();
+    if (!state.filters.length) return;
+    var chips = '<div class="cf-plp__active-filters-inline" style="display:flex;"><span class="cf-plp__active-filters-label">Active Filters:</span><div class="cf-plp__active-filters-list">';
+    state.filters.forEach(function (f) {
+      var label;
+      if (f.price) label = 'Price' + (f.price.min != null ? ' $' + f.price.min : '') + (f.price.max != null ? '–$' + f.price.max : '');
+      else if (f.productVendor != null) label = f.productVendor;
+      else if (f.tag != null) label = f.tag;
+      else if (f.available != null) label = f.available ? 'In stock' : 'Out of stock';
+      else if (f.variantOption) label = f.variantOption.value;
+      else label = 'Filter';
+      chips += '<span class="cf-plp__filter-chip">' + esc(label) + '</span>';
+    });
+    chips += '</div><a href="#" class="cf-plp__clear-all" onclick="window.cfOversized.clearAll();return false;">Clear All</a></div>';
+    left.insertAdjacentHTML('afterbegin', chips);
+  }
+
+  /* ---------- actions ---------- */
+  function apply(pushUrl) {
+    loadingOn();
+    return fetchPage({ filters: state.filters, cursor: null })
+      .then(function (page) {
+        renderResults(page);
+        loadingOff();
+        if (pushUrl !== false) history.pushState({ cfOversized: true }, '', buildUrl());
+      })
+      .catch(function (err) {
+        if (err && err.name === 'AbortError') return;
+        loadingOff();
+        console.error('[cfOversized] filter error', err);
+        notifyUnavailable();
+      });
+  }
+
+  function loadMore(btn) {
+    if (!state.hasNext) return;
+    btn.classList.add('loading');
+    btn.disabled = true;
+    fetchPage({ filters: state.filters, cursor: state.cursor })
+      .then(function (page) {
+        state.cursor = page.pageInfo.endCursor;
+        state.hasNext = page.pageInfo.hasNextPage;
+        var grid = document.getElementById('product-grid');
+        if (grid) grid.insertAdjacentHTML('beforeend', page.nodes.map(renderCard).join(''));
+        var shownEl = document.getElementById('load-more-shown');
+        if (shownEl && grid) shownEl.textContent = grid.children.length;
+        if (state.hasNext) { btn.classList.remove('loading'); btn.disabled = false; }
+        else {
+          btn.textContent = 'All Products Loaded';
+          btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+        }
+        reinit();
+      })
+      .catch(function (err) {
+        if (err && err.name === 'AbortError') return;
+        btn.classList.remove('loading'); btn.disabled = false; btn.textContent = 'Retry';
+        console.error('[cfOversized] load more error', err);
+      });
+  }
+
+  function notifyUnavailable() {
+    // Non-destructive: keep the native Liquid product list, flag the sidebar.
+    var sidebar = document.querySelector('.cf-plp__sidebar');
+    if (sidebar) {
+      sidebar.innerHTML = '<h2 class="cf-plp__filters-title">Filters</h2>' +
+        '<div class="cf-plp__filter-empty">Filters are temporarily unavailable. Please try again shortly.</div>';
+    }
+  }
+
+  /* ---------- public entry points ---------- */
+  function initSidebar() {
+    // Fetch unfiltered facets to populate the sidebar Liquid cannot provide.
+    fetchPage({ filters: [], cursor: null })
+      .then(function (page) {
+        var sidebar = document.querySelector('.cf-plp__sidebar');
+        if (sidebar && page.filters) sidebar.innerHTML = buildSidebar(page.filters);
+      })
+      .catch(function (err) {
+        if (err && err.name === 'AbortError') return;
+        console.error('[cfOversized] sidebar init error', err);
+      });
+  }
+
+  window.cfOversized.isAllProducts = isAllProducts;
+
+  // Called by handleCollectionSort / mobile apply to decide whether we own the action.
+  window.cfOversized.route = function (kind) {
+    if (!isAllProducts()) return false;
+    if (kind === 'sort') {
+      var sel = document.getElementById('collection-sort');
+      state.sort = sel ? sel.value : 'manual';
+      state.filters = collectFilters();
+      apply(true);
+      return true;
+    }
+    return false;
+  };
+
+  window.cfOversized.onFilterChange = function () {
+    if (!isAllProducts()) return;
+    var sel = document.getElementById('collection-sort');
+    if (sel) state.sort = sel.value;
+    state.filters = collectFilters();
+    apply(true);
+  };
+
+  window.cfOversized.onPriceApply = function () {
+    window.cfOversized.onFilterChange();
+  };
+
+  window.cfOversized.applyFromContainer = function (container) {
+    if (!isAllProducts()) return;
+    var sel = document.getElementById('collection-sort');
+    if (sel) state.sort = sel.value;
+    state.filters = collectFilters(container);
+    apply(true);
+  };
+
+  window.cfOversized.clearAll = function () {
+    state.filters = [];
+    var sel = document.getElementById('collection-sort');
+    if (sel) state.sort = sel.value;
+    // One clean history entry for the cleared state, then restore the native Liquid
+    // (unfiltered) listing WITHOUT an extra push; the reinit hook rebuilds the sidebar.
+    history.pushState({ cfOversized: true }, '', buildUrl());
+    if (typeof cfL2 !== 'undefined' && cfL2 && cfL2.restoreAllProducts) {
+      cfL2.restoreAllProducts();
+    } else {
+      window.location = CFG.base + (previewParam() ? '?preview_theme_id=' + previewParam() : '');
+    }
+  };
+
+  // Called after every cfL2 swap. When we land on "All Products" (no sub), rebuild
+  // the API sidebar (and re-render filtered results if the URL carries filters).
+  // URL-driven and self-resetting, so stale in-memory filters from a prior L3 or
+  // filtered view never block the rebuild.
+  window.cfOversized.onReturnToAllProducts = function () {
+    var sp = new URLSearchParams(window.location.search);
+    if (sp.get('sub')) return;   // still inside an L3 view — cfL2 owns it
+    state.sort = sp.get('sort_by') || 'manual';
+    state.filters = filtersFromUrl(sp);
+    if (state.filters.length) apply(false);
+    else initSidebar();
+  };
+
+  /* ---------- popstate + initial load ---------- */
+  // URL-driven (not DOM-class driven): a "sub" param means an L3 state that cfL2
+  // owns, so we bail. Otherwise this is an All-Products state we own. Restores use
+  // NON-pushing paths so the Back/Forward stack stays intact.
+  window.addEventListener('popstate', function () {
+    var sp = new URLSearchParams(window.location.search);
+    if (sp.get('sub')) return;   // L3 history state — handled by cfL2
+    state.sort = sp.get('sort_by') || 'manual';
+    var syncSort = document.getElementById('collection-sort');
+    if (syncSort) syncSort.value = state.sort;
+    state.filters = filtersFromUrl(sp);
+    if (state.filters.length) {
+      apply(false);
+    } else if (typeof cfL2 !== 'undefined' && cfL2 && cfL2.restoreAllProducts) {
+      cfL2.restoreAllProducts();   // native unfiltered listing + sidebar rebuild via reinit hook
+    } else {
+      initSidebar();
+    }
+  });
+
+  function boot() {
+    if (!isAllProducts()) return;   // an L3 sub is active — native cfL2 owns the page
+    var sp = new URLSearchParams(window.location.search);
+    state.sort = sp.get('sort_by') || 'manual';
+    var urlFilters = filtersFromUrl(sp);
+    if (urlFilters.length) {
+      // Shared/reloaded filtered link: fetch facets first (builds inputKeyMap for
+      // exact grouped-vendor round-trip), then apply the filtered results.
+      fetchPage({ filters: [], cursor: null }).then(function (page) {
+        var sidebar = document.querySelector('.cf-plp__sidebar');
+        if (sidebar && page.filters) sidebar.innerHTML = buildSidebar(page.filters);
+        state.filters = filtersFromUrl(sp);   // re-resolve now that inputKeyMap exists
+        apply(false);
+      }).catch(function () { initSidebar(); });
+    } else {
+      initSidebar();
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
 })();
 </script>
 
