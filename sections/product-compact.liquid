@@ -1500,6 +1500,9 @@
     </div>
   </div>
 </div>
+{%- endunless -%}
+{%- comment -%} /call_to_order — only the Sticky ATC Bar (PART E) is gated; the
+   image gallery + variant-switching JS below (PART F) MUST always render. {%- endcomment -%}
 
 {%- comment -%}
   ════════════════════════════════════════════
@@ -2249,7 +2252,8 @@ if ('requestIdleCallback' in window) requestIdleCallback(d); else setTimeout(d, 
 })();
 </script>
 
-{%- comment -%} ── F6: Sticky ATC Bar ── {%- endcomment -%}
+{%- unless call_to_order -%}
+{%- comment -%} ── F6: Sticky ATC Bar (gated: not shown for call-to-order products) ── {%- endcomment -%}
 <script>
 (function() {
   var stickyBar = document.getElementById('compact-sticky-bar');
