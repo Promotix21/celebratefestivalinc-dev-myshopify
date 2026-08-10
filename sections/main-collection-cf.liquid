@@ -1257,6 +1257,55 @@
   color: white;
 }
 
+/* Active pill (same-page L3 AJAX filtering) */
+.cf-plp__subcategory-pill.is-active {
+  background: var(--deep-blue);
+  color: #fff;
+  border-color: var(--deep-blue);
+  box-shadow: 0 4px 12px rgba(26, 58, 92, 0.2);
+  cursor: default;
+}
+.cf-plp__subcategory-pill.is-active .cf-plp__subcategory-pill-count {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+/* Results region loading state during same-page L3 AJAX swap */
+.cf-plp__results-region {
+  position: relative;
+  min-height: 200px;
+}
+.cf-plp__results-region.is-loading {
+  pointer-events: none;
+}
+.cf-plp__results-region.is-loading > *:not(.cf-plp__ajax-overlay) {
+  opacity: 0.35;
+  transition: opacity 0.15s ease;
+}
+.cf-plp__ajax-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 80px;
+}
+.cf-plp__results-region.is-loading .cf-plp__ajax-overlay {
+  display: flex;
+}
+.cf-plp__ajax-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(45, 90, 135, 0.2);
+  border-top-color: var(--deep-blue);
+  border-radius: 50%;
+  animation: cfPlpSpin 0.7s linear infinite;
+  position: sticky;
+  top: 120px;
+}
+@keyframes cfPlpSpin { to { transform: rotate(360deg); } }
+
 /* ========================================
    LOAD MORE BUTTON
    ======================================== */
@@ -2166,9 +2215,24 @@
         {% endfor %}
 
         {% if l3_pill_children.size > 0 %}
-          <div class="cf-plp__subcategory-pills">
+          {% comment %}
+            data-l2-ajax activates the same-page L3 filtering JS. Pills carry the REAL
+            L3 collection handle/url as the AJAX data source (rendered through the same
+            level-2-mega view). "All Products" restores the L2 collection itself.
+          {% endcomment %}
+          <div class="cf-plp__subcategory-pills" data-l2-ajax data-l2-base="{{ collection.url }}">
+            <a href="{{ collection.url }}"
+               class="cf-plp__subcategory-pill cf-plp__subcategory-pill--all is-active"
+               data-l3-handle=""
+               data-l3-url="{{ collection.url }}">
+              All Products
+            </a>
             {% for child_link in l3_pill_children %}
-              <a href="{{ child_link.url }}" class="cf-plp__subcategory-pill">
+              {% assign l3_pill_handle = child_link.url | split: '/' | last | split: '?' | first %}
+              <a href="/collections/{{ l3_pill_handle }}"
+                 class="cf-plp__subcategory-pill"
+                 data-l3-handle="{{ l3_pill_handle }}"
+                 data-l3-url="/collections/{{ l3_pill_handle }}">
                 {{ child_link.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}
               </a>
             {% endfor %}
@@ -2177,6 +2241,9 @@
       {% endif %}
 
       {% comment %} Product Grid - Using L2 inline card design {% endcomment %}
+      {% comment %} #cf-plp-results is the swap target for same-page L3 AJAX filtering {% endcomment %}
+      <div class="cf-plp__results-region" id="cf-plp-results">
+      <div class="cf-plp__ajax-overlay" aria-hidden="true"><div class="cf-plp__ajax-spinner"></div></div>
       {% if collection.products_count > 0 %}
         <div class="cf-plp__grid" id="product-grid">
           {% for product in collection.products %}
@@ -2242,6 +2309,7 @@
           <p>This collection doesn't have any products yet.</p>
         </div>
       {% endif %}
+      </div>{% comment %} /#cf-plp-results {% endcomment %}
 
     </main>
   </div>
@@ -2268,76 +2336,13 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const productGrid = document.getElementById('product-grid');
-
-  // View Toggle
+  // View Toggle (query grid fresh so it keeps working after AJAX swaps)
   document.querySelectorAll('.cf-plp__view-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       document.querySelectorAll('.cf-plp__view-btn').forEach(b => b.classList.remove('active'));
       this.classList.add('active');
-      if (productGrid) {
-        if (this.dataset.view === 'list') {
-          productGrid.classList.add('list-view');
-        } else {
-          productGrid.classList.remove('list-view');
-        }
-      }
-    });
-  });
-
-  // Add to Cart
-  document.querySelectorAll('.cf-plp__add-btn').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-      e.preventDefault();
-      const variantId = this.dataset.variantId;
-      const card = this.closest('.cf-plp__card');
-      const qty = card ? parseInt(card.querySelector('.cf-plp__qty-input').value) || 1 : 1;
-      const button = this;
-
-      button.disabled = true;
-      button.textContent = 'Adding...';
-
-      fetch('/cart/add.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: parseInt(variantId), quantity: qty })
-      })
-      .then(res => {
-        if (!res.ok) throw new Error('Add to cart failed');
-        return res.json();
-      })
-      .then(data => {
-        button.textContent = 'Added!';
-        button.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
-
-        if (window.updateCartCount) window.updateCartCount();
-        else {
-          fetch('/cart.js').then(r => r.json()).then(cart => {
-            const countEls = document.querySelectorAll('.cart-count-bubble span, .cart-count, [data-cart-count]');
-            countEls.forEach(el => el.textContent = cart.item_count);
-          });
-        }
-
-        if (typeof window.cfShowCartToast === 'function') {
-          window.cfShowCartToast(data, qty);
-        }
-
-        setTimeout(() => {
-          button.textContent = 'Add to Cart';
-          button.style.background = '';
-          button.disabled = false;
-        }, 2000);
-      })
-      .catch(err => {
-        console.error('Cart error:', err);
-        button.textContent = 'Error';
-        button.style.background = '#ef4444';
-        setTimeout(() => {
-          button.textContent = 'Add to Cart';
-          button.style.background = '';
-          button.disabled = false;
-        }, 2000);
-      });
+      const grid = document.getElementById('product-grid');
+      if (grid) grid.classList.toggle('list-view', this.dataset.view === 'list');
     });
   });
 
@@ -2346,6 +2351,47 @@ document.addEventListener('DOMContentLoaded', function() {
   if (mobileFilterBtn) {
     mobileFilterBtn.addEventListener('click', openCollectionMobileFilters);
   }
+});
+
+// Add to Cart — delegated so it survives same-page L3 AJAX swaps.
+// Only real BUTTON add-buttons with a variant id (skips anchor CTAs like View Details / Call to Order).
+document.addEventListener('click', function(e) {
+  const button = e.target.closest('button.cf-plp__add-btn[data-variant-id]');
+  if (!button || button.disabled || !button.closest('.cf-plp')) return;
+  e.preventDefault();
+
+  const variantId = button.dataset.variantId;
+  const card = button.closest('.cf-plp__card');
+  const qtyInput = card ? card.querySelector('.cf-plp__qty-input') : null;
+  const qty = qtyInput ? (parseInt(qtyInput.value) || 1) : 1;
+
+  button.disabled = true;
+  button.textContent = 'Adding...';
+
+  fetch('/cart/add.js', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: parseInt(variantId), quantity: qty })
+  })
+  .then(res => { if (!res.ok) throw new Error('Add to cart failed'); return res.json(); })
+  .then(data => {
+    button.textContent = 'Added!';
+    button.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+    if (window.updateCartCount) window.updateCartCount();
+    else {
+      fetch('/cart.js').then(r => r.json()).then(cart => {
+        document.querySelectorAll('.cart-count-bubble span, .cart-count, [data-cart-count]').forEach(el => el.textContent = cart.item_count);
+      });
+    }
+    if (typeof window.cfShowCartToast === 'function') window.cfShowCartToast(data, qty);
+    setTimeout(() => { button.textContent = 'Add to Cart'; button.style.background = ''; button.disabled = false; }, 2000);
+  })
+  .catch(err => {
+    console.error('Cart error:', err);
+    button.textContent = 'Error';
+    button.style.background = '#ef4444';
+    setTimeout(() => { button.textContent = 'Add to Cart'; button.style.background = ''; button.disabled = false; }, 2000);
+  });
 });
 
 /* ========================================
@@ -2371,6 +2417,7 @@ window.handleStorefrontFilter = function(checkbox) {
   }
 
   url.searchParams.delete('page');
+  if (typeof cfL2 !== 'undefined' && cfL2 && cfL2.active) { cfL2.applyDisplayUrl(url); return; }
   window.location = url.toString();
 };
 
@@ -2385,6 +2432,7 @@ window.removeStorefrontFilter = function(paramName, paramValue) {
     }
   });
   url.searchParams.delete('page');
+  if (typeof cfL2 !== 'undefined' && cfL2 && cfL2.active) { cfL2.applyDisplayUrl(url); return; }
   window.location = url.toString();
 };
 
@@ -2401,6 +2449,7 @@ window.applyPriceFilter = function() {
   });
 
   url.searchParams.delete('page');
+  if (typeof cfL2 !== 'undefined' && cfL2 && cfL2.active) { cfL2.applyDisplayUrl(url); return; }
   window.location = url.toString();
 };
 
@@ -2434,6 +2483,8 @@ window.toggleFilterViewMore = function(btn) {
 window.handleCollectionSort = function(value) {
   const url = new URL(window.location);
   url.searchParams.set('sort_by', value);
+  url.searchParams.delete('page');
+  if (typeof cfL2 !== 'undefined' && cfL2 && cfL2.active) { cfL2.applyDisplayUrl(url); return; }
   window.location = url;
 };
 
@@ -2486,13 +2537,16 @@ function closeCollectionMobileFilters() {
   }
 }
 
-// Load More - fetches next page and appends product cards
-(function() {
+// Load More - fetches next page and appends product cards.
+// Re-callable so it re-binds to the fresh button after a same-page L3 AJAX swap.
+// paginate.next.url on the fetched page already carries view/filters/sort/preview,
+// so nextUrl stays scoped to whichever collection (L2 or selected L3) is active.
+window.cfInitLoadMore = function() {
   const loadMoreBtn = document.getElementById('load-more-btn');
-  if (!loadMoreBtn) return;
+  if (!loadMoreBtn || loadMoreBtn.dataset.lmBound === '1') return;
+  loadMoreBtn.dataset.lmBound = '1';
 
   let nextUrl = loadMoreBtn.dataset.nextUrl;
-  let totalProducts = parseInt(loadMoreBtn.dataset.totalProducts) || 0;
   const grid = document.getElementById('product-grid');
   const shownEl = document.getElementById('load-more-shown');
 
@@ -2505,47 +2559,37 @@ function closeCollectionMobileFilters() {
     fetch(nextUrl)
       .then(r => r.text())
       .then(html => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
+        const doc = new DOMParser().parseFromString(html, 'text/html');
         const newGrid = doc.getElementById('product-grid');
         const newLoadMore = doc.getElementById('load-more-btn');
 
         if (newGrid) {
           const cards = newGrid.children;
-          while (cards.length > 0) {
-            grid.appendChild(cards[0]);
-          }
+          while (cards.length > 0) { grid.appendChild(cards[0]); }
         }
 
-        // Update shown count
-        if (shownEl) {
-          shownEl.textContent = grid.children.length;
-        }
+        if (shownEl) shownEl.textContent = grid.children.length;
 
-        // Update next URL from the new page's Load More button
         if (newLoadMore && newLoadMore.dataset.nextUrl) {
           nextUrl = newLoadMore.dataset.nextUrl;
+          loadMoreBtn.classList.remove('loading');
+          loadMoreBtn.disabled = false;
         } else {
           nextUrl = null;
           loadMoreBtn.textContent = 'All Products Loaded';
           loadMoreBtn.disabled = true;
           loadMoreBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
-          // Sync total count to actual grid size now that everything is loaded
           const totalEl = document.getElementById('load-more-total');
           if (totalEl) totalEl.textContent = grid.children.length;
           if (shownEl) shownEl.textContent = grid.children.length;
-          return;
         }
 
-        loadMoreBtn.classList.remove('loading');
-        loadMoreBtn.disabled = false;
-
-        // Trigger BDR pricing for new cards
-        if (typeof window.cfWholesalePricingInit === 'function') {
-          window.cfWholesalePricingInit();
-        }
-        // Also dispatch event for cf-wholesale-pricing.js
+        // Re-price / re-init appended cards
         document.dispatchEvent(new CustomEvent('cf:products-added'));
+        if (typeof window.cfWholesalePricingInit === 'function') window.cfWholesalePricingInit();
+        if (window.CelebrateFestivalWishlist && typeof window.CelebrateFestivalWishlist.updateAllIcons === 'function') {
+          window.CelebrateFestivalWishlist.updateAllIcons();
+        }
       })
       .catch(err => {
         console.error('Load more error:', err);
@@ -2554,7 +2598,8 @@ function closeCollectionMobileFilters() {
         loadMoreBtn.textContent = 'Retry';
       });
   });
-})();
+};
+document.addEventListener('DOMContentLoaded', window.cfInitLoadMore);
 
 // Apply mobile filters - collects all checked state and navigates
 window.applyMobileFilters = function() {
@@ -2580,8 +2625,169 @@ window.applyMobileFilters = function() {
 
   url.searchParams.delete('page');
   closeCollectionMobileFilters();
+  if (typeof cfL2 !== 'undefined' && cfL2 && cfL2.active) { cfL2.applyDisplayUrl(url); return; }
   window.location = url.toString();
 };
+
+/* ========================================================================
+   SAME-PAGE L3 FILTERING (level-2-mega)
+   Clicking an L3 pill AJAX-loads that REAL L3 collection's complete listing
+   (rendered through the same ?view=level-2-mega section) into the current L2
+   page. Pagination / filters / sort are native and scoped to the selected
+   collection — never a DOM subset — so there is no product cap.
+   ======================================================================== */
+var cfL2 = (function() {
+  var pillBar = document.querySelector('.cf-plp__subcategory-pills[data-l2-ajax]');
+  if (!pillBar) return { active: false };
+
+  var VIEW = 'level-2-mega';
+  var l2Base = pillBar.getAttribute('data-l2-base'); // L2 collection path, e.g. /collections/cooking-equipment
+  var region = document.getElementById('cf-plp-results');
+
+  function previewParam() {
+    return new URLSearchParams(window.location.search).get('preview_theme_id');
+  }
+
+  // Active data source: the selected L3 collection, or the L2 collection for "All Products".
+  function basePathForSub(sub) {
+    return sub ? ('/collections/' + sub) : l2Base;
+  }
+
+  // Grab only the params that should scope a listing (sort + Storefront filters + page).
+  function collectScopedParams(sp) {
+    var out = [];
+    sp.forEach(function(val, key) {
+      if (key === 'sort_by' || key.indexOf('filter.') === 0 || key === 'page') out.push([key, val]);
+    });
+    return out;
+  }
+
+  function stripPage(params) {
+    return params.filter(function(p) { return p[0] !== 'page'; });
+  }
+
+  // URL we actually fetch — the collection rendered through the mega view.
+  function buildFetchUrl(sub, params) {
+    var u = new URL(basePathForSub(sub), window.location.origin);
+    u.searchParams.set('view', VIEW);
+    params.forEach(function(p) { u.searchParams.append(p[0], p[1]); });
+    var pv = previewParam();
+    if (pv) u.searchParams.set('preview_theme_id', pv);
+    return u.toString();
+  }
+
+  // Visible/history URL — stays on the L2 path, carries the selected sub + scope.
+  function buildDisplayUrl(sub, params) {
+    var u = new URL(l2Base, window.location.origin);
+    if (sub) u.searchParams.set('sub', sub);
+    params.forEach(function(p) { u.searchParams.append(p[0], p[1]); });
+    var pv = previewParam();
+    if (pv) u.searchParams.set('preview_theme_id', pv);
+    return u.toString();
+  }
+
+  function setActivePill(sub) {
+    pillBar.querySelectorAll('.cf-plp__subcategory-pill').forEach(function(p) {
+      p.classList.toggle('is-active', (p.getAttribute('data-l3-handle') || '') === (sub || ''));
+    });
+  }
+
+  function reinit() {
+    if (typeof window.cfInitLoadMore === 'function') window.cfInitLoadMore();
+    document.dispatchEvent(new CustomEvent('cf:products-added'));
+    if (typeof window.cfWholesalePricingInit === 'function') window.cfWholesalePricingInit();
+    if (window.CelebrateFestivalWishlist && typeof window.CelebrateFestivalWishlist.updateAllIcons === 'function') {
+      window.CelebrateFestivalWishlist.updateAllIcons();
+    }
+    // Preserve grid/list view state across swaps
+    var activeView = document.querySelector('.cf-plp__view-btn.active');
+    if (activeView && activeView.dataset.view === 'list') {
+      var g = document.getElementById('product-grid');
+      if (g) g.classList.add('list-view');
+    }
+  }
+
+  function swap(sub, params, displayUrl, push) {
+    if (region) region.classList.add('is-loading');
+    return fetch(buildFetchUrl(sub, params), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      .then(function(r) { return r.text(); })
+      .then(function(html) {
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        var newResults = doc.getElementById('cf-plp-results');
+        var newSidebar = doc.querySelector('.cf-plp__sidebar');
+        var newLeft = doc.querySelector('.cf-plp__toolbar-compact__left');
+        var newSort = doc.getElementById('collection-sort');
+
+        if (newResults && region) region.innerHTML = newResults.innerHTML;
+        var curSidebar = document.querySelector('.cf-plp__sidebar');
+        if (newSidebar && curSidebar) curSidebar.innerHTML = newSidebar.innerHTML;
+        var curLeft = document.querySelector('.cf-plp__toolbar-compact__left');
+        if (newLeft && curLeft) curLeft.innerHTML = newLeft.innerHTML;
+        var curSort = document.getElementById('collection-sort');
+        if (newSort && curSort) curSort.value = newSort.value;
+
+        setActivePill(sub);
+        if (push) history.pushState({ cfL2: true, sub: sub || '' }, '', displayUrl);
+
+        if (region) region.classList.remove('is-loading');
+        reinit();
+
+        // Keep the user near the product area (avoid a jarring jump to page top)
+        var toolbar = document.querySelector('.cf-plp__toolbar-compact');
+        if (toolbar) {
+          var top = toolbar.getBoundingClientRect().top + window.pageYOffset - 90;
+          if (window.pageYOffset > top) window.scrollTo({ top: top, behavior: 'smooth' });
+        }
+      })
+      .catch(function(err) {
+        console.error('[cfL2] load error', err);
+        if (region) region.classList.remove('is-loading');
+      });
+  }
+
+  // Apply a display URL built by the filter/sort handlers (already on the L2 path).
+  function applyDisplayUrl(urlObj) {
+    urlObj.searchParams.delete('page'); // filter/sort change resets pagination
+    var sub = urlObj.searchParams.get('sub') || null;
+    var params = stripPage(collectScopedParams(urlObj.searchParams));
+    swap(sub, params, buildDisplayUrl(sub, params), true);
+  }
+
+  // Select a pill (sub = '' for All Products). Drops stale filters, keeps sort.
+  function selectPill(sub) {
+    var sp = new URLSearchParams(window.location.search);
+    var params = [];
+    var sortv = sp.get('sort_by');
+    if (sortv) params.push(['sort_by', sortv]);
+    swap(sub || null, params, buildDisplayUrl(sub || null, params), true);
+  }
+
+  // Pill clicks (delegated)
+  pillBar.addEventListener('click', function(e) {
+    var pill = e.target.closest('.cf-plp__subcategory-pill');
+    if (!pill) return;
+    e.preventDefault();
+    if (pill.classList.contains('is-active')) return;
+    selectPill(pill.getAttribute('data-l3-handle') || '');
+  });
+
+  // Back / forward
+  window.addEventListener('popstate', function() {
+    var sp = new URLSearchParams(window.location.search);
+    var sub = sp.get('sub') || null;
+    swap(sub, stripPage(collectScopedParams(sp)), null, false);
+    setActivePill(sub);
+  });
+
+  // Refresh / shareable link: if a sub is present, load it (server rendered the L2 aggregate)
+  var initSub = new URLSearchParams(window.location.search).get('sub');
+  if (initSub) {
+    var sp0 = new URLSearchParams(window.location.search);
+    swap(initSub, stripPage(collectScopedParams(sp0)), null, false);
+  }
+
+  return { active: true, applyDisplayUrl: applyDisplayUrl, selectPill: selectPill };
+})();
 </script>
 
 {% endif %}
