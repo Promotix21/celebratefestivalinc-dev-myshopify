@@ -1,0 +1,166 @@
+{
+  "generated_at": "2026-08-12",
+  "source": "cms.hiraya.digital SQLite tracker.sqlite (via SSH)",
+  "total_tasks": 103,
+  "task_id_range": "3\u2013109",
+  "created_range": "2026-03-12 to 2026-08-04",
+  "status_breakdown": {
+    "Completed": 93,
+    "Pending": 10
+  },
+  "pending_tasks": [
+    {
+      "task_id": 54,
+      "title": "Journey page UI refinement",
+      "priority": "Medium",
+      "created": "2026-04-02",
+      "last_activity": "2026-07-27",
+      "comment_count": 7,
+      "classification": "WAITING_FOR_CLIENT",
+      "note": "Client asked on Jul 27 where the page will be embedded + sent attachment; no Hiraya reply recorded"
+    },
+    {
+      "task_id": 76,
+      "title": "Inventory status feature - 2nd iteration",
+      "priority": "High",
+      "created": "2026-04-20",
+      "eta": "2026-05-11",
+      "last_activity": "2026-08-04",
+      "comment_count": 13,
+      "classification": "ACTIVE_PRIORITY",
+      "note": "High priority; ETA 2026-05-11 (93 days overdue); active comment Aug 4; vendor-differentiated out-of-stock text for Indian vs USA products"
+    },
+    {
+      "task_id": 89,
+      "title": "Our Trusted Restaurant Partners \u2014 homepage section + page",
+      "priority": "High",
+      "created": "2026-05-11",
+      "eta": "2026-06-01",
+      "last_activity": "2026-07-07",
+      "comment_count": 2,
+      "classification": "WAITING_FOR_CLIENT",
+      "note": "ETA Jun 1 (72 days overdue); needs interactive US map + partner logos; last discussed Jul 7"
+    },
+    {
+      "task_id": 98,
+      "title": "WSH updated integration with Price Box",
+      "priority": "Medium",
+      "created": "2026-05-27",
+      "last_activity": "2026-07-07",
+      "comment_count": 1,
+      "classification": "ACTIVE_PRIORITY",
+      "note": "WSH Volume Discount integration broke Price Box UI; client provided clear requirements; no Hiraya action in git since filed; 77 days open"
+    },
+    {
+      "task_id": 101,
+      "title": "AI ChatBot implementation",
+      "priority": "High",
+      "created": "2026-07-16",
+      "last_activity": null,
+      "comment_count": 0,
+      "classification": "BACKLOG",
+      "note": "AI chatbot backend exists at cf-chatbot.hiraya.digital (built Apr 2026); floating widget hidden in theme; task asks to make it live"
+    },
+    {
+      "task_id": 102,
+      "title": "Rebate Interface",
+      "priority": "Medium",
+      "created": "2026-07-16",
+      "last_activity": null,
+      "comment_count": 0,
+      "classification": "BACKLOG",
+      "note": "New feature; no expected_behavior or spec defined; collection 'Rebates Eligible Products: California' exists in Shopify"
+    },
+    {
+      "task_id": 103,
+      "title": "Klaviyo Marketing Strategy",
+      "priority": "Low",
+      "created": "2026-07-16",
+      "last_activity": null,
+      "comment_count": 0,
+      "classification": "WAITING_FOR_CLIENT",
+      "note": "Task text: 'reminder to present us the Klaviyo strategy you mentioned in the meeting'; Hiraya must deliver strategy presentation"
+    },
+    {
+      "task_id": 106,
+      "title": "Outbound customer notifications: Out for delivery",
+      "priority": "Low",
+      "created": "2026-07-28",
+      "last_activity": null,
+      "comment_count": 0,
+      "classification": "BACKLOG",
+      "note": "Client specified 5 changes to email template; no implementation started"
+    },
+    {
+      "task_id": 107,
+      "title": "Outbound customer notifications: Order Delivered",
+      "priority": "Low",
+      "created": "2026-07-28",
+      "last_activity": null,
+      "comment_count": 0,
+      "classification": "BACKLOG",
+      "note": "Client specified 5 changes to email template; no implementation started"
+    },
+    {
+      "task_id": 109,
+      "title": "L2 Mega collections for all L2 category pages",
+      "priority": "Medium",
+      "created": "2026-08-04",
+      "last_activity": null,
+      "comment_count": 0,
+      "classification": "ACTIVE_PRIORITY",
+      "note": "Architecture designed and approved 2026-08-11 (SESSION-HANDOVER.md); Storefront API POC complete; implementation not started"
+    }
+  ],
+  "pending_by_classification": {
+    "ACTIVE_PRIORITY": [
+      76,
+      98,
+      109
+    ],
+    "WAITING_FOR_CLIENT": [
+      54,
+      89,
+      103
+    ],
+    "BACKLOG": [
+      101,
+      102,
+      106,
+      107
+    ]
+  },
+  "wsh_bdr_related_tasks": {
+    "note": "WSH/BDR wholesale pricing touched in multiple tasks",
+    "completed": [
+      {
+        "id": 28,
+        "title": "Indian products showing member pricing when logged out",
+        "completed": "2026-04-04"
+      },
+      {
+        "id": 29,
+        "title": "USA products showing Login for Member Pricing incorrectly",
+        "completed": "2026-04-04"
+      },
+      {
+        "id": 32,
+        "title": "Promotional elements visible to logged-in members",
+        "completed": "2026-04-04"
+      },
+      {
+        "id": 33,
+        "title": "Regular price missing strikethrough when member price shown",
+        "completed": "2026-04-04"
+      }
+    ],
+    "pending": [
+      {
+        "id": 98,
+        "title": "WSH updated integration with Price Box (Volume Discount)",
+        "status": "Pending",
+        "classification": "ACTIVE_PRIORITY"
+      }
+    ]
+  }
+}

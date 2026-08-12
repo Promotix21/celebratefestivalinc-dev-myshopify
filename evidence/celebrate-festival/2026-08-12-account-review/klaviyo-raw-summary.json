@@ -1,0 +1,78 @@
+{
+  "generated_at": "2026-08-12",
+  "account": {
+    "org": "Celebrate Festival Inc",
+    "account_id": "UVM8cY",
+    "timezone": "US/Eastern",
+    "currency": "USD"
+  },
+  "campaigns": {
+    "total_all_time": 166,
+    "sent": 135,
+    "draft": 26,
+    "cancelled": 5,
+    "scheduled": 0,
+    "sent_may_aug12_2026": 17,
+    "sms_campaigns": 0
+  },
+  "performance_may_aug12": {
+    "total_delivered": 58691,
+    "total_opens": 11682,
+    "total_clicks": 477,
+    "total_unsubscribes": 35,
+    "total_spam_complaints": 7,
+    "total_conversions_placed_order": 0,
+    "total_conversion_value_usd": 0.0,
+    "monthly": {
+      "May 2026": {
+        "campaigns": 8,
+        "delivered": 27078,
+        "avg_open_rate_pct": 15.07,
+        "avg_ctr_pct": 0.31,
+        "unsubscribes": 22,
+        "spam": 3
+      },
+      "June 2026": {
+        "campaigns": 5,
+        "delivered": 17310,
+        "avg_open_rate_pct": 14.75,
+        "avg_ctr_pct": 0.381,
+        "unsubscribes": 7,
+        "spam": 1
+      },
+      "July 2026": {
+        "campaigns": 4,
+        "delivered": 14303,
+        "avg_open_rate_pct": 12.34,
+        "avg_ctr_pct": 0.307,
+        "unsubscribes": 6,
+        "spam": 3
+      }
+    },
+    "note_zero_conversions": "All 17 campaigns show 0 Placed Order conversions. Likely causes: (1) Klaviyo-Shopify order webhook not configured, or (2) B2B orders happen via quote/phone rather than direct checkout."
+  },
+  "flows": {
+    "total": 3,
+    "active": 0,
+    "all_draft": true,
+    "note": "All 3 flows are in Draft status \u2014 no automated email sequences are currently active"
+  },
+  "lists": {
+    "count": 4,
+    "names": [
+      "TESTING group",
+      "Rupesh - Not yet but TO BE Premium customer Segment : Ask Rupesh before adding or deleting",
+      "Curry Pizza House active owners 06.02.2026",
+      "SUBSCRIBER LIST OF CELEBRATE - Updated 07.27.2026"
+    ]
+  },
+  "segments": {
+    "count": 0
+  },
+  "templates": {
+    "total": 90,
+    "named_workflow": 59,
+    "untitled_scratch": 31,
+    "note": "Named templates follow date-based convention (e.g. '01.May.Emailer_1', '08.July.Emailer_2.ready for review')"
+  }
+}

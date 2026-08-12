@@ -1,0 +1,453 @@
+id,title,task_type,priority,status,description,expected_behavior,eta_date,deadline,created_at,started_at,completed_at
+3,"Login for Member Pricing - Label Position","UI Change",Medium,Completed,"[BUG-001 · Product Listing & Card]
+
+""Login for member pricing"" label needs repositioning to bottom of product card on PDP.
+
+Current: Label appears in middle/upper area of card.","Label should appear at bottom like other product cards.",,"2026-03-15 17:00:00","2026-03-12 00:00:00","2026-03-13 00:00:00","2026-03-15 17:00:00"
+4,"Product Card SKU Display","UI Change",Low,Completed,"[BUG-002 · Product Listing & Card]
+
+SKU needs to be highlighted/styled differently on PDP.
+
+Current: SKU ""P48A-CCCC"" not prominently displayed.","SKU should be in highlighted box/badge for better visibility.",,"2026-03-15 17:00:00","2026-03-12 00:00:00","2026-03-13 00:00:00","2026-03-15 17:00:00"
+5,"Add to Cart Button - Price Section","UI Change",Medium,Completed,"[BUG-003 · Product Listing & Card]
+
+""Add to Cart"" button should be moved to the price box area on PDP.
+
+Current: Button positioned separately from price.","Button integrated within price display section.",,"2026-03-15 17:00:00","2026-03-12 00:00:00","2026-03-13 00:00:00","2026-03-15 17:00:00"
+6,"Category Filter Checkmarks Not Updating Product Grid","UI Change",High,Completed,"[BUG-004 · Navigation & Filtering]
+
+Category filter checkmarks on L2 pages do not update the product grid.
+
+Current: Selecting filter checkboxes does not filter products; no visual feedback; no clear-all.","Checkbox selections filter grid immediately; Clear All button available.",,"2026-03-18 17:00:00","2026-03-15 00:00:00","2026-03-16 00:00:00","2026-03-18 17:00:00"
+7,"Search Results - Brand Filter Goes to 404","UI Change",High,Completed,"[BUG-005 · Navigation & Filtering]
+
+Brand filter links in search results redirect to 404. AUDIT: NOT A BUG — uses client-side filtering, no URL navigation.
+
+Current: Brand filter links broken; URLs use /brands/ slug which does not exist.","Filter search results by selected brand/vendor; use /vendors/ slug.",,"2026-03-18 17:00:00","2026-03-15 00:00:00","2026-03-16 00:00:00","2026-03-18 17:00:00"
+8,"Food Preparation - Filter Buttons Directing to Wrong Collections","UI Change",High,Completed,"[BUG-006 · Navigation & Filtering]
+
+5 filter buttons direct to wrong collections when accessed via breadcrumb.
+
+Current: Buttons work from main menu but fail from breadcrumb path.","Consistent behavior regardless of navigation path.",,"2026-03-18 17:00:00","2026-03-15 00:00:00","2026-03-16 00:00:00","2026-03-18 17:00:00"
+9,"Cooking Equipment - Filters Not Working","UI Change",High,Completed,"[BUG-007 · Navigation & Filtering]
+
+Filter buttons not working on Indian Specialty >> Cooking Equipment.
+
+Current: Steam Cooking Equipment and Commercial Toasters filters non-functional.","Filters should narrow product selection.",,"2026-03-18 17:00:00","2026-03-15 00:00:00","2026-03-16 00:00:00","2026-03-18 17:00:00"
+10,"Filter Panel - Brand and Product Type Position","UI Change",Medium,Completed,"[BUG-008 · Navigation & Filtering]
+
+Brand and Product Type filters should be at top of filter panel on all product listing pages.
+
+Current: Positioned lower in filter hierarchy.","Top position in filter sidebar for easier access.",,"2026-03-18 17:00:00","2026-03-15 00:00:00","2026-03-16 00:00:00","2026-03-18 17:00:00"
+11,"Hero Section - Second Slide Position","UI Change",Low,Completed,"[BUG-009 · Hero Section & Slider]
+
+Reorder homepage hero: current 2nd slide becomes 1st.
+
+Current: Slide order incorrect.","2nd slide should be in 1st position.",,"2026-03-20 17:00:00","2026-03-17 00:00:00","2026-03-18 00:00:00","2026-03-20 17:00:00"
+12,"Hero Section - Shop Equipment Button Link","UI Change",Medium,Completed,"[BUG-010 · Hero Section & Slider]
+
+Shop Equipment button on 2nd slide should link to Restaurant Equipment main category.
+
+Current: Incorrect link destination (/collections/all).","Link to /collections/restaurant-equipment.",,"2026-03-20 17:00:00","2026-03-17 00:00:00","2026-03-18 00:00:00","2026-03-20 17:00:00"
+13,"Rolling Banner - Remove","UI Change",High,Completed,"[BUG-011 · Hero Section & Slider]
+
+Client does not like the top rolling announcement banner.
+
+Current: Rolling banner present at top.","Remove rolling banner completely.",,"2026-03-20 17:00:00","2026-03-17 00:00:00","2026-03-18 00:00:00","2026-03-20 17:00:00"
+14,"Contact Form - Form Type Dropdown",Bug,Medium,Completed,"[BUG-012 · Form & Contact]
+
+Select Form Type dropdown should be changed to buttons on contact page.
+
+Current: Dropdown menu for form selection.","Button-based form type selection.",,"2026-03-22 17:00:00","2026-03-19 00:00:00","2026-03-20 00:00:00","2026-03-22 17:00:00"
+15,"Contact Form - File Upload Section",Bug,Medium,Completed,"[BUG-013 · Form & Contact]
+
+Add file-upload capability to Request-a-Quote form.
+
+Current: No file upload capability.","File upload field in quote request form.",,"2026-03-22 17:00:00","2026-03-19 00:00:00","2026-03-20 00:00:00","2026-03-22 17:00:00"
+16,"Contact Section - Positioning",Bug,Low,Completed,"[BUG-014 · Form & Contact]
+
+Move contact forms up; make section narrower (or move under header).
+
+Current: Forms positioned too low, section too wide.","Higher positioning, narrower layout, under header.",,"2026-03-22 17:00:00","2026-03-19 00:00:00","2026-03-20 00:00:00","2026-03-22 17:00:00"
+17,"Help Box - Create Resource Pages and Add Links",Bug,High,Completed,"[BUG-015 · Form & Contact]
+
+Create three new resource pages and link them in Help Box: Product Videos, FAQ, Installation Service.
+
+Current: Buttons exist but pages not created.","Working links to the three resource pages.",,"2026-03-26 17:00:00","2026-03-23 00:00:00","2026-03-24 00:00:00","2026-03-26 17:00:00"
+18,"Cart Page - Continue Shopping Button",Bug,Medium,Completed,"[BUG-016 · Cart & Checkout]
+
+Continue Shopping button should return to original browsing page, not a default.
+
+Current: Button always links to /collections/all.","Navigate back to last visited product/category page.",,"2026-03-26 17:00:00","2026-03-23 00:00:00","2026-03-24 00:00:00","2026-03-26 17:00:00"
+19,"Sidebar Cart - Product List Display Optimization",Bug,High,Completed,"[BUG-017 · Cart & Checkout]
+
+Optimize cart sidebar so more items are visible before scrolling; move notes out.
+
+Current: Large product display taking up space; notes in sidebar.","Compact product list; notes on cart page.",,"2026-03-26 17:00:00","2026-03-23 00:00:00","2026-03-24 00:00:00","2026-03-26 17:00:00"
+20,"Cart Template Preview Issue",Bug,High,Completed,"[BUG-018 · Cart & Checkout]
+
+Custom cart theme not displaying correctly in preview mode.
+
+Current: Cart is rendered using live theme when previewing unpublished theme.","Alternative URL (/cart?view=drawer) to test unpublished cart template.",,"2026-03-26 17:00:00","2026-03-23 00:00:00","2026-03-24 00:00:00","2026-03-26 17:00:00"
+21,"Indian Specialty Category - Page Layout Different","UI Change",Medium,Completed,"[BUG-019 · Category & Collection]
+
+Indian Specialty - Cooking Equipment layout does not match other category pages.
+
+Current: Different layout/styling.","Consistent layout with other category pages.",,"2026-03-28 17:00:00","2026-03-25 00:00:00","2026-03-26 00:00:00","2026-03-28 17:00:00"
+22,"Parent Collection - Product Count Display","UI Change",High,Completed,"[BUG-020 · Category & Collection]
+
+Parent collection shows 0 products; must aggregate from child collections.
+
+Current: Shows 0 products on parent page.","Calculate and display total of all products in child collections.",,"2026-03-28 17:00:00","2026-03-25 00:00:00","2026-03-26 00:00:00","2026-03-28 17:00:00"
+23,"Restaurant Equipment Main Category - Missing Image","UI Change",Low,Completed,"[BUG-021 · Category & Collection]
+
+Indian Specialty subcategory shows a placeholder icon instead of image.
+
+Current: Generic box icon placeholder.","Proper category image uploaded via Shopify Admin.",,"2026-03-28 17:00:00","2026-03-25 00:00:00","2026-03-26 00:00:00","2026-03-28 17:00:00"
+24,"Breadcrumb Navigation - Repeated Path","UI Change",High,Completed,"[BUG-022 · Category & Collection]
+
+Breadcrumb repeats Indian Specialty multiple times.
+
+Current: Home > Indian Specialty > Indian Specialty > Indian Specialty.","Proper hierarchical breadcrumb path.",,"2026-03-28 17:00:00","2026-03-25 00:00:00","2026-03-26 00:00:00","2026-03-28 17:00:00"
+25,"Smallwares Navigation Path Issue","UI Change",Medium,Completed,"[BUG-023 · Category & Collection]
+
+Smallwares > Cookware > Indian Specialty - Cookware path is wrong.
+
+Current: Incorrect category path/hierarchy.","Proper category hierarchy maintained.",,"2026-03-28 17:00:00","2026-03-25 00:00:00","2026-03-26 00:00:00","2026-03-28 17:00:00"
+26,"Search Results - Theme Inconsistency",Bug,Medium,Completed,"[BUG-024 · Search]
+
+Search results theme differs from category pages.
+
+Current: Inconsistent styling; View All redirects to main category.","Consistent theme; View All navigates to relevant filtered collection.",,"2026-03-26 17:00:00","2026-03-23 00:00:00","2026-03-24 00:00:00","2026-03-26 17:00:00"
+27,"Mini Cart View Cart button not navigating",Bug,High,Completed,"[BUG-025 · Cart]
+
+View Cart button in mini cart toast not redirecting to /cart.
+
+Current: Button click does nothing.","Navigate to /cart page.",,"2026-04-04 17:00:00","2026-04-01 00:00:00","2026-04-02 00:00:00","2026-04-04 17:00:00"
+28,"Indian products showing member pricing when logged out",Bug,High,Completed,"[BUG-026 · Pricing]
+
+Indian products display member pricing to non-members.
+
+Current: Shows member price to everyone.","Hide member pricing for non-members on Indian products.",,"2026-04-04 17:00:00","2026-04-01 00:00:00","2026-04-02 00:00:00","2026-04-04 17:00:00"
+29,"USA products showing Login for Member Pricing incorrectly",Bug,High,Completed,"[BUG-027 · Pricing]
+
+Non-CF products showing login prompt for member pricing.
+
+Current: Shows login prompt on all products.","Only show on own-brand CF products.",,"2026-04-04 17:00:00","2026-04-01 00:00:00","2026-04-02 00:00:00","2026-04-04 17:00:00"
+30,"Search Sort By and View Toggle not working",Bug,Medium,Completed,"[BUG-028 · Search]
+
+Sorting and view toggle buttons non-functional on search results.
+
+Current: Buttons do nothing.","Sort products and toggle grid/list view.",,"2026-04-04 17:00:00","2026-04-01 00:00:00","2026-04-02 00:00:00","2026-04-04 17:00:00"
+31,"Search results theme not matching L3 collection page","UI Change",Medium,Completed,"[BUG-029 · Design]
+
+Product cards on search have different styling than L3.
+
+Current: Different card design.","Match L3 collection page design.",,"2026-04-04 17:00:00","2026-04-01 00:00:00","2026-04-02 00:00:00","2026-04-04 17:00:00"
+32,"Promotional elements visible to logged-in members",Bug,Medium,Completed,"[BUG-030 · Pricing]
+
+Login for Member Pricing shown to already-logged-in members.
+
+Current: Shows login prompt to members.","Hide promotional CTAs for logged-in members.",,"2026-04-04 17:00:00","2026-04-01 00:00:00","2026-04-02 00:00:00","2026-04-04 17:00:00"
+33,"Regular price missing strikethrough when member price shown",Bug,Low,Completed,"[BUG-031 · Pricing]
+
+Compare price not styled with strikethrough.
+
+Current: No strikethrough on regular price.","Show strikethrough when member price active.",,"2026-04-04 17:00:00","2026-04-01 00:00:00","2026-04-02 00:00:00","2026-04-04 17:00:00"
+34,"Product page Add to Cart not showing toast notification",Bug,Medium,Completed,"[BUG-032 · Cart]
+
+No feedback when adding to cart from PDP.
+
+Current: No visual feedback.","Show toast notification on add.",,"2026-04-04 17:00:00","2026-04-01 00:00:00","2026-04-02 00:00:00","2026-04-04 17:00:00"
+35,"Topbar not visible","UI Change",Low,Completed,"[BUG-033 · Header]
+
+Top announcement bar not showing in header.
+
+Current: Topbar hidden.","Topbar visible (enable_top_bar=true).",,"2026-04-04 17:00:00","2026-04-01 00:00:00","2026-04-02 00:00:00","2026-04-04 17:00:00"
+36,"Cart drawer exit animation abrupt",Bug,Low,Completed,"[BUG-034 · Cart]
+
+Cart drawer closes without smooth animation.
+
+Current: Abrupt close.","Smooth slide-out animation.",,"2026-04-04 17:00:00","2026-04-01 00:00:00","2026-04-02 00:00:00","2026-04-04 17:00:00"
+37,"Product Variant Price Not Updating",Bug,High,Completed,"[BUG-035 · Product Page]
+
+Variant price not updating on PDP.
+
+Current: JS targets .price-main, HTML uses .price-card-amount.","Price updates when variant is selected.",,"2026-04-08 17:00:00","2026-04-05 00:00:00","2026-04-06 00:00:00","2026-04-08 17:00:00"
+38,"Duplicate Menu Items in Need Help Section",Bug,Medium,Completed,"[BUG-036 · Product Page]
+
+Need Help section shows duplicate links.
+
+Current: Both hardcoded and dynamic links render.","Each link appears only once.",,"2026-04-08 17:00:00","2026-04-05 00:00:00","2026-04-06 00:00:00","2026-04-08 17:00:00"
+39,"Subcategory Limit of 10 Showing",Bug,High,Completed,"[BUG-037 · Collection]
+
+Only 10 subcategories show on L2 collection pages.
+
+Current: Hardcoded limit of 10 in forloop.","All subcategories should display.",,"2026-04-08 17:00:00","2026-04-05 00:00:00","2026-04-06 00:00:00","2026-04-08 17:00:00"
+40,"Wishlist Access Missing","UI Change",Medium,Completed,"[BUG-038 · Header]
+
+No wishlist link in header navigation.
+
+Current: Wishlist icon/link not present.","Heart icon linking to /pages/my-wishlist.",,"2026-04-08 17:00:00","2026-04-05 00:00:00","2026-04-06 00:00:00","2026-04-08 17:00:00"
+41,"Price Range Filter Cropped on Search Results",Bug,High,Completed,"[BUG-039 · Search]
+
+Price filter clipped in sidebar.
+
+Current: max-height + overflow clip the filter.","Price filter fully visible (now buttons).",,"2026-04-08 17:00:00","2026-04-05 00:00:00","2026-04-06 00:00:00","2026-04-08 17:00:00"
+42,"Subcategory Labels Inconsistent with Menu Labels",Bug,Low,Completed,"[BUG-040 · Collection]
+
+Subcategory tabs show raw collection titles instead of clean labels.
+
+Current: Prefixes like ""New Theme -"" visible.","Clean label names matching menu.",,"2026-04-08 17:00:00","2026-04-05 00:00:00","2026-04-06 00:00:00","2026-04-08 17:00:00"
+43,"Hero Slider Pagination Dots Wrong Position","UI Change",Medium,Completed,"[BUG-041 · Hero Banner]
+
+Carousel dots outside image instead of over it.
+
+Current: Dots positioned below content.","Dots at bottom-right over the image.",,"2026-04-08 17:00:00","2026-04-05 00:00:00","2026-04-06 00:00:00","2026-04-08 17:00:00"
+44,"Mega Menu Promo Text Shows Raw Liquid Code","UI Change",Medium,Completed,"[BUG-042 · Header]
+
+Mega menu displays raw Liquid code.
+
+Current: {{ section.settings.member_promo_megamenu_text }} visible.","Plain text message displayed.",,"2026-04-08 17:00:00","2026-04-05 00:00:00","2026-04-06 00:00:00","2026-04-08 17:00:00"
+45,"Default to Request a Quote Tab via URL",Feature,Medium,Completed,"[IMP-001 · Contact Page]
+
+Allow URL parameter to pre-select quote form tab (?tab=quote).
+
+Current: Always defaults to General Inquiry.","/pages/contact?tab=quote selects quote tab.",,"2026-04-08 17:00:00","2026-04-05 00:00:00","2026-04-06 00:00:00","2026-04-08 17:00:00"
+46,"Pre-populate Quote Form for Logged-in Users",Feature,Medium,Completed,"[IMP-002 · Contact Page]
+
+Auto-fill form fields with customer data.
+
+Current: Form fields empty for logged-in users.","Name, email, phone pre-filled.",,"2026-04-08 17:00:00","2026-04-05 00:00:00","2026-04-06 00:00:00","2026-04-08 17:00:00"
+47,"Add Variations Badge to Product Cards",Feature,Medium,Completed,"[IMP-003 · Product Cards]
+
+Show number of variants on product cards.
+
+Current: No indication of variant count.","Gold badge showing ""X Options"".",,"2026-04-08 17:00:00","2026-04-05 00:00:00","2026-04-06 00:00:00","2026-04-08 17:00:00"
+48,"Connect Hexagon Brand Logos to Vendor Pages",Feature,Medium,Completed,"[IMP-004 · Homepage]
+
+Brand logos in hexagon grid had no links.
+
+Current: All brand link fields empty.","Each logo links to /collections/vendors?q=brand (34 logos + View All).",,"2026-04-08 17:00:00","2026-04-05 00:00:00","2026-04-06 00:00:00","2026-04-08 17:00:00"
+49,"Portal replication (new portal structure)",Feature,High,Completed,"New feature set introduced Mar 26: Portal replication with updated structure.
+
+Requested via Jielin timeline message (2026-04-15).",,,,"2026-03-26 09:00:00",,"2026-04-23 18:33:13"
+50,"Resources structure update",Feature,Medium,Completed,"Resources section restructure requested alongside portal work.
+
+Requested via Jielin timeline message (2026-04-15).",,,,"2026-03-26 09:00:00",,"2026-04-23 18:35:13"
+51,"SPP — Unhide recommendation sections (Other Products from this line / You may also like)","UI Change",High,Completed,"UI updates plus recommendation logic changes requested as part of Mar 26 feature set.
+
+Requested via Jielin timeline message (2026-04-15).","",,,"2026-03-26 09:00:00",,"2026-05-08 16:48:54"
+52,"Portal setup & structure changes (WIP)",Feature,High,Completed,"Work in progress across Mar 30–31 on portal setup and related structural updates.
+
+Requested via Jielin timeline message (2026-04-15).",,,,"2026-03-30 09:00:00",,"2026-04-23 18:35:24"
+53,"Inventory status feature",Feature,High,Completed,"New feature to surface inventory status on product pages (logic still under refinement).
+
+Requested via Jielin timeline message (2026-04-15).",,,,"2026-04-02 09:00:00",,"2026-04-20 19:56:42"
+54,"Journey page UI refinement","UI Change",Medium,Pending,"Journey page layout — tighter spacing, more compact layout.
+
+Requested via Jielin timeline message (2026-04-15).",,,,"2026-04-02 09:00:00",,"2026-07-27 15:57:54"
+55,"Mini cart feature",Feature,High,Completed,"Mini cart enhancement request — compact cart interaction.
+
+Requested via Jielin timeline message (2026-04-15).",,,,"2026-04-04 09:00:00",,"2026-04-23 18:28:38"
+56,"Product logic — zero-price handling & card notes",Feature,Medium,Completed,"0-price product handling plus notes inside product cards.
+
+Requested via Jielin timeline message (2026-04-15).",,,,"2026-04-04 09:00:00",,"2026-04-21 19:27:46"
+57,"Outbound customer notifications: improve the default Shopify templates",Feature,Medium,Completed,"Path: Shopify Admin Settings >> Notifications >> Customer notifications
+
+https://admin.shopify.com/store/celebratefestivalinc/settings/notifications/customer","",,,"2026-04-09 09:00:00",,"2026-05-21 22:05:42"
+58,"work_with_products limit + mobile UI issue",Bug,High,Completed,"Works With Products section on mobile SPP shows as horizontal scrolling carousel instead of vertical list. When many products are added via the works_with_products metafield, the horizontal layout overflows and is unusable on mobile. Screenshot attached. Fix: compact-carousel-track switches to flex-direction:column on <=992px breakpoint.",,,,"2026-04-10 09:00:00",,"2026-04-23 18:37:41"
+59,"call-to-order tag issue",Bug,High,Completed,"call-to-order tag affecting product/variant behavior incorrectly. Specifically: on products tagged call-to-order, product images and variant selectors stop responding (clicks have no effect). After removing the tag, the page works normally. Bug reported 2026-04-09 with video evidence.",,,,"2026-04-10 09:00:00",,"2026-04-23 18:38:17"
+60,"Load More instead of pagination (CPH / Hashtag portal)",Feature,Medium,Completed,"Replace paginated navigation with Load More pattern on CPH / Hashtag portal.
+
+Requested via Jielin timeline message (2026-04-15).",,,,"2026-04-11 09:00:00",,"2026-05-05 17:59:34"
+61,"SEO — pricing in Google search results",Feature,Medium,Completed,"Expose product pricing in Google search results via structured data / Merchant listings.
+
+Requested via Jielin timeline message (2026-04-15).",,,,"2026-04-11 09:00:00",,"2026-04-23 18:39:56"
+64,"SPP other_resources metafield — wrong filename + broken links",Bug,High,Completed,"In the Resources & Documents accordion on the SPP, files added via the other_resources metafield (list.file_reference) display as ""GenericFileDrop"" instead of their actual filename, and clicking them opens nothing. Affects product: https://celebratefestivalinc.com/products/waring-wsb40x-quik-stik-plus-10-1-2-hp-medium-duty-immersion-blender-120v. Root cause: (1) file_url filter does not work on GenericFile objects — correct property is resource_file.url; (2) resource_file coerced to string outputs class name GenericFileDrop instead of the URL.","Each file in other_resources metafield shows its real filename and opens the file in a new tab when clicked.",,,"2026-04-15 16:46:47",,"2026-04-23 18:41:18"
+65,"Estimate Shipping — sidebar cart modal",Feature,Medium,Completed,"Client wants an Estimate Shipping feature inside the sidebar/drawer cart. Needs full planning and research before implementation can begin.
+
+Scope as described:
+- A button labelled ""Estimate Shipping"" visible in the sidebar cart
+- Clicking opens a modal overlay
+- Modal contains: Country selector, Province/State selector, Postal/ZIP code input, and a Calculate button
+- On calculate: calls Shopify Shipping Rates API (/cart/shipping_rates.json) with cart contents + address
+- Results displayed as a list of available carriers + prices inside the same modal below the form
+- No page navigation — everything in-modal
+
+Research needed before dev:
+1. Shopify Shipping Rates API format + CORS requirements (requires server-side proxy or storefront API)
+2. Whether cart must have items for rates to return (empty cart edge case)
+3. Province dropdown dynamic population based on selected country
+4. How to handle multiple currencies / market rates
+5. Error states (invalid postal, no rates available, API timeout)
+6. Integration point: which cart file (main-cart-celebrate-festival.liquid or quick-cart.liquid / cart-drawer)","User clicks ""Estimate Shipping"" button in the cart sidebar. A modal opens with Country, Province, Postal Code fields and a Calculate button. After filling and clicking Calculate, a list of shipping options with carrier names and rates appears below the form in the same modal. No page reload.",2026-04-29,2026-04-29,"2026-04-15 16:48:31",,"2026-05-02 09:44:53"
+68,"AI chatbot page — messages not scrollable when chat gets long",Bug,High,Completed,"On the AI Kitchen Consultant page (/pages/ai-kitchen-consultant), when the conversation grows long the chat messages overflow out of the viewport with no scroll. User cannot read earlier messages.
+
+Root cause: .cf-ai__center (the center flex column) was missing overflow:hidden and min-height:0. In a CSS grid with height:100vh, grid children need these to be constrained. Without them, .cf-ai__center grew past the viewport so the inner .cf-chatbot__body overflow-y:auto never activated.
+
+Fix applied:
+1. sections/page-ai-assistant.liquid:42 — added overflow:hidden + min-height:0 to .cf-ai__center
+2. assets/cf-chatbot.css:58 — added min-height:0 to .cf-chatbot__body to complete the flex shrink chain","Chat messages area scrolls vertically when conversation is longer than the viewport. Earlier messages remain accessible by scrolling up.",,,"2026-04-15 18:37:20",,"2026-04-23 18:48:51"
+69,"Chatbot — messages overflow and push page, no inner scroll",Bug,High,Completed,"On the Celebrate Festival site chatbot widget: as the conversation grows, the message list does NOT scroll inside the chat card. Instead the earlier messages push the top bar up and the whole chat box extends past the viewport, making the header (Back / Send) and the composer hard to reach. Reproduced with repeated product queries (e.g. Robot Coupe food processors).
+
+See attachment for a screenshot of the overflow state.","Chat card has a fixed height and its message list scrolls internally. Top bar (title + close) and composer stay pinned regardless of history length.",,,"2026-04-15 19:07:35",,"2026-04-23 18:49:31"
+70,"Image Icon categories section 04/16",Feature,Medium,Completed,"We have Icon categories already in the L2 page as shown attached. Need to add similar section in the main page under trusted brands section.","",,,"2026-04-16 20:54:09",,"2026-05-06 00:08:26"
+71,"Snapshot/thumbnail for pdf files 04/16",Feature,Medium,Completed,"For files in the Resources section, show the snapshot of the pdf instead of only the doc name.","",,,"2026-04-16 20:58:21",,"2026-05-21 00:13:07"
+72,"Image zoom effect & pic size","UI Change",Medium,Completed,"The current Zoom in effect goes too big, not help end customer to view.
+Also, can the product pictures size fits the image box? not leaving too much blank in both sides","",,,"2026-04-16 21:03:09",,"2026-05-14 16:48:52"
+73,"Certifications metafields like drop down menu",Feature,Low,Completed,"This metafields is using JSON format. Need to change to drop down menu","",,,"2026-04-16 21:04:14",,"2026-05-11 20:08:06"
+74,"Online Traffic Analytics Reports",Feature,Medium,Completed,"This is a reminder of monthly reports on:
+1. SEO performance
+2. Social media presence
+3. UX","",,,"2026-04-16 21:17:11",,"2026-04-21 19:27:46"
+75,"L3 category not shows products properly 04/17",Bug,High,Completed,"1. Was checking Indian Specialty products for emailer use, noticed that Kitchen Utensils subcategories are not showing all products.
+2. if hit back to the previous path, it direct to bad page.
+
+Check details in the video","",,,"2026-04-17 20:59:53",,"2026-05-01 16:15:18"
+76,"Inventory status feature - 2nd iteration 04/20",Feature,High,Pending,"For those out-of-stock products, needs to differentiate Indian products vs USA products with different text. 
+1. No changes needed for USA products.
+
+2. For Indian products/variants, if out-of-stock, show “Notify me when back in stock”. 
+Indian products are with below vendors:   
+    'Celebrate Festival Inc',
+    'Hawkins',
+    'Shaan',
+    'Kwitex',
+    'Rotoquip',
+    'Prestige',
+    'Preethi',
+    'Milton'
+","",2026-05-11,2026-05-11,"2026-04-20 20:30:55",,"2026-05-25 14:41:22"
+77,"Mobile side:","UI Change",High,Completed,"Product Page on mobile:
+work_with_products & Description section break the phone page width","",,,"2026-04-20 20:53:16",,"2026-04-21 19:26:08"
+78,"LinkedIn Insight Tag — Sitewide Installation",Feature,Medium,Completed,"Install the LinkedIn Insight Tag globally in theme.liquid above </body> so it fires on every page for audience tracking and retargeting.\n\nPartner ID: 9205612","LinkedIn Insight Tag fires on all pages. Verified via LinkedIn Campaign Manager pixel helper.",,,"2026-04-21 14:19:34",,
+79,"LinkedIn Conversion Tracking — Button Click Events",Feature,Medium,Completed,"Add LinkedIn conversion tracking event to specific button or form submission elements so Jielin can track button clicks in LinkedIn Campaign Manager.\n\nCode to fire on click:\nwindow.lintrk('track', { conversion_id: 25153836 })\n\nClient request: add to relevant CTA buttons (Add to Cart, Login for Member Pricing, contact forms, etc). Awaiting confirmation on which specific buttons to track.","window.lintrk track event fires on targeted button clicks. Conversions appear in LinkedIn Campaign Manager under Conversion ID 25153836.",,,"2026-04-21 14:19:34",,"2026-04-21 19:31:46"
+80,"Contact Us page - Technical Support submission not going into our inbox 04/21",Bug,Low,Completed,"Only the Technical Support submission not going into our inbox as I tested multiple times. Other forms are good. ","",,,"2026-04-21 21:02:10",,"2026-05-05 17:58:16"
+81,"Inbound form submissions",Feature,Medium,Completed,"Currently all inquiries (support, general, financing) are being sent as plain text emails. We’ve installed Shopify Forms app to store submissions, and need to align on finalizing this setup.
+
+APP link:
+https://admin.shopify.com/store/celebratefestivalinc/apps/shopify-forms
+","Need to map the fields in the Contact Us page, including different forms (gengeral inquery, tech support, quote, financing), to the Shopify Forms so that leads can store as Shopify customers automatically. Also need to tag forms to make clear the lead source.",,,"2026-04-23 16:33:25",,"2026-05-11 17:20:15"
+82,"Resources page content populate",Feature,Low,Completed,"Now that this page structure is in place, need to create related content/posts.","",,,"2026-04-23 18:35:06",,"2026-05-06 00:10:46"
+83,"Brands Hexagon & all brands page: new brands adding","UI Change",High,Completed,"With more new vendors added to our Shopify:
+1. Hexagon section: need to redesign/compact to include more logos 
+2. All brands page: can new vendor logos be visible automatically after new vendor-logo-xxx.png added in the code? Also we want to add a side-panel list-view with all brands.
+Check attachments.","",,,"2026-05-01 21:15:25",,"2026-08-06 17:48:43"
+84,"Change Icon of Indian Specialty in the main menu bar",Feature,Medium,Completed,"Rupesh changed this icon long time ago, it was overwritten. ","",,,"2026-05-01 21:18:03",,"2026-05-05 16:26:50"
+85,"In Sale Section, 0 price products are hidden",Bug,Low,Completed,"Please check this collection (name in Shopify: New Theme -Sale Collection, and link pasted below). The first product Lincoln oven (SKU 1400‐FB2G) is 0 priced and it's hidden in the storefront.
+
+https://celebratefestivalinc.com/collections/new-theme-staff-picks-copy","",,,"2026-05-01 22:04:42",,"2026-06-01 18:30:46"
+86,"Order Status page showing backend codes",Bug,Medium,Completed,"order status page link: 
+https://celebratefestivalinc.com/56234836013/orders/a831c1bb10f26fb58e3ef485fc8553da
+
+Need to hide those codes.","",,,"2026-05-04 21:26:10",,"2026-05-06 00:21:49"
+87,"Display actual color swatches for variants","UI Change",Medium,Completed,"Please help us evaluate this request: to display actual color swatches, instead of just text names on storefront. The variants color options and metafields are connected on Shopify. Check attachments.
+
+Use this product as testing. SKU APRARN000018019.
+
+https://celebratefestivalinc.com/products/ariane-prime-round-medium-rim-flat-porcelain-banquet-plate-case-of-12?variant=44918402908205","",,,"2026-05-06 18:33:12",,"2026-06-02 17:06:56"
+88,"Update tandoor image in the Hero Slider",Bug,High,Completed,"","Please don't use that tandoor image anywhere in the future. Rupesh pointed it out many times. I'm sorry.",,,"2026-05-11 20:14:03",,"2026-05-20 23:09:02"
+89,"Our Trusted Restaurant Partners - new section in main page & a new partners page",Feature,High,Pending,"Rupesh asks for a new section in main page and its own separate partners page to present the chain restaurants we have business with. We want to have:
+1.⁠ ⁠The Map marked with our business presence. (excluding states: Alaska, Maine, Mississippi,South Dakota, Vermont) 
+2.⁠ ⁠Top brands: Paris Baguette, T⁠ous les Jours, Curry Pizza House, Hashtag India, Mylapore and Deccan Morsels
+
+Please check our expected layout for new section and page. If you need to move this task into the Feature dev, do it. I'm not able to add the Feature section.","",2026-06-01,,"2026-05-11 22:12:19",,
+90,"Repeated ""Free Shipping"" Lable in SPP",Bug,Low,Completed,"","",,,"2026-05-13 16:18:50",,"2026-07-07 22:15:53"
+91,"Financing Button directs to 404 page",Bug,Medium,Completed,"Financing Button at top right in main page directs to 404 page. ","",,,"2026-05-13 16:35:23",,"2026-05-20 23:08:14"
+92,"Track Order button update landing page","UI Change",Low,Completed,"Please link the Track Order button to the Orders page as shown attached.","",,,"2026-05-13 16:50:50",,"2026-05-25 14:41:22"
+93,"Track Order button update landing page","UI Change",Low,Completed,"Please link the Track Order button to the Orders page as shown attached.","",,,"2026-05-13 16:50:52",,"2026-05-13 17:00:43"
+94,"Use Case image remove emoji","UI Change",Medium,Completed,"","",,,"2026-05-13 19:02:09",,"2026-05-21 18:58:52"
+95,"Use Case section new pages",Feature,High,Completed,"This Feature development is high priority. Rupesh expect it by the end of this month.
+
+We need to create 2 Use Case pages as shown attached.
+1. One page is for after clicking the ""View More Use Cases"" button, it shows all use cases.
+2. The next level page is after clicking one use case (let's start from “Grocery Store”), it shows Featured Categories, Popular Products per Category and etc. 
+
+Our internal team is working on content of Featured Categories, Popular Products. Please develop the layout of new pages.
+","",,,"2026-05-13 20:06:21",,"2026-05-26 14:54:49"
+96,"Outbound customer notifications: Order confirmation",Feature,High,Completed,"Please check the preview email of Order confirmation template.
+Changes we want:
+1. Fix the issue of broken CFI logo
+2. Don't use emoji
+3. Move up ""DELIVERY & PAYMENT"" in our new template up before item lines
+4. Add below KaTom alert into our template as well. The KaTom email also fwd to you (KaTom Order 4699655).
+Order Status Alert	
+Not all items will be charged and shipped together. Items ship based on availability. Charges will appear as ""KaTom Restaurant Supply"" on your credit card statement.","",,,"2026-05-21 22:26:39",,"2026-08-03 22:37:54"
+97,"Outbound customer notifications: Shipping confirmation",Feature,Medium,Completed,"Please check the preview email of Shipping confirmation template and also our current template.
+Changes we want:
+1. Fix the issue of broken CFI logo
+2. Don't use emoji
+3. Move up ""SHIPPING TO"" section in new template up before item lines
+4. Item lines are broken in new template. In our current template it's working.
+5. We want to keep the content of Shipping Policy in our current template.
+6. Fwd KaTom shipping related email for reference (KaTom Order #KT13300925)
+","",,,"2026-05-21 22:49:40",,"2026-07-28 22:03:00"
+98,"WSH updated integration with Price Box",Feature,Medium,Pending,"We're implementing WSH new feature ""Volume discount"" which requires the new integration. The WSH team completed theme is ""Celebrate-festival-PT - preWPD -- WPD_BDR"".
+
+The update integration broke the Price Box as shown attached. Please help us:
+1. Recover the broken Price Box UI
+2. Improve the new ""Volume discount"" box, also attached how webrestaurant configure it in SPP.
+
+Use this product to test:
+https://celebratefestivalinc.com/products/ariane-cruise-amalfi-9-round-porcelain-deep-plate-case-of-12?variant=44934375637037","",,,"2026-05-27 18:32:44",,
+99,"Add SGS Certificate into Metafields >> Product Certificates (JSON format)",Feature,High,Completed,"Need to configure the SGS certificate into Product Certificates metafields. Check the SGS icon in attachment.
+
+This is metafields link
+https://admin.shopify.com/store/celebratefestivalinc/settings/custom_data/product/metafields/165983223853","",,,"2026-06-03 23:13:10",,"2026-06-04 16:38:01"
+100,"Free Shipping Badge on Category Page","UI Change",High,Completed,"","Now the free_shipping metafield badge only shows up in SPP. 
+Need the badge present on collective products page, like category page, search page, vendor page and etc.",,,"2026-07-16 20:54:07",,"2026-07-27 15:45:06"
+101,"AI ChatBot implemetation",Feature,High,Pending,"","Please implement your AI Kitchen Consultant to our page, we'll ask some customers to test it out.
+Ideal Situation: the chat history for the same customer is stored under his profile data and AI remember it.",,,"2026-07-16 20:59:42",,
+102,"Rebate Interface",Feature,Medium,Pending,"Can we design an interface/workflow for Rebate? Below collection include products eligible for rebates. Basic logic is when any product is added in the Shopify Invoice, we get reminded that product is eligible.
+
+Collection Name: ""Rebates Eligible Products: California""
+URL: https://celebratefestivalinc.com/collections/rebates-eligible-products-california
+
+","",,,"2026-07-16 21:49:06",,
+103,"Klaviyo Marketing Strategy",Feature,Low,Pending,"This task is only a reminder to present us the Klaviyo strategy you mentioned in the meeting. Need to see improvements","",,,"2026-07-16 22:16:45",,
+104,"Contact Us button in SPP",Bug,High,Completed,"","For 0 priced SPP, we want side by side 2 buttons: Contact Us & Save to Wishlist. Contact Us should be more prominent and leading to contact us page.
+After clicking Contact Us, give options to either call or send message with prefilled customer info.",,,"2026-07-24 16:33:58","2026-07-27 15:01:12","2026-07-28 17:58:47"
+105,"Add more Use Case industry pages. (refer to Task #95 for template detail)",Feature,Medium,Completed,"Apply cf-industry-hub template to all industry use-case pages listed on the homepage, modeled on the Grocery Store page Jielin built.
+
+COMPLETED (2026-08-04):
+• Pizza Restaurants (/pages/cf-pizza-restaurants)
+• Italian Restaurants (/pages/cf-italian-restaurants)
+• French Bistros (/pages/cf-french-bistros)
+• Fast Casual (/pages/cf-fast-casual)
+• Indian Restaurants (/pages/cf-indian-restaurants)
+• Bakeries & Cafes (/pages/cf-bakery-cafe)
+• Hotels & Banquets (/pages/cf-hotels-banquets) — new page created
+• Food Trucks & Catering (/pages/cf-food-trucks-catering) — new page created
+
+Each page has a dedicated template JSON (not shared). Pre-filled with: hero title & lead, 3 equipment sections with descriptions/bullets/collection links, 6 store-type sub-cards, 3 buying guide placeholders, 5 brand slots. Homepage updated — Hotels & Food Trucks now link to their dedicated pages.","Each page opens in the Shopify Theme Editor showing a fully structured cf-industry-hub layout. Jielin can open any page and replace the pre-filled content (titles, descriptions, bullet points, collection handles, brand names) without needing to add any new sections or blocks from scratch.",,,"2026-07-27 18:49:36",,"2026-08-06 17:52:05"
+106,"Outbound customer notifications: Out for delivery",Feature,Low,Pending,"Please check the forwarded preview email of Out for delivery template.
+
+Changes we want:
+1. Fix the issue of broken CFI logo
+2. Don't use emoji
+3. Move up ""SHIPPING TO"" section in new template up before item lines
+4. Item lines are blank. Please at least include image, title, quantity.
+5. Add content of Delivery checking Policy.","",,,"2026-07-28 22:56:30",,
+107,"Outbound customer notifications: Order Delivered",Feature,Low,Pending,"Please check the forwarded preview email of Order Delivered template.
+
+Changes we want:
+
+1. Fix the issue of broken CFI logo
+2. Don't use emoji
+3. Add ""SHIPPING TO"" section in new template up before item lines
+4. Item lines are blank. Please at least include image, title, quantity.
+5. Add content of Delivery checking Policy.","",,,"2026-07-28 23:00:44",,
+108,"Brands Page — hardcode A-Z grid for instant load",Feature,Medium,Completed,"The All Brands A-Z grid was loading slowly because JavaScript was paginating through /products.json on every cache miss (fetching 250 products per call across multiple pages) to collect vendor names before rendering anything.
+
+Fix implemented (2026-08-04):
+- Replaced the JS vendor-fetch with a hardcoded Liquid brand list (189 brands)
+- All Brands grid and sidebar now render server-side — HTML arrives fully built in the page response
+- Zero API calls, zero JS fetching on page load
+- Alphabet filter (A-Z buttons) kept as JS — just show/hide, no network calls
+- hidden_vendors section setting still works (checked in Liquid at render time)
+
+Trade-off: if a new vendor is added to Shopify, they wont appear on the brands page automatically. Someone needs to add one line to the brand list in theme code.","The /pages/brands page (All Brands A-Z section) should load instantly on first visit — no loading spinner, no delay before the grid appears. The alphabet filter buttons should still work to filter visible brand cards.",,,"2026-08-04 17:06:46",,"2026-08-06 17:50:22"
+109,"L2 Mega collections for all L2 category pages",Bug,Medium,Pending,"As per dicussed, switch current L2 categories to Mega collections. Check doc for corresponding L2 Mega Collection names.
+
+https://docs.google.com/spreadsheets/d/19WAAJIaE4FtQTUkML5om_n0B4jKMXDucmI_pI92T7wg/edit?usp=drive_link","",,,"2026-08-04 22:59:17",,
