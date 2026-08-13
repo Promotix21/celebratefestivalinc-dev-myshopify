@@ -1,20 +1,17 @@
 {
   "sections": {
-    "level2_hub": {
-      "type": "collection-level2-hub-ajax",
+    "mega_collection": {
+      "type": "main-collection-cf",
       "settings": {
+        "products_per_page": 100,
+        "compact_mode": true,
         "menu": "cf-menu-31-12-2026",
-        "products_per_page": 192
+        "show_subcategory_pills": true,
+        "use_load_more": true
       }
-    },
-    "rich_text": {
-      "type": "rich-text",
-      "disabled": true,
-      "settings": {}
     }
   },
   "order": [
-    "level2_hub",
-    "rich_text"
+    "mega_collection"
   ]
 }
