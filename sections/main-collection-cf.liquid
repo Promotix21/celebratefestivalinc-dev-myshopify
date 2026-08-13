@@ -1217,25 +1217,38 @@
    ======================================== */
 .cf-plp__subcategory-pills {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  flex-wrap: nowrap;
+  gap: 8px;
   padding: 16px 0 8px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cf-plp__subcategory-pills::-webkit-scrollbar {
+  height: 4px;
+}
+
+.cf-plp__subcategory-pills::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
 }
 
 .cf-plp__subcategory-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
+  gap: 5px;
+  padding: 5px 12px;
   background: var(--bg-light);
   border: 1px solid var(--border-color);
-  border-radius: 24px;
-  font-size: 12px;
+  border-radius: 999px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--deep-blue);
   text-decoration: none;
   transition: all 0.2s ease;
   white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 .cf-plp__subcategory-pill:hover {
@@ -3089,7 +3102,7 @@ var cfL2 = (function() {
 
     h += '<div class="card-content product-info cf-plp__card-content">';
     if (category) {
-      h += '<div class="cf-plp__meta-row" style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;">' +
+      h += '<div class="cf-plp__meta-row" style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;">' +
         '<span class="card-category product-brand cf-plp__card-category">' + esc(category) + '</span></div>';
     }
     h += '<a href="' + esc(url) + (vid ? '?variant=' + vid : '') + '" class="product-title-link" data-full-title="' + esc(n.title) + '">' +
