@@ -308,6 +308,8 @@
   align-items: center;
   gap: 8px;
   font-size: 12px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .cf-plp__breadcrumb-inline a {
@@ -333,6 +335,20 @@
   font-weight: 700;
   color: var(--deep-blue);
   margin: 0;
+  white-space: nowrap;
+}
+
+.cf-plp__title-with-count {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.cf-plp__title-with-count .cf-plp__results-count {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 400;
   white-space: nowrap;
 }
 
@@ -1217,22 +1233,34 @@
    ======================================== */
 .cf-plp__subcategory-pills {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: 8px;
-  padding: 16px 0 8px;
-  overflow-x: auto;
-  scrollbar-width: thin;
-  -webkit-overflow-scrolling: touch;
+  flex: 1;
+  min-width: 0;
+  padding: 2px 0;
+  align-items: center;
 }
 
-.cf-plp__subcategory-pills::-webkit-scrollbar {
-  height: 4px;
+@media (max-width: 768px) {
+  .cf-plp__toolbar-compact {
+    flex-wrap: wrap;
+  }
+  .cf-plp__subcategory-pills {
+    order: -1;
+    width: 100%;
+    flex: none;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .cf-plp__subcategory-pills::-webkit-scrollbar {
+    display: none;
+  }
 }
 
-.cf-plp__subcategory-pills::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 4px;
-}
 
 .cf-plp__subcategory-pill {
   display: inline-flex;
@@ -1458,7 +1486,7 @@
 }
 
 .cf-plp--compact .cf-plp__grid {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -2009,7 +2037,12 @@
       {% endfor %}
       <span class="cf-plp__breadcrumb-current">{{ collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</span>
     </nav>
-    <h1 class="cf-plp__title-compact">{{ collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</h1>
+    <div class="cf-plp__title-with-count">
+      <h1 class="cf-plp__title-compact">{{ collection.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}</h1>
+      {% if section.settings.show_subcategory_pills %}
+        <span class="cf-plp__results-count"><strong>{{ collection.products_count }}</strong> products</span>
+      {% endif %}
+    </div>
   </header>
 
   {% paginate collection.products by products_per_page %}
@@ -2159,35 +2192,71 @@
 
       {% comment %} Compact Toolbar {% endcomment %}
       <div class="cf-plp__toolbar-compact">
-        <div class="cf-plp__toolbar-compact__left">
-          {% comment %} Server-rendered active filters from Storefront Filtering API {% endcomment %}
-          {% assign active_filter_count = 0 %}
-          {% for filter in collection.filters %}
-            {% assign active_filter_count = active_filter_count | plus: filter.active_values.size %}
+        {% if section.settings.show_subcategory_pills %}
+          {% assign pill_menu_handle = section.settings.menu | default: 'cf-menu-31-12-2026' %}
+          {% assign parent_l2_handle = collection.handle | remove: 'l2-mega-' %}
+          {% assign l3_pill_children = blank %}
+          {% assign pill_found = false %}
+          {% for link in linklists[pill_menu_handle].links %}
+            {% for l2_link in link.links %}
+              {% assign l2_handle = l2_link.url | split: '/' | last | split: '?' | first %}
+              {% if l2_handle == parent_l2_handle %}
+                {% assign l3_pill_children = l2_link.links %}
+                {% assign pill_found = true %}
+                {% break %}
+              {% endif %}
+            {% endfor %}
+            {% if pill_found %}{% break %}{% endif %}
           {% endfor %}
-
-          {% if active_filter_count > 0 %}
-            <div class="cf-plp__active-filters-inline" style="display: flex;">
-              <span class="cf-plp__active-filters-label">Active Filters:</span>
-              <div class="cf-plp__active-filters-list">
-                {% for filter in collection.filters %}
-                  {% for value in filter.active_values %}
-                    <span class="cf-plp__filter-chip">
-                      {{ value.label }}
-                      <button type="button" class="cf-plp__filter-chip-remove"
-                        onclick="removeStorefrontFilter('{{ value.param_name | escape }}', '{{ value.value | escape }}')">×</button>
-                    </span>
-                  {% endfor %}
-                {% endfor %}
-              </div>
-              <a href="{{ collection.url }}{% if sort_by != blank %}?sort_by={{ sort_by }}{% endif %}" class="cf-plp__clear-all">Clear All</a>
+          {% if l3_pill_children.size > 0 %}
+            <div class="cf-plp__subcategory-pills" data-l2-ajax data-l2-base="{{ collection.url }}">
+              <a href="{{ collection.url }}"
+                 class="cf-plp__subcategory-pill cf-plp__subcategory-pill--all is-active"
+                 data-l3-handle=""
+                 data-l3-url="{{ collection.url }}">
+                All Products
+              </a>
+              {% for child_link in l3_pill_children %}
+                {% assign l3_pill_handle = child_link.url | split: '/' | last | split: '?' | first %}
+                <a href="/collections/{{ l3_pill_handle }}"
+                   class="cf-plp__subcategory-pill"
+                   data-l3-handle="{{ l3_pill_handle }}"
+                   data-l3-url="/collections/{{ l3_pill_handle }}">
+                  {{ child_link.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}
+                </a>
+              {% endfor %}
             </div>
           {% endif %}
+        {% endif %}
 
-          <div class="cf-plp__results-count">
-            <strong>{{ collection.products_count }}</strong> products
+        {% unless section.settings.show_subcategory_pills %}
+          <div class="cf-plp__toolbar-compact__left">
+            {% assign active_filter_count = 0 %}
+            {% for filter in collection.filters %}
+              {% assign active_filter_count = active_filter_count | plus: filter.active_values.size %}
+            {% endfor %}
+            {% if active_filter_count > 0 %}
+              <div class="cf-plp__active-filters-inline" style="display: flex;">
+                <span class="cf-plp__active-filters-label">Active Filters:</span>
+                <div class="cf-plp__active-filters-list">
+                  {% for filter in collection.filters %}
+                    {% for value in filter.active_values %}
+                      <span class="cf-plp__filter-chip">
+                        {{ value.label }}
+                        <button type="button" class="cf-plp__filter-chip-remove"
+                          onclick="removeStorefrontFilter('{{ value.param_name | escape }}', '{{ value.value | escape }}')">×</button>
+                      </span>
+                    {% endfor %}
+                  {% endfor %}
+                </div>
+                <a href="{{ collection.url }}{% if sort_by != blank %}?sort_by={{ sort_by }}{% endif %}" class="cf-plp__clear-all">Clear All</a>
+              </div>
+            {% endif %}
+            <div class="cf-plp__results-count">
+              <strong>{{ collection.products_count }}</strong> products
+            </div>
           </div>
-        </div>
+        {% endunless %}
 
         <div class="cf-plp__toolbar-compact__right">
           <button type="button" class="cf-plp__mobile-filter-btn" id="mobile-filter-btn">
@@ -2232,51 +2301,6 @@
           </div>
         </div>
       </div>
-
-      {% comment %} L3 Subcategory Pills (for L2 mega collections) {% endcomment %}
-      {% if section.settings.show_subcategory_pills %}
-        {% assign pill_menu_handle = section.settings.menu | default: 'cf-menu-31-12-2026' %}
-        {% comment %} Derive parent L2 handle by stripping "l2-mega-" prefix {% endcomment %}
-        {% assign parent_l2_handle = collection.handle | remove: 'l2-mega-' %}
-        {% assign l3_pill_children = blank %}
-        {% assign pill_found = false %}
-        {% for link in linklists[pill_menu_handle].links %}
-          {% for l2_link in link.links %}
-            {% assign l2_handle = l2_link.url | split: '/' | last | split: '?' | first %}
-            {% if l2_handle == parent_l2_handle %}
-              {% assign l3_pill_children = l2_link.links %}
-              {% assign pill_found = true %}
-              {% break %}
-            {% endif %}
-          {% endfor %}
-          {% if pill_found %}{% break %}{% endif %}
-        {% endfor %}
-
-        {% if l3_pill_children.size > 0 %}
-          {% comment %}
-            data-l2-ajax activates the same-page L3 filtering JS. Pills carry the REAL
-            L3 collection handle/url as the AJAX data source (rendered through the same
-            level-2-mega view). "All Products" restores the L2 collection itself.
-          {% endcomment %}
-          <div class="cf-plp__subcategory-pills" data-l2-ajax data-l2-base="{{ collection.url }}">
-            <a href="{{ collection.url }}"
-               class="cf-plp__subcategory-pill cf-plp__subcategory-pill--all is-active"
-               data-l3-handle=""
-               data-l3-url="{{ collection.url }}">
-              All Products
-            </a>
-            {% for child_link in l3_pill_children %}
-              {% assign l3_pill_handle = child_link.url | split: '/' | last | split: '?' | first %}
-              <a href="/collections/{{ l3_pill_handle }}"
-                 class="cf-plp__subcategory-pill"
-                 data-l3-handle="{{ l3_pill_handle }}"
-                 data-l3-url="/collections/{{ l3_pill_handle }}">
-                {{ child_link.title | remove: 'New Theme - ' | remove: 'New Theme- ' }}
-              </a>
-            {% endfor %}
-          </div>
-        {% endif %}
-      {% endif %}
 
       {% comment %} Product Grid - Using L2 inline card design {% endcomment %}
       {% comment %} #cf-plp-results is the swap target for same-page L3 AJAX filtering {% endcomment %}
@@ -2777,6 +2801,9 @@ var cfL2 = (function() {
         if (newSidebar && curSidebar) curSidebar.innerHTML = newSidebar.innerHTML;
         var curLeft = document.querySelector('.cf-plp__toolbar-compact__left');
         if (newLeft && curLeft) curLeft.innerHTML = newLeft.innerHTML;
+        var newCount = doc.querySelector('.cf-plp__title-with-count .cf-plp__results-count');
+        var curCount = document.querySelector('.cf-plp__title-with-count .cf-plp__results-count');
+        if (newCount && curCount) curCount.innerHTML = newCount.innerHTML;
         var curSort = document.getElementById('collection-sort');
         if (newSort && curSort) curSort.value = newSort.value;
 
@@ -3574,6 +3601,7 @@ var cfL2 = (function() {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 })();
+
 </script>
 
 {% endif %}
