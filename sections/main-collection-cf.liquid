@@ -2075,9 +2075,14 @@
             {% if pass == 1 and is_brand_filter == false %}{% continue %}{% endif %}
             {% if pass == 2 and is_brand_filter %}{% continue %}{% endif %}
 
+          {%- comment -%} Force exact "Product Type" label regardless of Search & Discovery casing {%- endcomment -%}
+          {%- assign filter_display_label = filter.label -%}
+          {%- if filter.type != 'price_range' and filter.values.first.param_name contains 'product_type' -%}
+            {%- assign filter_display_label = 'Product Type' -%}
+          {%- endif -%}
           <div class="cf-plp__filter-group" data-filter-index="{{ forloop.index }}">
             <h3 class="cf-plp__filter-title cf-plp__filter-toggle" onclick="toggleFilterCollapse(this)">
-              {{ filter.label }}
+              {{ filter_display_label }}
               <svg class="cf-plp__filter-arrow" width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M8 11L3 6h10l-5 5z"/></svg>
             </h3>
 
@@ -3254,11 +3259,13 @@ var cfL2 = (function() {
       // L2 only: hide the mislabeled Tags facet. Real Product Type (filter.p.product_type,
       // enabled in Search & Discovery) is returned by the Storefront API and renders here.
       if (/\.tag$/.test(group.id || '')) return;
+      // Force exact "Product Type" label regardless of Search & Discovery casing.
+      var glabel = /product_type/.test(group.id || '') ? 'Product Type' : group.label;
       if (group.type === 'PRICE_RANGE') {
         var minV = priceFilter ? priceFilter.price.min : '';
         var maxV = priceFilter ? priceFilter.price.max : '';
         html += '<div class="cf-plp__filter-group">' +
-          '<h3 class="cf-plp__filter-title cf-plp__filter-toggle" onclick="toggleFilterCollapse(this)">' + esc(group.label) +
+          '<h3 class="cf-plp__filter-title cf-plp__filter-toggle" onclick="toggleFilterCollapse(this)">' + esc(glabel) +
           '<svg class="cf-plp__filter-arrow" width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M8 11L3 6h10l-5 5z"/></svg></h3>' +
           '<div class="cf-plp__filter-price-range"><div class="cf-plp__price-inputs">' +
           '<div class="cf-plp__price-input-group"><span class="cf-plp__price-currency">$</span>' +
@@ -3280,7 +3287,7 @@ var cfL2 = (function() {
       values.sort(function (a, b) { return a.label.localeCompare(b.label); });
 
       html += '<div class="cf-plp__filter-group">' +
-        '<h3 class="cf-plp__filter-title cf-plp__filter-toggle" onclick="toggleFilterCollapse(this)">' + esc(group.label) +
+        '<h3 class="cf-plp__filter-title cf-plp__filter-toggle" onclick="toggleFilterCollapse(this)">' + esc(glabel) +
         '<svg class="cf-plp__filter-arrow" width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M8 11L3 6h10l-5 5z"/></svg></h3>' +
         '<ul class="cf-plp__filter-options">';
       var total = values.length;
