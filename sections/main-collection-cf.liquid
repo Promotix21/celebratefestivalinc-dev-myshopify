@@ -2058,6 +2058,14 @@
         {% comment %} Render Brand/Vendor filter first (pass 1), then all others (pass 2) {% endcomment %}
         {% for pass in (1..2) %}
           {% for filter in collection.filters %}
+            {% comment %}
+              L2 only: hide the mislabeled Tags facet (filter.p.tag). The real Product Type
+              facet (filter.p.product_type, enabled in Search & Discovery) renders normally.
+              Standalone L3 / other templates (show_subcategory_pills false) are untouched.
+            {% endcomment %}
+            {% if section.settings.show_subcategory_pills and filter.type != 'price_range' and filter.values.first.param_name contains 'p.tag' %}
+              {% continue %}
+            {% endif %}
             {% assign is_brand_filter = false %}
             {% if filter.type != 'price_range' %}
               {% if filter.values.first.param_name contains 'vendor' %}
@@ -3243,6 +3251,9 @@ var cfL2 = (function() {
     var anyActive = state.filters.length > 0;
 
     ordered.forEach(function (group) {
+      // L2 only: hide the mislabeled Tags facet. Real Product Type (filter.p.product_type,
+      // enabled in Search & Discovery) is returned by the Storefront API and renders here.
+      if (/\.tag$/.test(group.id || '')) return;
       if (group.type === 'PRICE_RANGE') {
         var minV = priceFilter ? priceFilter.price.min : '';
         var maxV = priceFilter ? priceFilter.price.max : '';
