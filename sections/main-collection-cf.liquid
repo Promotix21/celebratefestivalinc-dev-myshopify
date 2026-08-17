@@ -2852,6 +2852,23 @@ var cfL2 = (function() {
     selectPill(pill.getAttribute('data-l3-handle') || '');
   });
 
+  // Sidebar/mobile "Clear All" reset. The server-rendered link points at the
+  // fetched collection's own URL (e.g. /collections/new-theme-ranges), which
+  // would break out of the L2 shell. In cfL2 mode, keep it on l2Base + the
+  // current sub, drop filters + page, preserve sort_by, and route via AJAX.
+  // Oversized (Dinnerware) links carry an inline onclick — leave those alone.
+  function clearFilters() {
+    var sub = new URLSearchParams(window.location.search).get('sub') || null;
+    if (typeof closeCollectionMobileFilters === 'function') closeCollectionMobileFilters();
+    selectPill(sub);
+  }
+  document.addEventListener('click', function(e) {
+    var a = e.target.closest('.cf-plp__clear-all-link, .cf-plp__clear-all');
+    if (!a || a.hasAttribute('onclick')) return;
+    e.preventDefault();
+    clearFilters();
+  });
+
   // Back / forward.
   // For the oversized collection, the no-"sub" (All Products) history states are
   // owned by the cfOversized module (Storefront-API filtering) — bail here so the
