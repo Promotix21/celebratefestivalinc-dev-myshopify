@@ -115,10 +115,10 @@
     border-color: #2d5a87;
   }
 
-  /* Compact card adjustments for slider */
+  /* Compact card adjustments for slider — matches featured-products-grid sizing */
   .sp-slide-wrapper .product-card .card-image {
-    padding: 12px;
-    height: 140px;
+    padding: 6px;
+    height: 110px;
     aspect-ratio: auto !important;
     display: flex !important;
     align-items: center !important;
@@ -134,27 +134,92 @@
   }
 
   .sp-slide-wrapper .product-card .card-content {
-    padding: 12px;
+    padding: 6px 10px 10px;
+  }
+
+  .sp-slide-wrapper .product-card .cf-plp__meta-row {
+    margin-bottom: 2px;
+  }
+
+  .sp-slide-wrapper .product-card .card-category {
+    margin-bottom: 0;
+    line-height: 1.2;
   }
 
   .sp-slide-wrapper .product-card .card-title {
     font-size: 12px;
-    min-height: 36px;
+    min-height: 32px;
+    line-height: 1.3;
+    margin-bottom: 3px;
     -webkit-line-clamp: 2;
+  }
+
+  .sp-slide-wrapper .product-card .card-sku {
+    margin-bottom: 4px;
+    line-height: 1.2;
   }
 
   .sp-slide-wrapper .product-card .sku {
     font-size: 9px;
   }
 
-  .sp-slide-wrapper .product-card .price-single,
   .sp-slide-wrapper .product-card .price-dual,
   .sp-slide-wrapper .product-card .price-member-view {
-    padding: 8px 6px;
-    min-height: 92px;
+    padding: 6px;
+    min-height: 0;
+    margin-bottom: 6px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+  }
+
+  /* Compact price-single: label on top, strikethrough + price on one line, savings below */
+  .sp-slide-wrapper .product-card .price-single {
+    padding: 5px 6px;
+    min-height: 48px;
+    margin-bottom: 6px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0 6px;
+  }
+
+  .sp-slide-wrapper .product-card .price-single .price-label-single {
+    width: 100%;
+    order: 1;
+    margin-bottom: 0;
+    line-height: 1.2;
+  }
+
+  .sp-slide-wrapper .product-card .price-single .compare-price-strike {
+    order: 2;
+    margin-bottom: 0;
+    line-height: 1.2;
+  }
+
+  .sp-slide-wrapper .product-card .price-single .price-amount-single {
+    order: 3;
+    line-height: 1.2;
+  }
+
+  .sp-slide-wrapper .product-card .price-single .sale-savings-tag {
+    width: 100%;
+    order: 4;
+    margin-top: 0;
+    line-height: 1.2;
+  }
+
+  .sp-slide-wrapper .product-card .member-view-label {
+    margin-bottom: 2px;
+    line-height: 1.2;
+  }
+
+  .sp-slide-wrapper .product-card .member-view-price,
+  .sp-slide-wrapper .product-card .member-view-regular,
+  .sp-slide-wrapper .product-card .member-view-savings {
+    line-height: 1.2;
   }
 
   .sp-slide-wrapper .product-card .price-amount-single,
@@ -177,17 +242,18 @@
   }
 
   .sp-slide-wrapper .product-card .card-actions {
-    padding: 0 12px 12px;
+    padding: 0;
+    gap: 6px;
   }
 
   .sp-slide-wrapper .product-card .qty-input {
-    width: 50px;
-    height: 34px;
+    width: 44px;
+    height: 32px;
     font-size: 12px;
   }
 
   .sp-slide-wrapper .product-card .add-to-cart {
-    height: 34px;
+    height: 32px;
     font-size: 11px;
   }
 
@@ -203,11 +269,13 @@
     display: block;
     width: 100%;
     box-sizing: border-box;
-    margin-top: 6px;
-    padding: 5px 8px;
+    margin-top: 0;
+    margin-bottom: 6px;
+    padding: 4px 6px;
     border-radius: 6px;
     font-size: 9px;
     font-weight: 600;
+    line-height: 1.3;
     text-align: center;
     text-decoration: none;
     white-space: normal;
@@ -266,7 +334,7 @@
     }
 
     .sp-slide-wrapper .product-card .card-image {
-      height: 120px;
+      height: 110px;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
@@ -317,8 +385,8 @@
     .sp-slide-wrapper .product-card .price-single,
     .sp-slide-wrapper .product-card .price-dual,
     .sp-slide-wrapper .product-card .price-member-view {
-      padding: 6px 5px;
-      min-height: 60px;
+      padding: 4px 5px;
+      min-height: 44px;
     }
 
     .sp-slide-wrapper .product-card .price-amount-single,
@@ -408,6 +476,7 @@
               show_free_shipping: section.settings.show_card_free_shipping,
               show_sku: true,
               show_qty_input: true,
+              show_category: false,
               homepage_pricing_mode: true
             -%}
           </div>
