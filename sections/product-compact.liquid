@@ -753,7 +753,8 @@
     {%- comment -%} ═══ RIGHT SIDEBAR ═══ {%- endcomment -%}
     <div class="compact-right">
 
-      {%- comment -%} ── Inventory Box (above price) ── {%- endcomment -%}
+      {%- comment -%} ── Inventory Box (above price) — hidden for OOS Indian-vendor products ── {%- endcomment -%}
+      {%- unless is_indian_vendor and product.available == false -%}
       <div class="compact-inventory-box compact-inventory-box--sidebar" id="compact-inventory-box-sidebar-{{ section.id }}"
         data-state="{{ inv_state }}"
         data-qty="{{ inv_qty }}"
@@ -780,6 +781,7 @@
           {%- endif -%}
         </div>
       </div>
+      {%- endunless -%}
 
       {%- comment -%} ── Pricing Card ── {%- endcomment -%}
       <div class="pricing-card"
@@ -1856,12 +1858,17 @@
         atcBtn.disabled = false;
         atcBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> {{ section.settings.add_to_cart_text | default: "Add to Cart" }}';
       } else {
-        atcBtn.disabled = true;
-        let soldOutText = 'Sold Out';
         if (isIndianVendor) {
-          soldOutText = 'Notify me when back in stock';
+          atcBtn.disabled = false;
+          atcBtn.type = 'button';
+          atcBtn.classList.add('compact-atc-btn--contact');
+          atcBtn.onclick = function() { document.getElementById('cf-contact-popup').style.display='flex'; };
+          atcBtn.innerHTML = '<i class="fas fa-phone-alt"></i> Contact us for more details';
+        } else {
+          atcBtn.disabled = true;
+          atcBtn.onclick = null;
+          atcBtn.innerHTML = 'Sold Out';
         }
-        atcBtn.innerHTML = soldOutText;
       }
     }
 
@@ -1877,7 +1884,7 @@
       var qty     = inv.qty;
       var inStock = tracked && qty >= 1;
       var content = box.querySelector('.cib-content');
-      if (!tracked) { box.style.display = 'none'; return; }
+      if (!tracked || (!inStock && isIndianVendor)) { box.style.display = 'none'; return; }
       box.style.display = '';
       box.dataset.state = inStock ? 'in_stock' : 'out_of_stock';
       box.dataset.qty   = qty;
