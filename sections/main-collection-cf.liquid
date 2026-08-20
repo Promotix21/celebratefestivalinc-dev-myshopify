@@ -2514,7 +2514,10 @@ window.applyPriceFilter = function() {
   inputs.forEach(input => {
     url.searchParams.delete(input.name);
     if (input.value && parseFloat(input.value) > 0) {
-      url.searchParams.set(input.name, Math.round(parseFloat(input.value) * 100));
+      // Shopify storefront price filters expect DOLLARS (major units), e.g.
+      // filter.v.price.lte=500 means $500. The input already holds dollars, so
+      // pass it through unchanged (previously multiplied by 100 -> $50,000 bug).
+      url.searchParams.set(input.name, parseFloat(input.value));
     }
   });
 
@@ -2700,7 +2703,10 @@ window.applyMobileFilters = function() {
 
   content.querySelectorAll('.cf-plp__price-range-input').forEach(input => {
     if (input.value && parseFloat(input.value) > 0) {
-      url.searchParams.set(input.name, Math.round(parseFloat(input.value) * 100));
+      // Shopify storefront price filters expect DOLLARS (major units), e.g.
+      // filter.v.price.lte=500 means $500. The input already holds dollars, so
+      // pass it through unchanged (previously multiplied by 100 -> $50,000 bug).
+      url.searchParams.set(input.name, parseFloat(input.value));
     }
   });
 

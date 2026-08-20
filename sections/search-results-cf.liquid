@@ -91,6 +91,12 @@
   display: flex;
   gap: 24px;
 }
+/* AJAX filtering: dim + lock the region while the swap is in flight */
+.cf-plp__container.cf-plp__region--loading {
+  opacity: 0.55;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
 
 /* ========================================
    FILTERS SIDEBAR
@@ -1419,8 +1425,8 @@
     {%- assign sort_by = search.sort_by | default: 'relevance' -%}
     {% paginate search.results by section.settings.products_per_page %}
 
-    {% comment %} Main Container {% endcomment %}
-    <div class="cf-plp__container">
+    {% comment %} Main Container — AJAX swap region (sidebar + results + toolbar + pagination) {% endcomment %}
+    <div class="cf-plp__container" id="cf-search-results-region">
 
       {% comment %} Filters Sidebar - Shopify Storefront Filtering API {% endcomment %}
       <aside class="cf-plp__sidebar">
@@ -1607,10 +1613,10 @@
             <div class="cf-plp__sort">
               <label for="search-sort">Sort by</label>
               <select id="search-sort" onchange="handleSearchSort(this.value)">
-                <option value="relevance">Most Relevant</option>
-                <option value="price-ascending">Price: Low to High</option>
-                <option value="price-descending">Price: High to Low</option>
-                <option value="title-ascending">Name: A-Z</option>
+                <option value="relevance" {% if sort_by == 'relevance' %}selected{% endif %}>Most Relevant</option>
+                <option value="price-ascending" {% if sort_by == 'price-ascending' %}selected{% endif %}>Price: Low to High</option>
+                <option value="price-descending" {% if sort_by == 'price-descending' %}selected{% endif %}>Price: High to Low</option>
+                <option value="title-ascending" {% if sort_by == 'title-ascending' %}selected{% endif %}>Name: A-Z</option>
               </select>
             </div>
           </div>
@@ -1699,85 +1705,85 @@
 </div>
 
 <script>
+/* All product-region controls use EVENT DELEGATION on document so they keep
+   working after cfSearchAjax swaps #cf-search-results-region (the grid, view
+   toggle and mobile-filter button are re-rendered on every AJAX filter). */
 document.addEventListener('DOMContentLoaded', function() {
-  const productGrid = document.getElementById('product-grid');
 
-  // View Toggle
-  document.querySelectorAll('.cf-plp__view-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('.cf-plp__view-btn').forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
-      if (productGrid) {
-        if (this.dataset.view === 'list') {
-          productGrid.classList.add('list-view');
-        } else {
-          productGrid.classList.remove('list-view');
-        }
+  // View Toggle (grid / list) — delegated
+  document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.cf-plp__view-btn');
+    if (!btn) return;
+    const productGrid = document.getElementById('product-grid');
+    document.querySelectorAll('.cf-plp__view-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (productGrid) {
+      productGrid.classList.toggle('list-view', btn.dataset.view === 'list');
+    }
+  });
+
+  // Add to Cart — delegated (product cards are re-injected on every AJAX swap)
+  document.addEventListener('click', function(e) {
+    const button = e.target.closest('.quick-add-btn');
+    if (!button) return;
+    e.preventDefault();
+    const variantId = button.dataset.variantId;
+    const card = button.closest('.product-card');
+    const qtyInput = card ? card.querySelector('.qty-input') : null;
+    const qty = qtyInput ? (parseInt(qtyInput.value) || 1) : 1;
+
+    button.disabled = true;
+    button.textContent = 'Adding...';
+
+    fetch('/cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: parseInt(variantId), quantity: qty })
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('Add to cart failed');
+      return res.json();
+    })
+    .then(data => {
+      button.textContent = 'Added!';
+      button.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+
+      if (window.updateCartCount) window.updateCartCount();
+      else {
+        fetch('/cart.js').then(r => r.json()).then(cart => {
+          const countEls = document.querySelectorAll('.cart-count-bubble span, .cart-count, [data-cart-count]');
+          countEls.forEach(el => el.textContent = cart.item_count);
+        });
       }
+
+      if (typeof window.cfShowCartToast === 'function') {
+        window.cfShowCartToast(data, qty);
+      }
+
+      setTimeout(() => {
+        button.textContent = 'Add to Cart';
+        button.style.background = '';
+        button.disabled = false;
+      }, 2000);
+    })
+    .catch(err => {
+      console.error('Cart error:', err);
+      button.textContent = 'Error';
+      button.style.background = '#ef4444';
+      setTimeout(() => {
+        button.textContent = 'Add to Cart';
+        button.style.background = '';
+        button.disabled = false;
+      }, 2000);
     });
   });
 
-  // Add to Cart
-  document.querySelectorAll('.quick-add-btn').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-      e.preventDefault();
-      const variantId = this.dataset.variantId;
-      const card = this.closest('.product-card');
-      const qty = card ? parseInt(card.querySelector('.qty-input').value) || 1 : 1;
-      const button = this;
-
-      button.disabled = true;
-      button.textContent = 'Adding...';
-
-      fetch('/cart/add.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: parseInt(variantId), quantity: qty })
-      })
-      .then(res => {
-        if (!res.ok) throw new Error('Add to cart failed');
-        return res.json();
-      })
-      .then(data => {
-        button.textContent = 'Added!';
-        button.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
-
-        if (window.updateCartCount) window.updateCartCount();
-        else {
-          fetch('/cart.js').then(r => r.json()).then(cart => {
-            const countEls = document.querySelectorAll('.cart-count-bubble span, .cart-count, [data-cart-count]');
-            countEls.forEach(el => el.textContent = cart.item_count);
-          });
-        }
-
-        if (typeof window.cfShowCartToast === 'function') {
-          window.cfShowCartToast(data, qty);
-        }
-
-        setTimeout(() => {
-          button.textContent = 'Add to Cart';
-          button.style.background = '';
-          button.disabled = false;
-        }, 2000);
-      })
-      .catch(err => {
-        console.error('Cart error:', err);
-        button.textContent = 'Error';
-        button.style.background = '#ef4444';
-        setTimeout(() => {
-          button.textContent = 'Add to Cart';
-          button.style.background = '';
-          button.disabled = false;
-        }, 2000);
-      });
-    });
+  // Mobile Filter Button — delegated (re-rendered inside the swap region)
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('#mobile-filter-btn')) {
+      openSearchMobileFilters();
+    }
   });
-
-  // Mobile Filter Button
-  const mobileFilterBtn = document.getElementById('mobile-filter-btn');
-  if (mobileFilterBtn) {
-    mobileFilterBtn.addEventListener('click', openSearchMobileFilters);
-  }
 });
 
 /* ========================================
@@ -1805,7 +1811,7 @@ window.handleSearchStorefrontFilter = function(checkbox) {
 
   // Reset to page 1 when filtering
   url.searchParams.delete('page');
-  window.location = url.toString();
+  cfSearchGo(url);
 };
 
 // Remove a specific active filter (called from active filter chips)
@@ -1819,7 +1825,7 @@ window.removeSearchStorefrontFilter = function(paramName, paramValue) {
     }
   });
   url.searchParams.delete('page');
-  window.location = url.toString();
+  cfSearchGo(url);
 };
 
 // Apply price range filter
@@ -1830,13 +1836,15 @@ window.applySearchPriceFilter = function() {
   inputs.forEach(input => {
     url.searchParams.delete(input.name);
     if (input.value && parseFloat(input.value) > 0) {
-      // Shopify expects price in cents (subunit)
-      url.searchParams.set(input.name, Math.round(parseFloat(input.value) * 100));
+      // Shopify storefront price filters expect DOLLARS (major units), e.g.
+      // filter.v.price.lte=500 means $500. The input already holds dollars, so
+      // pass it through unchanged (previously multiplied by 100 -> $50,000 bug).
+      url.searchParams.set(input.name, parseFloat(input.value));
     }
   });
 
   url.searchParams.delete('page');
-  window.location = url.toString();
+  cfSearchGo(url);
 };
 
 // Toggle filter group collapse
@@ -1869,8 +1877,9 @@ window.toggleFilterViewMore = function(btn) {
 window.handleSearchSort = function(value) {
   const url = new URL(window.location);
   url.searchParams.set('sort_by', value);
-  // Preserve existing filter params
-  window.location = url;
+  url.searchParams.delete('page');
+  // Preserve existing filter params + q
+  cfSearchGo(url);
 };
 
 // Mobile Filters - clone sidebar, instant apply on checkbox tap
@@ -1945,14 +1954,126 @@ window.applySearchMobileFilters = function() {
   // Add price inputs from mobile drawer
   content.querySelectorAll('.cf-plp__price-range-input').forEach(input => {
     if (input.value && parseFloat(input.value) > 0) {
-      url.searchParams.set(input.name, Math.round(parseFloat(input.value) * 100));
+      // Shopify storefront price filters expect DOLLARS (major units), e.g.
+      // filter.v.price.lte=500 means $500. The input already holds dollars, so
+      // pass it through unchanged (previously multiplied by 100 -> $50,000 bug).
+      url.searchParams.set(input.name, parseFloat(input.value));
     }
   });
 
   url.searchParams.delete('page');
   closeSearchMobileFilters();
-  window.location = url.toString();
+  cfSearchGo(url);
 };
+
+/* ========================================================================
+   SEARCH AJAX FILTERING  (cfSearchAjax)
+   Same-page filter / sort / price / pagination without a full reload.
+   Modeled on the proven cfL2 module in sections/main-collection-cf.liquid,
+   but scoped to SEARCH: the "q" search term is the permanent scope and is
+   never dropped from the URL.
+
+   Flow:
+     handler builds a URL (adds/removes filter.* / sort_by, deletes page)
+       -> cfSearchGo(url)
+       -> fetch same URL, parse HTML, swap only #cf-search-results-region
+          (sidebar + toolbar + result count + active chips + grid + pagination)
+       -> history.pushState, re-fire cf:products-added / wholesale / wishlist
+     popstate re-fetches the restored URL (no extra history entry).
+   ======================================================================== */
+window.cfSearchAjax = (function () {
+  var REGION_ID = 'cf-search-results-region';
+  var inFlight = null;               // AbortController for the active request
+
+  function region() { return document.getElementById(REGION_ID); }
+
+  // Never lose the search scope; carry preview_theme_id so dev-theme testing works.
+  function normalize(rawUrl) {
+    var here = new URL(window.location.href);
+    var u = new URL(rawUrl, window.location.origin);
+    if (!u.searchParams.get('q')) {
+      var q = here.searchParams.get('q');
+      if (q) u.searchParams.set('q', q);
+    }
+    var preview = here.searchParams.get('preview_theme_id');
+    if (preview && !u.searchParams.get('preview_theme_id')) {
+      u.searchParams.set('preview_theme_id', preview);
+    }
+    return u;
+  }
+
+  // Re-run client-side product-card wiring on freshly injected cards.
+  // Reuses existing project hooks — do NOT duplicate their logic here.
+  function reinit() {
+    document.dispatchEvent(new CustomEvent('cf:products-added'));
+    if (typeof window.cfWholesalePricingInit === 'function') {
+      try { window.cfWholesalePricingInit(); } catch (e) { console.error('[cfSearch] wholesale reinit', e); }
+    }
+    if (window.CelebrateFestivalWishlist && typeof window.CelebrateFestivalWishlist.updateAllIcons === 'function') {
+      try { window.CelebrateFestivalWishlist.updateAllIcons(); } catch (e) { console.error('[cfSearch] wishlist reinit', e); }
+    }
+  }
+
+  function navigate(rawUrl, push) {
+    var host = region();
+    if (!host) { window.location = rawUrl; return; }   // graceful: no region -> full nav
+
+    var u = normalize(rawUrl);
+    var fetchUrl = u.toString();
+
+    if (inFlight) { inFlight.abort(); }                 // cancel superseded request (rapid filtering)
+    inFlight = new AbortController();
+    host.classList.add('cf-plp__region--loading');
+
+    fetch(fetchUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, signal: inFlight.signal })
+      .then(function (r) { return r.text(); })
+      .then(function (html) {
+        var next = new DOMParser().parseFromString(html, 'text/html').getElementById(REGION_ID);
+        if (!next) { window.location = fetchUrl; return; }   // markup missing -> full nav fallback
+        host.innerHTML = next.innerHTML;
+        host.classList.remove('cf-plp__region--loading');
+        if (push !== false) { history.pushState({ cfSearch: true }, '', fetchUrl); }
+        reinit();
+        var top = host.getBoundingClientRect().top + window.pageYOffset - 140;
+        window.scrollTo({ top: top < 0 ? 0 : top, behavior: 'smooth' });
+        inFlight = null;
+      })
+      .catch(function (err) {
+        if (err && err.name === 'AbortError') { return; } // superseded — ignore
+        console.error('[cfSearch] AJAX failed, falling back to full navigation', err);
+        window.location = fetchUrl;
+      });
+  }
+
+  // Delegated clicks for server-rendered anchors inside the region:
+  // pagination arrows/numbers + Clear All links. Filter checkboxes / chip
+  // removers / sort / price already call the window.* handlers above.
+  document.addEventListener('click', function (e) {
+    var host = region();
+    if (!host) { return; }
+    var a = e.target.closest('a');
+    if (!a || !host.contains(a) || !a.getAttribute('href')) { return; }
+    if (a.classList.contains('cf-plp__page-btn') ||
+        a.classList.contains('cf-plp__page-num') ||
+        a.classList.contains('cf-plp__clear-all-link') ||
+        a.classList.contains('cf-plp__clear-all')) {
+      e.preventDefault();
+      navigate(a.getAttribute('href'), true);
+    }
+  });
+
+  window.addEventListener('popstate', function () {
+    if (region()) { navigate(window.location.href, false); }
+  });
+
+  return { navigate: navigate };
+})();
+
+// Single entry point used by every filter/sort/price handler above.
+// Accepts a URL object or string; always routes through the AJAX engine.
+function cfSearchGo(url) {
+  window.cfSearchAjax.navigate(url.toString(), true);
+}
 </script>
 
 {% schema %}

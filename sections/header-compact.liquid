@@ -583,6 +583,26 @@
     // ============================================
     let searchTimeout;
 
+    // Predictive search config (Shopify Predictive Search API).
+    // - fields: explicitly include variants.sku so B2B customers/staff can find
+    //   products by SKU/model number (default field set does NOT search SKU).
+    // - unavailable_products=show: keep out-of-stock products in results ranked
+    //   by relevance. Commercial equipment / Indian specialty items are still
+    //   relevant when OOS (customers can call to order). The store default
+    //   demotes/drops them, which hid e.g. the OOS "Ceramic Kullad" line item.
+    const CF_PS_FIELDS = 'title,product_type,variants.title,vendor,variants.sku';
+    const CF_PS_LIMIT = 10;
+
+    // Shopify search treats a token that begins with "-" as a NEGATION operator
+    // (e.g. "-Line" means "exclude Line"). Several of our SKUs contain a space
+    // before a hyphen (e.g. "Ceramic Kullad -Line"), so a literal SKU search was
+    // silently excluding the very product being searched for. Neutralize a
+    // leading hyphen at the start of a token while preserving internal hyphens
+    // (e.g. "SW-TC-GLASS-M3" and "Kullad-Line" are untouched).
+    function cfSanitizeSearchQuery(q) {
+      return q.replace(/(^|\s)-(?=\S)/g, '$1');
+    }
+
     function initPredictiveSearch(inputId, autocompleteId) {
       const searchInput = document.getElementById(inputId);
       const autocompleteContainer = document.getElementById(autocompleteId);
@@ -603,7 +623,13 @@
         autocompleteContainer.classList.add('active');
 
         searchTimeout = setTimeout(() => {
-          fetch(`/search/suggest.json?q=${encodeURIComponent(query)}&resources[type]=product&resources[limit]=5`)
+          const apiQuery = cfSanitizeSearchQuery(query);
+          const suggestUrl = `/search/suggest.json?q=${encodeURIComponent(apiQuery)}`
+            + `&resources[type]=product`
+            + `&resources[limit]=${CF_PS_LIMIT}`
+            + `&resources[options][fields]=${encodeURIComponent(CF_PS_FIELDS)}`
+            + `&resources[options][unavailable_products]=show`;
+          fetch(suggestUrl)
             .then(response => response.json())
             .then(data => {
               const products = data.resources.results.products || [];
@@ -614,7 +640,7 @@
               }
 
               let html = '';
-              const maxProducts = Math.min(products.length, 5);
+              const maxProducts = Math.min(products.length, CF_PS_LIMIT);
 
               for (let i = 0; i < maxProducts; i++) {
                 const product = products[i];
@@ -631,7 +657,7 @@
               }
 
               html += `
-                <a href="/search?q=${encodeURIComponent(query)}" class="compact-autocomplete-view-all">
+                <a href="/search?q=${encodeURIComponent(apiQuery)}" class="compact-autocomplete-view-all">
                   View All Results →
                 </a>
               `;
