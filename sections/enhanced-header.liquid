@@ -510,6 +510,7 @@
       autocomplete="off">
     <input type="hidden" name="type" value="product">
     <input type="hidden" name="options[prefix]" value="last">
+    <input type="hidden" name="options[unavailable_products]" value="show">
     <button type="submit" class="search-button" aria-label="Search">
       <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
         <path d="M21.71 20.29L18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 7-7 7 7 0 0 1-7 7Z"/>
@@ -673,6 +674,7 @@
         autocomplete="off">
       <input type="hidden" name="type" value="product">
       <input type="hidden" name="options[prefix]" value="last">
+      <input type="hidden" name="options[unavailable_products]" value="show">
       <button type="submit" class="search-button" aria-label="Search">
         <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
           <path d="M21.71 20.29L18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 7-7 7 7 0 0 1-7 7Z"/>
@@ -1108,6 +1110,7 @@
       autocomplete="off">
     <input type="hidden" name="type" value="product">
     <input type="hidden" name="options[prefix]" value="last">
+    <input type="hidden" name="options[unavailable_products]" value="show">
     <button type="submit" class="search-button">
       <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
         <path d="M21.71 20.29L18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 7-7 7 7 0 0 1-7 7Z"/>
@@ -1253,7 +1256,33 @@
     // PREDICTIVE SEARCH
     // ============================================
     let searchTimeout;
-    
+
+    // ---- Unified Celebrate Festival search contract (predictive + full search) ----
+    // Full /search must be given these explicitly or partial terms collapse to ~0.
+    // Verified live: q=kull with prefix=last + unavailable_products=show -> 6 results;
+    // without unavailable_products=show -> ~0/1. Predictive uses the same fields so
+    // the dropdown and the full results page stay consistent.
+    const CF_PS_FIELDS = 'title,product_type,variants.title,vendor,variants.sku';
+    const CF_PS_LIMIT = 10;
+
+    // Shopify search treats a token beginning with "-" as a NEGATION operator
+    // (e.g. "-Line" = exclude Line). Some SKUs contain " -" (e.g.
+    // "Ceramic Kullad -Line") which silently excluded the product being searched.
+    // Neutralize a hyphen that starts a token; internal hyphens (SW-TC-GLASS,
+    // Kullad-Line) are preserved.
+    function cfSanitizeSearchQuery(q) {
+      return (q || '').replace(/(^|\s)-(?=\S)/g, '$1');
+    }
+
+    // Build a full-search URL that carries the complete, explicit contract.
+    function cfBuildSearchUrl(rawQuery) {
+      const q = cfSanitizeSearchQuery(rawQuery);
+      return '/search?q=' + encodeURIComponent(q)
+        + '&type=product'
+        + '&options%5Bprefix%5D=last'
+        + '&options%5Bunavailable_products%5D=show';
+    }
+
    function initPredictiveSearch(inputId, autocompleteId) {
   const searchInput = document.getElementById(inputId);
   const autocompleteContainer = document.getElementById(autocompleteId);
@@ -1274,18 +1303,24 @@
     autocompleteContainer.classList.add('active');
     
     searchTimeout = setTimeout(() => {
-      fetch(`/search/suggest.json?q=${encodeURIComponent(query)}&resources[type]=product&resources[limit]=5`)
+      const apiQuery = cfSanitizeSearchQuery(query);
+      const suggestUrl = `/search/suggest.json?q=${encodeURIComponent(apiQuery)}`
+        + `&resources[type]=product`
+        + `&resources[limit]=${CF_PS_LIMIT}`
+        + `&resources[options][fields]=${encodeURIComponent(CF_PS_FIELDS)}`
+        + `&resources[options][unavailable_products]=show`;
+      fetch(suggestUrl)
         .then(response => response.json())
         .then(data => {
           const products = data.resources.results.products || [];
-          
+
           if (products.length === 0) {
             autocompleteContainer.innerHTML = '<div class="autocomplete-no-results">No products found</div>';
             return;
           }
-          
+
           let html = '';
-          const maxProducts = Math.min(products.length, 5);
+          const maxProducts = Math.min(products.length, CF_PS_LIMIT);
           
          for (let i = 0; i < maxProducts; i++) {
   const product = products[i];
@@ -1309,7 +1344,7 @@
 }
           
           html += `
-            <a href="/search?q=${encodeURIComponent(query)}&type=product&options%5Bprefix%5D=last" class="autocomplete-view-all">
+            <a href="${cfBuildSearchUrl(query)}" class="autocomplete-view-all">
               View All Results →
             </a>
           `;
@@ -1342,6 +1377,17 @@
     initPredictiveSearch('desktop-search-input', 'desktop-autocomplete');
     initPredictiveSearch('mobile-search-input', 'mobile-autocomplete');
     initPredictiveSearch('mobile-bar-search-input', 'mobile-bar-autocomplete');
+
+    // Sanitize the query on ENTER / button submit (native form path) so a typed
+    // SKU like "Ceramic Kullad -Line" is not read as "exclude Line". The hidden
+    // type / options[prefix] / options[unavailable_products] inputs already ride
+    // along with the form, so full search stays consistent with predictive.
+    document.querySelectorAll('form.search-form').forEach(function(form) {
+      form.addEventListener('submit', function() {
+        var input = form.querySelector('input[name="q"]');
+        if (input) { input.value = cfSanitizeSearchQuery(input.value); }
+      });
+    });
 
     // ============================================
     // EXISTING MOBILE MENU CODE

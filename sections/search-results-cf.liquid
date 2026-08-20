@@ -1535,7 +1535,7 @@
 
           {% if has_active_filters %}
             <div class="cf-plp__sidebar-clear">
-              <a href="/search?q={{ search.terms | url_encode }}{% if sort_by != blank %}&sort_by={{ sort_by }}{% endif %}" class="cf-plp__clear-all-link">Clear All Filters</a>
+              <a href="/search?q={{ search.terms | url_encode }}&type=product&options[prefix]=last&options[unavailable_products]=show{% if sort_by != blank %}&sort_by={{ sort_by }}{% endif %}" class="cf-plp__clear-all-link">Clear All Filters</a>
             </div>
           {% endif %}
 
@@ -1572,7 +1572,7 @@
                     {% endfor %}
                   {% endfor %}
                 </div>
-                <a href="/search?q={{ search.terms | url_encode }}{% if sort_by != blank %}&sort_by={{ sort_by }}{% endif %}" class="cf-plp__clear-all">Clear All</a>
+                <a href="/search?q={{ search.terms | url_encode }}&type=product&options[prefix]=last&options[unavailable_products]=show{% if sort_by != blank %}&sort_by={{ sort_by }}{% endif %}" class="cf-plp__clear-all">Clear All</a>
               </div>
             {% endif %}
 
@@ -1987,14 +1987,25 @@ window.cfSearchAjax = (function () {
 
   function region() { return document.getElementById(REGION_ID); }
 
-  // Never lose the search scope; carry preview_theme_id so dev-theme testing works.
+  // Enforce the full CF search contract on EVERY AJAX request so a filter,
+  // sort, Clear All or pagination action never silently drops type / prefix /
+  // unavailable_products (which would change the result set — e.g. "kull" would
+  // collapse from 6 products to ~0 after the first filter). Also never lose the
+  // q scope, and carry preview_theme_id so dev-theme testing works.
   function normalize(rawUrl) {
     var here = new URL(window.location.href);
     var u = new URL(rawUrl, window.location.origin);
+
+    // q — the permanent search scope
     if (!u.searchParams.get('q')) {
       var q = here.searchParams.get('q');
       if (q) u.searchParams.set('q', q);
     }
+    // Explicit, consistent search contract (matches the header forms/predictive)
+    u.searchParams.set('type', 'product');
+    u.searchParams.set('options[prefix]', 'last');
+    u.searchParams.set('options[unavailable_products]', 'show');
+
     var preview = here.searchParams.get('preview_theme_id');
     if (preview && !u.searchParams.get('preview_theme_id')) {
       u.searchParams.set('preview_theme_id', preview);
