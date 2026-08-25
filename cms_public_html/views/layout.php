@@ -36,6 +36,7 @@ $f = flash();
                 <a href="/calendar" class="<?= str_starts_with($path, '/calendar') ? 'active' : '' ?>"><span class="nav-ico"><?= icon('calendar') ?></span> Content Calendar</a>
                 <a href="/docs"     class="<?= str_starts_with($path, '/docs') ? 'active' : '' ?>"><span class="nav-ico"><?= icon('book') ?></span> Documentation</a>
                 <a href="/activity" class="<?= str_starts_with($path, '/activity') ? 'active' : '' ?>"><span class="nav-ico"><?= icon('clock') ?></span> Activity</a>
+                <a href="/library"  class="<?= str_starts_with($path, '/library') ? 'active' : '' ?>"><span class="nav-ico"><?= icon('archive') ?></span> Product & Brand Library</a>
                 <a href="/notifications" class="<?= str_starts_with($path, '/notifications') ? 'active' : '' ?>"><span class="nav-ico"><?= icon('bell') ?></span> Email Templates</a>
             </nav>
         </div>

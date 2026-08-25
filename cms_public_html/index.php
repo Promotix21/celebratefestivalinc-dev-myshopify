@@ -543,6 +543,13 @@ if ($uri === '/notifications/download' && $method === 'GET') {
     readfile($path);
     exit;
 }
+// --- Product & Brand Library ----------------------------------------------
+if (str_starts_with($uri, '/library')) {
+    require_once __DIR__ . '/lib/library.php';
+    handle_library_routes($uri, $method);
+    exit;
+}
+
 // --- 404 ------------------------------------------------------------------
 http_response_code(404);
 render('404', ['title' => 'Not found']);
