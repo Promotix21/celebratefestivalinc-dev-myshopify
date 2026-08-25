@@ -47,7 +47,20 @@ function lib_fetch_data(PDO $pdo): array {
         ORDER BY r.severity DESC, r.created_at DESC
     ")->fetchAll();
 
-    return compact('stats', 'brands', 'products', 'categories', 'links', 'restrictions');
+    // Visual evidence (screenshots / rejected creatives) attached to each
+    // restriction, keyed by restriction_id. A restriction may have many.
+    $evidence = [];
+    foreach ($pdo->query("
+        SELECT e.*, u.display_name AS uploaded_by_name
+        FROM marketing_restriction_evidence e
+        LEFT JOIN users u ON e.created_by = u.id
+        WHERE e.archived = 0
+        ORDER BY e.created_at ASC
+    ")->fetchAll() as $ev) {
+        $evidence[$ev['restriction_id']][] = $ev;
+    }
+
+    return compact('stats', 'brands', 'products', 'categories', 'links', 'restrictions', 'evidence');
 }
 
 function lib_render_index(PDO $pdo, bool $is_admin): void {
@@ -60,6 +73,7 @@ function lib_render_index(PDO $pdo, bool $is_admin): void {
         'categories' => $data['categories'],
         'links' => $data['links'],
         'restrictions' => $data['restrictions'],
+        'evidence' => $data['evidence'],
         'is_admin' => $is_admin,
     ]);
     exit;
@@ -272,6 +286,92 @@ function handle_library_routes($uri, $method) {
         lib_redirect_tab('restrictions');
     }
 
+    // ---- Restriction evidence (attach image/screenshot/document or URL) ----
+    if (preg_match('#^/library/restrictions/(\d+)/evidence/add$#', $uri, $m)) {
+        $restriction_id = (int)$m[1];
+        $exists = $pdo->prepare("SELECT id FROM marketing_restrictions WHERE id=?");
+        $exists->execute([$restriction_id]);
+        if (!$exists->fetchColumn()) { flash('Restriction not found.', 'error'); lib_redirect_tab('restrictions'); }
+
+        $caption = trim((string)post('caption', '')) ?: null;
+        $source = lib_in((string)post('source', ''), ['synergy_account_intelligence', 'github', 'cms_upload', 'manual'], 'cms_upload');
+        $source_reference = trim((string)post('source_reference', '')) ?: null;
+        $url = trim((string)post('public_url', ''));
+
+        $has_file = isset($_FILES['evidence_file']) && ($_FILES['evidence_file']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK;
+
+        if ($has_file) {
+            [$ok, $result] = lib_save_restriction_evidence_file($_FILES['evidence_file']);
+            if (!$ok) { flash($result, 'error'); lib_redirect_tab('restrictions'); }
+            $evidence_type = str_starts_with($result['mime'], 'image/') ? 'image' : 'document';
+            $stmt = $pdo->prepare("INSERT INTO marketing_restriction_evidence
+                (restriction_id, evidence_type, source, source_reference, public_url, local_path, caption, original_filename, created_by, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)");
+            $stmt->execute([
+                $restriction_id, $evidence_type, $source, $source_reference,
+                $result['public_url'], $result['local_path'], $caption, $result['original_filename'], $me['id'],
+            ]);
+            $eid = (int)$pdo->lastInsertId();
+            activity_log('restriction_evidence', $eid, 'added', "Attached {$evidence_type} evidence to restriction #{$restriction_id} ({$result['original_filename']})");
+            flash('Evidence attached.', 'success');
+        } elseif ($url !== '') {
+            if (!preg_match('#^https?://#i', $url)) { flash('Evidence URL must start with http:// or https://', 'error'); lib_redirect_tab('restrictions'); }
+            $stmt = $pdo->prepare("INSERT INTO marketing_restriction_evidence
+                (restriction_id, evidence_type, source, source_reference, public_url, caption, created_by, created_at)
+                VALUES (?, 'url', ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)");
+            $stmt->execute([$restriction_id, $source, $source_reference, $url, $caption, $me['id']]);
+            $eid = (int)$pdo->lastInsertId();
+            activity_log('restriction_evidence', $eid, 'added', "Linked URL evidence to restriction #{$restriction_id}");
+            flash('Evidence link added.', 'success');
+        } else {
+            flash('Provide an image/document file or an evidence URL.', 'error');
+        }
+        lib_redirect_tab('restrictions');
+    }
+
+    // ---- Archive (soft-remove) an evidence attachment ----
+    if (preg_match('#^/library/evidence/(\d+)/archive$#', $uri, $m)) {
+        $eid = (int)$m[1];
+        $stmt = $pdo->prepare("UPDATE marketing_restriction_evidence SET archived=1 WHERE id=?");
+        $stmt->execute([$eid]);
+        activity_log('restriction_evidence', $eid, 'archived', "Archived evidence #{$eid}");
+        flash('Evidence archived.', 'success');
+        lib_redirect_tab('restrictions');
+    }
+
     http_response_code(404);
     exit('Not found');
+}
+
+/**
+ * Save an uploaded restriction-evidence file into the dedicated managed
+ * location public/uploads/library/restrictions/ using a safe random filename,
+ * preserving the original filename for the DB. Mirrors save_task_attachment()
+ * but scoped to the library so no shared helper needs changing.
+ *
+ * @return array{0:bool,1:(string|array)}  [true, {public_url, local_path, mime, original_filename}] or [false, errorMessage]
+ */
+function lib_save_restriction_evidence_file(array $f) {
+    if (($f['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) return [false, 'Upload error.'];
+    if ($f['size'] > 25 * 1024 * 1024) return [false, "{$f['name']}: exceeds 25 MB."];
+    $allowed = [
+        'image/png' => 'png', 'image/jpeg' => 'jpg', 'image/gif' => 'gif',
+        'image/webp' => 'webp', 'application/pdf' => 'pdf',
+    ];
+    $mime = mime_content_type($f['tmp_name']) ?: ($f['type'] ?? '');
+    if (!isset($allowed[$mime])) return [false, "{$f['name']}: type {$mime} not allowed (png, jpg, gif, webp, pdf only)."];
+
+    $dir = __DIR__ . '/../public/uploads/library/restrictions';
+    if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) return [false, 'Could not create evidence directory.'];
+
+    $name = bin2hex(random_bytes(8)) . '.' . $allowed[$mime];
+    $dest = $dir . '/' . $name;
+    if (!move_uploaded_file($f['tmp_name'], $dest)) return [false, "{$f['name']}: could not save."];
+
+    return [true, [
+        'public_url' => '/uploads/library/restrictions/' . $name,
+        'local_path' => 'public/uploads/library/restrictions/' . $name,
+        'mime' => $mime,
+        'original_filename' => $f['name'],
+    ]];
 }

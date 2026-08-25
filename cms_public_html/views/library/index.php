@@ -59,6 +59,38 @@ $severities = ['low', 'medium', 'high'];
 .lib-modal .lib-modal-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.25rem; }
 .lib-target-group { display: none; }
 .lib-target-group.active { display: block; }
+
+/* ---- Restrictions tab polish ---- */
+.lib-restrictions-table td { vertical-align: top; }
+.lib-restrictions-table tbody tr { transition: background 0.15s ease; }
+.lib-restr-target-title { font-weight: 700; color: var(--text-main); font-size: 0.95rem; margin-bottom: 0.4rem; line-height: 1.35; }
+.lib-restr-type-chip { display: inline-block; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.12rem 0.45rem; border-radius: 999px; margin-right: 0.4rem; vertical-align: middle; }
+.lib-restr-type-chip.creative_asset { background: #fee2e2; color: #991b1b; }
+.lib-restr-type-chip.brand { background: #e0e7ff; color: #3730a3; }
+.lib-restr-type-chip.product { background: #dbeafe; color: #1e40af; }
+.lib-restr-type-chip.link { background: #ede9fe; color: #5b21b6; }
+.lib-restr-type-chip.global { background: #f3f4f6; color: #374151; }
+.lib-restr-meta { font-size: 0.75rem; color: var(--text-muted); line-height: 1.6; }
+.lib-restr-meta strong { color: var(--text-main); }
+.lib-pill-reject { display: inline-block; background: var(--danger, #dc2626); color: #fff; font-weight: 700; font-size: 0.68rem; letter-spacing: 0.04em; padding: 0.14rem 0.5rem; border-radius: 5px; }
+.lib-note { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem; font-style: italic; }
+
+.lib-evidence { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: flex-start; margin-top: 0.65rem; }
+.lib-ev-thumb { position: relative; padding: 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; cursor: zoom-in; background: var(--bg-card); width: 92px; box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+.lib-ev-thumb img { display: block; width: 92px; height: 72px; object-fit: cover; }
+.lib-ev-thumb .lib-ev-label { display: block; font-size: 0.6rem; font-weight: 600; text-align: center; padding: 0.2rem; color: var(--text-muted); background: var(--bg-card); border-top: 1px solid var(--border); }
+.lib-ev-thumb:hover { border-color: var(--accent); }
+.lib-ev-doc { display: flex; align-items: center; gap: 0.35rem; font-size: 0.72rem; padding: 0.4rem 0.6rem; border: 1px solid var(--border); border-radius: 8px; text-decoration: none; color: var(--text-main); background: var(--bg-card); }
+.lib-ev-chip { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.72rem; padding: 0.35rem 0.55rem; border: 1px solid var(--border); border-radius: 999px; text-decoration: none; color: var(--accent); background: var(--bg-card); }
+.lib-ev-empty { font-size: 0.72rem; color: var(--text-muted); font-style: italic; padding: 0.3rem 0; }
+.lib-ev-archive { position: absolute; top: 2px; right: 2px; }
+.lib-ev-archive button { background: rgba(15,23,42,0.72); color: #fff; border: 0; border-radius: 50%; width: 18px; height: 18px; line-height: 1; font-size: 0.7rem; cursor: pointer; padding: 0; }
+.lib-ev-cell { display: inline-flex; flex-direction: column; align-items: center; }
+.btn-xs { font-size: 0.7rem !important; padding: 0.25rem 0.5rem !important; }
+
+.lib-preview-img { max-width: 100%; max-height: 62vh; border-radius: 8px; display: block; margin: 0 auto; border: 1px solid var(--border); }
+.lib-preview-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.85rem; line-height: 1.7; }
+.lib-preview-meta strong { color: var(--text-main); }
 </style>
 
 <div class="header-split" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
@@ -313,19 +345,19 @@ $severities = ['low', 'medium', 'high'];
         <div class="spacer"></div>
         <?php if ($is_admin): ?><button type="button" class="btn btn-accent btn-sm" data-modal-open="modal-restriction-add">+ Add Restriction</button><?php endif; ?>
     </div>
-    <div class="card" style="padding:0; border: 1px solid var(--danger);">
-        <table class="table">
+    <div class="card" style="padding:0; border: 1px solid var(--danger); overflow:hidden;">
+        <table class="table lib-restrictions-table">
             <thead>
                 <tr>
-                    <th>Target</th>
+                    <th style="width:44%">Target &amp; Evidence</th>
                     <th>Restriction</th>
-                    <th>Severity</th>
-                    <?php if ($is_admin): ?><th>Actions</th><?php endif; ?>
+                    <th style="width:110px">Severity</th>
+                    <?php if ($is_admin): ?><th style="width:150px">Actions</th><?php endif; ?>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($restrictions)): ?>
-                    <tr class="empty-row"><td colspan="4">No active restrictions.</td></tr>
+                    <tr class="empty-row"><td colspan="<?= $is_admin ? 4 : 3 ?>">No active restrictions.</td></tr>
                 <?php endif; ?>
                 <?php foreach ($restrictions as $r):
                     // A stored target_type (e.g. an image-only creative asset with no
@@ -346,20 +378,67 @@ $severities = ['low', 'medium', 'high'];
                         $target_type = 'global';
                         $target_label = 'Global';
                     }
+                    $evs = $evidence[$r['id']] ?? [];
                 ?>
                 <tr data-row-id="<?= (int)$r['id'] ?>" data-f-severity="<?= h($r['severity']) ?>">
                     <td>
-                        <strong><?= h($target_label) ?></strong>
+                        <div class="lib-restr-target-title">
+                            <span class="lib-restr-type-chip <?= h($target_type) ?>"><?= h(str_replace('_',' ',$target_type)) ?></span>
+                            <?= h($target_label) ?>
+                        </div>
                         <?php if ($target_type === 'creative_asset'): ?>
-                            <div style="font-size:0.75rem"><strong>Status:</strong> REJECTED / DO NOT USE</div>
-                            <div style="font-size:0.75rem"><strong>Scope:</strong> <?= h(($r['target_scope'] ?? '') === 'image_only' ? 'Image only' : ($r['target_scope'] ?: 'Image only')) ?></div>
-                            <div style="font-size:0.75rem; color:var(--text-muted)"><strong>Asset URL:</strong> <?= !empty($r['asset_url']) ? '<a href="'.h($r['asset_url']).'" target="_blank" rel="noopener">Open asset</a>' : 'Not available in workbook / historical client-feedback screenshot' ?></div>
-                            <div style="font-size:0.7rem; color:var(--text-muted)">Image-only creative restriction — the Rational brand stays Approved and the Index!G24 Rational product page is not restricted by this image rule.</div>
+                            <div class="lib-restr-meta">
+                                <div><strong>Status:</strong> <span class="lib-pill-reject">REJECTED / DO NOT USE</span></div>
+                                <div><strong>Scope:</strong> <?= h(($r['target_scope'] ?? '') === 'image_only' ? 'Image only' : ($r['target_scope'] ?: 'Image only')) ?></div>
+                                <div><strong>Asset URL:</strong> <?= !empty($r['asset_url']) ? '<a href="'.h($r['asset_url']).'" target="_blank" rel="noopener">Open asset</a>' : 'Not available in workbook / historical client-feedback screenshot' ?></div>
+                            </div>
+                            <div class="lib-note">Image-only creative restriction — the Rational brand stays Approved and the Index!G24 Rational product page is not restricted by this image rule.</div>
                         <?php elseif ($target_type === 'link'): ?>
-                            <div style="font-size:0.75rem"><a href="<?= h($r['link_url']) ?>" target="_blank" rel="noopener">Open asset</a></div>
-                            <?php if ($r['product_name']): ?><div style="font-size:0.75rem; color:var(--text-muted)">Product: <?= h($r['product_name']) ?></div><?php endif; ?>
-                            <div style="font-size:0.7rem; color:var(--text-muted)">Specific-creative restriction — not a brand-wide ban.</div>
+                            <div class="lib-restr-meta">
+                                <div><a href="<?= h($r['link_url']) ?>" target="_blank" rel="noopener">Open asset</a></div>
+                                <?php if ($r['product_name']): ?><div>Product: <?= h($r['product_name']) ?></div><?php endif; ?>
+                            </div>
+                            <div class="lib-note">Specific-creative restriction — not a brand-wide ban.</div>
                         <?php endif; ?>
+
+                        <div class="lib-evidence">
+                            <?php foreach ($evs as $ev):
+                                $ev_json = h(json_encode([
+                                    'url' => $ev['public_url'],
+                                    'type' => $ev['evidence_type'],
+                                    'caption' => $ev['caption'],
+                                    'original_filename' => $ev['original_filename'],
+                                    'source' => $ev['source'],
+                                    'source_reference' => $ev['source_reference'],
+                                    'uploaded_by' => $ev['uploaded_by_name'] ?? null,
+                                    'target' => $target_label,
+                                ]));
+                                $ev_label = $target_type === 'creative_asset' ? 'Rejected creative' : ($ev['caption'] ?: 'Evidence');
+                            ?>
+                                <?php if ($ev['evidence_type'] === 'url'): ?>
+                                    <a class="lib-ev-chip" href="<?= h($ev['public_url']) ?>" target="_blank" rel="noopener">🔗 <?= h($ev['caption'] ?: 'Evidence link') ?></a>
+                                <?php elseif ($ev['evidence_type'] === 'document'): ?>
+                                    <span class="lib-ev-cell">
+                                        <a class="lib-ev-doc" href="<?= h($ev['public_url']) ?>" target="_blank" rel="noopener">📄 <?= h($ev['original_filename'] ?: 'Document') ?></a>
+                                        <?php if ($is_admin): ?><span class="lib-ev-archive"><form method="post" action="/library/evidence/<?= (int)$ev['id'] ?>/archive" onsubmit="return confirm('Archive this evidence?');"><?= csrf_field() ?><button type="submit" title="Archive">×</button></form></span><?php endif; ?>
+                                    </span>
+                                <?php else: ?>
+                                    <span class="lib-ev-cell" style="position:relative;">
+                                        <button type="button" class="lib-ev-thumb" data-ev-preview data-ev='<?= $ev_json ?>'>
+                                            <img src="<?= h($ev['public_url']) ?>" alt="<?= h($ev_label) ?>" loading="lazy">
+                                            <span class="lib-ev-label"><?= h($ev_label) ?></span>
+                                        </button>
+                                        <?php if ($is_admin): ?><span class="lib-ev-archive"><form method="post" action="/library/evidence/<?= (int)$ev['id'] ?>/archive" onsubmit="return confirm('Archive this evidence?');"><?= csrf_field() ?><button type="submit" title="Archive">×</button></form></span><?php endif; ?>
+                                    </span>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+
+                            <?php if (empty($evs)): ?><span class="lib-ev-empty">No visual evidence attached yet.</span><?php endif; ?>
+                            <?php if ($is_admin): ?>
+                                <button type="button" class="btn btn-ghost btn-xs" data-modal-open="modal-evidence-add"
+                                    data-evidence-restriction="<?= (int)$r['id'] ?>" data-evidence-target="<?= h($target_label) ?>">+ Attach evidence</button>
+                            <?php endif; ?>
+                        </div>
                     </td>
                     <td><?= h($r['restriction']) ?></td>
                     <td><span class="badge <?= h($r['severity']) ?>"><?= h(strtoupper($r['severity'])) ?></span></td>
@@ -625,6 +704,51 @@ function lib_restriction_fields($brands, $products, $links, $severities) { ?>
         </form>
     </div>
 </div>
+<div id="modal-evidence-add" class="lib-modal-overlay hidden" data-modal-close-overlay>
+    <div class="lib-modal">
+        <h3>Attach Evidence</h3>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0;">Attaching to: <strong data-evidence-target-label>—</strong></p>
+        <form method="post" action="/library/restrictions/0/evidence/add" enctype="multipart/form-data" data-evidence-form>
+            <?= csrf_field() ?>
+            <label>Image / Document (png, jpg, gif, webp, pdf — max 25 MB)
+                <input type="file" name="evidence_file" accept="image/png,image/jpeg,image/gif,image/webp,application/pdf">
+            </label>
+            <label>…or Evidence URL (if it already lives at a stable link)
+                <input type="url" name="public_url" placeholder="https://…">
+            </label>
+            <label>Source
+                <select name="source">
+                    <option value="cms_upload">CMS upload</option>
+                    <option value="synergy_account_intelligence">Synergy / Account Intelligence</option>
+                    <option value="github">GitHub</option>
+                    <option value="manual">Manual</option>
+                </select>
+            </label>
+            <label>Source reference (record ID / path / note — optional)
+                <input name="source_reference" placeholder="e.g. Account Intelligence record, Drive file id, client email date">
+            </label>
+            <label>Caption (optional)
+                <input name="caption" placeholder='e.g. "Rejected creative — client feedback"'>
+            </label>
+            <div class="lib-modal-actions">
+                <button type="button" class="btn btn-ghost btn-sm" data-modal-close>Cancel</button>
+                <button class="btn btn-accent btn-sm">Attach Evidence</button>
+            </div>
+        </form>
+    </div>
+</div>
 <?php endif; ?>
+
+<!-- Evidence preview modal — available to all roles (read-only viewing) -->
+<div id="modal-evidence-preview" class="lib-modal-overlay hidden" data-modal-close-overlay>
+    <div class="lib-modal" style="max-width:760px;">
+        <h3 data-ev-title>Evidence</h3>
+        <div data-ev-body></div>
+        <div class="lib-modal-actions">
+            <a class="btn btn-ghost btn-sm" data-ev-original href="#" target="_blank" rel="noopener" style="display:none;">View original</a>
+            <button type="button" class="btn btn-accent btn-sm" data-modal-close>Close</button>
+        </div>
+    </div>
+</div>
 
 <script src="/library.js?v=<?= h(@filemtime(__DIR__ . '/../../public/library.js') ?: time()) ?>"></script>

@@ -74,7 +74,44 @@
                 var tts2 = form.querySelector('[data-target-type-select]');
                 if (tts2) tts2.dispatchEvent(new Event('change'));
             }
+            // Attach-evidence modal: point the form at the chosen restriction
+            if (btn.dataset.evidenceRestriction && form) {
+                form.action = '/library/restrictions/' + btn.dataset.evidenceRestriction + '/evidence/add';
+                var lbl = modal.querySelector('[data-evidence-target-label]');
+                if (lbl) lbl.textContent = btn.dataset.evidenceTarget || ('#' + btn.dataset.evidenceRestriction);
+            }
             modal.classList.remove('hidden');
+        });
+    });
+
+    // ---- Evidence preview modal ----
+    var previewModal = document.getElementById('modal-evidence-preview');
+    function escapeHtml(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+    document.querySelectorAll('[data-ev-preview]').forEach(function (thumb) {
+        thumb.addEventListener('click', function () {
+            if (!previewModal) return;
+            var ev = {};
+            try { ev = JSON.parse(thumb.dataset.ev); } catch (e) { return; }
+            previewModal.querySelector('[data-ev-title]').textContent = ev.caption || ev.original_filename || 'Evidence';
+            var body = previewModal.querySelector('[data-ev-body]');
+            var metaRows = [];
+            if (ev.target) metaRows.push('<div><strong>Restriction:</strong> ' + escapeHtml(ev.target) + '</div>');
+            if (ev.original_filename) metaRows.push('<div><strong>Filename:</strong> ' + escapeHtml(ev.original_filename) + '</div>');
+            if (ev.source) metaRows.push('<div><strong>Source:</strong> ' + escapeHtml(String(ev.source).replace(/_/g, ' ')) + '</div>');
+            if (ev.source_reference) metaRows.push('<div><strong>Reference:</strong> ' + escapeHtml(ev.source_reference) + '</div>');
+            if (ev.uploaded_by) metaRows.push('<div><strong>Uploaded by:</strong> ' + escapeHtml(ev.uploaded_by) + '</div>');
+            var imgHtml = ev.url ? '<img class="lib-preview-img" src="' + escapeHtml(ev.url) + '" alt="evidence">' : '';
+            body.innerHTML = imgHtml + '<div class="lib-preview-meta">' + metaRows.join('') + '</div>';
+            var orig = previewModal.querySelector('[data-ev-original]');
+            if (orig) {
+                if (ev.url) { orig.href = ev.url; orig.style.display = ''; }
+                else { orig.style.display = 'none'; }
+            }
+            previewModal.classList.remove('hidden');
         });
     });
     document.querySelectorAll('[data-modal-close]').forEach(function (btn) {

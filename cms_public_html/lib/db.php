@@ -242,7 +242,23 @@ function db_ensure_marketing_schema(PDO $pdo): void {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME
     );
+    CREATE TABLE IF NOT EXISTS marketing_restriction_evidence (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      restriction_id INTEGER NOT NULL REFERENCES marketing_restrictions(id) ON DELETE CASCADE,
+      evidence_type TEXT CHECK(evidence_type IN ('image','screenshot','document','url')) DEFAULT 'image',
+      source TEXT CHECK(source IN ('synergy_account_intelligence','github','cms_upload','manual')) DEFAULT 'cms_upload',
+      source_reference TEXT,
+      source_path TEXT,
+      public_url TEXT,
+      local_path TEXT,
+      caption TEXT,
+      original_filename TEXT,
+      archived INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      created_by INTEGER REFERENCES users(id)
+    );
     SQL);
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_restriction_evidence ON marketing_restriction_evidence(restriction_id, archived)");
 
     // Backfill columns that older installs may be missing.
     $cols = array_column($pdo->query("PRAGMA table_info(marketing_restrictions)")->fetchAll(), 'name');
