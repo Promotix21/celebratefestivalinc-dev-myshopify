@@ -328,7 +328,12 @@ $severities = ['low', 'medium', 'high'];
                     <tr class="empty-row"><td colspan="4">No active restrictions.</td></tr>
                 <?php endif; ?>
                 <?php foreach ($restrictions as $r):
-                    if (!empty($r['link_id'])) {
+                    // A stored target_type (e.g. an image-only creative asset with no
+                    // brand/product/link row) always wins; otherwise infer from ids.
+                    if (($r['target_type'] ?? '') === 'creative_asset') {
+                        $target_type = 'creative_asset';
+                        $target_label = 'Creative Asset — ' . ($r['target_label'] ?: 'Restricted image');
+                    } elseif (!empty($r['link_id'])) {
                         $target_type = 'link';
                         $target_label = 'Asset: ' . $r['link_label'];
                     } elseif (!empty($r['brand_id'])) {
@@ -345,7 +350,12 @@ $severities = ['low', 'medium', 'high'];
                 <tr data-row-id="<?= (int)$r['id'] ?>" data-f-severity="<?= h($r['severity']) ?>">
                     <td>
                         <strong><?= h($target_label) ?></strong>
-                        <?php if ($target_type === 'link'): ?>
+                        <?php if ($target_type === 'creative_asset'): ?>
+                            <div style="font-size:0.75rem"><strong>Status:</strong> REJECTED / DO NOT USE</div>
+                            <div style="font-size:0.75rem"><strong>Scope:</strong> <?= h(($r['target_scope'] ?? '') === 'image_only' ? 'Image only' : ($r['target_scope'] ?: 'Image only')) ?></div>
+                            <div style="font-size:0.75rem; color:var(--text-muted)"><strong>Asset URL:</strong> <?= !empty($r['asset_url']) ? '<a href="'.h($r['asset_url']).'" target="_blank" rel="noopener">Open asset</a>' : 'Not available in workbook / historical client-feedback screenshot' ?></div>
+                            <div style="font-size:0.7rem; color:var(--text-muted)">Image-only creative restriction — the Rational brand stays Approved and the Index!G24 Rational product page is not restricted by this image rule.</div>
+                        <?php elseif ($target_type === 'link'): ?>
                             <div style="font-size:0.75rem"><a href="<?= h($r['link_url']) ?>" target="_blank" rel="noopener">Open asset</a></div>
                             <?php if ($r['product_name']): ?><div style="font-size:0.75rem; color:var(--text-muted)">Product: <?= h($r['product_name']) ?></div><?php endif; ?>
                             <div style="font-size:0.7rem; color:var(--text-muted)">Specific-creative restriction — not a brand-wide ban.</div>
@@ -360,6 +370,7 @@ $severities = ['low', 'medium', 'high'];
                             data-edit-row='<?= h(json_encode([
                                 'restriction'=>$r['restriction'],'severity'=>$r['severity'],'active'=>(string)$r['active'],
                                 'target_type'=>$target_type,'brand_id'=>$r['brand_id'],'product_id'=>$r['product_id'],'link_id'=>$r['link_id'],
+                                'target_label'=>$r['target_label'] ?? '','asset_url'=>$r['asset_url'] ?? '','target_scope'=>$r['target_scope'] ?? '',
                             ])) ?>'
                         >Edit</button></td>
                     <?php endif; ?>
@@ -553,6 +564,7 @@ function lib_restriction_fields($brands, $products, $links, $severities) { ?>
         <option value="brand">Brand</option>
         <option value="product">Product</option>
         <option value="link">Link / Asset (specific creative)</option>
+        <option value="creative_asset">Creative Asset (image only, no URL)</option>
     </select></label>
     <div class="lib-target-group" data-target-group="brand">
         <label>Brand<select name="brand_id">
@@ -570,6 +582,14 @@ function lib_restriction_fields($brands, $products, $links, $severities) { ?>
         <label>Link / Asset<select name="link_id">
             <option value="">—</option>
             <?php foreach ($links as $l): ?><option value="<?= (int)$l['id'] ?>"><?= h($l['label']) ?></option><?php endforeach; ?>
+        </select></label>
+    </div>
+    <div class="lib-target-group" data-target-group="creative_asset">
+        <label>Creative / Image Label<input name="target_label" placeholder="e.g. Previously rejected Rational / Combination Oven image"></label>
+        <label>Asset URL (optional — leave blank if not available)<input name="asset_url" placeholder="Leave blank if the image only exists as a client-feedback screenshot"></label>
+        <label>Scope<select name="target_scope">
+            <option value="image_only">Image only</option>
+            <option value="creative">Whole creative</option>
         </select></label>
     </div>
     <label>Restriction Text<textarea name="restriction" required></textarea></label>

@@ -240,23 +240,31 @@ function handle_library_routes($uri, $method) {
         $severity = lib_in((string)post('severity', ''), LIB_SEVERITIES, 'medium');
         $active = post('active', '1') === '1' ? 1 : 0;
 
-        // Only one target applies at a time — brand, product, or the more
-        // specific "link" target (a single creative/placement). Selecting
-        // "link" must NOT be stored as a brand-level restriction.
-        $target_type = lib_in((string)post('target_type', ''), ['brand', 'product', 'link', 'global'], 'global');
+        // Only one target applies at a time — brand, product, the specific
+        // "link" target (a single creative/placement), or "creative_asset"
+        // (an image-only restriction that has no brand/product/link row and
+        // possibly no URL at all). Selecting a non-brand target must NOT be
+        // stored as a brand-level restriction.
+        $target_type = lib_in((string)post('target_type', ''), ['brand', 'product', 'link', 'creative_asset', 'global'], 'global');
         $brand_id = $target_type === 'brand' ? lib_nullable_int(post('brand_id', '')) : null;
         $product_id = $target_type === 'product' ? lib_nullable_int(post('product_id', '')) : null;
         $link_id = $target_type === 'link' ? lib_nullable_int(post('link_id', '')) : null;
 
+        // Creative-asset descriptor fields (only meaningful for that target type).
+        $stored_target_type = $target_type === 'creative_asset' ? 'creative_asset' : null;
+        $target_label = $target_type === 'creative_asset' ? (trim((string)post('target_label', '')) ?: null) : null;
+        $asset_url = $target_type === 'creative_asset' ? (trim((string)post('asset_url', '')) ?: null) : null;
+        $target_scope = $target_type === 'creative_asset' ? lib_in((string)post('target_scope', ''), ['image_only', 'creative'], 'image_only') : null;
+
         if ($id === null) {
-            $stmt = $pdo->prepare("INSERT INTO marketing_restrictions (brand_id, product_id, link_id, restriction, severity, active, source, updated_at) VALUES (?, ?, ?, ?, ?, ?, 'manual', CURRENT_TIMESTAMP)");
-            $stmt->execute([$brand_id, $product_id, $link_id, $restriction, $severity, $active]);
+            $stmt = $pdo->prepare("INSERT INTO marketing_restrictions (brand_id, product_id, link_id, restriction, severity, active, source, target_type, target_label, asset_url, target_scope, updated_at) VALUES (?, ?, ?, ?, ?, ?, 'manual', ?, ?, ?, ?, CURRENT_TIMESTAMP)");
+            $stmt->execute([$brand_id, $product_id, $link_id, $restriction, $severity, $active, $stored_target_type, $target_label, $asset_url, $target_scope]);
             $id = (int)$pdo->lastInsertId();
             activity_log('restriction', $id, 'added', "Added restriction ($target_type, $severity)");
             flash("Restriction added.", "success");
         } else {
-            $stmt = $pdo->prepare("UPDATE marketing_restrictions SET brand_id=?, product_id=?, link_id=?, restriction=?, severity=?, active=?, updated_at=CURRENT_TIMESTAMP WHERE id=?");
-            $stmt->execute([$brand_id, $product_id, $link_id, $restriction, $severity, $active, $id]);
+            $stmt = $pdo->prepare("UPDATE marketing_restrictions SET brand_id=?, product_id=?, link_id=?, restriction=?, severity=?, active=?, target_type=?, target_label=?, asset_url=?, target_scope=?, updated_at=CURRENT_TIMESTAMP WHERE id=?");
+            $stmt->execute([$brand_id, $product_id, $link_id, $restriction, $severity, $active, $stored_target_type, $target_label, $asset_url, $target_scope, $id]);
             $action = $active ? 'edited' : 'deactivated';
             activity_log('restriction', $id, $action, "Updated restriction ($target_type, $severity, active=$active)");
             flash("Restriction updated.", "success");

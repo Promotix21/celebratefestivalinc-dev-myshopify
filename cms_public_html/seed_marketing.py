@@ -162,6 +162,10 @@ def ensure_schema(conn, cur) -> None:
       severity TEXT,
       active INTEGER DEFAULT 1,
       source TEXT,
+      target_type TEXT,
+      target_label TEXT,
+      asset_url TEXT,
+      target_scope TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME
     );
@@ -170,8 +174,56 @@ def ensure_schema(conn, cur) -> None:
     cols = [c[1] for c in cur.execute("PRAGMA table_info(marketing_restrictions)").fetchall()]
     if 'link_id' not in cols:
         cur.execute("ALTER TABLE marketing_restrictions ADD COLUMN link_id INTEGER REFERENCES marketing_links(id)")
+    # A restriction can target something that is neither a brand, product nor a
+    # concrete link row -- e.g. a previously rejected creative/image that only
+    # exists as a client-feedback screenshot and has no URL in the workbook.
+    # target_type/target_label/asset_url/target_scope describe such targets
+    # explicitly instead of mis-attaching them to an unrelated product page.
+    for col, ddl in (
+        ('target_type', "ALTER TABLE marketing_restrictions ADD COLUMN target_type TEXT"),
+        ('target_label', "ALTER TABLE marketing_restrictions ADD COLUMN target_label TEXT"),
+        ('asset_url', "ALTER TABLE marketing_restrictions ADD COLUMN asset_url TEXT"),
+        ('target_scope', "ALTER TABLE marketing_restrictions ADD COLUMN target_scope TEXT"),
+    ):
+        if col not in cols:
+            cur.execute(ddl)
 
     conn.commit()
+
+
+def migrate_drive_link_types(cur) -> None:
+    """The historical Account Intelligence source classifies every
+    drive.google.com placement as a Google Drive creative asset. Older seeds
+    stored them as 'other'; re-point any such existing rows to
+    'google_drive_asset' (idempotent -- only touches rows still on 'other')."""
+    n = cur.execute(
+        "UPDATE marketing_links SET link_type='google_drive_asset' "
+        "WHERE url LIKE '%drive.google.com%' AND link_type='other'"
+    ).rowcount
+    if n:
+        print(f"Migrated {n} drive.google.com link(s) from 'other' -> 'google_drive_asset'.")
+
+
+def migrate_product_url_fields(cur) -> None:
+    """Some products stored a manufacturer/supplier URL in celebrate_url.
+    celebrate_url must only ever hold celebratefestivalinc.com URLs; anything
+    else belongs in manufacturer_url. Idempotent and non-destructive: only
+    moves a URL into manufacturer_url when that field is empty (never clobbers
+    an admin-entered manufacturer_url), and only clears the mis-filed
+    celebrate_url. Rows already correct are left untouched."""
+    rows = cur.execute(
+        "SELECT id, celebrate_url, manufacturer_url FROM marketing_products "
+        "WHERE celebrate_url IS NOT NULL AND celebrate_url <> '' "
+        "AND celebrate_url NOT LIKE '%celebratefestivalinc.com%'"
+    ).fetchall()
+    moved = 0
+    for pid, cel, man in rows:
+        if not man:
+            cur.execute("UPDATE marketing_products SET manufacturer_url=? WHERE id=?", (cel, pid))
+        cur.execute("UPDATE marketing_products SET celebrate_url=NULL WHERE id=?", (pid,))
+        moved += 1
+    if moved:
+        print(f"Normalized {moved} product(s): moved manufacturer URL out of celebrate_url.")
 
 
 def seed_brands_and_categories(cur) -> None:
@@ -328,47 +380,91 @@ def add_link_restriction(cur, source_sheet, source_cell, text, severity):
         )
 
 
-def migrate_legacy_rational_restriction(cur) -> None:
-    """Older runs stored the 'specific rejected creative' note as a brand-level
-    restriction on Rational (link_id NULL). Re-point that same row at the
-    actual link instead of leaving it looking like a brand ban."""
+# The one previously-rejected Rational creative. Per the Account Intelligence
+# source this blocks a specific historical IMAGE used in the Combination Oven
+# creative -- NOT the Rational brand and NOT the Rational product page at
+# Index!G24. The rejected image URL is not present in the workbook (it only
+# exists as a historical client-feedback screenshot), so asset_url stays NULL
+# rather than being invented.
+RATIONAL_CREATIVE = {
+    'restriction': (
+        'REJECTED / DO NOT USE. Image only. Applies to the previously rejected '
+        'Rational / Combination Oven creative image, NOT the Rational brand '
+        '(Approved) nor the Index!G24 Rational product page.'
+    ),
+    'severity': 'medium',
+    'target_type': 'creative_asset',
+    'target_label': 'Previously rejected Rational / Combination Oven image',
+    'target_scope': 'image_only',
+    'asset_url': None,
+}
+
+
+def converge_rational_creative_restriction(cur) -> None:
+    """Ensure the previously-rejected Rational creative is represented as an
+    image-only creative-asset restriction with no brand/product/link target.
+
+    Historically this note has been mis-attached two different ways:
+      * as a brand-level ban on Rational (brand_id set, link_id NULL), and
+      * as a link/product restriction on Index!G24 -- but G24 is the Rational
+        *product page*, which the image rule does NOT restrict.
+    Either way, detach it from those targets and store it as a creative asset.
+    Idempotent: converts any legacy variant, else inserts one clean row."""
     b_id = brand_id_by_name(cur, 'Rational')
-    if not b_id:
-        return
-    row = cur.execute(
-        "SELECT id FROM marketing_restrictions WHERE brand_id=? AND link_id IS NULL AND restriction LIKE ?",
-        (b_id, '%rejected%')
-    ).fetchone()
-    if not row:
-        return
-    link_row = cur.execute(
+
+    # G24 is a celebrate_product page; capture its ids only so we can DETACH
+    # any restriction currently (wrongly) pointed at it.
+    g24 = cur.execute(
         "SELECT id, product_id FROM marketing_links WHERE source_sheet='Index' AND source_cell='G24'"
     ).fetchone()
-    if not link_row:
-        return
-    link_id, product_id = link_row
-    cur.execute(
-        "UPDATE marketing_restrictions SET brand_id=NULL, link_id=?, product_id=?, "
-        "restriction='Previously rejected creative. Restricted / Do Not Use. This does not apply to the Rational brand, which remains Approved.' "
-        "WHERE id=?",
-        (link_id, product_id, row[0])
-    )
-    print(f"Migrated legacy brand-level Rational restriction (id={row[0]}) to link-level (link_id={link_id}).")
+    g24_link_id = g24[0] if g24 else None
+    g24_product_id = g24[1] if g24 else None
+
+    # Find any existing form of this restriction (brand ban, G24 link, or the
+    # already-converged creative_asset row).
+    candidates = cur.execute(
+        "SELECT id FROM marketing_restrictions WHERE "
+        "target_type='creative_asset' "
+        "OR (restriction LIKE '%rejected%' AND ("
+        "    (brand_id IS NOT NULL AND brand_id=?) "
+        " OR (link_id IS NOT NULL AND link_id=?) "
+        " OR (product_id IS NOT NULL AND product_id=?)))",
+        (b_id or -1, g24_link_id or -1, g24_product_id or -1)
+    ).fetchall()
+
+    if candidates:
+        target_id = candidates[0][0]
+        cur.execute(
+            "UPDATE marketing_restrictions SET brand_id=NULL, product_id=NULL, link_id=NULL, "
+            "restriction=?, severity=?, target_type=?, target_label=?, target_scope=?, asset_url=?, "
+            "active=1, updated_at=CURRENT_TIMESTAMP WHERE id=?",
+            (RATIONAL_CREATIVE['restriction'], RATIONAL_CREATIVE['severity'],
+             RATIONAL_CREATIVE['target_type'], RATIONAL_CREATIVE['target_label'],
+             RATIONAL_CREATIVE['target_scope'], RATIONAL_CREATIVE['asset_url'], target_id)
+        )
+        # Deactivate any duplicate legacy rows so only one clean row remains.
+        for (dup_id,) in candidates[1:]:
+            cur.execute("UPDATE marketing_restrictions SET active=0, updated_at=CURRENT_TIMESTAMP WHERE id=?", (dup_id,))
+        print(f"Converged Rational creative restriction to creative_asset (id={target_id}); "
+              f"detached from Index!G24 product page.")
+    else:
+        cur.execute(
+            "INSERT INTO marketing_restrictions "
+            "(restriction, severity, target_type, target_label, target_scope, asset_url, source, updated_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, 'account_intelligence', CURRENT_TIMESTAMP)",
+            (RATIONAL_CREATIVE['restriction'], RATIONAL_CREATIVE['severity'],
+             RATIONAL_CREATIVE['target_type'], RATIONAL_CREATIVE['target_label'],
+             RATIONAL_CREATIVE['target_scope'], RATIONAL_CREATIVE['asset_url'])
+        )
+        print("Inserted Rational creative-asset (image-only) restriction.")
 
 
 def seed_restrictions(cur) -> None:
-    migrate_legacy_rational_restriction(cur)
+    converge_rational_creative_restriction(cur)
     add_brand_restriction(
         cur, 'Rotoquip',
         'Historical workbook reference exists, but do not currently promote unless explicitly approved again.',
         'high'
-    )
-    # This targets the ONE previously-rejected Rational combi-oven creative
-    # (Index!G24), not the Rational brand -- the brand stays Approved.
-    add_link_restriction(
-        cur, 'Index', 'G24',
-        'Previously rejected creative. Restricted / Do Not Use. This does not apply to the Rational brand, which remains Approved.',
-        'medium'
     )
     row = cur.execute("SELECT id FROM marketing_restrictions WHERE restriction=?", ('DO NOT PROMOTE - WEB RESTAURANT',)).fetchone()
     if not row:
@@ -393,6 +489,12 @@ def main():
     conn.commit()
 
     import_links(cur, data['links'], product_ids)
+    conn.commit()
+
+    # Data-quality migrations for rows that predate the corrected seed. All are
+    # idempotent and non-destructive to admin edits.
+    migrate_drive_link_types(cur)
+    migrate_product_url_fields(cur)
     conn.commit()
 
     seed_restrictions(cur)

@@ -235,21 +235,27 @@ function db_ensure_marketing_schema(PDO $pdo): void {
       severity TEXT,
       active INTEGER DEFAULT 1,
       source TEXT,
+      target_type TEXT,
+      target_label TEXT,
+      asset_url TEXT,
+      target_scope TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME
     );
     SQL);
 
-    // Add link_id to marketing_restrictions if it doesn't exist
-    $cols = $pdo->query("PRAGMA table_info(marketing_restrictions)")->fetchAll();
-    $has_link_id = false;
-    foreach ($cols as $col) {
-        if ($col['name'] === 'link_id') {
-            $has_link_id = true;
-            break;
+    // Backfill columns that older installs may be missing.
+    $cols = array_column($pdo->query("PRAGMA table_info(marketing_restrictions)")->fetchAll(), 'name');
+    $add = [
+        'link_id'      => "ALTER TABLE marketing_restrictions ADD COLUMN link_id INTEGER REFERENCES marketing_links(id)",
+        'target_type'  => "ALTER TABLE marketing_restrictions ADD COLUMN target_type TEXT",
+        'target_label' => "ALTER TABLE marketing_restrictions ADD COLUMN target_label TEXT",
+        'asset_url'    => "ALTER TABLE marketing_restrictions ADD COLUMN asset_url TEXT",
+        'target_scope' => "ALTER TABLE marketing_restrictions ADD COLUMN target_scope TEXT",
+    ];
+    foreach ($add as $name => $ddl) {
+        if (!in_array($name, $cols, true)) {
+            $pdo->exec($ddl);
         }
-    }
-    if (!$has_link_id) {
-        $pdo->exec("ALTER TABLE marketing_restrictions ADD COLUMN link_id INTEGER REFERENCES marketing_links(id)");
     }
 }
