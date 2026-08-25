@@ -212,3 +212,19 @@ document.querySelectorAll('.lib-tab').forEach(tab => {
     });
 });
 </script>
+
+<script>
+// Simple client-side search and filter logic
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.querySelector('[data-search]');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            document.querySelectorAll('.lib-pane.active tbody tr').forEach(tr => {
+                const text = tr.textContent.toLowerCase();
+                tr.style.display = text.includes(val) ? '' : 'none';
+            });
+        });
+    }
+});
+</script>

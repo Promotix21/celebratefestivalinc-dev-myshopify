@@ -8,12 +8,12 @@ function handle_library_routes($uri, $method) {
     if ($uri === '/library' && $method === 'GET') {
         $stats = [
             'brands' => $pdo->query("SELECT COUNT(*) FROM marketing_brands")->fetchColumn(),
-            'refs' => $pdo->query("SELECT COUNT(*) FROM marketing_links")->fetchColumn(),
+            'refs' => $pdo->query("SELECT COUNT(DISTINCT url) FROM marketing_links")->fetchColumn(),
             'categories' => $pdo->query("SELECT COUNT(*) FROM marketing_categories")->fetchColumn(),
             'approved' => $pdo->query("SELECT COUNT(*) FROM marketing_products WHERE marketing_status='approved'")->fetchColumn(),
             'needs_verification' => $pdo->query("SELECT COUNT(*) FROM marketing_products WHERE marketing_status='needs_verification'")->fetchColumn(),
             'restricted' => $pdo->query("SELECT COUNT(*) FROM marketing_restrictions WHERE active=1")->fetchColumn(),
-            'original_placements' => 130
+            'original_placements' => $pdo->query("SELECT COUNT(*) FROM marketing_links")->fetchColumn()
         ];
 
         $brands = $pdo->query("SELECT * FROM marketing_brands ORDER BY name ASC")->fetchAll();
@@ -54,11 +54,14 @@ function handle_library_routes($uri, $method) {
         exit;
     }
     
-    // Add logic for POSTs to create/edit if needed
-    if ($is_admin && $method === 'POST') {
-        csrf_check();
+    // Handle POST mutations
+    if ($method === 'POST') {
         
-        // Simple handler to show we can save things (not strictly required for the prompt as long as structure exists, but good for completeness).
+        if (!$is_admin) {
+            http_response_code(403);
+            exit('Forbidden: Only admins can modify library data.');
+        }
+
         if ($uri === '/library/brands/add') {
             $name = trim(post('name'));
             $status = post('status', 'approved');
@@ -78,7 +81,9 @@ function handle_library_routes($uri, $method) {
             redirect('/library');
         }
         
-        // Similarly add routes for other forms...
+        // Catch-all for other POSTs to the library
+        http_response_code(404);
+        exit('Not found');
     }
 
     http_response_code(404);

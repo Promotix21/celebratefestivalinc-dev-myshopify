@@ -17,6 +17,10 @@ function db(): PDO {
         db_bootstrap($pdo);
         db_seed($pdo);
     }
+
+    // Idempotent schema upgrades for existing DBs
+    db_ensure_marketing_schema($pdo);
+
     return $pdo;
 }
 
@@ -163,4 +167,89 @@ function db_seed(PDO $pdo): void {
     $d = $pdo->prepare('INSERT INTO docs (title, content, category, created_by) VALUES (?,?,?,?)');
     $d->execute(['How Collections Work', "# Collections\n\nCollections are grouped by tag. Each tag maps to a landing page.\n\n- Tag prefix: `collection:`\n- Auto-generated sitemap entry\n- Custom meta via the admin module", 'Features', $adminId]);
     $d->execute(['SEO Setup Checklist', "# SEO Checklist\n\n- robots.txt\n- sitemap.xml\n- canonical tags\n- OG / Twitter meta\n- Structured data", 'SEO', $adminId]);
+}
+
+function db_ensure_marketing_schema(PDO $pdo): void {
+    $pdo->exec(<<<SQL
+    CREATE TABLE IF NOT EXISTS marketing_brands (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT UNIQUE NOT NULL,
+      origin TEXT CHECK(origin IN ('excel','current_addition','manual')),
+      marketing_status TEXT CHECK(marketing_status IN ('approved','restricted','needs_verification','inactive')),
+      notes TEXT,
+      source_sheet TEXT,
+      source_cell TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME,
+      updated_by INTEGER REFERENCES users(id)
+    );
+    CREATE TABLE IF NOT EXISTS marketing_categories (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT UNIQUE NOT NULL,
+      description TEXT,
+      historical_status TEXT,
+      current_status TEXT,
+      sort_order INTEGER,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME
+    );
+    CREATE TABLE IF NOT EXISTS marketing_products (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      product_name TEXT NOT NULL,
+      brand_id INTEGER REFERENCES marketing_brands(id),
+      category_id INTEGER REFERENCES marketing_categories(id),
+      product_type TEXT,
+      marketing_status TEXT,
+      description TEXT,
+      celebrate_url TEXT,
+      image_url TEXT,
+      manufacturer_url TEXT,
+      notes TEXT,
+      source TEXT,
+      source_sheet TEXT,
+      source_cell TEXT,
+      last_verified_at DATETIME,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME,
+      updated_by INTEGER REFERENCES users(id)
+    );
+    CREATE TABLE IF NOT EXISTS marketing_links (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      product_id INTEGER REFERENCES marketing_products(id),
+      category_id INTEGER REFERENCES marketing_categories(id),
+      label TEXT,
+      url TEXT,
+      link_type TEXT CHECK(link_type IN ('celebrate_product','celebrate_collection','google_drive_asset','manufacturer','supplier','external_reference','other')),
+      source_sheet TEXT,
+      source_cell TEXT,
+      verification_status TEXT,
+      last_verified_at DATETIME,
+      notes TEXT
+    );
+    CREATE TABLE IF NOT EXISTS marketing_restrictions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      brand_id INTEGER REFERENCES marketing_brands(id),
+      product_id INTEGER REFERENCES marketing_products(id),
+      link_id INTEGER REFERENCES marketing_links(id),
+      restriction TEXT,
+      severity TEXT,
+      active INTEGER DEFAULT 1,
+      source TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME
+    );
+    SQL);
+
+    // Add link_id to marketing_restrictions if it doesn't exist
+    $cols = $pdo->query("PRAGMA table_info(marketing_restrictions)")->fetchAll();
+    $has_link_id = false;
+    foreach ($cols as $col) {
+        if ($col['name'] === 'link_id') {
+            $has_link_id = true;
+            break;
+        }
+    }
+    if (!$has_link_id) {
+        $pdo->exec("ALTER TABLE marketing_restrictions ADD COLUMN link_id INTEGER REFERENCES marketing_links(id)");
+    }
 }
