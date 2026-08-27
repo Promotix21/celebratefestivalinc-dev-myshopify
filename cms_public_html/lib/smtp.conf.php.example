@@ -1,0 +1,11 @@
+<?php
+// ── CMS SMTP Configuration ──────────────────────────────────────────────────
+// Copy this file to smtp.conf.php on the server and fill in real values.
+// smtp.conf.php is gitignored — NEVER commit it.
+
+define('SMTP_HOST',      'mail.smtp2go.com');
+define('SMTP_PORT',      587);
+define('SMTP_USER',      'YOUR_SMTP2GO_USERNAME');   // e.g. hiraya
+define('SMTP_PASS',      'YOUR_SMTP2GO_PASSWORD');   // rotate in SMTP2GO dashboard
+define('SMTP_FROM',      'cms@hiraya.digital');
+define('SMTP_FROM_NAME', 'Hiraya CMS');

@@ -2,13 +2,23 @@
 declare(strict_types=1);
 
 // ── SMTP2GO Mailer ──────────────────────────────────────────────────────────
+// Credentials are loaded from smtp.conf.php (gitignored, server-only file).
+// Never hardcode credentials here. See smtp.conf.php.example for the template.
 
-define('SMTP_HOST', 'mail.smtp2go.com');
-define('SMTP_PORT', 587);
-define('SMTP_USER', 'hiraya');
-define('SMTP_PASS', 'Zjsj5NumZFPOGfrT');
-define('SMTP_FROM', 'cms@hiraya.digital');
-define('SMTP_FROM_NAME', 'Hiraya CMS');
+$_smtpConf = __DIR__ . '/smtp.conf.php';
+if (!file_exists($_smtpConf)) {
+    error_log('CMS mailer: smtp.conf.php missing — email disabled.');
+    // Define stubs so the rest of the file parses without fatal errors.
+    define('SMTP_HOST', '');
+    define('SMTP_PORT', 587);
+    define('SMTP_USER', '');
+    define('SMTP_PASS', '');
+    define('SMTP_FROM', '');
+    define('SMTP_FROM_NAME', 'Hiraya CMS');
+} else {
+    require_once $_smtpConf;
+}
+unset($_smtpConf);
 
 define('DEVS_EMAIL', ['rajesh_kumar@hiraya.digital', 'badal_sharma@hiraya.digital']);
 define('CLIENT_EMAIL', 'jielinz@celebratefestivalinc.com');

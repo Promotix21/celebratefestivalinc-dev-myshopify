@@ -6,6 +6,9 @@
 # Backup zip of the chatbot backend — contains a real .env inside.
 cf-chatbot-backend.zip
 cf-chatbot-backend*.zip
+# CMS SMTP credential config — credentials must live only on the server
+cms_public_html/lib/smtp.conf.php
+cms_public_html/lib/mailer.php.bak-*
 
 # ===== Shopify CLI =====
 node_modules/

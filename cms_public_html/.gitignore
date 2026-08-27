@@ -6,6 +6,10 @@ NEXT_SESSION_PROMPT.md
 NEXT-SESSION-PROMPT.md
 CORTEX_INTELLIGENCE_MASTER.md
 
+# SMTP credentials — must never be committed
+lib/smtp.conf.php
+lib/mailer.php.bak-*
+
 # Runtime
 data/*.sqlite
 public/uploads/*
