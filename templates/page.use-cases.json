@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
@@ -15,7 +24,7 @@
             "is_new": false,
             "is_featured": false,
             "cta_text": "Shop Bakery Equipment",
-            "cta_url": "\/collections\/commercial-ovens",
+            "cta_url": "/collections/commercial-ovens",
             "thumb_1_title": "",
             "thumb_1_url": "",
             "thumb_2_title": "",
@@ -24,7 +33,7 @@
             "thumb_3_url": "",
             "thumb_4_title": "",
             "thumb_4_url": "",
-            "view_all_url": "\/collections\/commercial-ovens"
+            "view_all_url": "/collections/commercial-ovens"
           }
         },
         "uc_pizza": {
@@ -39,20 +48,20 @@
             "is_new": false,
             "is_featured": false,
             "cta_text": "Shop Pizza Equipment",
-            "cta_url": "\/collections\/refrigerated-pizza-prep-tables",
-            "thumb_1_image": "shopify:\/\/shop_images\/Pizza_Oven.webp",
+            "cta_url": "/collections/refrigerated-pizza-prep-tables",
+            "thumb_1_image": "shopify://shop_images/Pizza_Oven.webp",
             "thumb_1_title": "Pizza Ovens",
-            "thumb_1_url": "shopify:\/\/collections\/pizza-restaurant-pizza-ovens",
-            "thumb_2_image": "shopify:\/\/shop_images\/tpr-67sd-n_right_open-1-700x700.jpg",
+            "thumb_1_url": "shopify://collections/pizza-restaurant-pizza-ovens",
+            "thumb_2_image": "shopify://shop_images/tpr-67sd-n_right_open-1-700x700.jpg",
             "thumb_2_title": "Prep Tables",
-            "thumb_2_url": "shopify:\/\/collections\/pizza-restaurant-prep-tables",
-            "thumb_3_image": "shopify:\/\/shop_images\/CDR-600F-1.jpg",
+            "thumb_2_url": "shopify://collections/pizza-restaurant-prep-tables",
+            "thumb_3_image": "shopify://shop_images/CDR-600F-1.jpg",
             "thumb_3_title": "Dough Sheeters",
-            "thumb_3_url": "shopify:\/\/collections\/pizza-restaurant-dough-sheeters",
-            "thumb_4_image": "shopify:\/\/shop_images\/080-emp30.webp",
+            "thumb_3_url": "shopify://collections/pizza-restaurant-dough-sheeters",
+            "thumb_4_image": "shopify://shop_images/080-emp30.webp",
             "thumb_4_title": "Mixers",
-            "thumb_4_url": "shopify:\/\/collections\/pizza-restaurant-mixers",
-            "view_all_url": "\/collections\/refrigerated-pizza-prep-tables"
+            "thumb_4_url": "shopify://collections/pizza-restaurant-mixers",
+            "view_all_url": "/collections/refrigerated-pizza-prep-tables"
           }
         },
         "uc_grocery": {
@@ -67,7 +76,7 @@
             "is_new": false,
             "is_featured": false,
             "cta_text": "Shop Grocery Equipment",
-            "cta_url": "\/pages\/cf-grocery-store",
+            "cta_url": "/pages/cf-grocery-store",
             "thumb_1_title": "",
             "thumb_1_url": "",
             "thumb_2_title": "",
@@ -76,7 +85,7 @@
             "thumb_3_url": "",
             "thumb_4_title": "",
             "thumb_4_url": "",
-            "view_all_url": "\/pages\/cf-grocery-store"
+            "view_all_url": "/pages/cf-grocery-store"
           }
         },
         "uc_indian": {
@@ -91,7 +100,7 @@
             "is_new": true,
             "is_featured": true,
             "cta_text": "Shop Indian Restaurant Equipment",
-            "cta_url": "\/collections\/indian-specialty",
+            "cta_url": "/collections/indian-specialty",
             "thumb_1_title": "",
             "thumb_1_url": "",
             "thumb_2_title": "",
@@ -100,14 +109,14 @@
             "thumb_3_url": "",
             "thumb_4_title": "",
             "thumb_4_url": "",
-            "view_all_url": "\/collections\/indian-specialty"
+            "view_all_url": "/collections/indian-specialty"
           }
         },
         "uc_cafe": {
           "type": "use_case",
           "settings": {
             "image_url": "industry-cafe-coffee-shop.png",
-            "title": "Café \/ Coffee Shop",
+            "title": "Café / Coffee Shop",
             "cat_slug": "cafe-coffee-shop",
             "icon_image_url": "",
             "icon": "☕",
@@ -115,7 +124,7 @@
             "is_new": false,
             "is_featured": false,
             "cta_text": "Shop Café Equipment",
-            "cta_url": "\/collections\/ice-machine-all-by-all-brands",
+            "cta_url": "/collections/ice-machine-all-by-all-brands",
             "thumb_1_title": "",
             "thumb_1_url": "",
             "thumb_2_title": "",
@@ -124,7 +133,7 @@
             "thumb_3_url": "",
             "thumb_4_title": "",
             "thumb_4_url": "",
-            "view_all_url": "\/collections\/ice-machine-all-by-all-brands"
+            "view_all_url": "/collections/ice-machine-all-by-all-brands"
           }
         },
         "uc_foodtruck": {
@@ -139,7 +148,7 @@
             "is_new": false,
             "is_featured": false,
             "cta_text": "Shop Food Truck Equipment",
-            "cta_url": "\/collections\/commercial-grills-and-griddles",
+            "cta_url": "/collections/commercial-grills-and-griddles",
             "thumb_1_title": "",
             "thumb_1_url": "",
             "thumb_2_title": "",
@@ -148,7 +157,7 @@
             "thumb_3_url": "",
             "thumb_4_title": "",
             "thumb_4_url": "",
-            "view_all_url": "\/collections\/commercial-grills-and-griddles"
+            "view_all_url": "/collections/commercial-grills-and-griddles"
           }
         }
       },
@@ -167,7 +176,7 @@
         "hero_btn1_text": "Browse Business Types",
         "hero_btn1_url": "",
         "hero_btn2_text": "Talk to an Expert",
-        "hero_btn2_url": "\/pages\/contact-us",
+        "hero_btn2_url": "/pages/contact-us",
         "show_opening": true,
         "opening_title": "Opening a New Business?",
         "opening_body": "Check out our starter packages curated for each type of business — assembled by our equipment experts.",
@@ -178,9 +187,9 @@
         "cta_title": "Outfit your kitchen with confidence.",
         "cta_body": "From a single piece of equipment to a full commercial fit-out, our specialists curate the right solution for your operation — every time.",
         "cta_btn1_text": "Request a Quote",
-        "cta_btn1_url": "\/pages\/contact-us",
+        "cta_btn1_url": "/pages/contact-us",
         "cta_btn2_text": "Browse Catalog",
-        "cta_btn2_url": "\/collections\/restaurant-equipment",
+        "cta_btn2_url": "/collections/restaurant-equipment",
         "show_features": true,
         "feat_1_title": "Expert Support",
         "feat_1_text": "Get help from our equipment experts",

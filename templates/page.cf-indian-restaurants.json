@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
@@ -50,6 +59,7 @@
         },
         "nav_more": {
           "type": "cat_nav",
+          "disabled": true,
           "settings": {
             "label": "More Equipment",
             "anchor": "more-equipment",
@@ -69,33 +79,35 @@
             "bullet_2": "Rotoquip Tandoor Ovens",
             "bullet_3": "Commercial Indian Tandoors",
             "cta_text": "Shop Tandoor Ovens",
-            "cta_url": "\/collections\/shaan-tandoor",
+            "cta_url": "/collections/shaan-tandoor",
             "popular_products_label": "Popular Products",
             "featured_collection": "shaan-tandoor",
-            "view_all_url": "\/collections\/shaan-tandoor"
+            "view_all_url": "/collections/shaan-tandoor"
           }
         },
         "equip_cookware": {
           "type": "equip_section",
           "settings": {
+            "image": "shopify://shop_images/kadai_in_kitchen.png",
             "image_url": "",
             "section_id": "cookware",
             "is_reverse": true,
             "title": "Kadai & Indian Cookware",
             "description": "Heavy-duty kadais, tavas, and specialty cookware built for the high-heat demands of an Indian kitchen.",
             "bullet_1": "Kadai (Wok-Style Pans)",
-            "bullet_2": "Tava \/ Iron Griddles",
+            "bullet_2": "Tava / Iron Griddles",
             "bullet_3": "Cooking Ladles & Utensils",
             "cta_text": "Shop Cookware",
-            "cta_url": "\/collections\/kadai-all",
+            "cta_url": "/collections/kadai-all",
             "popular_products_label": "Popular Products",
             "featured_collection": "kadai-all",
-            "view_all_url": "\/collections\/kadai-all"
+            "view_all_url": "/collections/kadai-all"
           }
         },
         "equip_section_TDzgrN": {
           "type": "equip_section",
           "settings": {
+            "image": "shopify://shop_images/patila.png",
             "image_url": "",
             "section_id": "patila-pots",
             "is_reverse": false,
@@ -104,16 +116,17 @@
             "bullet_1": "Ideal for high-volume cooking",
             "bullet_2": "Durable stainless steel construction",
             "bullet_3": "Available in multiple capacities",
-            "cta_text": "Shop Tandoor Ovens",
-            "cta_url": "shopify:\/\/collections\/patila-pots",
+            "cta_text": "Shop Patila & Pots",
+            "cta_url": "shopify://collections/patila-pots",
             "popular_products_label": "Popular Products",
             "featured_collection": "patila-pots",
-            "view_all_url": "shopify:\/\/collections\/patila-pots"
+            "view_all_url": "shopify://collections/patila-pots"
           }
         },
         "equip_section_GVLMQJ": {
           "type": "equip_section",
           "settings": {
+            "image": "shopify://shop_images/steamers.png",
             "image_url": "",
             "section_id": "steamers",
             "is_reverse": true,
@@ -123,15 +136,16 @@
             "bullet_2": "Ideal for high-volume kitchens",
             "bullet_3": "Available in multiple capacities",
             "cta_text": "Shop Steamers",
-            "cta_url": "shopify:\/\/collections\/idli-momo-steamer-all",
+            "cta_url": "shopify://collections/idli-momo-steamer-all",
             "popular_products_label": "Popular Products",
             "featured_collection": "idli-momo-steamer-all",
-            "view_all_url": "shopify:\/\/collections\/idli-momo-steamer-all"
+            "view_all_url": "shopify://collections/idli-momo-steamer-all"
           }
         },
         "equip_section_aAcB6H": {
           "type": "equip_section",
           "settings": {
+            "image": "shopify://shop_images/cookers.png",
             "image_url": "",
             "section_id": "patila-pots",
             "is_reverse": false,
@@ -141,10 +155,10 @@
             "bullet_2": "Automatic keep-warm function",
             "bullet_3": "Ideal for commercial kitchens",
             "cta_text": "Shop Pressure Cookers",
-            "cta_url": "shopify:\/\/collections\/pressure-cooker-aluminum",
+            "cta_url": "shopify://collections/pressure-cooker-aluminum",
             "popular_products_label": "Popular Products",
             "featured_collection": "pressure-cooker-aluminum",
-            "view_all_url": "shopify:\/\/collections\/pressure-cooker-aluminum"
+            "view_all_url": "shopify://collections/pressure-cooker-aluminum"
           }
         },
         "st_north_indian": {
@@ -153,7 +167,7 @@
           "settings": {
             "image_url": "",
             "name": "North Indian",
-            "url": "\/collections\/indian-specialty"
+            "url": "/collections/indian-specialty"
           }
         },
         "st_south_indian": {
@@ -162,7 +176,7 @@
           "settings": {
             "image_url": "",
             "name": "South Indian",
-            "url": "\/collections\/indian-specialty"
+            "url": "/collections/indian-specialty"
           }
         },
         "st_tandoori": {
@@ -171,7 +185,7 @@
           "settings": {
             "image_url": "",
             "name": "Tandoori Grill",
-            "url": "\/collections\/shaan-tandoor"
+            "url": "/collections/shaan-tandoor"
           }
         },
         "st_catering": {
@@ -180,7 +194,7 @@
           "settings": {
             "image_url": "",
             "name": "Indian Catering",
-            "url": "\/collections\/indian-specialty"
+            "url": "/collections/indian-specialty"
           }
         },
         "st_dhaba": {
@@ -189,7 +203,7 @@
           "settings": {
             "image_url": "",
             "name": "Dhaba Style",
-            "url": "\/collections\/indian-specialty"
+            "url": "/collections/indian-specialty"
           }
         },
         "st_sweets": {
@@ -198,7 +212,7 @@
           "settings": {
             "image_url": "",
             "name": "Sweets & Snacks",
-            "url": "\/collections\/indian-specialty"
+            "url": "/collections/indian-specialty"
           }
         },
         "guide_tandoor": {
@@ -206,7 +220,7 @@
           "settings": {
             "image_url": "",
             "title": "How to Choose the Right Tandoor for Your Restaurant",
-            "url": "\/blogs\/resources",
+            "url": "/blogs/resources",
             "meta": "Guide"
           }
         },
@@ -215,7 +229,7 @@
           "settings": {
             "image_url": "",
             "title": "Indian Cookware Guide: Kadai, Patila & Tava Sizes Explained",
-            "url": "\/blogs\/resources",
+            "url": "/blogs/resources",
             "meta": "Guide"
           }
         },
@@ -224,7 +238,7 @@
           "settings": {
             "image_url": "",
             "title": "Setting Up an Indian Restaurant Kitchen: Equipment Checklist",
-            "url": "\/blogs\/resources",
+            "url": "/blogs/resources",
             "meta": "Guide"
           }
         },
@@ -233,7 +247,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Shaan Tandoor",
-            "url": "\/collections\/shaan-tandoor",
+            "url": "/collections/shaan-tandoor",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -243,7 +257,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Rotoquip",
-            "url": "\/collections\/rotoquip",
+            "url": "/collections/rotoquip",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -253,7 +267,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Servewell",
-            "url": "\/collections\/restaurant-equipment",
+            "url": "/collections/restaurant-equipment",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -263,7 +277,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Angaar",
-            "url": "\/collections\/restaurant-equipment",
+            "url": "/collections/restaurant-equipment",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -273,27 +287,9 @@
           "settings": {
             "brand_image_url": "",
             "name": "Vollrath",
-            "url": "\/collections\/restaurant-equipment",
+            "url": "/collections/restaurant-equipment",
             "color": "#8a8a8a",
             "italic": false
-          }
-        },
-        "equip_steamers": {
-          "type": "equip_section",
-          "settings": {
-            "image_url": "",
-            "section_id": "steamers",
-            "is_reverse": false,
-            "title": "Steamers & Pressure Cookers",
-            "description": "Idli steamers, momo makers, and commercial pressure cookers for South Indian and North Indian menus.",
-            "bullet_1": "Idli & Momo Steamers",
-            "bullet_2": "Aluminium Pressure Cookers",
-            "bullet_3": "Commercial Rice Cookers",
-            "cta_text": "Shop Steamers",
-            "cta_url": "\/collections\/idli-momo-steamer-all",
-            "popular_products_label": "Popular Products",
-            "featured_collection": "idli-momo-steamer-all",
-            "view_all_url": "\/collections\/idli-momo-steamer-all"
           }
         }
       },
@@ -306,7 +302,6 @@
         "nav_more",
         "equip_tandoors",
         "equip_cookware",
-        "equip_steamers",
         "equip_section_TDzgrN",
         "equip_section_GVLMQJ",
         "equip_section_aAcB6H",
@@ -329,13 +324,13 @@
         "hero_title_override": "Indian Restaurant Equipment Solutions",
         "hero_lead": "Specialized equipment built for authentic Indian cuisine — tandoor ovens, patilas, kadais, and more, all in one place.",
         "hero_btn1_text": "Shop All Indian Restaurant Equipment",
-        "hero_btn1_url": "\/collections\/indian-specialty",
+        "hero_btn1_url": "/collections/indian-specialty",
         "hero_btn2_text": "Request a Quote",
-        "hero_btn2_url": "\/pages\/contact-us",
+        "hero_btn2_url": "/pages/contact-us",
         "breadcrumb_home_label": "Home",
         "breadcrumb_home_url": "",
         "breadcrumb_parent_label": "Use Cases",
-        "breadcrumb_parent_url": "\/pages\/use-cases",
+        "breadcrumb_parent_url": "/pages/use-cases",
         "show_store_types": true,
         "store_types_title": "Shop by Store Type",
         "show_guides": true,
@@ -347,7 +342,7 @@
         "help_title": "Need Help Choosing the Right Equipment?",
         "help_body": "Our experts can help you find the right tandoors, cookware, and specialty equipment for your Indian restaurant.",
         "help_btn_text": "Contact an Expert",
-        "help_btn_url": "\/pages\/contact-us",
+        "help_btn_url": "/pages/contact-us",
         "show_brands": true,
         "brands_title": "Top Brands We Carry",
         "show_expert_cta": true,
@@ -355,9 +350,9 @@
         "expert_title": "Equip your Indian kitchen with confidence.",
         "expert_body": "From a single tandoor to a complete Indian kitchen setup, our specialists will help you find the right equipment for your menu and volume.",
         "expert_btn1_text": "Request a Quote",
-        "expert_btn1_url": "\/pages\/contact-us",
+        "expert_btn1_url": "/pages/contact-us",
         "expert_btn2_text": "Talk to an Expert",
-        "expert_btn2_url": "\/pages\/contact-us",
+        "expert_btn2_url": "/pages/contact-us",
         "show_features": true,
         "feat_1_title": "Expert Support",
         "feat_1_text": "Get help from our equipment experts",

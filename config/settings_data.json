@@ -1,7 +1,16 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "current": {
     "logo_width": 90,
-    "favicon": "shopify:\/\/shop_images\/celebrate-logo.png",
+    "favicon": "shopify://shop_images/celebrate-logo.png",
     "type_header_font": "playfair_display_n7",
     "heading_scale": 100,
     "type_body_font": "inter_n4",
@@ -98,10 +107,10 @@
     "sale_badge_color_scheme": "scheme-4",
     "sold_out_badge_color_scheme": "scheme-3",
     "brand_headline": "",
-    "brand_description": "<p><\/p>",
+    "brand_description": "<p></p>",
     "brand_image_width": 100,
-    "social_facebook_link": "https:\/\/www.facebook.com\/celebratefestivalinc",
-    "social_instagram_link": "https:\/\/www.instagram.com\/celebrate.festival",
+    "social_facebook_link": "https://www.facebook.com/celebratefestivalinc",
+    "social_instagram_link": "https://www.instagram.com/celebrate.festival",
     "social_youtube_link": "",
     "social_tiktok_link": "",
     "social_twitter_link": "",
@@ -139,7 +148,7 @@
             "name": "Restaurant Equipment",
             "settings": {
               "menu_item_title": "Restaurant Equipment",
-              "menu_icon": "shopify:\/\/shop_images\/0000_Ovens.png",
+              "menu_icon": "shopify://shop_images/0000_Ovens.png",
               "more_items_menu": "restaurant-equipment-more"
             }
           },
@@ -148,7 +157,7 @@
             "name": "Cookware",
             "settings": {
               "menu_item_title": "Smallwares",
-              "menu_icon": "shopify:\/\/shop_images\/0001_Cookware.png",
+              "menu_icon": "shopify://shop_images/0001_Cookware.png",
               "more_items_menu": "smallwares-more"
             }
           },
@@ -157,7 +166,7 @@
             "name": "Refrigeration",
             "settings": {
               "menu_item_title": "Refrigeration",
-              "menu_icon": "shopify:\/\/shop_images\/0002_Refrigration.png",
+              "menu_icon": "shopify://shop_images/0002_Refrigration.png",
               "more_items_menu": "refrigeration-more"
             }
           },
@@ -166,7 +175,7 @@
             "name": "Tabletop",
             "settings": {
               "menu_item_title": "Tabletop",
-              "menu_icon": "shopify:\/\/shop_images\/0004_Dinnerware.png",
+              "menu_icon": "shopify://shop_images/0004_Dinnerware.png",
               "more_items_menu": "tabletop-more"
             }
           },
@@ -175,7 +184,7 @@
             "name": "Indian Specialty",
             "settings": {
               "menu_item_title": "Indian Specialty",
-              "menu_icon": "shopify:\/\/shop_images\/indian-speciality.png",
+              "menu_icon": "shopify://shop_images/indian-speciality.png",
               "more_items_menu": "indian-specialty-more"
             }
           },
@@ -184,7 +193,7 @@
             "name": "Storage and Transport",
             "settings": {
               "menu_item_title": "Storage and Transport",
-              "menu_icon": "shopify:\/\/shop_images\/0006_Furniture.png",
+              "menu_icon": "shopify://shop_images/0006_Furniture.png",
               "more_items_menu": "storage-and-transport-more"
             }
           }
@@ -201,15 +210,15 @@
           "enable_top_bar": true,
           "topbar_welcome_text": "Welcome to Celebrate Festival - Your Partner in Foodservice Excellence",
           "topbar_phone": "(408) 673-9999",
-          "topbar_hours": "24\/7 Online Ordering",
+          "topbar_hours": "24/7 Online Ordering",
           "topbar_link_1_text": "Track Order",
           "topbar_link_1_url": "",
           "topbar_link_2_text": "Financing",
-          "topbar_link_2_url": "\/pages\/contact-us#financing",
+          "topbar_link_2_url": "/pages/contact-us#financing",
           "show_live_chat": false,
           "topbar_chat_text": "Live Chat",
           "topbar_chat_url": "",
-          "logo": "shopify:\/\/shop_images\/celebrate-logo.png",
+          "logo": "shopify://shop_images/celebrate-logo.png",
           "logo_height": 60,
           "logo_max_width": 180,
           "mobile_menu_logo_height": 50,
@@ -277,7 +286,7 @@
               "menu_item_title": "Shop by Brands",
               "logos_per_row": 8,
               "show_view_all": true,
-              "view_all_url": "\/collections\/vendors",
+              "view_all_url": "/collections/vendors",
               "view_all_text": "View All Brands"
             }
           },
@@ -286,7 +295,7 @@
             "settings": {
               "parent_menu_title": "Shop by Brands",
               "brand_name": "ATOSA",
-              "brand_url": "\/collections\/atosa-reach-ins"
+              "brand_url": "/collections/atosa-reach-ins"
             }
           },
           "brand_turbo_air": {
@@ -294,7 +303,7 @@
             "settings": {
               "parent_menu_title": "Shop by Brands",
               "brand_name": "Turbo Air",
-              "brand_url": "\/collections\/turbo-air"
+              "brand_url": "/collections/turbo-air"
             }
           },
           "brand_waring": {
@@ -302,7 +311,7 @@
             "settings": {
               "parent_menu_title": "Shop by Brands",
               "brand_name": "Waring",
-              "brand_url": "\/collections\/waring-all"
+              "brand_url": "/collections/waring-all"
             }
           }
         },
@@ -319,7 +328,7 @@
           "brand_waring"
         ],
         "settings": {
-          "logo": "shopify:\/\/shop_images\/celebrate-logo.png",
+          "logo": "shopify://shop_images/celebrate-logo.png",
           "sidebar_logo_height": 55,
           "sidebar_logo_max_width": 180,
           "search_placeholder": "Search 10,000+ products...",
@@ -337,14 +346,14 @@
             "type": "social_link",
             "settings": {
               "social_platform": "facebook",
-              "social_url": "https:\/\/www.facebook.com\/celebratefestivalinc"
+              "social_url": "https://www.facebook.com/celebratefestivalinc"
             }
           },
           "social_link_XDhaHx": {
             "type": "social_link",
             "settings": {
               "social_platform": "instagram",
-              "social_url": "https:\/\/www.instagram.com\/celebrate.festival"
+              "social_url": "https://www.instagram.com/celebrate.festival"
             }
           },
           "menu_section_V3RxbL": {
@@ -461,8 +470,8 @@
           "footer_max_width": 1400,
           "footer_layout": "balanced",
           "footer_content_gap": 60,
-          "footer_logo": "shopify:\/\/shop_images\/celebrate-logo.png",
-          "footer_logo_url": "\/",
+          "footer_logo": "shopify://shop_images/celebrate-logo.png",
+          "footer_logo_url": "/",
           "footer_logo_width": 140,
           "footer_logo_margin": 10,
           "brand_section_max_width": 350,
@@ -502,11 +511,11 @@
           "copyright_text": "",
           "show_policy_links": true,
           "privacy_policy_text": "Privacy Policy",
-          "privacy_policy_url": "shopify:\/\/pages\/privacy-policy-1",
+          "privacy_policy_url": "shopify://pages/privacy-policy-1",
           "terms_service_text": "Terms of Service",
-          "terms_service_url": "shopify:\/\/pages\/terms-of-service",
+          "terms_service_url": "shopify://pages/terms-of-service",
           "return_policy_text": "Return Policy",
-          "return_policy_url": "shopify:\/\/pages\/return-policy",
+          "return_policy_url": "shopify://pages/return-policy",
           "show_payment_methods": true,
           "payment_methods_gap": 15,
           "payment_icon_size": 24,
@@ -523,54 +532,54 @@
     "content_for_index": [],
     "blocks": {
       "5149645339031002760": {
-        "type": "shopify:\/\/apps\/minmaxify-order-limits\/blocks\/app-embed-block\/3acfba32-89f3-4377-ae20-cbb9abc48475",
+        "type": "shopify://apps/minmaxify-order-limits/blocks/app-embed-block/3acfba32-89f3-4377-ae20-cbb9abc48475",
         "disabled": false,
         "settings": {}
       },
       "8232603958289840080": {
-        "type": "shopify:\/\/apps\/seo-manager-venntov\/blocks\/seomanager-404\/c54c366f-d4bb-4d52-8d2f-dd61ce8e7e12",
+        "type": "shopify://apps/seo-manager-venntov/blocks/seomanager-404/c54c366f-d4bb-4d52-8d2f-dd61ce8e7e12",
         "disabled": false,
         "settings": {}
       },
       "17992116214976573926": {
-        "type": "shopify:\/\/apps\/seo-manager-venntov\/blocks\/seomanager\/c54c366f-d4bb-4d52-8d2f-dd61ce8e7e12",
+        "type": "shopify://apps/seo-manager-venntov/blocks/seomanager/c54c366f-d4bb-4d52-8d2f-dd61ce8e7e12",
         "disabled": false,
         "settings": {}
       },
       "1935445597218932304": {
-        "type": "shopify:\/\/apps\/avada-seo-suite\/blocks\/avada-seo\/15507c6e-1aa3-45d3-b698-7e175e033440",
+        "type": "shopify://apps/avada-seo-suite/blocks/avada-seo/15507c6e-1aa3-45d3-b698-7e175e033440",
         "disabled": false,
         "settings": {}
       },
       "18228966181090706294": {
-        "type": "shopify:\/\/apps\/selleasy\/blocks\/app-embed\/790c1a03-a71f-4bc1-9869-00dad526d3c2",
+        "type": "shopify://apps/selleasy/blocks/app-embed/790c1a03-a71f-4bc1-9869-00dad526d3c2",
         "disabled": false,
         "settings": {
           "storefrontAccessToken": ""
         }
       },
       "5294968793578418440": {
-        "type": "shopify:\/\/apps\/king-product-options-variant\/blocks\/app-embed\/ce104259-52b1-4720-9ecf-76b34cae0401",
+        "type": "shopify://apps/king-product-options-variant/blocks/app-embed/ce104259-52b1-4720-9ecf-76b34cae0401",
         "disabled": false,
         "settings": {}
       },
       "855628211100114053": {
-        "type": "shopify:\/\/apps\/klaviyo-email-marketing-sms\/blocks\/klaviyo-onsite-embed\/2632fe16-c075-4321-a88b-50b567f42507",
+        "type": "shopify://apps/klaviyo-email-marketing-sms/blocks/klaviyo-onsite-embed/2632fe16-c075-4321-a88b-50b567f42507",
         "disabled": false,
         "settings": {}
       },
       "1910501027098541543": {
-        "type": "shopify:\/\/apps\/starapps-variant-image\/blocks\/starapps-via-embed\/2a01d106-3d10-48e8-ba53-5cb971217ac4",
+        "type": "shopify://apps/starapps-variant-image/blocks/starapps-via-embed/2a01d106-3d10-48e8-ba53-5cb971217ac4",
         "disabled": false,
         "settings": {}
       },
       "1306064247955555917": {
-        "type": "shopify:\/\/apps\/variant-title-king\/blocks\/starapps-vtk-embed\/b9b7a642-58c3-4fe1-8f1b-ed3e502da04b",
+        "type": "shopify://apps/variant-title-king/blocks/starapps-vtk-embed/b9b7a642-58c3-4fe1-8f1b-ed3e502da04b",
         "disabled": false,
         "settings": {}
       },
       "9945917646655616230": {
-        "type": "shopify:\/\/apps\/variant-description\/blocks\/app-embed\/dee11698-5b0b-4a0f-9562-ea29cbe9c77e",
+        "type": "shopify://apps/variant-description/blocks/app-embed/dee11698-5b0b-4a0f-9562-ea29cbe9c77e",
         "disabled": false,
         "settings": {
           "show_product_description": true,
@@ -579,30 +588,39 @@
         }
       },
       "11989592277864780042": {
-        "type": "shopify:\/\/apps\/wsh-wholesale-pricing\/blocks\/app-embed\/94cbfa01-7191-4bb2-bcd8-b519b9b3bd06",
+        "type": "shopify://apps/wsh-wholesale-pricing/blocks/app-embed/94cbfa01-7191-4bb2-bcd8-b519b9b3bd06",
         "disabled": false,
         "settings": {
           "showCrossOutPrice": true,
           "showCurrencyCodes": false,
           "priceColor": "#000000",
           "crossOutPriceColor": "#e9330c",
-          "appProxy": "\/apps\/wpdapp"
+          "appProxy": "/apps/wpdapp"
         }
       },
       "12715431849321867433": {
-        "type": "shopify:\/\/apps\/nospy-protect-data\/blocks\/app-block\/0ea824f6-5b8e-445c-b27f-1d4763c81aa3",
+        "type": "shopify://apps/nospy-protect-data/blocks/app-block/0ea824f6-5b8e-445c-b27f-1d4763c81aa3",
         "disabled": true,
         "settings": {}
       },
       "2567389343055140935": {
-        "type": "shopify:\/\/apps\/microsoft-clarity\/blocks\/clarity_js\/31c3d126-8116-4b4a-8ba1-baeda7c4aeea",
+        "type": "shopify://apps/microsoft-clarity/blocks/clarity_js/31c3d126-8116-4b4a-8ba1-baeda7c4aeea",
         "disabled": false,
         "settings": {}
       },
       "11651401770006824842": {
-        "type": "shopify:\/\/apps\/ymq-product-options\/blocks\/app-embed\/86b91121-1f62-4e27-9812-b70a823eb918",
+        "type": "shopify://apps/ymq-product-options/blocks/app-embed/86b91121-1f62-4e27-9812-b70a823eb918",
         "disabled": false,
         "settings": {}
+      },
+      "17368511000352060744": {
+        "type": "shopify://apps/goaffpro-affiliate-marketing/blocks/goaffpro-embedded-pixel/2f4d802b-86c2-47e4-8096-ae1aa3efbab2",
+        "disabled": false,
+        "settings": {
+          "enable_toolbar": false,
+          "enable_floating_widget": false,
+          "enable_popup": false
+        }
       }
     },
     "color_schemes": {
@@ -830,12 +848,12 @@
       "sale_badge_color_scheme": "scheme-4",
       "sold_out_badge_color_scheme": "scheme-3",
       "brand_headline": "",
-      "brand_description": "<p><\/p>",
+      "brand_description": "<p></p>",
       "brand_image_width": 100,
       "social_twitter_link": "",
-      "social_facebook_link": "https:\/\/www.facebook.com\/celebratefestivalinc",
+      "social_facebook_link": "https://www.facebook.com/celebratefestivalinc",
       "social_pinterest_link": "",
-      "social_instagram_link": "https:\/\/www.instagram.com\/celebrate.festival",
+      "social_instagram_link": "https://www.instagram.com/celebrate.festival",
       "social_tiktok_link": "",
       "social_tumblr_link": "",
       "social_snapchat_link": "",

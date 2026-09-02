@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
@@ -13,9 +22,9 @@
         "column_g3JJGD": {
           "type": "column",
           "settings": {
-            "image": "shopify:\/\/shop_images\/GriddleGroup.webp",
+            "image": "shopify://shop_images/GriddleGroup.webp",
             "title": "Commercial Grills",
-            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.<\/p>",
+            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
             "link_label": "",
             "link": ""
           }
@@ -23,9 +32,9 @@
         "column_TGNxdX": {
           "type": "column",
           "settings": {
-            "image": "shopify:\/\/shop_images\/Restaurant_Ranges.avif",
+            "image": "shopify://shop_images/Restaurant_Ranges.avif",
             "title": "Commercial Restaurant Ranges",
-            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.<\/p>",
+            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
             "link_label": "",
             "link": ""
           }
@@ -33,9 +42,9 @@
         "column_n7nAzA": {
           "type": "column",
           "settings": {
-            "image": "shopify:\/\/shop_images\/Commercial_Fryers.jpg",
+            "image": "shopify://shop_images/Commercial_Fryers.jpg",
             "title": "Commercial Fryers",
-            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.<\/p>",
+            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
             "link_label": "",
             "link": ""
           }

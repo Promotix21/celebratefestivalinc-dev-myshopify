@@ -189,10 +189,10 @@
                       <td class="cf-cart-item-price-cell" data-label="Price">
                         <div class="cf-cart-item-price cf-cart-unit-price">
                           {%- if item.original_price != item.final_price -%}
-                            <span class="cf-price-compare">{{ item.original_price | money }}</span>
-                            <span class="cf-price-sale">{{ item.final_price | money }}</span>
+                            <span class="cf-price-compare"><span data-ymq-item-key="{{ item.key }}" class='ymq_item_original_price'>{{ item.original_price | money }}</span></span>
+                            <span class="cf-price-sale"><span data-ymq-item-key="{{ item.key }}" class='ymq_item_final_price'>{{ item.final_price | money }}</span></span>
                           {%- else -%}
-                            <span class="cf-price-regular">{{ item.original_price | money }}</span>
+                            <span class="cf-price-regular"><span data-ymq-item-key="{{ item.key }}" class='ymq_item_original_price'>{{ item.original_price | money }}</span></span>
                           {%- endif -%}
                           {%- if item.variant.available and item.unit_price_measurement -%}
                             <span class="cf-unit-price">
@@ -200,7 +200,7 @@
                             </span>
                           {%- endif -%}
                           {%- comment -%}wpd.js cart hook — lets WSH detect cart items for checkout interception{%- endcomment -%}
-                          <span class="money" data-wpd-cart-variant-id="{{ item.variant.id }}" data-wpd-cart-item="{{ item.key }}" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">{{ item.final_price | money }}</span>
+                          <span class="money" data-wpd-cart-variant-id="{{ item.variant.id }}" data-wpd-cart-item="{{ item.key }}" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"><span data-ymq-item-key="{{ item.key }}" class='ymq_item_final_price'>{{ item.final_price | money }}</span></span>
                         </div>
                       </td>
 
@@ -287,13 +287,13 @@
                         </div>
                         <div class="cf-cart-item-total cf-cart-line-total">
                           {%- if item.original_line_price != item.final_line_price -%}
-                            <span class="cf-total-compare">{{ item.original_line_price | money }}</span>
-                            <span class="cf-total-final cf-total-sale">{{ item.final_line_price | money }}</span>
+                            <span class="cf-total-compare"><span data-ymq-item-key="{{ item.key }}" class='ymq_item_original_line_price'>{{ item.original_line_price | money }}</span></span>
+                            <span class="cf-total-final cf-total-sale"><span data-ymq-item-key="{{ item.key }}" class='ymq_item_final_line_price'>{{ item.final_line_price | money }}</span></span>
                           {%- else -%}
-                            <span class="cf-total-final">{{ item.original_line_price | money }}</span>
+                            <span class="cf-total-final"><span data-ymq-item-key="{{ item.key }}" class='ymq_item_original_line_price'>{{ item.original_line_price | money }}</span></span>
                           {%- endif -%}
                           {%- comment -%}wpd.js line-price hook for checkout{%- endcomment -%}
-                          <span class="money" data-wpd-cart-variant-id="{{ item.variant.id }}" data-wpd-cart-item="{{ item.key }}" data-wpd-cart-line-price style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">{{ item.final_line_price | money }}</span>
+                          <span class="money" data-wpd-cart-variant-id="{{ item.variant.id }}" data-wpd-cart-item="{{ item.key }}" data-wpd-cart-line-price style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"><span data-ymq-item-key="{{ item.key }}" class='ymq_item_final_line_price'>{{ item.final_line_price | money }}</span></span>
                         </div>
                       </td>
                     </tr>
@@ -325,18 +325,26 @@
 
           <!-- Order Summary Sidebar -->
           <div class="cf-cart-summary-section" id="main-cart-footer" data-id="{{ section.id }}">
+            <div class="cf-cart-help-box">
+              <div class="cf-cart-help-title">
+                  Having trouble? Contact us!
+                               </div>
+                               <a href="tel:+14086739999" class="cf-cart-help-phone">
+                                (408) 673-9999
+                               </a>
+                              </div>
             <div class="cf-cart-summary js-contents js-cart-footer-contents">
               <h2 class="cf-summary-title">Order Summary</h2>
 
               <!-- Subtotal -->
               <div class="cf-summary-row">
                 <span class="cf-summary-label">Subtotal ({{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }})</span>
-                <span class="cf-summary-value cf-cart-subtotal-amount" data-cf-original-subtotal="{{ cart.items_subtotal_price }}">{{ cart.items_subtotal_price | money }}</span>
+                <span class="cf-summary-value cf-cart-subtotal-amount" data-cf-original-subtotal="{{ cart.items_subtotal_price }}"><span  class='ymq_cart_total_price'>{{ cart.items_subtotal_price | money }}</span></span>
               </div>
               {%- comment -%}wpd.js cart total hooks — required for WSH checkout interception{%- endcomment -%}
               <div style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">
                 <span class="money" data-cart-total>
-                  <span class="wcp-original-cart-total">{{ cart.total_price | money }}</span>
+                  <span class="wcp-original-cart-total"><span  class='ymq_cart_total_price'>{{ cart.total_price | money }}</span></span>
                   <span class="wcp-cart-total"></span>
                 </span>
               </div>
@@ -374,7 +382,7 @@
               <!-- Total -->
               <div class="cf-summary-total">
                 <span class="cf-total-label">Estimated Total</span>
-                <span class="cf-total-amount cf-cart-total-amount">{{ cart.total_price | money }}</span>
+                <span class="cf-total-amount cf-cart-total-amount"><span  class='ymq_cart_total_price'>{{ cart.total_price | money }}</span></span>
               </div>
 
               <!-- Tax Note -->
@@ -481,7 +489,7 @@
                         {{ product.title | truncate: 50 }}
                       </a>
                       <div class="cf-recommended-price">
-                        {{ product.price | money }}<span class="cf-price-unit">/Each</span>
+                        <span data-ymq-item-key="{{ product.key }}" class='ymq_item_price'>{{ product.price | money }}</span><span class="cf-price-unit">/Each</span>
                       </div>
                     </div>
                     <div class="cf-recommended-actions">
@@ -1227,8 +1235,65 @@ cart-items.cf-cart-page {
 }
 
 /* ========================================
+   CART HELP BOX
+   ======================================== */
+
+.cf-cart-help-box {
+  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+  border: 1px solid rgba(45, 90, 135, 0.2);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.cf-cart-help-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--cf-deep-blue);
+  margin: 0 0 10px;
+}
+
+.cf-cart-help-phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--cf-coral);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.cf-cart-help-phone::before {
+  content: "📞";
+  font-size: 18px;
+}
+
+.cf-cart-help-phone:hover {
+  color: var(--cf-deep-blue);
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .cf-cart-help-box {
+    padding: 16px 18px;
+    margin-bottom: 16px;
+  }
+
+  .cf-cart-help-title {
+    font-size: 15px;
+  }
+
+  .cf-cart-help-phone {
+    font-size: 16px;
+  }
+}/* ========================================
    ORDER SUMMARY SIDEBAR
    ======================================== */
+
 .cf-cart-summary-section {
   position: sticky;
   top: 20px;
@@ -2046,3 +2111,4 @@ async function addRecommendedToCart(button) {
   ]
 }
 {% endschema %}
+{% comment %}<!-- ymq option done -->{% endcomment %}

@@ -541,7 +541,9 @@ reqJquery(function($){
       email: "{{customer.email | escape}}",
       id: {{customer.id}},
       tags: {{ customer.tags|json }},
-      default_address: {{customer.default_address|json}}
+      default_address: {{customer.default_address|json}},
+      company_id: "{{ customer.current_company.id }}",
+      location_id: "{{ customer.current_location.id }}"
     }
     function GetCartData(){
       $.get('/search?view=wcp_cart',function(data){

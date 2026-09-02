@@ -178,9 +178,12 @@ class PredictiveSearch extends SearchForm {
       return;
     }
 
-    fetch(`${routes.predictive_search_url}?q=${encodeURIComponent(searchTerm)}&section_id=predictive-search`, {
-      signal: this.abortController.signal,
-    })
+fetch(
+  `${routes.predictive_search_url}?q=${encodeURIComponent(searchTerm)}&resources[type]=product&resources[limit]=10&resources[options][unavailable_products]=hide&resources[options][fields]=title,product_type,variants.title,variants.sku,tag,vendor&section_id=predictive-search`,
+  {
+    signal: this.abortController.signal,
+  }
+)
       .then((response) => {
         if (!response.ok) {
           var error = new Error(response.status);

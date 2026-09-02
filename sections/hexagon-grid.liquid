@@ -7,23 +7,34 @@
   }
 
   .hexagon-container {
-    max-width: 1400px;
+    max-width: 1500px;
     margin: 0 auto;
     text-align: center;
-    padding: 0 20px;
+    padding: 0 10px;
   }
 
   .hexagon-title {
     color: {{ section.settings.title_color }};
     font-size: {{ section.settings.title_size_desktop }}px;
     font-weight: bold;
+    line-height: 1.2;
+    margin-top: 0;
     margin-bottom: {{ section.settings.title_margin_desktop }}px;
+  }
+
+  .brand-grid-wrap {
+    line-height: 0;
+  }
+
+  .hexagon-grid,
+  .hexagon-grid-wide {
+    position: relative;
+    margin: 0 auto;
+    vertical-align: top;
   }
 
   .hexagon-grid {
     display: inline-block;
-    position: relative;
-    margin: 0 auto;
     --hex-size-desktop: {{ section.settings.hex_size_desktop }}px;
     --hex-height-desktop: {{ section.settings.hex_height_desktop }}px;
     --vertical-spacing-desktop: {{ section.settings.vertical_spacing_desktop }}px;
@@ -31,9 +42,17 @@
     --offset-desktop: {{ section.settings.honeycomb_offset_desktop }}px;
   }
 
-  .hex-row {
+  .hexagon-grid-wide {
+    display: none;
+  }
+
+  .hex-row,
+  .wide-hex-row {
     display: flex;
     justify-content: center;
+  }
+
+  .hex-row {
     margin-bottom: calc(-1 * var(--vertical-spacing-desktop));
   }
 
@@ -41,7 +60,7 @@
     margin-bottom: 0;
   }
 
-  /* Honeycomb offset for even rows */
+  /* Honeycomb offset for standard desktop/tablet rows */
   .hex-row:nth-child(even) {
     transform: translateX(var(--offset-desktop));
   }
@@ -49,27 +68,30 @@
   .hexagon-link {
     text-decoration: none;
     display: inline-block;
+    line-height: 0;
   }
 
   .hexagon-item {
     margin: 0 calc(-1 * var(--horizontal-spacing-desktop));
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: transform 0.25s ease, filter 0.25s ease;
+    position: relative;
   }
 
   .hexagon-item:hover {
     transform: scale({{ section.settings.hover_scale }});
-    z-index: 999;
+    z-index: 10;
+    filter: drop-shadow(0 8px 12px rgba(24, 48, 82, 0.10));
   }
 
   .hexagon-svg {
     width: var(--hex-size-desktop);
     height: var(--hex-height-desktop);
+    display: block;
   }
 
   .hex-shape {
     fill: {{ section.settings.hex_background }};
-    
     stroke-width: {{ section.settings.hex_border_width }};
   }
 
@@ -80,73 +102,163 @@
     object-fit: contain;
   }
 
-  /* Stats Section Styling */
+  /* Stats: compact card so it visually belongs to the brand grid */
   .stats-section {
-    margin-top: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 80px;
-    flex-wrap: wrap;
+    width: min(690px, calc(100% - 24px));
+    margin: 26px auto 0;
+    padding: 16px 18px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 0;
+    background: rgba(255, 255, 255, 0.76);
+    border: 1px solid rgba(29, 58, 94, 0.08);
+    border-radius: 20px;
+    box-shadow: 0 10px 28px rgba(31, 54, 83, 0.07);
+    box-sizing: border-box;
   }
 
   .stat-item {
+    min-width: 0;
+    padding: 3px 24px;
     text-align: center;
     text-decoration: none;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    display: block;
+    position: relative;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+
+  .stat-item + .stat-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 10%;
+    bottom: 10%;
+    width: 1px;
+    background: rgba(30, 58, 92, 0.11);
   }
 
   .stat-item:hover {
-    transform: translateY(-5px);
-    opacity: 0.8;
+    transform: translateY(-3px);
+    opacity: 0.9;
   }
 
   .stat-number {
-    font-size: 48px;
-    font-weight: bold;
+    font-size: 44px;
+    font-weight: 800;
     color: {{ section.settings.stats_number_color }};
     line-height: 1;
-    margin-bottom: 5px;
+    margin-bottom: 7px;
+    white-space: nowrap;
+    letter-spacing: -1px;
   }
 
   .stat-label {
-    font-size: 14px;
-    color: {{ section.settings.stats_label_color }};
-    font-weight: 500;
+    font-size: 12px;
+      color: #FF8448;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.9px;
+    line-height: 1.25;
   }
 
   .view-brands-btn {
-    margin-top: 40px;
-    display: inline-block;
+    margin-top: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
     background-color: {{ section.settings.button_background_color }};
     color: {{ section.settings.button_text_color }};
-    padding: 15px 30px;
-    border-radius: 25px;
+    padding: 13px 28px;
+    border-radius: 999px;
     text-decoration: none;
-    font-weight: 600;
-    font-size: 16px;
-    transition: all 0.3s ease;
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 1;
+    box-shadow: 0 8px 18px rgba(248, 84, 84, 0.20);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+  }
+
+  .view-brands-btn::after {
+    content: "\2192";
+    font-size: 17px;
+    line-height: 1;
+    transition: transform 0.25s ease;
   }
 
   .view-brands-btn:hover {
     background-color: {{ section.settings.button_hover_color }};
     transform: translateY(-2px);
+    box-shadow: 0 11px 24px rgba(248, 84, 84, 0.26);
   }
 
-  /* Tablet Responsive */
+  .view-brands-btn:hover::after {
+    transform: translateX(3px);
+  }
+
+  /*
+    Wide desktop layout.
+    Uses the SAME 42 configured logos, but redistributes them as 10 / 11 / 10 / 11.
+    This fills wide monitors without requiring new Shopify logo settings.
+  */
+  @media screen and (min-width: 1500px) {
+    .hexagon-container {
+      max-width: 1760px;
+      padding: 0 14px;
+    }
+
+    .brand-grid-wrap--wide-ready .hexagon-grid {
+      display: none;
+    }
+
+    .brand-grid-wrap--wide-ready .hexagon-grid-wide {
+      display: inline-block;
+      --wide-hex-size: clamp(145px, {{ section.settings.hex_size_desktop }}px, 170px);
+      --wide-hex-height: calc(var(--wide-hex-size) * 0.875);
+      --wide-horizontal-overlap: clamp(9px, 0.7vw, 12px);
+      --wide-vertical-overlap: clamp(52px, {{ section.settings.vertical_spacing_desktop }}px, 64px);
+      --wide-step: calc(var(--wide-hex-size) - var(--wide-horizontal-overlap) - var(--wide-horizontal-overlap));
+    }
+
+    .wide-hex-row {
+      margin-bottom: calc(-1 * var(--wide-vertical-overlap));
+    }
+
+    .wide-hex-row:last-child {
+      margin-bottom: 0;
+    }
+
+    /* 10-item rows are naturally centered inside the 11-item row width. */
+
+    .hexagon-grid-wide .hexagon-item {
+      margin: 0 calc(-1 * var(--wide-horizontal-overlap));
+    }
+
+    .hexagon-grid-wide .hexagon-svg {
+      width: var(--wide-hex-size);
+      height: var(--wide-hex-height);
+    }
+
+    .stats-section {
+      margin-top: 24px;
+    }
+  }
+
+  /* Tablet */
   @media screen and (max-width: 1024px) and (min-width: 768px) {
     .hexagon-section {
       padding: {{ section.settings.section_padding_tablet }}px 15px;
     }
-    
+
+    .hexagon-container {
+      padding: 0 8px;
+    }
+
     .hexagon-title {
       font-size: {{ section.settings.title_size_tablet }}px;
       margin-bottom: {{ section.settings.title_margin_tablet }}px;
     }
-    
+
     .hexagon-grid {
       --hex-size-desktop: {{ section.settings.hex_size_tablet }}px;
       --hex-height-desktop: {{ section.settings.hex_height_tablet }}px;
@@ -156,89 +268,141 @@
     }
 
     .stats-section {
-      gap: 60px;
-      margin-top: 50px;
+      width: min(620px, calc(100% - 20px));
+      margin-top: 24px;
+      padding: 14px 12px;
     }
 
     .stat-number {
-      font-size: 40px;
+      font-size: 38px;
     }
 
-    .stat-label {
-      font-size: 13px;
+    .stat-item {
+      padding: 3px 14px;
     }
   }
 
-  /* Mobile Responsive */
+  /*
+    Mobile: keep the ORIGINAL source-code honeycomb exactly as before.
+    We only pull the stats upward to cancel the invisible space created by translateY.
+  */
   @media screen and (max-width: 767px) {
     .hexagon-section {
-      padding: {{ section.settings.section_padding_mobile }}px 10px;
+      padding: {{ section.settings.section_padding_mobile }}px 8px;
+    }
+
+    .hexagon-container {
+      padding: 0;
     }
 
     .hexagon-title {
       font-size: {{ section.settings.title_size_mobile }}px;
       margin-bottom: {{ section.settings.title_margin_mobile }}px;
+      line-height: 1.3;
     }
 
     .hexagon-grid {
-      --hex-size-desktop: 68px;
-      --hex-height-desktop: 59px;
+      --hex-size-desktop: {{ section.settings.hex_size_mobile }}px;
+      --hex-height-desktop: {{ section.settings.hex_height_mobile }}px;
       --vertical-spacing-desktop: 0px;
       --horizontal-spacing-desktop: 0px;
       --offset-desktop: 0px;
     }
 
-    /* Center rows - honeycomb effect comes from 6-5-6-5 pattern */
+    .hexagon-grid-wide {
+      display: none !important;
+    }
+
+    /* ORIGINAL mobile grid behavior: 6 / 5 / 6 / 5 / 6 */
     .hexagon-section .hexagon-grid .hex-row {
       justify-content: center !important;
       margin: 0 !important;
     }
 
-    /* Row 2 */
     .hexagon-section .hexagon-grid .hex-row:nth-child(2) {
-      transform: translateY(-18px) !important;
+      transform: translateY(-16px) !important;
     }
 
-    /* Row 3 */
     .hexagon-section .hexagon-grid .hex-row:nth-child(3) {
-      transform: translateY(-36px) !important;
+      transform: translateY(-32px) !important;
     }
 
-    /* Row 4 */
     .hexagon-section .hexagon-grid .hex-row:nth-child(4) {
-      transform: translateY(-54px) !important;
+      transform: translateY(-48px) !important;
     }
 
-    /* Row 5 */
     .hexagon-section .hexagon-grid .hex-row:nth-child(5) {
-      transform: translateY(-72px) !important;
+      transform: translateY(-64px) !important;
     }
 
     .hexagon-section .hexagon-grid .hexagon-item {
-      margin: 0 -8px !important;
+      margin: 0 -6px !important;
     }
 
-    /* Hide hexagons on mobile - show only 4 per row */
     .hexagon-link.hide-on-mobile {
       display: none !important;
     }
 
+    /*
+      translateY keeps the original row height in the document flow.
+      These negative margins remove only that invisible blank area,
+      without changing the logo layout itself.
+    */
+    .stats-section--five-rows {
+      margin-top: -50px;
+    }
+
+    .stats-section--four-rows {
+      margin-top: -34px;
+    }
+
     .stats-section {
-      gap: 40px;
-      margin-top: 40px;
+      width: min(360px, calc(100% - 12px));
+      padding: 13px 4px;
+      border-radius: 17px;
+      box-shadow: 0 7px 20px rgba(31, 54, 83, 0.06);
+    }
+
+    .stat-item {
+      padding: 2px 5px;
+    }
+
+    .stat-item + .stat-item::before {
+      top: 12%;
+      bottom: 12%;
     }
 
     .stat-number {
-      font-size: 32px;
+      font-size: clamp(24px, 7vw, 30px);
+      margin-bottom: 6px;
+      letter-spacing: -0.7px;
     }
 
     .stat-label {
-      font-size: 12px;
+      font-size: clamp(8px, 2.45vw, 10px);
+      letter-spacing: 0.45px;
+      line-height: 1.2;
     }
 
     .view-brands-btn {
-      padding: 12px 25px;
-      font-size: 15px;
+      margin-top: 14px;
+      min-width: 178px;
+      padding: 13px 23px;
+      font-size: 14px;
+      box-shadow: 0 7px 16px rgba(248, 84, 84, 0.20);
+    }
+
+    .view-brands-btn:active {
+      transform: scale(0.97);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hexagon-item,
+    .stat-item,
+    .view-brands-btn,
+    .view-brands-btn::after {
+      transition: none;
     }
   }
 </style>
@@ -251,6 +415,297 @@
 
     {%- comment %} Default brand links mapping for 18 priority brands {% endcomment -%}
     {%- assign brand_links = '/collections/atosa-all,/collections/gsw,/collections/thunder-group,/collections/combi-oven-rational,/pages/cf-robot-coupe,/pages/cf-cac,/pages/turboair-page,/pages/waring,/pages/cf-eurodib,/collections/winco,/collections/sammic,/pages/globe,/collections/shaan,/collections/somerset,/pages/global-solutions,/collections/rotoquip,/collections/kwitex,/collections/yanco-product-collection' | split: ',' -%}
+
+    {%- assign row5_filled = 0 -%}
+    {%- for i in (1..8) -%}
+      {%- assign lk = 'logo_row5_' | append: i -%}
+      {%- if section.settings[lk] != blank -%}{%- assign row5_filled = row5_filled | plus: 1 -%}{%- endif -%}
+    {%- endfor -%}
+
+    <div class="brand-grid-wrap{% if row5_filled == 8 %} brand-grid-wrap--wide-ready{% endif %}">
+      {%- if row5_filled == 8 -%}
+      <div class="hexagon-grid-wide" aria-label="Featured brands">
+        <!-- Wide desktop row 1: 10 logos -->
+        <div class="wide-hex-row">
+      {% for i in (1..8) %}
+        {% assign logo_key = 'logo_row1_' | append: i %}
+        {% assign link_key = 'link_row1_' | append: i %}
+        {% assign logo = section.settings[logo_key] %}
+        {% assign link_url = section.settings[link_key] %}
+        {% assign brand_idx = i | minus: 1 | plus: 0 %}
+        {% assign default_brand_link = brand_links[brand_idx] | default: '/pages/brands' %}
+        {% assign hex_link = link_url | default: default_brand_link %}
+        <a href="{{ hex_link }}" class="hexagon-link">
+          <div class="hexagon-item">
+            <svg class="hexagon-svg" viewBox="0 0 80 70" aria-hidden="true">
+              <defs>
+                <linearGradient id="hexBorderGradient-wide-r1-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
+                  <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
+                </linearGradient>
+              </defs>
+              <polygon class="hex-shape"
+                points="40,2 70,18 70,52 40,68 10,52 10,18"
+                fill="{{ section.settings.hex_background }}"
+                stroke="url(#hexBorderGradient-wide-r1-{{ i }})"
+                stroke-width="{{ section.settings.hex_border_width }}" />
+              <foreignObject x="17" y="25" width="46" height="36">
+                {% if logo != blank %}
+                  <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ brand_idx | plus: 1 }}" loading="lazy">
+                {% else %}
+                  <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
+                {% endif %}
+              </foreignObject>
+            </svg>
+          </div>
+        </a>
+      {% endfor %}
+      {% for i in (1..2) %}
+        {% assign logo_key = 'logo_row2_' | append: i %}
+        {% assign link_key = 'link_row2_' | append: i %}
+        {% assign logo = section.settings[logo_key] %}
+        {% assign link_url = section.settings[link_key] %}
+        {% assign brand_idx = i | minus: 1 | plus: 8 %}
+        {% assign default_brand_link = brand_links[brand_idx] | default: '/pages/brands' %}
+        {% assign hex_link = link_url | default: default_brand_link %}
+        <a href="{{ hex_link }}" class="hexagon-link">
+          <div class="hexagon-item">
+            <svg class="hexagon-svg" viewBox="0 0 80 70" aria-hidden="true">
+              <defs>
+                <linearGradient id="hexBorderGradient-wide-r2-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
+                  <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
+                </linearGradient>
+              </defs>
+              <polygon class="hex-shape"
+                points="40,2 70,18 70,52 40,68 10,52 10,18"
+                fill="{{ section.settings.hex_background }}"
+                stroke="url(#hexBorderGradient-wide-r2-{{ i }})"
+                stroke-width="{{ section.settings.hex_border_width }}" />
+              <foreignObject x="17" y="25" width="46" height="36">
+                {% if logo != blank %}
+                  <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ brand_idx | plus: 1 }}" loading="lazy">
+                {% else %}
+                  <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
+                {% endif %}
+              </foreignObject>
+            </svg>
+          </div>
+        </a>
+      {% endfor %}
+        </div>
+
+        <!-- Wide desktop row 2: 11 logos -->
+        <div class="wide-hex-row">
+      {% for i in (3..9) %}
+        {% assign logo_key = 'logo_row2_' | append: i %}
+        {% assign link_key = 'link_row2_' | append: i %}
+        {% assign logo = section.settings[logo_key] %}
+        {% assign link_url = section.settings[link_key] %}
+        {% assign brand_idx = i | minus: 1 | plus: 8 %}
+        {% assign default_brand_link = brand_links[brand_idx] | default: '/pages/brands' %}
+        {% assign hex_link = link_url | default: default_brand_link %}
+        <a href="{{ hex_link }}" class="hexagon-link">
+          <div class="hexagon-item">
+            <svg class="hexagon-svg" viewBox="0 0 80 70" aria-hidden="true">
+              <defs>
+                <linearGradient id="hexBorderGradient-wide-r2-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
+                  <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
+                </linearGradient>
+              </defs>
+              <polygon class="hex-shape"
+                points="40,2 70,18 70,52 40,68 10,52 10,18"
+                fill="{{ section.settings.hex_background }}"
+                stroke="url(#hexBorderGradient-wide-r2-{{ i }})"
+                stroke-width="{{ section.settings.hex_border_width }}" />
+              <foreignObject x="17" y="25" width="46" height="36">
+                {% if logo != blank %}
+                  <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ brand_idx | plus: 1 }}" loading="lazy">
+                {% else %}
+                  <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
+                {% endif %}
+              </foreignObject>
+            </svg>
+          </div>
+        </a>
+      {% endfor %}
+      {% for i in (1..4) %}
+        {% assign logo_key = 'logo_row3_' | append: i %}
+        {% assign link_key = 'link_row3_' | append: i %}
+        {% assign logo = section.settings[logo_key] %}
+        {% assign link_url = section.settings[link_key] %}
+        {% assign brand_idx = i | minus: 1 | plus: 17 %}
+        {% assign default_brand_link = brand_links[brand_idx] | default: '/pages/brands' %}
+        {% assign hex_link = link_url | default: default_brand_link %}
+        <a href="{{ hex_link }}" class="hexagon-link">
+          <div class="hexagon-item">
+            <svg class="hexagon-svg" viewBox="0 0 80 70" aria-hidden="true">
+              <defs>
+                <linearGradient id="hexBorderGradient-wide-r3-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
+                  <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
+                </linearGradient>
+              </defs>
+              <polygon class="hex-shape"
+                points="40,2 70,18 70,52 40,68 10,52 10,18"
+                fill="{{ section.settings.hex_background }}"
+                stroke="url(#hexBorderGradient-wide-r3-{{ i }})"
+                stroke-width="{{ section.settings.hex_border_width }}" />
+              <foreignObject x="17" y="25" width="46" height="36">
+                {% if logo != blank %}
+                  <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ brand_idx | plus: 1 }}" loading="lazy">
+                {% else %}
+                  <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
+                {% endif %}
+              </foreignObject>
+            </svg>
+          </div>
+        </a>
+      {% endfor %}
+        </div>
+
+        <!-- Wide desktop row 3: 10 logos -->
+        <div class="wide-hex-row">
+      {% for i in (5..8) %}
+        {% assign logo_key = 'logo_row3_' | append: i %}
+        {% assign link_key = 'link_row3_' | append: i %}
+        {% assign logo = section.settings[logo_key] %}
+        {% assign link_url = section.settings[link_key] %}
+        {% assign brand_idx = i | minus: 1 | plus: 17 %}
+        {% assign default_brand_link = brand_links[brand_idx] | default: '/pages/brands' %}
+        {% assign hex_link = link_url | default: default_brand_link %}
+        <a href="{{ hex_link }}" class="hexagon-link">
+          <div class="hexagon-item">
+            <svg class="hexagon-svg" viewBox="0 0 80 70" aria-hidden="true">
+              <defs>
+                <linearGradient id="hexBorderGradient-wide-r3-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
+                  <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
+                </linearGradient>
+              </defs>
+              <polygon class="hex-shape"
+                points="40,2 70,18 70,52 40,68 10,52 10,18"
+                fill="{{ section.settings.hex_background }}"
+                stroke="url(#hexBorderGradient-wide-r3-{{ i }})"
+                stroke-width="{{ section.settings.hex_border_width }}" />
+              <foreignObject x="17" y="25" width="46" height="36">
+                {% if logo != blank %}
+                  <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ brand_idx | plus: 1 }}" loading="lazy">
+                {% else %}
+                  <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
+                {% endif %}
+              </foreignObject>
+            </svg>
+          </div>
+        </a>
+      {% endfor %}
+      {% for i in (1..6) %}
+        {% assign logo_key = 'logo_row4_' | append: i %}
+        {% assign link_key = 'link_row4_' | append: i %}
+        {% assign logo = section.settings[logo_key] %}
+        {% assign link_url = section.settings[link_key] %}
+        {% assign brand_idx = i | minus: 1 | plus: 25 %}
+        {% assign default_brand_link = brand_links[brand_idx] | default: '/pages/brands' %}
+        {% assign hex_link = link_url | default: default_brand_link %}
+        <a href="{{ hex_link }}" class="hexagon-link">
+          <div class="hexagon-item">
+            <svg class="hexagon-svg" viewBox="0 0 80 70" aria-hidden="true">
+              <defs>
+                <linearGradient id="hexBorderGradient-wide-r4-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
+                  <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
+                </linearGradient>
+              </defs>
+              <polygon class="hex-shape"
+                points="40,2 70,18 70,52 40,68 10,52 10,18"
+                fill="{{ section.settings.hex_background }}"
+                stroke="url(#hexBorderGradient-wide-r4-{{ i }})"
+                stroke-width="{{ section.settings.hex_border_width }}" />
+              <foreignObject x="17" y="25" width="46" height="36">
+                {% if logo != blank %}
+                  <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ brand_idx | plus: 1 }}" loading="lazy">
+                {% else %}
+                  <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
+                {% endif %}
+              </foreignObject>
+            </svg>
+          </div>
+        </a>
+      {% endfor %}
+        </div>
+
+        <!-- Wide desktop row 4: 11 logos -->
+        <div class="wide-hex-row">
+      {% for i in (7..9) %}
+        {% assign logo_key = 'logo_row4_' | append: i %}
+        {% assign link_key = 'link_row4_' | append: i %}
+        {% assign logo = section.settings[logo_key] %}
+        {% assign link_url = section.settings[link_key] %}
+        {% assign brand_idx = i | minus: 1 | plus: 25 %}
+        {% assign default_brand_link = brand_links[brand_idx] | default: '/pages/brands' %}
+        {% assign hex_link = link_url | default: default_brand_link %}
+        <a href="{{ hex_link }}" class="hexagon-link">
+          <div class="hexagon-item">
+            <svg class="hexagon-svg" viewBox="0 0 80 70" aria-hidden="true">
+              <defs>
+                <linearGradient id="hexBorderGradient-wide-r4-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
+                  <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
+                </linearGradient>
+              </defs>
+              <polygon class="hex-shape"
+                points="40,2 70,18 70,52 40,68 10,52 10,18"
+                fill="{{ section.settings.hex_background }}"
+                stroke="url(#hexBorderGradient-wide-r4-{{ i }})"
+                stroke-width="{{ section.settings.hex_border_width }}" />
+              <foreignObject x="17" y="25" width="46" height="36">
+                {% if logo != blank %}
+                  <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ brand_idx | plus: 1 }}" loading="lazy">
+                {% else %}
+                  <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
+                {% endif %}
+              </foreignObject>
+            </svg>
+          </div>
+        </a>
+      {% endfor %}
+      {% for i in (1..8) %}
+        {% assign logo_key = 'logo_row5_' | append: i %}
+        {% assign link_key = 'link_row5_' | append: i %}
+        {% assign logo = section.settings[logo_key] %}
+        {% assign link_url = section.settings[link_key] %}
+        {% assign brand_idx = i | minus: 1 | plus: 34 %}
+        {% assign default_brand_link = brand_links[brand_idx] | default: '/pages/brands' %}
+        {% assign hex_link = link_url | default: default_brand_link %}
+        <a href="{{ hex_link }}" class="hexagon-link">
+          <div class="hexagon-item">
+            <svg class="hexagon-svg" viewBox="0 0 80 70" aria-hidden="true">
+              <defs>
+                <linearGradient id="hexBorderGradient-wide-r5-{{ i }}" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="{{ section.settings.hex_border_gradient_start }}" />
+                  <stop offset="100%" stop-color="{{ section.settings.hex_border_gradient_end }}" />
+                </linearGradient>
+              </defs>
+              <polygon class="hex-shape"
+                points="40,2 70,18 70,52 40,68 10,52 10,18"
+                fill="{{ section.settings.hex_background }}"
+                stroke="url(#hexBorderGradient-wide-r5-{{ i }})"
+                stroke-width="{{ section.settings.hex_border_width }}" />
+              <foreignObject x="17" y="25" width="46" height="36">
+                {% if logo != blank %}
+                  <img class="hex-logo" src="{{ logo | img_url: '200x200' }}" alt="Brand Logo {{ brand_idx | plus: 1 }}" loading="lazy">
+                {% else %}
+                  <img class="hex-logo" src="https://cf-images.hiraya.digital/emails/4th-july/images/footer_logo.png" alt="Placeholder Logo" loading="lazy">
+                {% endif %}
+              </foreignObject>
+            </svg>
+          </div>
+        </a>
+      {% endfor %}
+        </div>
+      </div>
+      {%- endif -%}
 
    <div class="hexagon-grid">
   <!-- Row 1: 8 hexagons (6 on mobile) -->
@@ -406,11 +861,6 @@
   </div>
 
   <!-- Row 5: only rendered when all 8 logo slots are filled -->
-  {%- assign row5_filled = 0 -%}
-  {%- for i in (1..8) -%}
-    {%- assign lk = 'logo_row5_' | append: i -%}
-    {%- if section.settings[lk] != blank -%}{%- assign row5_filled = row5_filled | plus: 1 -%}{%- endif -%}
-  {%- endfor -%}
   {%- if row5_filled == 8 -%}
   <div class="hex-row">
     {% for i in (1..8) %}
@@ -450,9 +900,10 @@
   </div>
   {%- endif -%}
 </div>
+    </div>
 
     <!-- Stats Section -->
-    <div class="stats-section">
+    <div class="stats-section{% if row5_filled == 8 %} stats-section--five-rows{% else %} stats-section--four-rows{% endif %}">
       <a href="{{ section.settings.stat1_url | default: '/pages/brands' }}" class="stat-item">
         <div class="stat-number">{{ section.settings.stat1_number }}</div>
         <div class="stat-label">{{ section.settings.stat1_label }}</div>
@@ -571,7 +1022,7 @@
       "type": "color",
       "id": "stats_label_color",
       "label": "Stats Label Color",
-      "default": "#999999"
+      "default": "#f85454"
     },
     {
       "type": "header",
@@ -592,13 +1043,13 @@
       "type": "color",
       "id": "button_background_color",
       "label": "Button Background Color",
-      "default": "#f85454"
+      "default": "rgba(248, 84, 84, 1)"
     },
     {
       "type": "color",
       "id": "button_text_color",
       "label": "Button Text Color",
-      "default": "#ffffff"
+      "default": "#ffffffff"
     },
     {
       "type": "color",
@@ -617,7 +1068,7 @@
       "min": 20,
       "max": 100,
       "step": 5,
-      "default": 40,
+      "default": 30,
       "unit": "px"
     },
     {
@@ -637,7 +1088,7 @@
       "min": 10,
       "max": 60,
       "step": 5,
-      "default": 30,
+      "default": 20,
       "unit": "px"
     },
     {
@@ -647,7 +1098,7 @@
       "min": 120,
       "max": 250,
       "step": 5,
-      "default": 180,
+      "default": 160,
       "unit": "px"
     },
     {
@@ -657,7 +1108,7 @@
       "min": 120,
       "max": 250,
       "step": 5,
-      "default": 160,
+      "default": 140,
       "unit": "px"
     },
     {
@@ -667,7 +1118,7 @@
       "min": 40,
       "max": 120,
       "step": 2,
-      "default": 80,
+      "default": 58,
       "unit": "px",
       "info": "Distance between rows"
     },
@@ -678,7 +1129,7 @@
       "min": 10,
       "max": 40,
       "step": 1,
-      "default": 20,
+      "default": 12,
       "unit": "px",
       "info": "Distance between hexagons in same row"
     },
@@ -689,7 +1140,7 @@
       "min": 0,
       "max": 100,
       "step": 1,
-      "default": 90,
+      "default": 78,
       "unit": "px",
       "info": "How much even rows are shifted"
     },
@@ -704,7 +1155,7 @@
       "min": 20,
       "max": 100,
       "step": 5,
-      "default": 35,
+      "default": 25,
       "unit": "px"
     },
     {
@@ -724,7 +1175,7 @@
       "min": 10,
       "max": 60,
       "step": 5,
-      "default": 25,
+      "default": 20,
       "unit": "px"
     },
     {
@@ -734,7 +1185,7 @@
       "min": 60,
       "max": 150,
       "step": 5,
-      "default": 100,
+      "default": 95,
       "unit": "px"
     },
     {
@@ -744,7 +1195,7 @@
       "min": 60,
       "max": 150,
       "step": 5,
-      "default": 115,
+      "default": 105,
       "unit": "px"
     },
     {
@@ -754,7 +1205,7 @@
       "min": 15,
       "max": 70,
       "step": 1,
-      "default": 50,
+      "default": 42,
       "unit": "px"
     },
     {
@@ -764,7 +1215,7 @@
       "min": 3,
       "max": 25,
       "step": 1,
-      "default": 12,
+      "default": 6,
       "unit": "px"
     },
     {
@@ -774,7 +1225,7 @@
       "min": -50,
       "max": 50,
       "step": 1,
-      "default": 35,
+      "default": 46,
       "unit": "px"
     },
     {
@@ -788,7 +1239,7 @@
       "min": 10,
       "max": 80,
       "step": 5,
-      "default": 30,
+      "default": 20,
       "unit": "px"
     },
     {
@@ -808,7 +1259,7 @@
       "min": 10,
       "max": 40,
       "step": 5,
-      "default": 20,
+      "default": 15,
       "unit": "px"
     },
     {
@@ -818,7 +1269,7 @@
       "min": 50,
       "max": 120,
       "step": 5,
-      "default": 80,
+      "default": 75,
       "unit": "px"
     },
     {
@@ -828,7 +1279,7 @@
       "min": 50,
       "max": 120,
       "step": 5,
-      "default": 95,
+      "default": 65,
       "unit": "px"
     },
     {
@@ -838,7 +1289,7 @@
       "min": 10,
       "max": 60,
       "step": 1,
-      "default": 40,
+      "default": 16,
       "unit": "px"
     },
     {
@@ -848,7 +1299,7 @@
       "min": 2,
       "max": 20,
       "step": 1,
-      "default": 8,
+      "default": 6,
       "unit": "px"
     },
     {
@@ -858,7 +1309,7 @@
       "min": -40,
       "max": 40,
       "step": 1,
-      "default": 30,
+      "default": 0,
       "unit": "px"
     },
     {

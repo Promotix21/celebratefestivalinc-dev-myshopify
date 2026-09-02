@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "home_restaurant_partners": {
@@ -153,13 +162,13 @@
           "name": "Tandoor Equipment",
           "settings": {
             "category_name": "Tandoor Equipment",
-            "category_image": "shopify://shop_images/Tandoor.jpg",
+            "category_image": "shopify://shop_images/shaan_omcan_and_angaar_tandoor_ovens.png",
             "category_link": "/collections/new-theme-tandoor-and-parts",
             "visible_by_default": false,
             "show_brand_overlay": true,
             "brand_logo_1": "shopify://shop_images/1_0003_Shaan-logo-1.png",
-            "brand_logo_2": "shopify://shop_images/1_0004_Rotoquip-logo-_1_-1.png",
-            "brand_logo_3": "shopify://shop_images/1_0013_images-1.png",
+            "brand_logo_2": "shopify://shop_images/brand-logo-angaar-tandoor.avif",
+            "brand_logo_3": "shopify://shop_images/Untitled_design.png",
             "show_badge": false,
             "badge_text": "SALE",
             "badge_type": "sale"
@@ -535,7 +544,7 @@
         "logo_row5_1": "shopify://shop_images/brand-logo-migali.jpg",
         "logo_row5_2": "shopify://shop_images/brand-logo-ariane.png",
         "logo_row5_3": "shopify://shop_images/brand-logo-porto-brasil.jpg",
-        "logo_row5_4": "shopify://shop_images/brand-logo-Comstock-Castle.png",
+        "logo_row5_4": "shopify://shop_images/Cambro_logo.png",
         "logo_row5_5": "shopify://shop_images/brand-logo-alto-shaam.png",
         "logo_row5_6": "shopify://shop_images/brand-logo-belshaw.png",
         "logo_row5_7": "shopify://shop_images/brand-logo-angaar-tandoor.avif",
@@ -543,7 +552,7 @@
         "link_row5_1": "/collections/vendors?q=migali",
         "link_row5_2": "/collections/vendors?q=ariane",
         "link_row5_3": "/collections/vendors?q=porto+brasil",
-        "link_row5_4": "/collections/vendors?q=comstock+castle",
+        "link_row5_4": "/collections/vendors?q=cambro",
         "link_row5_5": "/collections/vendors?q=alto-shaam",
         "link_row5_6": "/collections/vendors?q=belshaw",
         "link_row5_7": "/collections/vendors?q=angaar+tandoor",
@@ -836,7 +845,10 @@
         "cta_title": "Don't See Your Restaurant Type?",
         "cta_subtitle": "Our equipment experts work with all types of food businesses. Get personalized recommendations for your specific needs.",
         "cta_button_text": "Get Free Consultation",
-        "cta_button_url": "shopify://pages/contact-us"
+        "cta_button_url": "shopify://pages/contact-us",
+        "show_view_all": true,
+        "view_all_text": "View All Use Cases",
+        "view_all_url": ""
       }
     },
     "featured_products_grid_sale_items": {
@@ -914,7 +926,8 @@
         "product_source": "collection",
         "featured_collection": "new-theme-staff-picks",
         "featured_products": [],
-        "products_limit": 20
+        "products_limit": 20,
+        "show_card_free_shipping": false
       }
     },
     "journey_promo_banner": {

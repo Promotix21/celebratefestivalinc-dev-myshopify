@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
@@ -70,16 +79,16 @@
             "bullet_2": "Conveyor Ovens",
             "bullet_3": "Wood-Fired & Gas Ovens",
             "cta_text": "Shop Pizza Ovens",
-            "cta_url": "\/collections\/new-theme-pizza-ovens",
+            "cta_url": "/collections/new-theme-pizza-ovens",
             "popular_products_label": "Popular Products",
             "featured_collection": "new-theme-pizza-ovens",
-            "view_all_url": "\/collections\/new-theme-pizza-ovens"
+            "view_all_url": "/collections/new-theme-pizza-ovens"
           }
         },
         "equip_dough_prep": {
           "type": "equip_section",
           "settings": {
-            "image": "shopify:\/\/shop_images\/dough_preparation.png",
+            "image": "shopify://shop_images/dough_preparation.png",
             "image_url": "",
             "section_id": "dough-preparation",
             "is_reverse": true,
@@ -89,16 +98,16 @@
             "bullet_2": "Planetary & Spiral Mixers",
             "bullet_3": "Dough Boxes & Proofing",
             "cta_text": "Shop Dough Equipment",
-            "cta_url": "\/collections\/new-theme-dough-prep-equipment",
+            "cta_url": "/collections/new-theme-dough-prep-equipment",
             "popular_products_label": "Popular Products",
             "featured_collection": "new-theme-dough-prep-equipment",
-            "view_all_url": "\/collections\/new-theme-dough-prep-equipment"
+            "view_all_url": "/collections/new-theme-dough-prep-equipment"
           }
         },
         "equip_prep_fridges": {
           "type": "equip_section",
           "settings": {
-            "image": "shopify:\/\/shop_images\/Pizza_prep_refrigeration.png",
+            "image": "shopify://shop_images/Pizza_prep_refrigeration.png",
             "image_url": "",
             "section_id": "prep-refrigerators",
             "is_reverse": false,
@@ -108,16 +117,16 @@
             "bullet_2": "Sandwich & Topping Prep Units",
             "bullet_3": "Undercounter Refrigerators",
             "cta_text": "Shop Prep Refrigerators",
-            "cta_url": "\/collections\/new-theme-pizza-preparation-refrigerators",
+            "cta_url": "/collections/new-theme-pizza-preparation-refrigerators",
             "popular_products_label": "Popular Products",
             "featured_collection": "new-theme-pizza-preparation-refrigerators",
-            "view_all_url": "\/collections\/new-theme-pizza-preparation-refrigerators"
+            "view_all_url": "/collections/new-theme-pizza-preparation-refrigerators"
           }
         },
         "equip_section_BPnRyA": {
           "type": "equip_section",
           "settings": {
-            "image": "shopify:\/\/shop_images\/pizza_prep_mixers.png",
+            "image": "shopify://shop_images/pizza_prep_mixers.png",
             "image_url": "",
             "section_id": "mixers",
             "is_reverse": true,
@@ -127,16 +136,16 @@
             "bullet_2": "Heavy-duty & commercial",
             "bullet_3": "Multiple sizes for any kitchen.",
             "cta_text": "Shop Mixers",
-            "cta_url": "shopify:\/\/collections\/pizza-restaurant-mixers",
+            "cta_url": "shopify://collections/pizza-restaurant-mixers",
             "popular_products_label": "Popular Products",
             "featured_collection": "pizza-restaurant-mixers",
-            "view_all_url": "shopify:\/\/collections\/pizza-restaurant-mixers"
+            "view_all_url": "shopify://collections/pizza-restaurant-mixers"
           }
         },
         "equip_section_Tf4MM3": {
           "type": "equip_section",
           "settings": {
-            "image": "shopify:\/\/shop_images\/display_pizza.png",
+            "image": "shopify://shop_images/display_pizza.png",
             "image_url": "",
             "section_id": "display-holding",
             "is_reverse": false,
@@ -146,10 +155,10 @@
             "bullet_2": "Improves product display.",
             "bullet_3": "Reduces food waste.",
             "cta_text": "Shop Display & Holding Equipments",
-            "cta_url": "shopify:\/\/collections\/pizza-restaurant-display-cases",
+            "cta_url": "shopify://collections/pizza-restaurant-display-cases",
             "popular_products_label": "Popular Products",
             "featured_collection": "pizza-restaurant-display-cases",
-            "view_all_url": "shopify:\/\/collections\/pizza-restaurant-display-cases"
+            "view_all_url": "shopify://collections/pizza-restaurant-display-cases"
           }
         },
         "st_pizzeria": {
@@ -158,7 +167,7 @@
           "settings": {
             "image_url": "",
             "name": "Pizzeria",
-            "url": "\/collections\/restaurant-equipment"
+            "url": "/collections/restaurant-equipment"
           }
         },
         "st_ny_slice": {
@@ -167,7 +176,7 @@
           "settings": {
             "image_url": "",
             "name": "NY-Style Slice Shop",
-            "url": "\/collections\/restaurant-equipment"
+            "url": "/collections/restaurant-equipment"
           }
         },
         "st_neapolitan": {
@@ -176,7 +185,7 @@
           "settings": {
             "image_url": "",
             "name": "Neapolitan Restaurant",
-            "url": "\/collections\/restaurant-equipment"
+            "url": "/collections/restaurant-equipment"
           }
         },
         "st_chicago": {
@@ -185,7 +194,7 @@
           "settings": {
             "image_url": "",
             "name": "Chicago Deep Dish",
-            "url": "\/collections\/restaurant-equipment"
+            "url": "/collections/restaurant-equipment"
           }
         },
         "st_delivery": {
@@ -194,7 +203,7 @@
           "settings": {
             "image_url": "",
             "name": "Pizza Delivery Kitchen",
-            "url": "\/collections\/restaurant-equipment"
+            "url": "/collections/restaurant-equipment"
           }
         },
         "st_catering": {
@@ -203,7 +212,7 @@
           "settings": {
             "image_url": "",
             "name": "Pizza Catering",
-            "url": "\/collections\/restaurant-equipment"
+            "url": "/collections/restaurant-equipment"
           }
         },
         "guide_deck_vs_conveyor": {
@@ -211,7 +220,7 @@
           "settings": {
             "image_url": "",
             "title": "Deck vs. Conveyor Pizza Ovens: Which Is Right for Your Pizzeria?",
-            "url": "\/blogs\/resources",
+            "url": "/blogs/resources",
             "meta": "Guide"
           }
         },
@@ -220,7 +229,7 @@
           "settings": {
             "image_url": "",
             "title": "How to Choose the Right Dough Mixer for Your Pizza Volume",
-            "url": "\/blogs\/resources",
+            "url": "/blogs/resources",
             "meta": "Guide"
           }
         },
@@ -229,7 +238,7 @@
           "settings": {
             "image_url": "",
             "title": "Pizza Prep Table Buying Guide: Size, Features & Brands",
-            "url": "\/blogs\/resources",
+            "url": "/blogs/resources",
             "meta": "Guide"
           }
         },
@@ -238,7 +247,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Bakers Pride",
-            "url": "\/collections\/restaurant-equipment",
+            "url": "/collections/restaurant-equipment",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -248,7 +257,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Lincoln",
-            "url": "\/collections\/restaurant-equipment",
+            "url": "/collections/restaurant-equipment",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -258,7 +267,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Vulcan",
-            "url": "\/collections\/restaurant-equipment",
+            "url": "/collections/restaurant-equipment",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -268,7 +277,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Robot Coupe",
-            "url": "\/pages\/robot-coupe",
+            "url": "/pages/robot-coupe",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -278,7 +287,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Waring",
-            "url": "\/pages\/waring",
+            "url": "/pages/waring",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -315,13 +324,13 @@
         "hero_title_override": "Pizza Restaurant Equipment Solutions",
         "hero_lead": "From wood-fired deck ovens to dough sheeters and prep tables — complete equipment for every stage of your pizza operation.",
         "hero_btn1_text": "Shop All Pizza Equipment",
-        "hero_btn1_url": "\/collections\/restaurant-equipment",
+        "hero_btn1_url": "/collections/restaurant-equipment",
         "hero_btn2_text": "Request a Quote",
-        "hero_btn2_url": "\/pages\/contact-us",
+        "hero_btn2_url": "/pages/contact-us",
         "breadcrumb_home_label": "Home",
         "breadcrumb_home_url": "",
         "breadcrumb_parent_label": "Use Cases",
-        "breadcrumb_parent_url": "\/pages\/use-cases",
+        "breadcrumb_parent_url": "/pages/use-cases",
         "show_store_types": true,
         "store_types_title": "Shop by Store Type",
         "show_guides": true,
@@ -333,7 +342,7 @@
         "help_title": "Need Help Choosing the Right Equipment?",
         "help_body": "Our experts can help you find the right pizza ovens, prep tables, and dough equipment for your operation.",
         "help_btn_text": "Contact an Expert",
-        "help_btn_url": "\/pages\/contact-us",
+        "help_btn_url": "/pages/contact-us",
         "show_brands": true,
         "brands_title": "Top Brands We Carry",
         "show_expert_cta": true,
@@ -341,9 +350,9 @@
         "expert_title": "Build out your pizzeria with confidence.",
         "expert_body": "From a single deck oven to a full pizza kitchen setup, our specialists will spec the right equipment for your volume, style, and budget.",
         "expert_btn1_text": "Request a Quote",
-        "expert_btn1_url": "\/pages\/contact-us",
+        "expert_btn1_url": "/pages/contact-us",
         "expert_btn2_text": "Talk to an Expert",
-        "expert_btn2_url": "\/pages\/contact-us",
+        "expert_btn2_url": "/pages/contact-us",
         "show_features": true,
         "feat_1_title": "Expert Support",
         "feat_1_text": "Get help from our equipment experts",

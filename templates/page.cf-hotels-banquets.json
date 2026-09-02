@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
@@ -23,6 +32,7 @@
         },
         "nav_chafers": {
           "type": "cat_nav",
+          "disabled": true,
           "settings": {
             "label": "Chafing Dishes",
             "anchor": "chafing-dishes",
@@ -41,6 +51,7 @@
         },
         "nav_carts": {
           "type": "cat_nav",
+          "disabled": true,
           "settings": {
             "label": "Banquet Carts",
             "anchor": "banquet-carts",
@@ -50,6 +61,7 @@
         },
         "nav_more": {
           "type": "cat_nav",
+          "disabled": true,
           "settings": {
             "label": "More Equipment",
             "anchor": "more-equipment",
@@ -60,6 +72,7 @@
         "equip_holding": {
           "type": "equip_section",
           "settings": {
+            "image": "shopify://shop_images/heat_cabinet.png",
             "image_url": "",
             "section_id": "holding-cabinets",
             "is_reverse": false,
@@ -78,6 +91,7 @@
         "equip_buffet": {
           "type": "equip_section",
           "settings": {
+            "image": "shopify://shop_images/steam_tables_for_buffet.png",
             "image_url": "",
             "section_id": "buffet-steam",
             "is_reverse": true,
@@ -96,6 +110,7 @@
         "equip_warewash": {
           "type": "equip_section",
           "settings": {
+            "image": "shopify://shop_images/washing.png",
             "image_url": "",
             "section_id": "warewashing",
             "is_reverse": false,
@@ -105,65 +120,65 @@
             "bullet_2": "Under-Counter Dishwashers",
             "bullet_3": "Glass Washers",
             "cta_text": "Shop Warewashing",
-            "cta_url": "/collections/restaurant-equipment",
+            "cta_url": "shopify://collections/omcan-dishwasher",
             "popular_products_label": "Popular Products",
-            "featured_collection": "restaurant-equipment",
-            "view_all_url": "/collections/restaurant-equipment"
+            "featured_collection": "omcan-dishwasher",
+            "view_all_url": "shopify://collections/omcan-dishwasher"
           }
         },
         "st_hotel_rest": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
             "image_url": "",
             "name": "Hotel Restaurant",
             "url": "/collections/restaurant-equipment"
-          },
-          "disabled": true
+          }
         },
         "st_conference": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
             "image_url": "",
             "name": "Conference & Meetings",
             "url": "/collections/restaurant-equipment"
-          },
-          "disabled": true
+          }
         },
         "st_wedding": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
             "image_url": "",
             "name": "Wedding Venue",
             "url": "/collections/restaurant-equipment"
-          },
-          "disabled": true
+          }
         },
         "st_corporate": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
             "image_url": "",
             "name": "Corporate Catering",
             "url": "/collections/restaurant-equipment"
-          },
-          "disabled": true
+          }
         },
         "st_event": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
             "image_url": "",
             "name": "Event Catering Hall",
             "url": "/collections/restaurant-equipment"
-          },
-          "disabled": true
+          }
         },
         "st_country": {
           "type": "store_type",
+          "disabled": true,
           "settings": {
             "image_url": "",
             "name": "Country Club",
             "url": "/collections/restaurant-equipment"
-          },
-          "disabled": true
+          }
         },
         "guide_holding": {
           "type": "guide",
@@ -269,12 +284,16 @@
         "brand_winco"
       ],
       "settings": {
+        "hero_title_override": "Hotel & Banquet Equipment Solutions",
+        "hero_lead": "High-capacity solutions for hotel restaurants, catering halls, and large-scale banquet operations — built to handle any event size.",
+        "hero_btn1_text": "Shop All Hotel & Banquet Equipment",
+        "hero_btn1_url": "/collections/restaurant-equipment",
+        "hero_btn2_text": "Request a Quote",
+        "hero_btn2_url": "/pages/contact-us",
         "breadcrumb_home_label": "Home",
         "breadcrumb_home_url": "",
         "breadcrumb_parent_label": "Use Cases",
         "breadcrumb_parent_url": "/pages/use-cases",
-        "hero_btn2_text": "Request a Quote",
-        "hero_btn2_url": "/pages/contact-us",
         "show_store_types": true,
         "store_types_title": "Shop by Store Type",
         "show_guides": true,
@@ -284,11 +303,15 @@
         "auto_blog_handle": "resources",
         "show_help": true,
         "help_title": "Need Help Choosing the Right Equipment?",
+        "help_body": "Our experts can help you select the right holding, buffet, and warewashing equipment for your hotel or banquet facility.",
         "help_btn_text": "Contact an Expert",
         "help_btn_url": "/pages/contact-us",
         "show_brands": true,
         "brands_title": "Top Brands We Carry",
         "show_expert_cta": true,
+        "expert_eyebrow": "Designed for hotel & banquet professionals",
+        "expert_title": "Equip your banquet operation with confidence.",
+        "expert_body": "From a single chafing dish order to a complete banquet kitchen spec, our team will build the right equipment package for your event volume and service style.",
         "expert_btn1_text": "Request a Quote",
         "expert_btn1_url": "/pages/contact-us",
         "expert_btn2_text": "Talk to an Expert",
@@ -305,15 +328,7 @@
         "color_maroon": "#8b1538",
         "color_navy": "#1b2b47",
         "color_gold": "#d4af37",
-        "color_coral": "#ff6b6b",
-        "hero_title_override": "Hotel & Banquet Equipment Solutions",
-        "hero_lead": "High-capacity solutions for hotel restaurants, catering halls, and large-scale banquet operations — built to handle any event size.",
-        "hero_btn1_text": "Shop All Hotel & Banquet Equipment",
-        "hero_btn1_url": "/collections/restaurant-equipment",
-        "expert_eyebrow": "Designed for hotel & banquet professionals",
-        "expert_title": "Equip your banquet operation with confidence.",
-        "expert_body": "From a single chafing dish order to a complete banquet kitchen spec, our team will build the right equipment package for your event volume and service style.",
-        "help_body": "Our experts can help you select the right holding, buffet, and warewashing equipment for your hotel or banquet facility."
+        "color_coral": "#ff6b6b"
       }
     }
   },

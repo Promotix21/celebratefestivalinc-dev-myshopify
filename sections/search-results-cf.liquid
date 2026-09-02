@@ -91,12 +91,6 @@
   display: flex;
   gap: 24px;
 }
-/* AJAX filtering: dim + lock the region while the swap is in flight */
-.cf-plp__container.cf-plp__region--loading {
-  opacity: 0.55;
-  pointer-events: none;
-  transition: opacity 0.15s ease;
-}
 
 /* ========================================
    FILTERS SIDEBAR
@@ -1425,8 +1419,8 @@
     {%- assign sort_by = search.sort_by | default: 'relevance' -%}
     {% paginate search.results by section.settings.products_per_page %}
 
-    {% comment %} Main Container — AJAX swap region (sidebar + results + toolbar + pagination) {% endcomment %}
-    <div class="cf-plp__container" id="cf-search-results-region">
+    {% comment %} Main Container {% endcomment %}
+    <div class="cf-plp__container">
 
       {% comment %} Filters Sidebar - Shopify Storefront Filtering API {% endcomment %}
       <aside class="cf-plp__sidebar">
@@ -1535,7 +1529,7 @@
 
           {% if has_active_filters %}
             <div class="cf-plp__sidebar-clear">
-              <a href="/search?q={{ search.terms | url_encode }}&type=product&options[prefix]=last&options[unavailable_products]=show{% if sort_by != blank %}&sort_by={{ sort_by }}{% endif %}" class="cf-plp__clear-all-link">Clear All Filters</a>
+              <a href="/search?q={{ search.terms | url_encode }}{% if sort_by != blank %}&sort_by={{ sort_by }}{% endif %}" class="cf-plp__clear-all-link">Clear All Filters</a>
             </div>
           {% endif %}
 
@@ -1572,7 +1566,7 @@
                     {% endfor %}
                   {% endfor %}
                 </div>
-                <a href="/search?q={{ search.terms | url_encode }}&type=product&options[prefix]=last&options[unavailable_products]=show{% if sort_by != blank %}&sort_by={{ sort_by }}{% endif %}" class="cf-plp__clear-all">Clear All</a>
+                <a href="/search?q={{ search.terms | url_encode }}{% if sort_by != blank %}&sort_by={{ sort_by }}{% endif %}" class="cf-plp__clear-all">Clear All</a>
               </div>
             {% endif %}
 
@@ -1613,10 +1607,10 @@
             <div class="cf-plp__sort">
               <label for="search-sort">Sort by</label>
               <select id="search-sort" onchange="handleSearchSort(this.value)">
-                <option value="relevance" {% if sort_by == 'relevance' %}selected{% endif %}>Most Relevant</option>
-                <option value="price-ascending" {% if sort_by == 'price-ascending' %}selected{% endif %}>Price: Low to High</option>
-                <option value="price-descending" {% if sort_by == 'price-descending' %}selected{% endif %}>Price: High to Low</option>
-                <option value="title-ascending" {% if sort_by == 'title-ascending' %}selected{% endif %}>Name: A-Z</option>
+                <option value="relevance">Most Relevant</option>
+                <option value="price-ascending">Price: Low to High</option>
+                <option value="price-descending">Price: High to Low</option>
+                <option value="title-ascending">Name: A-Z</option>
               </select>
             </div>
           </div>
@@ -1705,85 +1699,85 @@
 </div>
 
 <script>
-/* All product-region controls use EVENT DELEGATION on document so they keep
-   working after cfSearchAjax swaps #cf-search-results-region (the grid, view
-   toggle and mobile-filter button are re-rendered on every AJAX filter). */
 document.addEventListener('DOMContentLoaded', function() {
+  const productGrid = document.getElementById('product-grid');
 
-  // View Toggle (grid / list) — delegated
-  document.addEventListener('click', function(e) {
-    const btn = e.target.closest('.cf-plp__view-btn');
-    if (!btn) return;
-    const productGrid = document.getElementById('product-grid');
-    document.querySelectorAll('.cf-plp__view-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    if (productGrid) {
-      productGrid.classList.toggle('list-view', btn.dataset.view === 'list');
-    }
-  });
-
-  // Add to Cart — delegated (product cards are re-injected on every AJAX swap)
-  document.addEventListener('click', function(e) {
-    const button = e.target.closest('.quick-add-btn');
-    if (!button) return;
-    e.preventDefault();
-    const variantId = button.dataset.variantId;
-    const card = button.closest('.product-card');
-    const qtyInput = card ? card.querySelector('.qty-input') : null;
-    const qty = qtyInput ? (parseInt(qtyInput.value) || 1) : 1;
-
-    button.disabled = true;
-    button.textContent = 'Adding...';
-
-    fetch('/cart/add.js', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: parseInt(variantId), quantity: qty })
-    })
-    .then(res => {
-      if (!res.ok) throw new Error('Add to cart failed');
-      return res.json();
-    })
-    .then(data => {
-      button.textContent = 'Added!';
-      button.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
-
-      if (window.updateCartCount) window.updateCartCount();
-      else {
-        fetch('/cart.js').then(r => r.json()).then(cart => {
-          const countEls = document.querySelectorAll('.cart-count-bubble span, .cart-count, [data-cart-count]');
-          countEls.forEach(el => el.textContent = cart.item_count);
-        });
+  // View Toggle
+  document.querySelectorAll('.cf-plp__view-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.cf-plp__view-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      if (productGrid) {
+        if (this.dataset.view === 'list') {
+          productGrid.classList.add('list-view');
+        } else {
+          productGrid.classList.remove('list-view');
+        }
       }
-
-      if (typeof window.cfShowCartToast === 'function') {
-        window.cfShowCartToast(data, qty);
-      }
-
-      setTimeout(() => {
-        button.textContent = 'Add to Cart';
-        button.style.background = '';
-        button.disabled = false;
-      }, 2000);
-    })
-    .catch(err => {
-      console.error('Cart error:', err);
-      button.textContent = 'Error';
-      button.style.background = '#ef4444';
-      setTimeout(() => {
-        button.textContent = 'Add to Cart';
-        button.style.background = '';
-        button.disabled = false;
-      }, 2000);
     });
   });
 
-  // Mobile Filter Button — delegated (re-rendered inside the swap region)
-  document.addEventListener('click', function(e) {
-    if (e.target.closest('#mobile-filter-btn')) {
-      openSearchMobileFilters();
-    }
+  // Add to Cart
+  document.querySelectorAll('.quick-add-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const variantId = this.dataset.variantId;
+      const card = this.closest('.product-card');
+      const qty = card ? parseInt(card.querySelector('.qty-input').value) || 1 : 1;
+      const button = this;
+
+      button.disabled = true;
+      button.textContent = 'Adding...';
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: parseInt(variantId), quantity: qty })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Add to cart failed');
+        return res.json();
+      })
+      .then(data => {
+        button.textContent = 'Added!';
+        button.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+
+        if (window.updateCartCount) window.updateCartCount();
+        else {
+          fetch('/cart.js').then(r => r.json()).then(cart => {
+            const countEls = document.querySelectorAll('.cart-count-bubble span, .cart-count, [data-cart-count]');
+            countEls.forEach(el => el.textContent = cart.item_count);
+          });
+        }
+
+        if (typeof window.cfShowCartToast === 'function') {
+          window.cfShowCartToast(data, qty);
+        }
+
+        setTimeout(() => {
+          button.textContent = 'Add to Cart';
+          button.style.background = '';
+          button.disabled = false;
+        }, 2000);
+      })
+      .catch(err => {
+        console.error('Cart error:', err);
+        button.textContent = 'Error';
+        button.style.background = '#ef4444';
+        setTimeout(() => {
+          button.textContent = 'Add to Cart';
+          button.style.background = '';
+          button.disabled = false;
+        }, 2000);
+      });
+    });
   });
+
+  // Mobile Filter Button
+  const mobileFilterBtn = document.getElementById('mobile-filter-btn');
+  if (mobileFilterBtn) {
+    mobileFilterBtn.addEventListener('click', openSearchMobileFilters);
+  }
 });
 
 /* ========================================
@@ -1811,7 +1805,7 @@ window.handleSearchStorefrontFilter = function(checkbox) {
 
   // Reset to page 1 when filtering
   url.searchParams.delete('page');
-  cfSearchGo(url);
+  window.location = url.toString();
 };
 
 // Remove a specific active filter (called from active filter chips)
@@ -1825,7 +1819,7 @@ window.removeSearchStorefrontFilter = function(paramName, paramValue) {
     }
   });
   url.searchParams.delete('page');
-  cfSearchGo(url);
+  window.location = url.toString();
 };
 
 // Apply price range filter
@@ -1836,15 +1830,13 @@ window.applySearchPriceFilter = function() {
   inputs.forEach(input => {
     url.searchParams.delete(input.name);
     if (input.value && parseFloat(input.value) > 0) {
-      // Shopify storefront price filters expect DOLLARS (major units), e.g.
-      // filter.v.price.lte=500 means $500. The input already holds dollars, so
-      // pass it through unchanged (previously multiplied by 100 -> $50,000 bug).
-      url.searchParams.set(input.name, parseFloat(input.value));
+      // Shopify expects price in cents (subunit)
+      url.searchParams.set(input.name, Math.round(parseFloat(input.value) * 100));
     }
   });
 
   url.searchParams.delete('page');
-  cfSearchGo(url);
+  window.location = url.toString();
 };
 
 // Toggle filter group collapse
@@ -1877,9 +1869,8 @@ window.toggleFilterViewMore = function(btn) {
 window.handleSearchSort = function(value) {
   const url = new URL(window.location);
   url.searchParams.set('sort_by', value);
-  url.searchParams.delete('page');
-  // Preserve existing filter params + q
-  cfSearchGo(url);
+  // Preserve existing filter params
+  window.location = url;
 };
 
 // Mobile Filters - clone sidebar, instant apply on checkbox tap
@@ -1954,138 +1945,362 @@ window.applySearchMobileFilters = function() {
   // Add price inputs from mobile drawer
   content.querySelectorAll('.cf-plp__price-range-input').forEach(input => {
     if (input.value && parseFloat(input.value) > 0) {
-      // Shopify storefront price filters expect DOLLARS (major units), e.g.
-      // filter.v.price.lte=500 means $500. The input already holds dollars, so
-      // pass it through unchanged (previously multiplied by 100 -> $50,000 bug).
-      url.searchParams.set(input.name, parseFloat(input.value));
+      url.searchParams.set(input.name, Math.round(parseFloat(input.value) * 100));
     }
   });
 
   url.searchParams.delete('page');
   closeSearchMobileFilters();
-  cfSearchGo(url);
+  window.location = url.toString();
 };
-
-/* ========================================================================
-   SEARCH AJAX FILTERING  (cfSearchAjax)
-   Same-page filter / sort / price / pagination without a full reload.
-   Modeled on the proven cfL2 module in sections/main-collection-cf.liquid,
-   but scoped to SEARCH: the "q" search term is the permanent scope and is
-   never dropped from the URL.
-
-   Flow:
-     handler builds a URL (adds/removes filter.* / sort_by, deletes page)
-       -> cfSearchGo(url)
-       -> fetch same URL, parse HTML, swap only #cf-search-results-region
-          (sidebar + toolbar + result count + active chips + grid + pagination)
-       -> history.pushState, re-fire cf:products-added / wholesale / wishlist
-     popstate re-fetches the restored URL (no extra history entry).
-   ======================================================================== */
-window.cfSearchAjax = (function () {
-  var REGION_ID = 'cf-search-results-region';
-  var inFlight = null;               // AbortController for the active request
-
-  function region() { return document.getElementById(REGION_ID); }
-
-  // Enforce the full CF search contract on EVERY AJAX request so a filter,
-  // sort, Clear All or pagination action never silently drops type / prefix /
-  // unavailable_products (which would change the result set — e.g. "kull" would
-  // collapse from 6 products to ~0 after the first filter). Also never lose the
-  // q scope, and carry preview_theme_id so dev-theme testing works.
-  function normalize(rawUrl) {
-    var here = new URL(window.location.href);
-    var u = new URL(rawUrl, window.location.origin);
-
-    // q — the permanent search scope
-    if (!u.searchParams.get('q')) {
-      var q = here.searchParams.get('q');
-      if (q) u.searchParams.set('q', q);
-    }
-    // Explicit, consistent search contract (matches the header forms/predictive)
-    u.searchParams.set('type', 'product');
-    u.searchParams.set('options[prefix]', 'last');
-    u.searchParams.set('options[unavailable_products]', 'show');
-
-    var preview = here.searchParams.get('preview_theme_id');
-    if (preview && !u.searchParams.get('preview_theme_id')) {
-      u.searchParams.set('preview_theme_id', preview);
-    }
-    return u;
-  }
-
-  // Re-run client-side product-card wiring on freshly injected cards.
-  // Reuses existing project hooks — do NOT duplicate their logic here.
-  function reinit() {
-    document.dispatchEvent(new CustomEvent('cf:products-added'));
-    if (typeof window.cfWholesalePricingInit === 'function') {
-      try { window.cfWholesalePricingInit(); } catch (e) { console.error('[cfSearch] wholesale reinit', e); }
-    }
-    if (window.CelebrateFestivalWishlist && typeof window.CelebrateFestivalWishlist.updateAllIcons === 'function') {
-      try { window.CelebrateFestivalWishlist.updateAllIcons(); } catch (e) { console.error('[cfSearch] wishlist reinit', e); }
-    }
-  }
-
-  function navigate(rawUrl, push) {
-    var host = region();
-    if (!host) { window.location = rawUrl; return; }   // graceful: no region -> full nav
-
-    var u = normalize(rawUrl);
-    var fetchUrl = u.toString();
-
-    if (inFlight) { inFlight.abort(); }                 // cancel superseded request (rapid filtering)
-    inFlight = new AbortController();
-    host.classList.add('cf-plp__region--loading');
-
-    fetch(fetchUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, signal: inFlight.signal })
-      .then(function (r) { return r.text(); })
-      .then(function (html) {
-        var next = new DOMParser().parseFromString(html, 'text/html').getElementById(REGION_ID);
-        if (!next) { window.location = fetchUrl; return; }   // markup missing -> full nav fallback
-        host.innerHTML = next.innerHTML;
-        host.classList.remove('cf-plp__region--loading');
-        if (push !== false) { history.pushState({ cfSearch: true }, '', fetchUrl); }
-        reinit();
-        var top = host.getBoundingClientRect().top + window.pageYOffset - 140;
-        window.scrollTo({ top: top < 0 ? 0 : top, behavior: 'smooth' });
-        inFlight = null;
-      })
-      .catch(function (err) {
-        if (err && err.name === 'AbortError') { return; } // superseded — ignore
-        console.error('[cfSearch] AJAX failed, falling back to full navigation', err);
-        window.location = fetchUrl;
-      });
-  }
-
-  // Delegated clicks for server-rendered anchors inside the region:
-  // pagination arrows/numbers + Clear All links. Filter checkboxes / chip
-  // removers / sort / price already call the window.* handlers above.
-  document.addEventListener('click', function (e) {
-    var host = region();
-    if (!host) { return; }
-    var a = e.target.closest('a');
-    if (!a || !host.contains(a) || !a.getAttribute('href')) { return; }
-    if (a.classList.contains('cf-plp__page-btn') ||
-        a.classList.contains('cf-plp__page-num') ||
-        a.classList.contains('cf-plp__clear-all-link') ||
-        a.classList.contains('cf-plp__clear-all')) {
-      e.preventDefault();
-      navigate(a.getAttribute('href'), true);
-    }
-  });
-
-  window.addEventListener('popstate', function () {
-    if (region()) { navigate(window.location.href, false); }
-  });
-
-  return { navigate: navigate };
-})();
-
-// Single entry point used by every filter/sort/price handler above.
-// Accepts a URL object or string; always routes through the AJAX engine.
-function cfSearchGo(url) {
-  window.cfSearchAjax.navigate(url.toString(), true);
-}
 </script>
+
+
+<style>
+/* ==========================================================
+   CF SEARCH RESULTS - EXACT SAME VIEW AS CF COLLECTION
+   ----------------------------------------------------------
+   Visual override only.
+   Existing search, filters, sorting, pagination, mobile
+   drawer, view toggle, product-card and cart functionality
+   are preserved.
+   ========================================================== */
+
+/* Product area */
+.cf-plp--compact .cf-plp__products {
+  padding: 16px 20px !important;
+}
+
+/* Exact catalog grid structure */
+.cf-plp--compact .cf-plp__grid:not(.list-view) {
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  margin-top: 14px !important;
+  border-top: 1px solid #d9dde2;
+  border-left: 1px solid #d9dde2;
+  overflow: visible !important;
+  align-items: stretch;
+}
+
+/* Universal product-card -> flat catalog cell */
+.cf-plp--compact .cf-plp__grid:not(.list-view) .product-card {
+  padding: 10px 12px 14px !important;
+  border: 0 !important;
+  border-right: 1px solid #d9dde2 !important;
+  border-bottom: 1px solid #d9dde2 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: none !important;
+  min-width: 0;
+}
+
+.cf-plp--compact .cf-plp__grid:not(.list-view) .product-card:hover {
+  border-color: #d9dde2 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Same image treatment as collection */
+.cf-plp--compact .product-card .card-image {
+  width: 100% !important;
+  height: 205px !important;
+  max-height: 205px !important;
+  margin: 0 0 7px !important;
+  padding: 2px !important;
+  object-fit: contain !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  transform: none !important;
+  filter: none !important;
+}
+
+.cf-plp--compact .product-card:hover .card-image {
+  transform: none !important;
+  filter: none !important;
+}
+
+/* Remove category pill from compact catalog */
+.cf-plp--compact .product-card .card-category {
+  display: none !important;
+}
+
+/* Product information */
+.cf-plp--compact .product-card .card-content {
+  padding: 0 2px 2px !important;
+  text-align: center !important;
+}
+
+.cf-plp--compact .product-card .card-title {
+  color: var(--deep-blue) !important;
+  font-size: 12px !important;
+  line-height: 1.25 !important;
+  font-weight: 700 !important;
+  margin: 3px 0 5px !important;
+  min-height: 46px !important;
+  text-align: center !important;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 3 !important;
+  overflow: hidden !important;
+}
+
+.cf-plp--compact .product-card .card-title:hover {
+  color: var(--primary-blue) !important;
+}
+
+.cf-plp--compact .product-card .card-sku {
+  color: #4b5563 !important;
+  font-size: 9px !important;
+  line-height: 1.2 !important;
+  margin: 0 0 5px !important;
+}
+
+/* Same price presentation */
+.cf-plp--compact .product-card .price-single {
+  min-height: 58px !important;
+  padding: 3px 2px !important;
+  margin: 0 0 4px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  text-align: center !important;
+}
+
+.cf-plp--compact .product-card .price-label-single {
+  display: none !important;
+}
+
+.cf-plp--compact .product-card .price-amount-single {
+  color: #d83a00 !important;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 21px !important;
+  line-height: 1.15 !important;
+  font-weight: 700 !important;
+}
+
+.cf-plp--compact .product-card .compare-price-strike {
+  color: #777 !important;
+  font-size: 10px !important;
+}
+
+.cf-plp--compact .product-card .sale-savings-single {
+  color: #238b16 !important;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+}
+
+/* Existing badges - same compact size */
+.cf-plp--compact .product-card .badge-container {
+  top: 6px !important;
+  left: 6px !important;
+  gap: 3px !important;
+}
+
+.cf-plp--compact .product-card .badge-container .badge {
+  padding: 3px 6px !important;
+  border-radius: 2px !important;
+  font-size: 8px !important;
+  line-height: 1 !important;
+}
+
+.cf-plp--compact .product-card .variations-badge {
+  top: 6px !important;
+  right: 6px !important;
+  padding: 3px 6px !important;
+  border-radius: 2px !important;
+  font-size: 8px !important;
+}
+
+/* Shipping badge */
+.cf-plp--compact .product-card .card-shipping,
+.cf-plp--compact .product-card .shipping-badge,
+.cf-plp--compact .product-card .free-shipping {
+  font-size: 8px !important;
+  padding: 3px 6px !important;
+  margin: 1px auto 4px !important;
+  border-radius: 2px !important;
+}
+
+/* Same quantity + orange Add to Cart row */
+.cf-plp--compact .product-card .card-actions {
+  width: 100% !important;
+  margin-top: 5px !important;
+  gap: 0 !important;
+}
+
+.cf-plp--compact .product-card .qty-input {
+  width: 31px !important;
+  min-width: 31px !important;
+  height: 32px !important;
+  padding: 2px !important;
+  border: 1px solid #9aa3ad !important;
+  border-right: 0 !important;
+  border-radius: 4px 0 0 4px !important;
+  font-size: 10px !important;
+}
+
+.cf-plp--compact .product-card .add-to-cart,
+.cf-plp--compact .product-card .add-btn {
+  height: 32px !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+  padding: 4px 5px !important;
+  border: 0 !important;
+  border-radius: 0 4px 4px 0 !important;
+  background: #d83a00 !important;
+  color: #fff !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.cf-plp--compact .product-card .add-to-cart:hover,
+.cf-plp--compact .product-card .add-btn:hover {
+  background: #b92f00 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Compact login / call prompts */
+.cf-plp--compact .product-card .login-prompt,
+.cf-plp--compact .product-card .call-prompt {
+  font-size: 9px !important;
+  padding: 3px 0 !important;
+  margin-top: 2px !important;
+}
+
+/* Same toolbar */
+.cf-plp--compact .cf-plp__toolbar-compact {
+  padding: 8px 16px !important;
+  margin: 0 !important;
+  border: 1px solid #d9dde2 !important;
+  border-top: 0 !important;
+  border-radius: 0 !important;
+  background: #f7f7f7 !important;
+  box-shadow: none !important;
+}
+
+/* Same sidebar */
+.cf-plp--compact .cf-plp__sidebar {
+  width: 220px !important;
+  min-width: 220px !important;
+  padding: 16px !important;
+  background: #fafafa !important;
+  border-right: 1px solid #d9dde2 !important;
+}
+
+/* Preserve list-view functionality */
+.cf-plp--compact .cf-plp__grid.list-view {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  border: 0 !important;
+}
+
+.cf-plp--compact .cf-plp__grid.list-view .product-card {
+  border: 1px solid #d9dde2 !important;
+  border-radius: 4px !important;
+  padding: 12px !important;
+}
+
+/* Responsive hierarchy — same as final collection */
+@media (min-width: 1800px) {
+  .cf-plp--compact .cf-plp__grid:not(.list-view) {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  }
+
+  .cf-plp--compact .product-card .card-image {
+    height: 220px !important;
+    max-height: 220px !important;
+  }
+}
+
+@media (max-width: 1600px) {
+  .cf-plp--compact .cf-plp__grid:not(.list-view) {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+
+  .cf-plp--compact .product-card .card-image {
+    height: 195px !important;
+    max-height: 195px !important;
+  }
+}
+
+@media (max-width: 1250px) {
+  .cf-plp--compact .cf-plp__grid:not(.list-view) {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  .cf-plp--compact .product-card .card-image {
+    height: 185px !important;
+    max-height: 185px !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .cf-plp--compact .cf-plp__grid:not(.list-view) {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .cf-plp--compact .product-card .card-image {
+    height: 175px !important;
+    max-height: 175px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .cf-plp--compact .cf-plp__grid:not(.list-view) {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .cf-plp--compact .cf-plp__products {
+    padding: 10px 8px !important;
+  }
+
+  .cf-plp--compact .product-card {
+    padding: 8px !important;
+  }
+
+  .cf-plp--compact .product-card .card-image {
+    height: 145px !important;
+    max-height: 145px !important;
+  }
+
+  .cf-plp--compact .product-card .card-title {
+    font-size: 10px !important;
+    min-height: 40px !important;
+  }
+
+  .cf-plp--compact .product-card .price-amount-single {
+    font-size: 17px !important;
+  }
+
+  .cf-plp--compact .product-card .add-to-cart,
+  .cf-plp--compact .product-card .add-btn {
+    font-size: 9px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .cf-plp--compact .product-card .card-image {
+    height: 125px !important;
+    max-height: 125px !important;
+  }
+
+  .cf-plp--compact .product-card .card-title {
+    font-size: 9px !important;
+  }
+
+  .cf-plp--compact .product-card .price-amount-single {
+    font-size: 15px !important;
+  }
+}
+</style>
 
 {% schema %}
 {

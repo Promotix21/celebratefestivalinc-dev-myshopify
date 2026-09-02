@@ -464,12 +464,6 @@
     init();
   }
 
-  // Re-callable so dynamically injected product cards (Load More / same-page L3
-  // AJAX filtering on level-2-mega) get BDR wholesale pricing re-applied.
-  // collectProducts() reads the whole DOM and re-priced cards are idempotent.
-  window.cfWholesalePricingInit = init;
-  document.addEventListener('cf:products-added', init);
-
 })();
 
 /* ================================================================== */

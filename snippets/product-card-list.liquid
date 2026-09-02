@@ -28,15 +28,10 @@
     assign call_for_price = true
   endif
 
-  comment
-    Free Shipping controlled by metafield custom.free_shipping (single source of truth).
-    custom.shipping_note prints a custom line (e.g. "Ships for a flat $9.99") when not free.
-  endcomment
   assign has_free_shipping = false
-  if product.metafields.custom.free_shipping
+  if product.tags contains 'free-shipping'
     assign has_free_shipping = true
   endif
-  assign shipping_note = product.metafields.custom.shipping_note
 
   assign product_sku = product.selected_or_first_available_variant.sku
 
@@ -308,11 +303,9 @@
 
       {%- endcase -%}
 
-      <!-- Free Shipping Badge / custom shipping note -->
+      <!-- Free Shipping Badge -->
       {%- if has_free_shipping -%}
         <div class="free-shipping-badge-plp">Free Shipping</div>
-      {%- elsif shipping_note != blank -%}
-        <div class="free-shipping-badge-plp free-shipping-badge-plp--note">{{ shipping_note }}</div>
       {%- endif -%}
     {%- endif -%}
 
@@ -728,13 +721,6 @@
     padding: 4px 10px;
     font-weight: 600;
     border-radius: 4px;
-  }
-
-  /* Custom shipping note variant (e.g. "Ships for a flat $9.99") */
-  .product-actions-list .free-shipping-badge-plp--note {
-    background: #eef2f7;
-    color: #2d5a87;
-    border: 1px solid rgba(45,90,135,0.25);
   }
 
   /* Add to Cart Row for List View */

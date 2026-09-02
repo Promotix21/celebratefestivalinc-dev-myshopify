@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
@@ -50,6 +59,7 @@
         },
         "nav_more": {
           "type": "cat_nav",
+          "disabled": true,
           "settings": {
             "label": "More Equipment",
             "anchor": "more-equipment",
@@ -60,24 +70,26 @@
         "equip_combi": {
           "type": "equip_section",
           "settings": {
+            "image": "shopify://shop_images/ovens.png",
             "image_url": "",
             "section_id": "combination-ovens",
             "is_reverse": false,
             "title": "Combination & Convection Ovens",
             "description": "Precision temperature control for roasting, steaming, and braising — the heart of a French kitchen.",
-            "bullet_1": "Combination Steam\/Convection Ovens",
+            "bullet_1": "Combination Steam/Convection Ovens",
             "bullet_2": "Convection Ovens",
             "bullet_3": "Retherm & Cook-Hold Ovens",
             "cta_text": "Shop Combination Ovens",
-            "cta_url": "\/collections\/new-theme-convection-ovens-copy",
+            "cta_url": "/collections/new-theme-convection-ovens-copy",
             "popular_products_label": "Popular Products",
             "featured_collection": "new-theme-convection-ovens-copy",
-            "view_all_url": "\/collections\/new-theme-convection-ovens-copy"
+            "view_all_url": "/collections/new-theme-convection-ovens-copy"
           }
         },
         "equip_cookware": {
           "type": "equip_section",
           "settings": {
+            "image": "shopify://shop_images/pans.png",
             "image_url": "",
             "section_id": "cookware",
             "is_reverse": true,
@@ -87,15 +99,16 @@
             "bullet_2": "Sauce Pans & Rondeau",
             "bullet_3": "Saute Pan Sets & Lids",
             "cta_text": "Shop Cookware",
-            "cta_url": "\/collections\/new-theme-saute-pans",
+            "cta_url": "/collections/new-theme-saute-pans",
             "popular_products_label": "Popular Products",
             "featured_collection": "new-theme-saute-pans",
-            "view_all_url": "\/collections\/new-theme-saute-pans"
+            "view_all_url": "/collections/new-theme-saute-pans"
           }
         },
         "equip_wine": {
           "type": "equip_section",
           "settings": {
+            "image": "shopify://shop_images/wine_and_bar.png",
             "image_url": "",
             "section_id": "wine-beverage",
             "is_reverse": false,
@@ -105,15 +118,16 @@
             "bullet_2": "Back Bar Refrigerators",
             "bullet_3": "Beverage Dispensers",
             "cta_text": "Shop Wine & Beverage",
-            "cta_url": "\/collections\/new-theme-wine-coolers",
+            "cta_url": "/collections/new-theme-wine-coolers",
             "popular_products_label": "Popular Products",
             "featured_collection": "new-theme-wine-coolers",
-            "view_all_url": "\/collections\/new-theme-wine-coolers"
+            "view_all_url": "/collections/new-theme-wine-coolers"
           }
         },
         "equip_section_cFDkAb": {
           "type": "equip_section",
           "settings": {
+            "image": "shopify://shop_images/steamers.png",
             "image_url": "",
             "section_id": "steamers",
             "is_reverse": true,
@@ -123,15 +137,16 @@
             "bullet_2": "Retains moisture and nutrients.",
             "bullet_3": "Ideal for high-volume kitchens.",
             "cta_text": "Shop Steamers",
-            "cta_url": "shopify:\/\/collections\/new-theme-steamers",
+            "cta_url": "shopify://collections/new-theme-steamers",
             "popular_products_label": "Popular Products",
             "featured_collection": "new-theme-steamers",
-            "view_all_url": "shopify:\/\/collections\/new-theme-steamers"
+            "view_all_url": "shopify://collections/new-theme-steamers"
           }
         },
         "equip_section_AVkxx7": {
           "type": "equip_section",
           "settings": {
+            "image": "shopify://shop_images/precision_scales.png",
             "image_url": "",
             "section_id": "precision-scales",
             "is_reverse": false,
@@ -141,10 +156,10 @@
             "bullet_2": "Improves portion consistency.",
             "bullet_3": "Reduces food waste.",
             "cta_text": "Shop Precision Scales",
-            "cta_url": "shopify:\/\/collections\/new-theme-commercial-scales",
+            "cta_url": "shopify://collections/new-theme-commercial-scales",
             "popular_products_label": "Popular Products",
             "featured_collection": "new-theme-commercial-scales",
-            "view_all_url": "shopify:\/\/collections\/new-theme-commercial-scales"
+            "view_all_url": "shopify://collections/new-theme-commercial-scales"
           }
         },
         "st_bistro": {
@@ -153,7 +168,7 @@
           "settings": {
             "image_url": "",
             "name": "Classic Bistro",
-            "url": "\/collections\/restaurant-equipment"
+            "url": "/collections/restaurant-equipment"
           }
         },
         "st_brasserie": {
@@ -162,7 +177,7 @@
           "settings": {
             "image_url": "",
             "name": "Brasserie",
-            "url": "\/collections\/restaurant-equipment"
+            "url": "/collections/restaurant-equipment"
           }
         },
         "st_fine_dining": {
@@ -171,7 +186,7 @@
           "settings": {
             "image_url": "",
             "name": "Fine Dining",
-            "url": "\/collections\/restaurant-equipment"
+            "url": "/collections/restaurant-equipment"
           }
         },
         "st_patisserie": {
@@ -180,7 +195,7 @@
           "settings": {
             "image_url": "",
             "name": "Patisserie",
-            "url": "\/pages\/cf-bakery-cafe"
+            "url": "/pages/cf-bakery-cafe"
           }
         },
         "st_wine_bar": {
@@ -189,7 +204,7 @@
           "settings": {
             "image_url": "",
             "name": "Wine Bar",
-            "url": "\/collections\/restaurant-equipment"
+            "url": "/collections/restaurant-equipment"
           }
         },
         "st_catering": {
@@ -198,7 +213,7 @@
           "settings": {
             "image_url": "",
             "name": "French Catering",
-            "url": "\/collections\/restaurant-equipment"
+            "url": "/collections/restaurant-equipment"
           }
         },
         "guide_combi": {
@@ -206,7 +221,7 @@
           "settings": {
             "image_url": "",
             "title": "Combination Ovens for Fine Dining: Features, Brands & ROI",
-            "url": "\/blogs\/resources",
+            "url": "/blogs/resources",
             "meta": "Guide"
           }
         },
@@ -215,7 +230,7 @@
           "settings": {
             "image_url": "",
             "title": "Heavy-Gauge Cookware Guide: What Every French Kitchen Needs",
-            "url": "\/blogs\/resources",
+            "url": "/blogs/resources",
             "meta": "Guide"
           }
         },
@@ -224,7 +239,7 @@
           "settings": {
             "image_url": "",
             "title": "Wine Refrigeration for Restaurants: Temperature Zones Explained",
-            "url": "\/blogs\/resources",
+            "url": "/blogs/resources",
             "meta": "Guide"
           }
         },
@@ -233,7 +248,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Robot Coupe",
-            "url": "\/pages\/robot-coupe",
+            "url": "/pages/robot-coupe",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -243,7 +258,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Waring",
-            "url": "\/pages\/waring",
+            "url": "/pages/waring",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -253,7 +268,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Vollrath",
-            "url": "\/collections\/restaurant-equipment",
+            "url": "/collections/restaurant-equipment",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -263,7 +278,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Rational",
-            "url": "\/collections\/restaurant-equipment",
+            "url": "/collections/restaurant-equipment",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -273,7 +288,7 @@
           "settings": {
             "brand_image_url": "",
             "name": "Winco",
-            "url": "\/collections\/restaurant-equipment",
+            "url": "/collections/restaurant-equipment",
             "color": "#8a8a8a",
             "italic": false
           }
@@ -310,13 +325,13 @@
         "hero_title_override": "French Bistro & Fine Dining Equipment",
         "hero_lead": "Precision equipment for authentic French cuisine — from combination ovens and copper cookware to wine service and pastry.",
         "hero_btn1_text": "Shop All French Bistro Equipment",
-        "hero_btn1_url": "\/collections\/restaurant-equipment",
+        "hero_btn1_url": "/collections/restaurant-equipment",
         "hero_btn2_text": "Request a Quote",
-        "hero_btn2_url": "\/pages\/contact-us",
+        "hero_btn2_url": "/pages/contact-us",
         "breadcrumb_home_label": "Home",
         "breadcrumb_home_url": "",
         "breadcrumb_parent_label": "Use Cases",
-        "breadcrumb_parent_url": "\/pages\/use-cases",
+        "breadcrumb_parent_url": "/pages/use-cases",
         "show_store_types": true,
         "store_types_title": "Shop by Store Type",
         "show_guides": true,
@@ -328,7 +343,7 @@
         "help_title": "Need Help Choosing the Right Equipment?",
         "help_body": "Our experts can help you select the right combination ovens, cookware, and wine service equipment for your bistro.",
         "help_btn_text": "Contact an Expert",
-        "help_btn_url": "\/pages\/contact-us",
+        "help_btn_url": "/pages/contact-us",
         "show_brands": true,
         "brands_title": "Top Brands We Carry",
         "show_expert_cta": true,
@@ -336,9 +351,9 @@
         "expert_title": "Equip your bistro with precision.",
         "expert_body": "From combi ovens to copper saute pans, our specialists will spec the right equipment for your menu complexity and service level.",
         "expert_btn1_text": "Request a Quote",
-        "expert_btn1_url": "\/pages\/contact-us",
+        "expert_btn1_url": "/pages/contact-us",
         "expert_btn2_text": "Talk to an Expert",
-        "expert_btn2_url": "\/pages\/contact-us",
+        "expert_btn2_url": "/pages/contact-us",
         "show_features": true,
         "feat_1_title": "Expert Support",
         "feat_1_text": "Get help from our equipment experts",
