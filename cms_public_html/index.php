@@ -2,10 +2,29 @@
 declare(strict_types=1);
 
 // --- Static file passthrough for PHP built-in server ---------------------
+// Mirrors the Apache rule that exposes /public assets at the site root
+// (RewriteRule ^(...\.css|js|png|...)$ public/$1). Only runs under `php -S`;
+// production asset routing is handled by Apache and is untouched.
 if (PHP_SAPI === 'cli-server') {
     $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
-    $file = __DIR__ . '/public' . $path;
-    if ($path !== '/' && is_file($file)) return false;
+    if ($path !== '/') {
+        foreach ([__DIR__ . '/public' . $path, __DIR__ . $path] as $file) {
+            if (is_file($file)) {
+                $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                $types = [
+                    'css'=>'text/css', 'js'=>'application/javascript',
+                    'png'=>'image/png', 'jpg'=>'image/jpeg', 'jpeg'=>'image/jpeg',
+                    'gif'=>'image/gif', 'webp'=>'image/webp', 'svg'=>'image/svg+xml',
+                    'ico'=>'image/x-icon', 'woff'=>'font/woff', 'woff2'=>'font/woff2',
+                    'pdf'=>'application/pdf', 'mp4'=>'video/mp4', 'webm'=>'video/webm',
+                    'mov'=>'video/quicktime',
+                ];
+                if (isset($types[$ext])) header('Content-Type: ' . $types[$ext]);
+                readfile($file);
+                exit;
+            }
+        }
+    }
 }
 
 // --- Session & bootstrap --------------------------------------------------
@@ -123,12 +142,49 @@ if ($uri === '/') {
         ORDER BY f.id DESC
     ")->fetchAll();
 
-    $activity = activity_recent(8);
+    // WORKSTREAMS: the major fronts of the engagement. Counts are computed from
+    // real links only — an unassigned item is never counted (no fabrication).
+    // Active count = open (non-Completed) implementation/standalone tasks +
+    // non-Completed features linked to the workstream. Original request/history
+    // tasks are excluded. Blockers = linked open tasks needing clarification.
+    // Next ETA = earliest real eta_date among open linked tasks, else null.
+    $workstreams = $pdo->query("
+        SELECT w.*,
+          (
+            (SELECT COUNT(*) FROM tasks t
+               WHERE t.workstream_id = w.id
+                 AND t.status NOT IN ('Completed')
+                 AND t.id NOT IN (SELECT task_id FROM feature_tasks WHERE relation_type = 'request'))
+          + (SELECT COUNT(*) FROM features f
+               WHERE f.workstream_id = w.id
+                 AND f.status NOT IN ('Completed'))
+          ) AS active_count,
+          (SELECT COUNT(*) FROM tasks t
+             WHERE t.workstream_id = w.id
+               AND t.status = 'Needs Clarification') AS blocker_count,
+          (SELECT MIN(t.eta_date) FROM tasks t
+             WHERE t.workstream_id = w.id
+               AND t.eta_date IS NOT NULL
+               AND t.status NOT IN ('Completed')) AS next_eta
+        FROM workstreams w
+        WHERE w.active = 1
+        ORDER BY w.sort_order ASC, w.id ASC
+    ")->fetchAll();
+
+    $activity = activity_recent(6);
+
+    // Metric-card counts (derived from the buckets above — single source of truth).
+    $counts = [
+        'active'  => count($active_features) + count($active_tasks),
+        'review'  => count($ready_features) + count($ready_tasks),
+        'bugs'    => count($bugs_corrections),
+        'backlog' => count($feature_backlog),
+    ];
 
     render('dashboard', compact(
         'active_tasks', 'active_features', 'ready_tasks', 'ready_features',
-        'bugs_corrections', 'feature_backlog', 'activity'
-    ) + ['title' => 'Dashboard']);
+        'bugs_corrections', 'feature_backlog', 'activity', 'workstreams', 'counts'
+    ) + ['title' => 'Project Overview']);
     exit;
 }
 
@@ -390,8 +446,34 @@ if ($method === 'POST' && preg_match('#^/tasks/(\d+)/upload$#', $uri, $m)) {
 // --- Features -------------------------------------------------------------
 if (str_starts_with($uri, '/features')) require_page_access('features');
 if ($uri === '/features' && $method === 'GET') {
-    $rows = db()->query('SELECT * FROM features ORDER BY id DESC')->fetchAll();
-    render('features/list', ['features' => $rows, 'title' => 'Features']);
+    // Per-feature aggregates: who requested it, the original request task (if
+    // any), and objective implementation progress (completed / total linked
+    // implementation tasks). No arbitrary percentages — only real counts.
+    $rows = db()->query("
+        SELECT f.*, u.display_name AS requested_by,
+          (SELECT ft.task_id FROM feature_tasks ft
+             WHERE ft.feature_id = f.id AND ft.relation_type = 'request'
+             ORDER BY ft.task_id ASC LIMIT 1) AS request_task_id,
+          (SELECT COUNT(*) FROM feature_tasks ft
+             WHERE ft.feature_id = f.id AND ft.relation_type = 'implementation') AS impl_total,
+          (SELECT COUNT(*) FROM feature_tasks ft JOIN tasks t ON t.id = ft.task_id
+             WHERE ft.feature_id = f.id AND ft.relation_type = 'implementation'
+               AND t.status = 'Completed') AS impl_done
+        FROM features f
+        LEFT JOIN users u ON u.id = f.created_by
+        ORDER BY f.id DESC
+    ")->fetchAll();
+
+    // Real lifecycle counts for the summary strip / filter tabs.
+    $stage_counts = [];
+    foreach (feature_lifecycle_stages() as $st) $stage_counts[$st] = 0;
+    foreach ($rows as $r) { if (isset($stage_counts[$r['status']])) $stage_counts[$r['status']]++; }
+
+    render('features/list', [
+        'features' => $rows,
+        'stage_counts' => $stage_counts,
+        'title' => 'Features & Deliverables',
+    ]);
     exit;
 }
 if ($uri === '/features/new') {
@@ -422,7 +504,7 @@ if (preg_match('#^/features/(\d+)$#', $uri, $m)) {
     // Linked tasks, split by relationship: the original client request/history
     // record vs. actual implementation tasks. Preserves the request's
     // comments/attachments/activity as source context.
-    $lstmt = db()->prepare('SELECT t.id, t.title, t.task_type, t.status, ft.relation_type FROM feature_tasks ft JOIN tasks t ON t.id = ft.task_id WHERE ft.feature_id = ? ORDER BY t.id ASC');
+    $lstmt = db()->prepare('SELECT t.id, t.title, t.task_type, t.status, t.created_at, t.created_by, u.display_name AS requester, ft.relation_type FROM feature_tasks ft JOIN tasks t ON t.id = ft.task_id LEFT JOIN users u ON u.id = t.created_by WHERE ft.feature_id = ? ORDER BY t.id ASC');
     $lstmt->execute([$id]);
     $request_tasks = [];
     $implementation_tasks = [];
@@ -430,22 +512,94 @@ if (preg_match('#^/features/(\d+)$#', $uri, $m)) {
         if ($lt['relation_type'] === 'request') { $request_tasks[] = $lt; }
         else { $implementation_tasks[] = $lt; }
     }
-    render('features/detail', compact('feature', 'request_tasks', 'implementation_tasks') + ['title' => $feature['title']]);
+    // The single canonical "Original Request / Source" (first request link).
+    $source_task = $request_tasks[0] ?? null;
+
+    // Workstream label + (admin only) the picklist for the edit form.
+    $workstream = null;
+    if (!empty($feature['workstream_id'])) {
+        $ws = db()->prepare('SELECT id, name FROM workstreams WHERE id = ?');
+        $ws->execute([(int)$feature['workstream_id']]);
+        $workstream = $ws->fetch() ?: null;
+    }
+    $all_workstreams = is_admin()
+        ? db()->query('SELECT id, name FROM workstreams WHERE active = 1 ORDER BY sort_order, id')->fetchAll()
+        : [];
+
+    render('features/detail', compact(
+        'feature', 'request_tasks', 'implementation_tasks',
+        'source_task', 'workstream', 'all_workstreams'
+    ) + ['title' => $feature['title']]);
     exit;
 }
 if ($method === 'POST' && preg_match('#^/features/(\d+)/edit$#', $uri, $m)) {
+    require_admin();
     $id = (int)$m[1];
-    $stmt = db()->prepare('UPDATE features SET title=?, description=?, status=?, demo_url=?, completion_date=? WHERE id=?');
+
+    // Validate lifecycle status against the seven real stages.
+    $status = (string)post('status', 'Requested');
+    if (!in_array($status, feature_lifecycle_stages(), true)) $status = 'Requested';
+
+    // Optional planning metadata — all nullable, never required.
+    $wsId = (string)post('workstream_id', '');
+    $wsId = ($wsId === '' ? null : (int)$wsId);
+
+    $stmt = db()->prepare('UPDATE features SET title=?, description=?, status=?, demo_url=?, completion_date=?, workstream_id=?, priority=?, planning_stage=?, eta_period=?, planning_notes=?, dependencies=?, business_context=? WHERE id=?');
     $stmt->execute([
         (string)post('title', ''),
         (string)post('description', ''),
-        (string)post('status', 'Requested'),
+        $status,
         (string)post('demo_url', '') ?: null,
         (string)post('completion_date', '') ?: null,
+        $wsId,
+        (string)post('priority', '') ?: null,
+        (string)post('planning_stage', '') ?: null,
+        (string)post('eta_period', '') ?: null,
+        (string)post('planning_notes', '') ?: null,
+        (string)post('dependencies', '') ?: null,
+        (string)post('business_context', '') ?: null,
         $id,
     ]);
     activity_log('feature', $id, 'edited');
     flash('Feature updated.', 'success');
+    redirect('/features/' . $id);
+}
+
+// Add an IMPLEMENTATION task to a feature (admin). Creates a fresh task and
+// links it with relation_type='implementation'. Never touches the original
+// request/source task.
+if ($method === 'POST' && preg_match('#^/features/(\d+)/tasks$#', $uri, $m)) {
+    require_admin();
+    $id = (int)$m[1];
+    $chk = db()->prepare('SELECT id FROM features WHERE id = ?');
+    $chk->execute([$id]);
+    if (!$chk->fetch()) { http_response_code(404); exit('Feature not found'); }
+
+    $title = trim((string)post('title', ''));
+    if ($title === '') { flash('Task title is required.', 'error'); redirect('/features/' . $id); }
+    $type = in_array(post('task_type', 'Feature'), ['Bug', 'Feature', 'UI Change'], true) ? post('task_type') : 'Feature';
+
+    // Inherit the feature's workstream so the new task shows up on the right front.
+    $wsStmt = db()->prepare('SELECT workstream_id FROM features WHERE id = ?');
+    $wsStmt->execute([$id]);
+    $featureWs = $wsStmt->fetchColumn();
+    $featureWs = $featureWs ? (int)$featureWs : null;
+
+    $ins = db()->prepare('INSERT INTO tasks (title, description, task_type, priority, workstream_id, created_by) VALUES (?,?,?,?,?,?)');
+    $ins->execute([
+        $title,
+        (string)post('description', ''),
+        $type,
+        'Medium',
+        $featureWs,
+        $me['id'],
+    ]);
+    $newId = (int)db()->lastInsertId();
+    db()->prepare("INSERT INTO feature_tasks (feature_id, task_id, relation_type) VALUES (?,?, 'implementation')")
+        ->execute([$id, $newId]);
+    activity_log('feature', $id, 'implementation-task', '#' . $newId . ' ' . $title);
+    activity_log('task', $newId, 'created', $title);
+    flash('Implementation task #' . $newId . ' added.', 'success');
     redirect('/features/' . $id);
 }
 

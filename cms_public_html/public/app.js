@@ -162,6 +162,43 @@
         if (msg && !confirm(msg)) e.preventDefault();
     });
 
+    // 5b) Features lifecycle filter — tabs filter the feature table by status.
+    document.addEventListener('click', function (e) {
+        var tab = e.target.closest('[data-feature-filter] .filter-tab');
+        if (!tab) return;
+        var bar = tab.closest('[data-feature-filter]');
+        var table = document.querySelector('[data-feature-table]');
+        if (!table) return;
+        var filter = tab.getAttribute('data-filter');
+
+        bar.querySelectorAll('.filter-tab').forEach(function (t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+
+        var anyVisible = false;
+        // Toggle data rows.
+        table.querySelectorAll('tbody tr[data-status]').forEach(function (row) {
+            var show = (filter === 'all') || (row.getAttribute('data-status') === filter);
+            row.hidden = !show;
+            if (show) anyVisible = true;
+        });
+        // Recompute group header visibility: a header shows only if a following
+        // data row (before the next header) is visible.
+        var rows = Array.from(table.querySelectorAll('tbody tr'));
+        var currentHeader = null, headerHasVisible = false;
+        rows.forEach(function (row) {
+            if (row.classList.contains('ftable-group')) {
+                if (currentHeader) currentHeader.hidden = !headerHasVisible;
+                currentHeader = row; headerHasVisible = false;
+            } else if (row.hasAttribute('data-status')) {
+                if (!row.hidden) headerHasVisible = true;
+            }
+        });
+        if (currentHeader) currentHeader.hidden = !headerHasVisible;
+
+        var emptyRow = table.querySelector('[data-empty-row]');
+        if (emptyRow) emptyRow.hidden = anyVisible;
+    });
+
     // 6) Global search — press Enter inside [data-search]
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && e.target.matches && e.target.matches('[data-search]')) {
@@ -175,4 +212,47 @@
             if (s) { e.preventDefault(); s.focus(); s.select(); }
         }
     });
+
+    // 7) Copy email-template code — <button class="tpl-copy-btn" data-slug="...">
+    //    Lives here (not inline in the view) because the CSP blocks inline JS.
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest && e.target.closest('.tpl-copy-btn');
+        if (!btn) return;
+        e.preventDefault();
+        var slug = btn.getAttribute('data-slug');
+        if (!slug) return;
+        fetch('/notifications/download?file=' + encodeURIComponent(slug))
+            .then(function (r) { return r.text(); })
+            .then(function (code) { return copyText(code); })
+            .then(function () {
+                var orig = btn.innerHTML;
+                btn.classList.add('copied');
+                btn.textContent = '✓ Copied!';
+                setTimeout(function () {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = orig;
+                }, 2200);
+            })
+            .catch(function () {
+                alert('Copy failed — please use the Download button instead.');
+            });
+    });
+
+    function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            return navigator.clipboard.writeText(text);
+        }
+        return new Promise(function (resolve, reject) {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); resolve(); }
+            catch (err) { reject(err); }
+            document.body.removeChild(ta);
+        });
+    }
+
 })();

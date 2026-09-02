@@ -90,6 +90,40 @@ function status_class(string $s): string {
     };
 }
 
+// The one true seven-stage feature lifecycle. Do NOT collapse to a shorter
+// set — the visual mockups simplify it, but the real workflow has seven stages.
+function feature_lifecycle_stages(): array {
+    return ['Requested', 'Under Review', 'Approved for Planning', 'Scheduled', 'In Progress', 'Ready for Review', 'Completed'];
+}
+
+// Index of the current status within the lifecycle (0-based), or -1 if unknown.
+function lifecycle_index(?string $status): int {
+    $i = array_search((string)$status, feature_lifecycle_stages(), true);
+    return $i === false ? -1 : (int)$i;
+}
+
+// Which of the three dashboard/board groups a feature status belongs to.
+function feature_group(?string $status): string {
+    return match ((string)$status) {
+        'Requested', 'Under Review', 'Approved for Planning' => 'backlog',
+        'Scheduled', 'In Progress', 'Ready for Review'       => 'active',
+        'Completed'                                          => 'completed',
+        default                                              => 'backlog',
+    };
+}
+
+// Small coloured dot class for a workstream's operational status.
+function workstream_status_class(?string $s): string {
+    return match ((string)$s) {
+        'Active'        => 'ws-dot ws-dot-green',
+        'Planning'      => 'ws-dot ws-dot-amber',
+        'Ongoing'       => 'ws-dot ws-dot-sky',
+        'Idle'          => 'ws-dot ws-dot-gray',
+        'Not scheduled' => 'ws-dot ws-dot-gray',
+        default         => 'ws-dot ws-dot-gray',
+    };
+}
+
 function priority_class(string $p): string {
     return match($p) {
         'High' => 'pill pill-rose',

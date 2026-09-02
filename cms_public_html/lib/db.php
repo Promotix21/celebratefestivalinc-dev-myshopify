@@ -20,6 +20,7 @@ function db(): PDO {
 
     // Idempotent schema upgrades for existing DBs
     db_ensure_marketing_schema($pdo);
+    db_ensure_pm_schema($pdo);
 
     return $pdo;
 }
@@ -274,5 +275,111 @@ function db_ensure_marketing_schema(PDO $pdo): void {
         if (!in_array($name, $cols, true)) {
             $pdo->exec($ddl);
         }
+    }
+}
+
+/**
+ * Project-management schema for the redesigned Project Overview / Features
+ * pages. Fully idempotent so it runs safely against the existing production
+ * database on every request.
+ *
+ *   - workstreams          : the major fronts of the engagement (real data,
+ *                            admin-editable; empty ones simply show 0 / "—").
+ *   - tasks.workstream_id  : nullable link, so a task can belong to a front.
+ *   - features.workstream_id + planning metadata (all nullable): supports the
+ *     Feature Detail meta strip / planning sections WITHOUT ever being
+ *     required for a client-created request.
+ *
+ * Nothing here is destructive: no existing column, row or relationship is
+ * altered. Original client-request tasks are never touched.
+ */
+function db_ensure_pm_schema(PDO $pdo): void {
+    $pdo->exec(<<<SQL
+    CREATE TABLE IF NOT EXISTS workstreams (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      slug TEXT UNIQUE NOT NULL,
+      status TEXT DEFAULT 'Active',
+      current_focus TEXT,
+      sort_order INTEGER DEFAULT 100,
+      active INTEGER NOT NULL DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME
+    );
+    SQL);
+
+    // Nullable link column on tasks.
+    $taskCols = array_column($pdo->query("PRAGMA table_info(tasks)")->fetchAll(), 'name');
+    if (!in_array('workstream_id', $taskCols, true)) {
+        $pdo->exec("ALTER TABLE tasks ADD COLUMN workstream_id INTEGER REFERENCES workstreams(id)");
+    }
+
+    // Nullable link + optional planning metadata on features. Each guarded so
+    // partially-migrated installs self-heal.
+    $featCols = array_column($pdo->query("PRAGMA table_info(features)")->fetchAll(), 'name');
+    $featAdd = [
+        'workstream_id'    => "ALTER TABLE features ADD COLUMN workstream_id INTEGER REFERENCES workstreams(id)",
+        'priority'         => "ALTER TABLE features ADD COLUMN priority TEXT",
+        'planning_stage'   => "ALTER TABLE features ADD COLUMN planning_stage TEXT",
+        'eta_period'       => "ALTER TABLE features ADD COLUMN eta_period TEXT",
+        'planning_notes'   => "ALTER TABLE features ADD COLUMN planning_notes TEXT",
+        'dependencies'     => "ALTER TABLE features ADD COLUMN dependencies TEXT",
+        'business_context' => "ALTER TABLE features ADD COLUMN business_context TEXT",
+    ];
+    foreach ($featAdd as $name => $ddl) {
+        if (!in_array($name, $featCols, true)) $pdo->exec($ddl);
+    }
+
+    // First-run seed of the real engagement fronts + a one-time honest mapping
+    // of the currently-open items. Runs once (only while the table is empty),
+    // so it never re-files anything an admin later moves.
+    $count = (int)$pdo->query("SELECT COUNT(*) FROM workstreams")->fetchColumn();
+    if ($count === 0) {
+        db_seed_workstreams($pdo);
+    }
+}
+
+function db_seed_workstreams(PDO $pdo): void {
+    // name, slug, status, current_focus, sort_order
+    $rows = [
+        ['Website & Shopify',           'website-shopify',        'Active',        'L2 Mega collections — ready for review',            10],
+        ['Email Marketing & Klaviyo',   'email-klaviyo',          'Active',        'Klaviyo strategy & transactional notifications',    20],
+        ['Cella AI Shopping Assistant', 'cella-ai',               'Planning',      'AI ChatBot — requested',                            30],
+        ['SEO / Resources',             'seo-resources',          'Planning',      'SEO Content Program — approved for planning',        40],
+        ['Product Data & Content QA',   'product-data-qa',        'Ongoing',       'Product & Brand Library upkeep',                    50],
+        ['Social Media & Reels',        'social-reels',           'Not scheduled', null,                                                60],
+        ['Analytics & Integrations',    'analytics-integrations', 'Idle',          null,                                                70],
+    ];
+    $ins = $pdo->prepare("INSERT INTO workstreams (name, slug, status, current_focus, sort_order) VALUES (?,?,?,?,?)");
+    foreach ($rows as $r) $ins->execute($r);
+
+    // Resolve slugs -> ids for the one-time mapping.
+    $id = [];
+    foreach ($pdo->query("SELECT id, slug FROM workstreams")->fetchAll() as $w) $id[$w['slug']] = (int)$w['id'];
+
+    // Honest mapping of only the currently-open items (harmless if an id is
+    // absent). Historical completed tasks and original request-source tasks are
+    // intentionally left unassigned.
+    $mapTasks = [
+        109 => 'website-shopify',   //  L2 Mega collections (Ready for Review)
+        98  => 'website-shopify',   //  WSH price box (Bug)
+        103 => 'email-klaviyo',     //  Klaviyo Marketing Strategy
+        106 => 'email-klaviyo',     //  Out-for-delivery notification (Bug)
+        107 => 'email-klaviyo',     //  Order-delivered notification (Bug)
+    ];
+    $mapFeatures = [
+        4 => 'seo-resources',       //  SEO Content Program
+        5 => 'website-shopify',     //  Journey page UI refinement
+        6 => 'website-shopify',     //  Trusted Restaurant Partners section
+        7 => 'cella-ai',            //  AI ChatBot implementation
+        8 => 'website-shopify',     //  Rebate Interface
+    ];
+    $ut = $pdo->prepare("UPDATE tasks SET workstream_id = ? WHERE id = ?");
+    foreach ($mapTasks as $tid => $slug) {
+        if (isset($id[$slug])) $ut->execute([$id[$slug], $tid]);
+    }
+    $uf = $pdo->prepare("UPDATE features SET workstream_id = ? WHERE id = ?");
+    foreach ($mapFeatures as $fid => $slug) {
+        if (isset($id[$slug])) $uf->execute([$id[$slug], $fid]);
     }
 }
