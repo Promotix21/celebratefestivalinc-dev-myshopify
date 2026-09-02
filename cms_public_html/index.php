@@ -57,28 +57,83 @@ if ($uri === '/logout') {
 $me = require_login();
 
 if ($uri === '/') {
+    require_page_access('dashboard');
     $pdo = db();
-    $counts = $pdo->query("
-        SELECT
-          SUM(status='Pending') AS pending,
-          SUM(status='In Progress') AS in_progress,
-          SUM(status='Ready for Review') AS ready,
-          SUM(status='Completed') AS completed,
-          COUNT(*) AS total
-        FROM tasks
-    ")->fetch();
-    $recent_features = $pdo->query("SELECT * FROM features ORDER BY id DESC LIMIT 4")->fetchAll();
-    $upcoming = $pdo->query("
-        SELECT id, title, status, deadline FROM tasks
-        WHERE status='In Progress' AND deadline IS NOT NULL
-        ORDER BY deadline ASC LIMIT 5
+
+    // Model: CLIENT REQUEST task -> FEATURE -> IMPLEMENTATION task(s).
+    // An original request/history task (feature_tasks.relation_type = 'request')
+    // is NEVER surfaced as Active Delivery or Ready for Review, no matter what
+    // lifecycle its Feature reaches. Committed work is driven by the FEATURE
+    // lifecycle plus real implementation/standalone tasks.
+    // NOTE: there is no true "owner" column on tasks — Owner is intentionally
+    // omitted this release (do NOT surface eta_set_by / created_by as owner).
+
+    // ACTIVE DELIVERY (tasks): open, not a bug, not in review — and not an
+    // original client-request/history record.
+    $active_tasks = $pdo->query("
+        SELECT t.id, t.title, t.status, t.eta_date, t.created_at
+        FROM tasks t
+        WHERE t.status NOT IN ('Completed', 'Ready for Review')
+          AND t.task_type != 'Bug'
+          AND t.id NOT IN (SELECT task_id FROM feature_tasks WHERE relation_type = 'request')
+        ORDER BY t.id DESC
     ")->fetchAll();
+
+    // ACTIVE DELIVERY (features): Features the team has committed to.
+    $active_features = $pdo->query("
+        SELECT f.id, f.title, f.status, f.created_at
+        FROM features f
+        WHERE f.status IN ('Scheduled', 'In Progress')
+        ORDER BY f.id DESC
+    ")->fetchAll();
+
+    // READY FOR REVIEW (tasks): implementation/standalone tasks awaiting sign-off
+    // (never an original request/history record).
+    $ready_tasks = $pdo->query("
+        SELECT t.id, t.title, t.status, t.created_at
+        FROM tasks t
+        WHERE t.status = 'Ready for Review'
+          AND t.id NOT IN (SELECT task_id FROM feature_tasks WHERE relation_type = 'request')
+        ORDER BY t.id DESC
+    ")->fetchAll();
+
+    // READY FOR REVIEW (features): Features implemented, awaiting client sign-off.
+    $ready_features = $pdo->query("
+        SELECT f.id, f.title, f.status, f.created_at
+        FROM features f
+        WHERE f.status = 'Ready for Review'
+        ORDER BY f.id DESC
+    ")->fetchAll();
+
+    // BUGS & CORRECTIONS: something broke / is incorrect and still open.
+    $bugs_corrections = $pdo->query("
+        SELECT t.id, t.title, t.status, t.eta_date, t.created_at
+        FROM tasks t
+        WHERE t.status NOT IN ('Completed', 'Ready for Review')
+          AND t.task_type = 'Bug'
+        ORDER BY t.id DESC
+    ")->fetchAll();
+
+    // FEATURE BACKLOG: requested features not yet committed to a schedule.
+    $feature_backlog = $pdo->query("
+        SELECT f.id, f.title, f.description, f.status, f.created_at, u.display_name AS requested_by
+        FROM features f
+        LEFT JOIN users u ON f.created_by = u.id
+        WHERE f.status IN ('Requested', 'Under Review', 'Approved for Planning')
+        ORDER BY f.id DESC
+    ")->fetchAll();
+
     $activity = activity_recent(8);
-    render('dashboard', compact('counts', 'recent_features', 'upcoming', 'activity') + ['title' => 'Dashboard']);
+
+    render('dashboard', compact(
+        'active_tasks', 'active_features', 'ready_tasks', 'ready_features',
+        'bugs_corrections', 'feature_backlog', 'activity'
+    ) + ['title' => 'Dashboard']);
     exit;
 }
 
 // --- Tasks ----------------------------------------------------------------
+if (str_starts_with($uri, '/tasks')) require_page_access('tasks');
 if ($uri === '/tasks/export' && $method === 'GET') {
     $sql = 'SELECT t.*, u.display_name AS creator FROM tasks t JOIN users u ON u.id = t.created_by WHERE 1=1';
     $args = [];
@@ -119,6 +174,14 @@ if ($uri === '/tasks' && $method === 'GET') {
     if ($s = q('status'))   { $sql .= ' AND t.status = ?';    $args[] = $s; }
     if ($t = q('type'))     { $sql .= ' AND t.task_type = ?'; $args[] = $t; }
     if ($p = q('priority')) { $sql .= ' AND t.priority = ?';  $args[] = $p; }
+    // By default, hide original client-request / history records (the source
+    // tasks behind a Feature). They stay reachable via ?show=all, the linked
+    // Feature ("Original Request / Source"), or a direct /tasks/ID. Implementation
+    // tasks are never hidden.
+    $show_backlog = (q('show') === 'all');
+    if (!$show_backlog) {
+        $sql .= " AND t.id NOT IN (SELECT task_id FROM feature_tasks WHERE relation_type = 'request')";
+    }
     $sql .= ' ORDER BY CASE t.status
         WHEN "Needs Clarification" THEN 0
         WHEN "In Progress" THEN 1
@@ -127,7 +190,11 @@ if ($uri === '/tasks' && $method === 'GET') {
         WHEN "Completed" THEN 4 END, t.id DESC';
     $stmt = db()->prepare($sql);
     $stmt->execute($args);
-    render('tasks/list', ['tasks' => $stmt->fetchAll(), 'title' => 'Tasks']);
+    // Count how many original request/history records are hidden, for the toggle.
+    $hidden_backlog = (int)db()->query("
+        SELECT COUNT(*) FROM feature_tasks WHERE relation_type = 'request'
+    ")->fetchColumn();
+    render('tasks/list', ['tasks' => $stmt->fetchAll(), 'show_backlog' => $show_backlog, 'hidden_backlog' => $hidden_backlog, 'title' => 'Tasks']);
     exit;
 }
 
@@ -321,6 +388,7 @@ if ($method === 'POST' && preg_match('#^/tasks/(\d+)/upload$#', $uri, $m)) {
 }
 
 // --- Features -------------------------------------------------------------
+if (str_starts_with($uri, '/features')) require_page_access('features');
 if ($uri === '/features' && $method === 'GET') {
     $rows = db()->query('SELECT * FROM features ORDER BY id DESC')->fetchAll();
     render('features/list', ['features' => $rows, 'title' => 'Features']);
@@ -335,7 +403,7 @@ if ($method === 'POST' && $uri === '/features') {
     $stmt->execute([
         (string)post('title', ''),
         (string)post('description', ''),
-        (string)post('status', 'Planned'),
+        (string)post('status', 'Requested'),
         (string)post('demo_url', '') ?: null,
         (string)post('completion_date', '') ?: null,
         $me['id'],
@@ -351,7 +419,18 @@ if (preg_match('#^/features/(\d+)$#', $uri, $m)) {
     $stmt->execute([$id]);
     $feature = $stmt->fetch();
     if (!$feature) { http_response_code(404); exit('Feature not found'); }
-    render('features/detail', compact('feature') + ['title' => $feature['title']]);
+    // Linked tasks, split by relationship: the original client request/history
+    // record vs. actual implementation tasks. Preserves the request's
+    // comments/attachments/activity as source context.
+    $lstmt = db()->prepare('SELECT t.id, t.title, t.task_type, t.status, ft.relation_type FROM feature_tasks ft JOIN tasks t ON t.id = ft.task_id WHERE ft.feature_id = ? ORDER BY t.id ASC');
+    $lstmt->execute([$id]);
+    $request_tasks = [];
+    $implementation_tasks = [];
+    foreach ($lstmt->fetchAll() as $lt) {
+        if ($lt['relation_type'] === 'request') { $request_tasks[] = $lt; }
+        else { $implementation_tasks[] = $lt; }
+    }
+    render('features/detail', compact('feature', 'request_tasks', 'implementation_tasks') + ['title' => $feature['title']]);
     exit;
 }
 if ($method === 'POST' && preg_match('#^/features/(\d+)/edit$#', $uri, $m)) {
@@ -360,7 +439,7 @@ if ($method === 'POST' && preg_match('#^/features/(\d+)/edit$#', $uri, $m)) {
     $stmt->execute([
         (string)post('title', ''),
         (string)post('description', ''),
-        (string)post('status', 'Planned'),
+        (string)post('status', 'Requested'),
         (string)post('demo_url', '') ?: null,
         (string)post('completion_date', '') ?: null,
         $id,
@@ -371,6 +450,7 @@ if ($method === 'POST' && preg_match('#^/features/(\d+)/edit$#', $uri, $m)) {
 }
 
 // --- Docs -----------------------------------------------------------------
+if (str_starts_with($uri, '/docs')) require_page_access('docs');
 if ($uri === '/docs' && $method === 'GET') {
     $rows = db()->query('SELECT * FROM docs ORDER BY category, id DESC')->fetchAll();
     render('docs/list', ['docs' => $rows, 'title' => 'Documentation']);
@@ -410,6 +490,7 @@ if ($method === 'POST' && preg_match('#^/docs/(\d+)/edit$#', $uri, $m)) {
 }
 
 // --- Content Calendar -----------------------------------------------------
+if (str_starts_with($uri, '/calendar')) require_page_access('calendar');
 if ($uri === '/calendar' && $method === 'GET') {
     $month = q('m', date('Y-m'));
     if (!preg_match('/^\d{4}-\d{2}$/', (string)$month)) $month = date('Y-m');
@@ -517,6 +598,7 @@ if ($method === 'POST' && preg_match('#^/calendar/(\d+)/delete$#', $uri, $m)) {
 }
 
 // --- Activity -------------------------------------------------------------
+if (str_starts_with($uri, '/activity')) require_page_access('activity');
 if ($uri === '/activity') {
     $rows = activity_recent(100);
     render('activity', ['rows' => $rows, 'title' => 'Activity']);
@@ -526,6 +608,7 @@ if ($uri === '/activity') {
 
 
 // --- Email Notification Templates ----------------------------------------
+if (str_starts_with($uri, '/notifications')) require_page_access('notifications');
 if ($uri === '/notifications') {
     require_login();
     $tpl_dir = __DIR__ . '/data/email-templates';
@@ -544,6 +627,7 @@ if ($uri === '/notifications/download' && $method === 'GET') {
     exit;
 }
 // --- Product & Brand Library ----------------------------------------------
+if (str_starts_with($uri, '/library')) require_page_access('library');
 if (str_starts_with($uri, '/library')) {
     require_once __DIR__ . '/lib/library.php';
     handle_library_routes($uri, $method);

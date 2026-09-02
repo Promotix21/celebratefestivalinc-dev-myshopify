@@ -51,6 +51,38 @@ function allowed_task_statuses(?array $user = null): array {
     return $allowed;
 }
 
+// Returns null (all pages allowed) or an array of allowed page slugs.
+// Slugs: 'dashboard','tasks','features','calendar','docs','activity','library','notifications'
+function allowed_pages_for_user(?array $user = null): ?array {
+    $u = $user ?? current_user();
+    if (!$u) return [];
+    if (($u['role'] ?? '') === 'admin') return null; // admins: unrestricted
+    $raw = $u['allowed_pages'] ?? null;
+    if ($raw === null || trim($raw) === '') return null; // no restriction
+    return array_filter(array_map('trim', explode(',', $raw)));
+}
+
+function can_access_page(string $slug, ?array $user = null): bool {
+    $pages = allowed_pages_for_user($user);
+    if ($pages === null) return true; // unrestricted
+    return in_array($slug, $pages, true);
+}
+
+function require_page_access(string $slug): void {
+    if (!can_access_page($slug)) {
+        // Redirect staff to their first allowed page
+        $pages = allowed_pages_for_user();
+        $map = ['dashboard'=>'/','tasks'=>'/tasks','features'=>'/features',
+                 'calendar'=>'/calendar','docs'=>'/docs','activity'=>'/activity',
+                 'library'=>'/library','notifications'=>'/notifications'];
+        foreach ($map as $key => $url) {
+            if (in_array($key, (array)$pages, true)) { redirect($url); }
+        }
+        http_response_code(403);
+        exit('Access denied.');
+    }
+}
+
 function attempt_login(string $username, string $password): bool {
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'cli';
     $_SESSION['login_attempts'] ??= [];

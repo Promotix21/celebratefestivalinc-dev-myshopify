@@ -6,8 +6,8 @@
     <label>Description<textarea name="description" rows="4"><?= h($f['description'] ?? '') ?></textarea></label>
     <div class="form-row">
         <label>Status<select name="status">
-            <?php foreach (['Planned','In Progress','Completed'] as $v): ?>
-                <option <?= ($f['status'] ?? 'Planned')===$v?'selected':'' ?>><?= h($v) ?></option>
+            <?php foreach (['Requested', 'Under Review', 'Approved for Planning', 'Scheduled', 'In Progress', 'Ready for Review', 'Completed'] as $v): ?>
+                <option <?= ($f['status'] ?? 'Requested')===$v?'selected':'' ?>><?= h($v) ?></option>
             <?php endforeach; ?>
         </select></label>
         <label>Completion Date<input type="date" name="completion_date" value="<?= h($f['completion_date'] ?? '') ?>"></label>

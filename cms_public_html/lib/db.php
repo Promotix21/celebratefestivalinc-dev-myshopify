@@ -78,7 +78,7 @@ function db_bootstrap(PDO $pdo): void {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT NOT NULL,
       description TEXT,
-      status TEXT CHECK(status IN ('Planned','In Progress','Completed')) DEFAULT 'Planned',
+      status TEXT CHECK(status IN ('Requested','Under Review','Approved for Planning','Scheduled','In Progress','Ready for Review','Completed')) DEFAULT 'Requested',
       demo_url TEXT,
       completion_date DATE,
       created_by INTEGER NOT NULL REFERENCES users(id),
@@ -88,6 +88,7 @@ function db_bootstrap(PDO $pdo): void {
     CREATE TABLE feature_tasks (
       feature_id INTEGER NOT NULL REFERENCES features(id) ON DELETE CASCADE,
       task_id INTEGER NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+      relation_type TEXT NOT NULL CHECK(relation_type IN ('request','implementation')) DEFAULT 'implementation',
       PRIMARY KEY(feature_id, task_id)
     );
 

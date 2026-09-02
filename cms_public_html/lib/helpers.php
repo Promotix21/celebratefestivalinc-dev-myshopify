@@ -81,12 +81,11 @@ function fmt_rel(?string $dt): string {
 
 function status_class(string $s): string {
     return match($s) {
-        'Pending' => 'pill pill-gray',
-        'In Progress' => 'pill pill-blue',
-        'Ready for Review' => 'pill pill-amber',
+        'Pending', 'Planned', 'Requested', 'Approved for Planning' => 'pill pill-gray',
+        'Under Review', 'Ready for Review' => 'pill pill-amber',
+        'In Progress', 'Scheduled' => 'pill pill-blue',
         'Needs Clarification' => 'pill pill-rose',
         'Completed' => 'pill pill-green',
-        'Planned' => 'pill pill-gray',
         default => 'pill pill-gray',
     };
 }

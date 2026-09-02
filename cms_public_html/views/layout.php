@@ -30,19 +30,19 @@ $f = flash();
         <div>
             <div class="nav-section-label">Workspace</div>
             <nav class="nav">
-                <a href="/"         class="<?= $path === '/' ? 'active' : '' ?>"><span class="nav-ico"><?= icon('grid') ?></span> Dashboard</a>
-                <a href="/tasks"    class="<?= str_starts_with($path, '/tasks') ? 'active' : '' ?>"><span class="nav-ico"><?= icon('check') ?></span> Tasks</a>
-                <a href="/features" class="<?= str_starts_with($path, '/features') ? 'active' : '' ?>"><span class="nav-ico"><?= icon('sparkles') ?></span> Features</a>
-                <a href="/calendar" class="<?= str_starts_with($path, '/calendar') ? 'active' : '' ?>"><span class="nav-ico"><?= icon('calendar') ?></span> Content Calendar</a>
-                <a href="/docs"     class="<?= str_starts_with($path, '/docs') ? 'active' : '' ?>"><span class="nav-ico"><?= icon('book') ?></span> Documentation</a>
-                <a href="/activity" class="<?= str_starts_with($path, '/activity') ? 'active' : '' ?>"><span class="nav-ico"><?= icon('clock') ?></span> Activity</a>
-                <a href="/library"  class="<?= str_starts_with($path, '/library') ? 'active' : '' ?>"><span class="nav-ico"><?= icon('archive') ?></span> Product & Brand Library</a>
-                <a href="/notifications" class="<?= str_starts_with($path, '/notifications') ? 'active' : '' ?>"><span class="nav-ico"><?= icon('bell') ?></span> Email Templates</a>
+                <?php if (can_access_page('dashboard')): ?><a href="/"         class="<?= $path === '/' ? 'active' : '' ?>"><span class="nav-ico"><?= icon('grid') ?></span> Dashboard</a><?php endif; ?>
+                <?php if (can_access_page('tasks')): ?><a href="/tasks"    class="<?= str_starts_with($path, '/tasks') ? 'active' : '' ?>"><span class="nav-ico"><?= icon('check') ?></span> Tasks</a><?php endif; ?>
+                <?php if (can_access_page('features')): ?><a href="/features" class="<?= str_starts_with($path, '/features') ? 'active' : '' ?>"><span class="nav-ico"><?= icon('sparkles') ?></span> Features</a><?php endif; ?>
+                <?php if (can_access_page('calendar')): ?><a href="/calendar" class="<?= str_starts_with($path, '/calendar') ? 'active' : '' ?>"><span class="nav-ico"><?= icon('calendar') ?></span> Content Calendar</a><?php endif; ?>
+                <?php if (can_access_page('docs')): ?><a href="/docs"     class="<?= str_starts_with($path, '/docs') ? 'active' : '' ?>"><span class="nav-ico"><?= icon('book') ?></span> Documentation</a><?php endif; ?>
+                <?php if (can_access_page('activity')): ?><a href="/activity" class="<?= str_starts_with($path, '/activity') ? 'active' : '' ?>"><span class="nav-ico"><?= icon('clock') ?></span> Activity</a><?php endif; ?>
+                <?php if (can_access_page('library')): ?><a href="/library"  class="<?= str_starts_with($path, '/library') ? 'active' : '' ?>"><span class="nav-ico"><?= icon('archive') ?></span> Product & Brand Library</a><?php endif; ?>
+                <?php if (can_access_page('notifications')): ?><a href="/notifications" class="<?= str_starts_with($path, '/notifications') ? 'active' : '' ?>"><span class="nav-ico"><?= icon('bell') ?></span> Email Templates</a><?php endif; ?>
             </nav>
         </div>
 
         <div class="sidebar-foot">
-            <a href="/tasks/new" class="btn btn-accent btn-block"><?= icon('plus',14) ?> New Task</a>
+            <?php if (can_access_page('tasks')): ?><a href="/tasks/new" class="btn btn-accent btn-block"><?= icon('plus',14) ?> New Task</a><?php endif; ?>
             <div class="workspace-card">
                 <span class="dot"></span>
                 <div>

@@ -1,11 +1,15 @@
 <?php
 /** @var array $tasks */
+/** @var bool $show_backlog */
+/** @var int $hidden_backlog */
 require_once __DIR__ . '/../_icons.php';
+$show_backlog = $show_backlog ?? false;
+$hidden_backlog = $hidden_backlog ?? 0;
 ?>
 <div class="page-head">
     <div>
         <h1>Tasks</h1>
-        <p class="muted">All requests — pending, active, and shipped.</p>
+        <p class="muted">Active, pending, and shipped work. Original client requests live in the <a href="/features" class="link">Feature Backlog</a> as their source records.</p>
     </div>
     <div class="page-head-actions">
         <?php $qs = http_build_query(array_filter(['status'=>q('status'),'type'=>q('type'),'priority'=>q('priority')])); ?>
@@ -35,6 +39,11 @@ require_once __DIR__ . '/../_icons.php';
     </select>
     <?php if (q('status') || q('type') || q('priority')): ?>
         <a href="/tasks" class="btn btn-ghost btn-sm">Clear filters</a>
+    <?php endif; ?>
+    <?php if ($show_backlog): ?>
+        <a href="/tasks" class="btn btn-ghost btn-sm">Hide request/history records</a>
+    <?php elseif ($hidden_backlog > 0): ?>
+        <a href="/tasks?show=all" class="btn btn-ghost btn-sm">Show <?= (int)$hidden_backlog ?> request/history record<?= $hidden_backlog === 1 ? '' : 's' ?></a>
     <?php endif; ?>
 </form>
 
